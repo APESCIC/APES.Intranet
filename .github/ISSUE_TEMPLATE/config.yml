@@ -1,0 +1,16 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/APESCIC/APES.Intranet/security/advisories/new
+    about: >-
+      Use GitHub private vulnerability reporting.
+      Do not open a public issue or discussion.
+  - name: Ask a question
+    url: https://github.com/APESCIC/APES.Intranet/discussions/categories/q-and-a
+    about: Questions about the intranet. No personal or HR data.
+  - name: Suggest an idea
+    url: https://github.com/APESCIC/APES.Intranet/discussions/categories/ideas
+    about: Ideas for the intranet. No personal or HR data.
+  - name: Docs and guides
+    url: https://github.com/APESCIC/APES.Intranet/discussions/categories/docs-and-guides
+    about: Notes on guides and how the intranet is run.
