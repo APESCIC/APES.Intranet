@@ -1,0 +1,46 @@
+title: "[Question] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ask a question about APES Intranet. Use the Q and A category.
+        Do not include personal, HR, student, volunteer or agreement data.
+        Security problems go to SECURITY.md and a private advisory.
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: What have you already tried?
+    validations:
+      required: true
+  - type: dropdown
+    id: who
+    attributes:
+      label: Who is this about?
+      options:
+        - Staff
+        - Volunteers
+        - Students
+        - Managers
+        - HR
+        - Admins
+    validations:
+      required: true
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy and security
+      options:
+        - label: >-
+            I have removed personal data (names, emails, phone numbers, and
+            staff, volunteer, student, HR or agreement details).
+          required: true
+        - label: >-
+            This is not a security problem (those go to SECURITY.md and a
+            private advisory).
+          required: true

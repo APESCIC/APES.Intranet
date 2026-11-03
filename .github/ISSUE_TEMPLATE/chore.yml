@@ -1,0 +1,87 @@
+name: Chore
+description: Track a concrete piece of maintenance or setup work
+title: "[v0.N.x] NN "
+assignees:
+  - apescic-director
+type: Task
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the work to complete. Remove credentials, personal data,
+        and real HR, student, volunteer or agreement details.
+        After opening, set the area label and the milestone to match the
+        answers below. The form does not apply them itself.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Matches an area label. Set that label after opening.
+      options:
+        - "area:cloudron"
+        - "area:local-dev"
+        - "area:auth"
+        - "area:people"
+        - "area:comms"
+        - "area:operations"
+        - "area:helpdesk"
+        - "area:hr"
+        - "area:agreements"
+        - "area:integrations"
+        - "area:accessibility"
+        - "area:tests"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: milestone
+    attributes:
+      label: Milestone
+      description: Work one milestone at a time, in order. Set it after opening.
+      options:
+        - "v0.1.x Foundations"
+        - "v0.2.x People"
+        - "v0.3.x Communications"
+        - "v0.4.x Operations"
+        - "v0.5.x Help desk"
+        - "v0.6.x HR and training"
+        - "v0.7.x Agreements and legal"
+        - "v0.8.x Hiring and integrations"
+        - "v1.0.0 Launch"
+    validations:
+      required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What should be done, and why?
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: What is included, and what is left out?
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Observable conditions that would make this chore complete.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Data-safety confirmation
+      options:
+        - label: >-
+            I removed credentials, personal data, and real HR, student,
+            volunteer or agreement details.
+          required: true

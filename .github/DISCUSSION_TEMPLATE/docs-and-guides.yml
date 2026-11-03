@@ -1,0 +1,46 @@
+title: "[Docs] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Suggest or outline a guide for APES Intranet. Use the Docs and
+        guides category. Do not paste real personal or HR data.
+  - type: textarea
+    id: gap
+    attributes:
+      label: What is missing or unclear?
+    validations:
+      required: true
+  - type: textarea
+    id: guide
+    attributes:
+      label: What should the guide explain?
+    validations:
+      required: true
+  - type: dropdown
+    id: who
+    attributes:
+      label: Who is the guide for?
+      multiple: true
+      options:
+        - Staff
+        - Volunteers
+        - Students
+        - Managers
+        - HR
+        - Admins
+    validations:
+      required: true
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy and security
+      options:
+        - label: >-
+            I have removed personal data (names, emails, phone numbers, and
+            staff, volunteer, student, HR or agreement details).
+          required: true
+        - label: >-
+            This is not a security problem (those go to SECURITY.md and a
+            private advisory).
+          required: true

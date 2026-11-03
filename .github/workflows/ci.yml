@@ -1,0 +1,87 @@
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: ci
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Configure markdownlint
+        shell: bash
+        run: |
+          printf '%s\n' 'MD013: false' 'MD034: false' > .markdownlint.yaml
+
+      - name: Check Markdown
+        uses: DavidAnson/markdownlint-cli2-action@v25
+        with:
+          config: .markdownlint.yaml
+          globs: |
+            **/*.md
+
+      - name: Install actionlint
+        shell: bash
+        run: |
+          set -eu
+          curl -sSfL -o /tmp/actionlint.tar.gz \
+            "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz"
+          tar -xzf /tmp/actionlint.tar.gz -C /tmp actionlint
+          sudo mv /tmp/actionlint /usr/local/bin/actionlint
+          actionlint -version
+
+      - name: Check workflow files
+        shell: bash
+        run: actionlint -color
+
+      - name: Parse YAML files
+        shell: bash
+        run: |
+          set -eu
+          python3 -m pip install --disable-pip-version-check pyyaml
+          python3 - <<'PY'
+          import pathlib
+          import sys
+          import yaml
+
+          errors = 0
+          for path in pathlib.Path(".").rglob("*"):
+              if path.suffix not in {".yml", ".yaml"}:
+                  continue
+              if ".git" in path.parts:
+                  continue
+              try:
+                  list(yaml.safe_load_all(path.read_text(encoding="utf-8")))
+              except yaml.YAMLError as exc:
+                  print(f"{path}: {exc}")
+                  errors += 1
+          if errors:
+              sys.exit(1)
+          PY
+
+      - name: Reject unexpected env files
+        shell: bash
+        run: |
+          set -eu
+          found=0
+          while IFS= read -r -d '' path; do
+            base="${path##*/}"
+            case "${base}" in
+              .env.example|.env.laragon.example)
+                ;;
+              .env|.env.*)
+                printf 'Unexpected env file committed: %s\n' "${path}"
+                found=1
+                ;;
+            esac
+          done < <(git ls-files -z)
+          if [ "${found}" -ne 0 ]; then
+            exit 1
+          fi

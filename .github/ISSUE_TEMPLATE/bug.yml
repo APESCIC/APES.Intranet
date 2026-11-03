@@ -1,0 +1,129 @@
+name: Bug report
+description: Report a reproducible problem with APES Intranet
+title: "[v0.N.x] NN "
+labels:
+  - bug
+assignees:
+  - apescic-director
+type: Bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a problem. Remove credentials, personal data,
+        and real HR, student, volunteer or agreement details from every field
+        and attachment.
+        Do not use this form for a suspected security vulnerability. Follow
+        SECURITY.md and open a private advisory.
+        After opening, set the area label and the milestone to match the
+        answers below. The form does not apply them itself.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Matches an area label. Set that label after opening.
+      options:
+        - "area:cloudron"
+        - "area:local-dev"
+        - "area:auth"
+        - "area:people"
+        - "area:comms"
+        - "area:operations"
+        - "area:helpdesk"
+        - "area:hr"
+        - "area:agreements"
+        - "area:integrations"
+        - "area:accessibility"
+        - "area:tests"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: milestone
+    attributes:
+      label: Milestone
+      description: Work one milestone at a time, in order. Set it after opening.
+      options:
+        - "v0.1.x Foundations"
+        - "v0.2.x People"
+        - "v0.3.x Communications"
+        - "v0.4.x Operations"
+        - "v0.5.x Help desk"
+        - "v0.6.x HR and training"
+        - "v0.7.x Agreements and legal"
+        - "v0.8.x Hiring and integrations"
+        - "v1.0.0 Launch"
+    validations:
+      required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What went wrong?
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact
+      description: Who is affected, and how does this interfere with their work?
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Affected version or environment
+      description: Version, environment, browser or device, where relevant.
+      placeholder: main, Laragon, Firefox on Windows 11
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      description: The smallest repeatable sequence that shows the problem.
+      placeholder: |
+        1. Open ...
+        2. Select ...
+        3. Observe ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Supporting logs or screenshots
+      description: >-
+        Sanitised evidence only. No credentials, cookies, tokens or
+        personal data.
+
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Data-safety confirmation
+      options:
+        - label: >-
+            I removed credentials, personal data, and real HR, student,
+            volunteer or agreement details.
+          required: true
+        - label: This report is not a suspected security vulnerability.
+          required: true
