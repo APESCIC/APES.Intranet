@@ -1,0 +1,69 @@
+@import '@fontsource-variable/fraunces/wght.css';
+@import '@fontsource-variable/nunito-sans/wght.css';
+@import 'tailwindcss';
+
+@source '../views/**/*.blade.php';
+@source '../js/**/*.js';
+@source '../../modules/*/resources/views/**/*.blade.php';
+@source '../../plugins/*/resources/views/**/*.blade.php';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+/* Palette shared with MyAPES Account (resources/css/workspace.css there). */
+@theme {
+    --font-sans: 'Nunito Sans Variable', 'Segoe UI', sans-serif;
+    --font-serif: 'Fraunces Variable', Georgia, serif;
+
+    --color-sg-ink: #12262c;
+    --color-sg-muted: #40676a;
+    --color-sg-teal: #107481;
+    --color-sg-teal-dark: #0c5d68;
+    /* Decoration only: fails contrast as text. */
+    --color-sg-accent: #67c3ce;
+    --color-sg-base: #d2f4fa;
+    --color-sg-ok: #11613b;
+    --color-sg-ok-mist: #dcf5e7;
+    --color-sg-warn: #8a4b0b;
+    --color-sg-warn-mist: #fdefd3;
+    --color-sg-error: #a12828;
+    --color-sg-error-mist: #fde4e4;
+    --color-sg-info: #005b5d;
+    --color-sg-info-mist: #d5f4f5;
+    --color-sg-white: #ffffff;
+    --color-focus: #2563eb;
+
+    --radius-sg-card: 1.25rem;
+    --radius-sg-rail: 1.375rem;
+    --radius-sg-field: 0.75rem;
+    --shadow-sg-card: 0 8px 30px rgba(12, 93, 104, 0.08);
+    --container-panel: 70rem;
+}
+
+@layer base {
+    html {
+        min-width: 20rem;
+        background: var(--color-sg-base);
+    }
+
+    body {
+        min-height: 100vh;
+        color: var(--color-sg-ink);
+        font-family: var(--font-sans);
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+        color: var(--color-sg-teal);
+        text-underline-offset: 0.18em;
+    }
+
+    a:hover {
+        color: var(--color-sg-teal-dark);
+    }
+
+    :focus-visible {
+        outline: 3px solid var(--color-focus);
+        outline-offset: 2px;
+    }
+}
