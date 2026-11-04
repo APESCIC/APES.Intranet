@@ -4,15 +4,17 @@ namespace App\Core\Access\Http\Controllers;
 
 use App\Core\Access\AccessMatrix;
 use App\Core\Access\RoleName;
+use App\Core\Audit\AuditLogger;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 use Spatie\Permission\Models\Role;
 
 class RoleIndexController
 {
-    public function __invoke(): View
+    public function __invoke(AuditLogger $audit): View
     {
         Gate::authorize('viewAny', Role::class);
+        $audit->record('admin.roles.viewed');
 
         $roles = Role::query()
             ->with('permissions')

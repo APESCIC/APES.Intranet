@@ -342,9 +342,18 @@ a.sg-nav-link:hover {
 }
 
 .site-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
     margin-top: 3rem;
     color: var(--color-sg-muted);
     font-size: 0.75rem;
+}
+
+.site-footer__links {
+    display: flex;
+    gap: 1rem;
 }
 
 /* Mobile top card and drawer */
