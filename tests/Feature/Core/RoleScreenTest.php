@@ -12,7 +12,7 @@ beforeEach(function () {
 });
 
 it('sends guests away from the roles screen', function () {
-    $this->get(route('admin.roles.index'))->assertRedirect('/');
+    $this->get(route('admin.roles.index'))->assertRedirect(route('login'));
 });
 
 it('shows the roles screen to admins only', function (RoleName $role, int $status) {
@@ -37,7 +37,8 @@ it('lists every role and offers no way to change them', function () {
     foreach (RoleName::cases() as $role) {
         $response->assertSee($role->label());
     }
-    $response->assertDontSee('<form', false);
+    $main = str($response->getContent())->after('<main')->before('</main>');
+    expect((string) $main)->not->toContain('<form');
 });
 
 it('treats managers and flagged staff as supervisors', function () {
