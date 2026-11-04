@@ -24,6 +24,9 @@ Until the Laravel app is deployed, the APES IT Administrator is putting up a
 simple APES "coming soon" holding page on that app. Agents do not change DNS,
 Cloudflare or Cloudron.
 
+Deploys are manual and follow [docs/deploy/cloudron.md](docs/deploy/cloudron.md).
+After a deploy, check <https://intranet.apes.org.uk/healthz>.
+
 ## Local preview
 
 Day-to-day development uses Laragon at <http://apes-intranet.test>. Check
