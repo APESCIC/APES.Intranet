@@ -160,3 +160,32 @@ jobs:
 
       - name: Tests
         run: php artisan test --compact
+
+      - name: Start app for the accessibility check
+        shell: bash
+        run: |
+          set -euo pipefail
+          sed -i \
+            -e 's/^DB_DATABASE=.*/DB_DATABASE=apes_intranet_testing/' \
+            -e 's/^DB_PASSWORD=.*/DB_PASSWORD=password/' \
+            -e 's/^SESSION_DRIVER=.*/SESSION_DRIVER=file/' \
+            -e 's/^CACHE_STORE=.*/CACHE_STORE=file/' \
+            -e 's/^QUEUE_CONNECTION=.*/QUEUE_CONNECTION=sync/' \
+            -e 's|^APP_URL=.*|APP_URL=http://127.0.0.1:8000|' \
+            .env
+          php artisan migrate:fresh --seed --force
+          php artisan serve --host=127.0.0.1 --port=8000 > /tmp/serve.log 2>&1 &
+          for _ in $(seq 1 30); do
+            curl -sf -o /dev/null http://127.0.0.1:8000/login && exit 0
+            sleep 1
+          done
+          cat /tmp/serve.log
+          exit 1
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Accessibility check (axe and keyboard)
+        env:
+          BASE_URL: http://127.0.0.1:8000
+        run: npm run test:a11y

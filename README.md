@@ -25,6 +25,7 @@ simple APES "coming soon" holding page on that app. Agents do not change DNS,
 Cloudflare or Cloudron.
 
 Deploys are manual and follow [docs/deploy/cloudron.md](docs/deploy/cloudron.md).
+Accessibility notes and checks are in [docs/accessibility.md](docs/accessibility.md).
 After a deploy, check <https://intranet.apes.org.uk/healthz>.
 
 ## Local preview
