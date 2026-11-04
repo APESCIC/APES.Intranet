@@ -3,6 +3,7 @@
 namespace App\Core;
 
 use App\Core\Access\Policies\RolePolicy;
+use App\Core\Audit\Console\PruneAuditLog;
 use App\Core\Auth\Cloudron\CloudronIdentityProvider;
 use App\Core\Auth\Cloudron\LdapDirectoryGroups;
 use App\Core\Auth\Contracts\DirectoryGroups;
@@ -26,6 +27,8 @@ class CoreServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->commands([PruneAuditLog::class]);
+
         Gate::policy(Role::class, RolePolicy::class);
 
         View::composer('components.layouts.app', function (ViewInstance $view) {

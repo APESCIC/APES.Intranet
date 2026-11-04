@@ -38,6 +38,9 @@
 
                     <footer class="site-footer">
                         <span>&copy; {{ now()->year }} Association of Protecting Exotic Species CIC</span>
+                        <nav class="site-footer__links" aria-label="Legal">
+                            <a href="{{ route('privacy') }}" @if (request()->routeIs('privacy')) aria-current="page" @endif>Privacy notice</a>
+                        </nav>
                     </footer>
                 </div>
             </div>

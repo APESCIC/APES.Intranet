@@ -65,3 +65,24 @@ Rules for new code:
   there.
 - `User::isSupervisor()` is true for the manager role and for anyone with the
   `is_supervisor` flag. Use it for "my team" features such as rota approvals.
+
+## Audit log
+
+Record who did what with `App\Core\Audit\AuditLogger`:
+
+```php
+$audit->record('rota.published', $rota, ['week' => '2026-W46']);
+```
+
+It stores the time, the signed-in person, the subject, the IP address, the
+browser and any context. Entries cannot be edited or deleted one at a time.
+`audit:prune` runs daily at 03:15 and deletes entries older than
+`AUDIT_LOG_RETENTION_DAYS` (default 730, never less than 30). The Cloudron
+cron must run `php artisan schedule:run` every minute for this to happen.
+
+Core already records `auth.signed_in`, `auth.signed_out`,
+`auth.sign_in_denied`, `roles.changed`, `admin.roles.viewed` and
+`admin.audit.viewed`. Admins read the log at `/admin/audit`.
+
+Do not put special category data (health, DBS results, and so on) in the
+context. Record ids, not contents.

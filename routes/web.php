@@ -2,6 +2,7 @@
 
 use App\Core\Access\AccessMatrix;
 use App\Core\Access\Http\Controllers\RoleIndexController;
+use App\Core\Audit\Http\Controllers\AuditLogIndexController;
 use App\Core\Auth\Http\Controllers\OidcController;
 use App\Core\Qa\Http\Controllers\QaLoginController;
 use App\Core\Qa\Http\Middleware\EnsureQaLoginEnabled;
@@ -10,6 +11,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return redirect()->route(auth()->check() ? 'dashboard' : 'login');
 });
+
+Route::view('/privacy', 'core.privacy')->name('privacy');
 
 Route::get('/login', [OidcController::class, 'show'])->name('login');
 Route::get('/auth/redirect', [OidcController::class, 'redirect'])->name('auth.redirect');
@@ -23,6 +26,9 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/roles', RoleIndexController::class)->name('roles.index');
+        Route::get('/audit', AuditLogIndexController::class)
+            ->middleware('can:'.AccessMatrix::ADMIN_AUDIT_VIEW)
+            ->name('audit.index');
     });
 });
 

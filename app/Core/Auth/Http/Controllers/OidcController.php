@@ -2,6 +2,7 @@
 
 namespace App\Core\Auth\Http\Controllers;
 
+use App\Core\Audit\AuditLogger;
 use App\Core\Auth\Contracts\DirectoryGroups;
 use App\Core\Auth\Contracts\IdentityProvider;
 use App\Core\Auth\Exceptions\DirectoryUnavailable;
@@ -18,6 +19,8 @@ use Illuminate\View\View;
 
 class OidcController
 {
+    public function __construct(private readonly AuditLogger $audit) {}
+
     public function show(): View|RedirectResponse
     {
         if (Auth::check()) {
@@ -55,7 +58,7 @@ class OidcController
         }
 
         if ($identity->subject === null || $identity->email === null) {
-            return $this->denied('Your Cloudron account did not share an email address with the intranet.');
+            return $this->denied(null, 'missing_email', 'Your Cloudron account did not share an email address with the intranet.');
         }
 
         $email = Str::lower($identity->email);
@@ -72,13 +75,17 @@ class OidcController
             ?? User::query()->where('email', $email)->whereNull('oidc_sub')->first();
 
         if ($roles === []) {
-            $user?->syncRoles([]);
+            if ($user !== null) {
+                $before = $user->getRoleNames()->all();
+                $user->syncRoles([]);
+                $this->audit->recordRoleChange($user, $before, [], 'cloudron');
+            }
 
-            return $this->denied();
+            return $this->denied($user, 'no_intranet_group');
         }
 
         if ($user === null && User::query()->where('email', $email)->exists()) {
-            return $this->denied('Another intranet account already uses your email address. Ask the APES IT Administrator for help.');
+            return $this->denied(null, 'email_conflict', 'Another intranet account already uses your email address. Ask the APES IT Administrator for help.');
         }
 
         $user ??= new User(['password' => Str::random(64)]);
@@ -88,16 +95,22 @@ class OidcController
             'name' => $identity->name ?? $email,
             'email_verified_at' => $user->email_verified_at ?? now(),
         ])->save();
+
+        $before = $user->getRoleNames()->all();
         $user->syncRoles($roles);
+        $this->audit->recordRoleChange($user, $before, $roles, 'cloudron');
 
         Auth::login($user);
         $request->session()->regenerate();
+        $this->audit->record('auth.signed_in', $user, ['method' => 'cloudron', 'roles' => $roles], $user);
 
         return redirect()->intended(route('dashboard'));
     }
 
     public function logout(Request $request): RedirectResponse
     {
+        $this->audit->record('auth.signed_out', $request->user());
+
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
@@ -105,8 +118,10 @@ class OidcController
         return redirect()->route('login')->with('status', 'You have signed out of the intranet.');
     }
 
-    private function denied(?string $reason = null): Response
+    private function denied(?User $user, string $reason, ?string $message = null): Response
     {
-        return response()->view('core.auth.denied', ['reason' => $reason], 403);
+        $this->audit->record('auth.sign_in_denied', $user, ['reason' => $reason]);
+
+        return response()->view('core.auth.denied', ['reason' => $message], 403);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Core\Qa\Http\Controllers;
 
 use App\Core\Access\RoleName;
+use App\Core\Audit\AuditLogger;
 use App\Core\Qa\QaLogin;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -20,20 +21,23 @@ class QaLoginController
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, AuditLogger $audit): RedirectResponse
     {
         $validated = $request->validate([
             'role' => ['required', Rule::enum(RoleName::class)],
         ]);
 
-        Auth::login(QaLogin::userFor(RoleName::from($validated['role'])));
+        $user = QaLogin::userFor(RoleName::from($validated['role']));
+        Auth::login($user);
         $request->session()->regenerate();
+        $audit->record('auth.signed_in', $user, ['method' => 'qa', 'roles' => [$validated['role']]], $user);
 
         return redirect()->route('dashboard');
     }
 
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $request, AuditLogger $audit): RedirectResponse
     {
+        $audit->record('auth.signed_out', $request->user());
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

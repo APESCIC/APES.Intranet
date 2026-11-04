@@ -38,6 +38,14 @@ return [
     ],
 
     /*
+    | How long records are kept. A blank or too-small value falls back to a
+    | safe minimum so a missing setting never wipes the log.
+    */
+    'retention' => [
+        'audit_log_days' => max(30, (int) (env('AUDIT_LOG_RETENTION_DAYS') ?: 730)),
+    ],
+
+    /*
     | Cloudron directory groups that grant an intranet role. Other groups are
     | ignored.
     */
