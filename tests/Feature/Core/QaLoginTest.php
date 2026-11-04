@@ -50,7 +50,7 @@ it('lists every role when enabled on local', function () {
 it('signs in as a fake account with exactly one role', function (RoleName $role) {
     enableQa();
 
-    $this->post(route('qa.login'), ['role' => $role->value])->assertRedirect('/');
+    $this->post(route('qa.login'), ['role' => $role->value])->assertRedirect(route('dashboard'));
 
     $user = auth()->user();
     expect($user->email)->toBe("qa-{$role->value}@example.test")

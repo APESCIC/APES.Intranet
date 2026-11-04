@@ -1,11 +1,6 @@
-<x-layouts.app title="QA role switcher">
-    <h1 class="font-serif text-3xl font-semibold">QA role switcher</h1>
-    <p class="mt-2 text-sg-muted">
-        Local only. Signs you in as a fake <code>@example.test</code> account with one role.
-    </p>
-
+<x-layouts.app title="QA role switcher" subtitle="Local only. Signs you in as a fake @example.test account with one role.">
     @if ($current)
-        <p class="mt-4">
+        <p>
             Signed in as <strong>{{ $current->name }}</strong> ({{ $current->email }}).
         </p>
     @endif

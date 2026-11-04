@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Core\Access\AccessMatrix;
+use App\Core\Access\RoleName;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -26,6 +27,28 @@ class User extends Authenticatable
     public function isSupervisor(): bool
     {
         return $this->is_supervisor || $this->can(AccessMatrix::TEAM_MANAGE);
+    }
+
+    public function primaryRoleLabel(): ?string
+    {
+        $names = $this->getRoleNames();
+
+        foreach (RoleName::byPrecedence() as $role) {
+            if ($names->contains($role->value)) {
+                return $role->label();
+            }
+        }
+
+        return null;
+    }
+
+    public function initials(): string
+    {
+        return collect(preg_split('/\s+/', trim($this->name)) ?: [])
+            ->filter()
+            ->take(2)
+            ->map(fn (string $part) => mb_strtoupper(mb_substr($part, 0, 1)))
+            ->implode('');
     }
 
     /**

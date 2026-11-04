@@ -29,7 +29,7 @@ class QaLoginController
         Auth::login(QaLogin::userFor(RoleName::from($validated['role'])));
         $request->session()->regenerate();
 
-        return redirect('/');
+        return redirect()->route('dashboard');
     }
 
     public function destroy(Request $request): RedirectResponse
