@@ -71,6 +71,13 @@ works. To test on the floor, run the PHP 8.3 CLI from
 The seeders refuse to run outside the `local` and `testing` environments. You
 can run them again safely, because they do not create duplicates.
 
+## Preview as each role
+
+The QA role switcher at <http://apes-intranet.test/qa> signs you in as a fake
+account for any role, such as `qa-admin@example.test`. It only works when
+`QA_LOGIN_ENABLED=true` and `APP_ENV=local`, as in `.env.laragon.example`.
+Anywhere else, every `/qa` route returns 404. Leave the flag off on Cloudron.
+
 To start again from an empty database:
 
 ```powershell
