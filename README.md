@@ -33,3 +33,11 @@ every change there before any Cloudron deploy. See [AGENTS.md](AGENTS.md).
 
 - LMS: <https://lms.intranet.apes.org.uk/>
 - MyAPES Account: <https://myaccount.myapes.me.uk/>
+
+## Licence
+
+This code is proprietary to Association of Protecting Exotic Species CIC
+(APES CIC). It is published for transparency only. No licence is granted to
+use, copy, modify, distribute or deploy it, in whole or in part, without prior
+written permission from APES CIC. See [LICENSE](LICENSE). For permission or
+questions, use the contact details in [SECURITY.md](SECURITY.md).
