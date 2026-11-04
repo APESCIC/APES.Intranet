@@ -7,6 +7,9 @@
         <meta name="theme-color" content="#d2f4fa">
         <title>{{ $title ? $title.' - ' : '' }}{{ config('app.name') }}</title>
         <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('brand/apes-favicon-32.png') }}">
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('icons/apple-touch-icon.png') }}">
+        <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
+        <meta name="apple-mobile-web-app-title" content="Intranet">
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="workspace-shell">
