@@ -38,7 +38,7 @@ try {
     Set-Content -NoNewline -Path REVISION -Value $sha
     Pop-Location
 
-    robocopy $src $out /E /NFL /NDL /NJH /NJS /NP /XD .git node_modules tests storage /XF .env .env.* | Out-Null
+    robocopy $src $out /E /NFL /NDL /NJH /NJS /NP /XD .git .github docs node_modules tests storage /XF .git .env .env.* | Out-Null
     if ($LASTEXITCODE -ge 8) { throw "robocopy failed with $LASTEXITCODE" }
     New-Item -ItemType File -Force (Join-Path $out 'bootstrap\cache\.gitkeep') | Out-Null
 }
@@ -50,3 +50,4 @@ finally {
 Write-Output "ReleaseId=$id"
 Write-Output "ReleaseDir=$out"
 Write-Output "Revision=$sha"
+exit 0
