@@ -14,7 +14,7 @@ use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
 #[Fillable(['name', 'email', 'password', 'is_supervisor'])]
-#[Hidden(['password', 'remember_token'])]
+#[Hidden(['password', 'remember_token', 'oidc_sub'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */

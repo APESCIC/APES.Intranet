@@ -29,8 +29,8 @@ function menuKeysFor(User $user): array
         ->all();
 }
 
-it('sends guests from the dashboard to the home page', function () {
-    $this->get(route('dashboard'))->assertRedirect('/');
+it('sends guests from the dashboard to the sign-in page', function () {
+    $this->get(route('dashboard'))->assertRedirect(route('login'));
 });
 
 it('sends signed-in people from the home page to the dashboard', function () {
