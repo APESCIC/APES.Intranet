@@ -90,14 +90,9 @@ Do this once, before the first deploy.
    cloudron exec --app $app -- bash -c 'chmod 0755 /app/data/run.sh; bash -n /app/data/run.sh'
    ```
 
-5. **Apache.** Do this only after the owner approves replacing the holding page
-   (issue #13). Keep the holding page in `/app/data/public` as a fallback:
-
-   ```powershell
-   cloudron push --app $app .\deploy\cloudron\apache-app.conf /app/data/apache/app.conf
-   ```
-
-Then do a normal deploy, below.
+Then do a normal deploy, below. The holding page stays up until Apache is
+switched over, which follows [holding-page.md](holding-page.md) and needs the
+owner's approval on issue #13.
 
 ## Each deploy
 
