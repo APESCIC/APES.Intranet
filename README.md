@@ -27,7 +27,9 @@ Cloudflare or Cloudron.
 ## Local preview
 
 Day-to-day development uses Laragon at <http://apes-intranet.test>. Check
-every change there before any Cloudron deploy. See [AGENTS.md](AGENTS.md).
+every change there before any Cloudron deploy. Set-up steps are in
+[docs/local-development.md](docs/local-development.md). See also
+[AGENTS.md](AGENTS.md).
 
 ## Related sites
 
