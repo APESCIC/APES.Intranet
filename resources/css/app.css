@@ -1,6 +1,7 @@
 @import '@fontsource-variable/fraunces/wght.css';
 @import '@fontsource-variable/nunito-sans/wght.css';
 @import 'tailwindcss';
+@import './shell.css';
 
 @source '../views/**/*.blade.php';
 @source '../js/**/*.js';
@@ -30,13 +31,21 @@
     --color-sg-info: #005b5d;
     --color-sg-info-mist: #d5f4f5;
     --color-sg-white: #ffffff;
+    --color-sg-glow-cyan: rgba(127, 231, 234, 0.6);
+    --color-sg-glow-lavender: rgba(185, 198, 255, 0.55);
+    --color-sg-glow-mint: rgba(167, 243, 208, 0.55);
     --color-focus: #2563eb;
 
     --radius-sg-card: 1.25rem;
     --radius-sg-rail: 1.375rem;
     --radius-sg-field: 0.75rem;
     --shadow-sg-card: 0 8px 30px rgba(12, 93, 104, 0.08);
+    --shadow-sg-rail: 0 12px 40px rgba(16, 116, 129, 0.14);
+    --shadow-sg-primary: 0 6px 18px rgba(16, 116, 129, 0.27);
+    --shadow-sg-active: 0 4px 14px rgba(12, 93, 104, 0.12);
     --container-panel: 70rem;
+    --text-panel-title: 1.75rem;
+    --text-panel-title--line-height: 2.125rem;
 }
 
 @layer base {

@@ -1,10 +1,5 @@
-<x-layouts.app title="Roles">
-    <h1 class="font-serif text-3xl font-semibold">Roles</h1>
-    <p class="mt-2 text-sg-muted">
-        Roles come from Cloudron directory groups (<code>intranet.*</code>). This page is read-only.
-    </p>
-
-    <div class="mt-6 overflow-x-auto rounded-sg-card bg-sg-white shadow-sg-card">
+<x-layouts.app title="Roles" subtitle="Roles come from Cloudron directory groups (intranet.*). This page is read-only.">
+    <div class="overflow-x-auto rounded-sg-card bg-sg-white shadow-sg-card">
         <table class="w-full text-left">
             <caption class="sr-only">Roles, their permissions and how many people have each role</caption>
             <thead class="border-b border-sg-info-mist text-sm text-sg-muted">

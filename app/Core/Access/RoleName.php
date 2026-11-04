@@ -12,6 +12,16 @@ enum RoleName: string
     case Legal = 'legal';
     case Admin = 'admin';
 
+    /**
+     * Most senior first, for showing one role per person.
+     *
+     * @return list<self>
+     */
+    public static function byPrecedence(): array
+    {
+        return [self::Admin, self::Hr, self::Legal, self::Manager, self::Staff, self::Volunteer, self::Student];
+    }
+
     public function label(): string
     {
         return match ($this) {

@@ -1,15 +1,50 @@
-@props(['title' => null])
+@props(['title' => null, 'subtitle' => null])
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#d2f4fa">
         <title>{{ $title ? $title.' - ' : '' }}{{ config('app.name') }}</title>
+        <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('brand/apes-favicon-32.png') }}">
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body>
-        <main class="mx-auto max-w-panel p-6">
-            {{ $slot }}
-        </main>
+    <body class="workspace-shell">
+        <a class="skip-link" href="#main-content">Skip to main content</a>
+
+        <div class="sg-page" data-workspace-page>
+            @if ($shellUser)
+                <aside class="sg-rail-dock" aria-label="Main menu" data-workspace-rail-dock>
+                    <x-shell.rail :menu="$menu" :user="$shellUser" :qa-enabled="$qaEnabled" />
+                </aside>
+            @endif
+
+            <div @class(['sg-main-column', 'sg-main-column--rail' => $shellUser])>
+                <div class="sg-content">
+                    <x-shell.topbar :has-menu="(bool) $shellUser" />
+
+                    @if ($title)
+                        <header class="sg-page-header">
+                            <h1 class="sg-page-header__title">{{ $title }}</h1>
+                            @if ($subtitle)
+                                <p class="sg-page-header__subtitle">{{ $subtitle }}</p>
+                            @endif
+                        </header>
+                    @endif
+
+                    <main id="main-content" class="app-main" tabindex="-1">
+                        {{ $slot }}
+                    </main>
+
+                    <footer class="site-footer">
+                        <span>&copy; {{ now()->year }} Association of Protecting Exotic Species CIC</span>
+                    </footer>
+                </div>
+            </div>
+        </div>
+
+        @if ($shellUser)
+            <x-shell.drawer />
+        @endif
     </body>
 </html>

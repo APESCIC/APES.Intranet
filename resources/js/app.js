@@ -1,13 +1,54 @@
-import { createIcons, House, LifeBuoy, ShieldCheck, Users } from 'lucide';
-
-const icons = {
+import {
+    BookOpen,
+    Briefcase,
+    CalendarDays,
+    ClipboardList,
+    Clock,
+    createIcons,
+    ExternalLink,
+    FilePenLine,
+    FlaskConical,
     House,
+    LayoutDashboard,
     LifeBuoy,
+    ListChecks,
+    LogOut,
+    Menu,
+    MessagesSquare,
+    Network,
+    Newspaper,
+    ScrollText,
     ShieldCheck,
     Users,
+    X,
+} from 'lucide';
+import { initDrawer } from './shell/drawer.js';
+
+const icons = {
+    BookOpen,
+    Briefcase,
+    CalendarDays,
+    ClipboardList,
+    Clock,
+    ExternalLink,
+    FilePenLine,
+    FlaskConical,
+    House,
+    LayoutDashboard,
+    LifeBuoy,
+    ListChecks,
+    LogOut,
+    Menu,
+    MessagesSquare,
+    Network,
+    Newspaper,
+    ScrollText,
+    ShieldCheck,
+    Users,
+    X,
 };
 
-function renderIcons() {
+function init() {
     createIcons({
         icons,
         attrs: {
@@ -15,10 +56,11 @@ function renderIcons() {
             focusable: 'false',
         },
     });
+    initDrawer();
 }
 
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', renderIcons);
+    document.addEventListener('DOMContentLoaded', init);
 } else {
-    renderIcons();
+    init();
 }
