@@ -51,6 +51,12 @@ $id = ''
 $previous = ''
 $backupId = ''
 $script:lastHealth = [pscustomobject]@{ Code = 0; Body = '' }
+$script:restartedAt = [datetime]::UtcNow
+
+function Restart-App {
+    $script:restartedAt = [datetime]::UtcNow
+    cloudron restart --app $App | Out-Host
+}
 
 function Write-Step([string]$Message) { Write-Host "==> $Message" }
 
@@ -119,10 +125,16 @@ function Test-Live([string]$ExpectedRevision) {
             return $false
         }
     }
-    $logs = (cloudron logs --app $App --lines 300) -join "`n"
-    foreach ($line in 'Starting queue worker', 'Starting scheduler') {
-        if ($logs -notmatch [regex]::Escape($line)) {
-            Write-Host "  the logs do not show '$line'"
+    # run.sh stamps its lines with UTC HH:MM:SS; only lines since the restart count.
+    $since = $script:restartedAt.AddSeconds(-60).ToString('HH:mm:ss')
+    $now = [datetime]::UtcNow.ToString('HH:mm:ss')
+    $logs = @(cloudron logs --app $App --lines 500)
+    foreach ($worker in 'queue worker', 'scheduler') {
+        $seen = $logs | Where-Object {
+            $_ -match "\[run\.sh (\d\d:\d\d:\d\d)\] Starting $worker" -and ($Matches[1] -ge $since -or $since -gt $now)
+        }
+        if (-not $seen) {
+            Write-Host "  the logs do not show 'Starting $worker' since the restart"
             return $false
         }
     }
@@ -203,7 +215,7 @@ try {
     $ok = $LASTEXITCODE -eq 0
     if ($ok) {
         Write-Step 'Restarting the app'
-        cloudron restart --app $App | Out-Host
+        Restart-App
         $ok = $LASTEXITCODE -eq 0
     }
     if ($ok) {
@@ -223,7 +235,7 @@ try {
     }
     Write-Step "Verification failed. Rolling back to $($previous.Split('/')[-1])"
     Invoke-App bash "$target/deploy/cloudron/rollback-release.sh" $previous | Out-Host
-    cloudron restart --app $App | Out-Host
+    Restart-App
     if (Test-Live $previousRevision) {
         if ("$(Invoke-App readlink -f /app/data/current)".Trim() -eq $previous) {
             Invoke-App rm -rf $target | Out-Null
