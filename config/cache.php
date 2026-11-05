@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'default' => env('CACHE_STORE') ?: (env('CLOUDRON_REDIS_HOST') ? 'redis' : 'database'),
+    'default' => env('CLOUDRON_REDIS_HOST') ? 'redis' : (env('CACHE_STORE') ?: 'database'),
 
     /*
     |--------------------------------------------------------------------------

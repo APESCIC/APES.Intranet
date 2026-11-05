@@ -43,14 +43,52 @@ restarts.
 | `/app/data/run.sh` | Starts the queue worker and the scheduler when the app starts |
 | `/app/data/apache/app.conf` | Points Apache at `current/public` |
 
-The database, Redis and mail come from Cloudron addons through the
-`CLOUDRON_MYSQL_*`, `CLOUDRON_REDIS_*` and `CLOUDRON_MAIL_*` variables. Do not
-copy those values into `.env`.
-
 The LAMP image runs `chown -R www-data:www-data /app/data` every time the app
 starts. So `shared/.env` shows owner `www-data` after a restart, even though
 `activate-release.sh` sets `root:www-data`. That is expected. What matters is
 mode `0640`.
+
+## Addon settings
+
+The database, Redis, mail and the directory come from Cloudron addons. The
+config files read the live `CLOUDRON_*` variable first and only fall back to
+`.env` when it is missing (on Laragon). So a password rotation, a restore or a
+clone never leaves the app using an old copy. `run.sh` rebuilds the config
+cache on every start, which picks up any changed value.
+
+| Addon | Variables read | Secret |
+| --- | --- | --- |
+| MySQL | `CLOUDRON_MYSQL_HOST`, `CLOUDRON_MYSQL_PORT`, `CLOUDRON_MYSQL_DATABASE`, `CLOUDRON_MYSQL_USERNAME`, `CLOUDRON_MYSQL_PASSWORD`, `CLOUDRON_MYSQL_URL` | `CLOUDRON_MYSQL_PASSWORD`, `CLOUDRON_MYSQL_URL` |
+| Redis | `CLOUDRON_REDIS_HOST`, `CLOUDRON_REDIS_PORT`, `CLOUDRON_REDIS_PASSWORD`, `CLOUDRON_REDIS_URL` | `CLOUDRON_REDIS_PASSWORD`, `CLOUDRON_REDIS_URL` |
+| Sendmail | `CLOUDRON_MAIL_SMTP_SERVER`, `CLOUDRON_MAIL_SMTP_PORT`, `CLOUDRON_MAIL_SMTP_USERNAME`, `CLOUDRON_MAIL_SMTP_PASSWORD`, `CLOUDRON_MAIL_FROM`, `CLOUDRON_MAIL_DOMAIN` | `CLOUDRON_MAIL_SMTP_PASSWORD` |
+| LDAP | `CLOUDRON_LDAP_HOST`, `CLOUDRON_LDAP_PORT`, `CLOUDRON_LDAP_USERS_BASE_DN`, `CLOUDRON_LDAP_GROUPS_BASE_DN`, `CLOUDRON_LDAP_BIND_DN`, `CLOUDRON_LDAP_BIND_PASSWORD` | `CLOUDRON_LDAP_BIND_PASSWORD` |
+| OIDC client (no addon, set by hand) | `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `OIDC_REDIRECT_URI` in `shared/.env` | `OIDC_CLIENT_SECRET` |
+
+`CLOUDRON_APP_ORIGIN` sets the app URL. When Redis is present it is used for
+the cache, sessions and queues. Without it they use the database.
+
+Rules:
+
+- `shared/.env` must not set `DB_PASSWORD`, `REDIS_PASSWORD`, `MAIL_PASSWORD`
+  or `LDAP_BIND_PASSWORD`. The [preflight](#preflight) fails if it does, and a
+  test fails if `.env.example` does.
+- The app was installed with Cloudron user management on, so the
+  `CLOUDRON_LDAP_*` variables exist (checked by name on 5 November 2026). The
+  preflight fails if they disappear.
+- The OIDC values live in `/app/data/shared/.env`, which is part of the app
+  backup, so a restore keeps them. A clone on another domain needs its own
+  OIDC client with that domain's redirect URI
+  ([cloudron-sign-in.md](../cloudron-sign-in.md)), because the client and
+  `OIDC_REDIRECT_URI` name `intranet.apes.org.uk`.
+
+To check that a changed addon value is picked up, restart the app and check
+`/healthz` and **Admin > System status**. Every check should be `ok`, with no
+`.env` change:
+
+```powershell
+cloudron restart --app $app
+curl.exe -s "$url/healthz"
+```
 
 ## Preflight
 
@@ -65,7 +103,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File deploy\cloudron\preflight.ps
 It checks:
 
 - the CLI sign-in, the run state and the latest backup
-- the shared `.env` and its `APP_KEY`
+- the shared `.env`, its `APP_KEY`, and that it holds no addon passwords
 - `run.sh` against the repository copy
 - `app.conf`
 - the releases and `current`

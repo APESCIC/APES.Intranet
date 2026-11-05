@@ -14,7 +14,7 @@ return [
     |
     */
 
-    'default' => env('MAIL_MAILER') ?: (env('CLOUDRON_MAIL_SMTP_SERVER') ? 'smtp' : 'log'),
+    'default' => env('CLOUDRON_MAIL_SMTP_SERVER') ? 'smtp' : (env('MAIL_MAILER') ?: 'log'),
 
     /*
     |--------------------------------------------------------------------------
@@ -41,10 +41,10 @@ return [
             'transport' => 'smtp',
             'scheme' => env('MAIL_SCHEME'),
             'url' => env('MAIL_URL'),
-            'host' => env('MAIL_HOST') ?: env('CLOUDRON_MAIL_SMTP_SERVER', '127.0.0.1'),
-            'port' => env('MAIL_PORT') ?: env('CLOUDRON_MAIL_SMTP_PORT', 2525),
-            'username' => env('MAIL_USERNAME') ?: env('CLOUDRON_MAIL_SMTP_USERNAME'),
-            'password' => env('MAIL_PASSWORD') ?: env('CLOUDRON_MAIL_SMTP_PASSWORD'),
+            'host' => env('CLOUDRON_MAIL_SMTP_SERVER') ?: env('MAIL_HOST', '127.0.0.1'),
+            'port' => env('CLOUDRON_MAIL_SMTP_PORT') ?: env('MAIL_PORT', 2525),
+            'username' => env('CLOUDRON_MAIL_SMTP_USERNAME') ?: env('MAIL_USERNAME'),
+            'password' => env('CLOUDRON_MAIL_SMTP_PASSWORD') ?: env('MAIL_PASSWORD'),
             'timeout' => null,
             'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
         ],
@@ -111,7 +111,7 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS') ?: env('CLOUDRON_MAIL_FROM', 'no-reply@apes.org.uk'),
+        'address' => env('CLOUDRON_MAIL_FROM') ?: env('MAIL_FROM_ADDRESS', 'no-reply@apes.org.uk'),
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
     ],
 

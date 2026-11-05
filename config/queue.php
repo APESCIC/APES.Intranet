@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'default' => env('QUEUE_CONNECTION') ?: (env('CLOUDRON_REDIS_HOST') ? 'redis' : 'database'),
+    'default' => env('CLOUDRON_REDIS_HOST') ? 'redis' : (env('QUEUE_CONNECTION') ?: 'database'),
 
     /*
     |--------------------------------------------------------------------------

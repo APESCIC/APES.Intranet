@@ -17,7 +17,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION') ?: (env('CLOUDRON_MYSQL_HOST') ? 'mysql' : 'sqlite'),
+    'default' => env('CLOUDRON_MYSQL_HOST') ? 'mysql' : (env('DB_CONNECTION') ?: 'sqlite'),
 
     /*
     |--------------------------------------------------------------------------
@@ -47,11 +47,11 @@ return [
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DB_URL'),
-            'host' => env('DB_HOST') ?: env('CLOUDRON_MYSQL_HOST', '127.0.0.1'),
-            'port' => env('DB_PORT') ?: env('CLOUDRON_MYSQL_PORT', '3306'),
-            'database' => env('DB_DATABASE') ?: env('CLOUDRON_MYSQL_DATABASE', 'laravel'),
-            'username' => env('DB_USERNAME') ?: env('CLOUDRON_MYSQL_USERNAME', 'root'),
-            'password' => env('DB_PASSWORD') ?: env('CLOUDRON_MYSQL_PASSWORD', ''),
+            'host' => env('CLOUDRON_MYSQL_HOST') ?: env('DB_HOST', '127.0.0.1'),
+            'port' => env('CLOUDRON_MYSQL_PORT') ?: env('DB_PORT', '3306'),
+            'database' => env('CLOUDRON_MYSQL_DATABASE') ?: env('DB_DATABASE', 'laravel'),
+            'username' => env('CLOUDRON_MYSQL_USERNAME') ?: env('DB_USERNAME', 'root'),
+            'password' => env('CLOUDRON_MYSQL_PASSWORD') ?: env('DB_PASSWORD', ''),
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => env('DB_CHARSET', 'utf8mb4'),
             'collation' => env('DB_COLLATION', 'utf8mb4_unicode_ci'),
@@ -155,10 +155,10 @@ return [
 
         'default' => [
             'url' => env('REDIS_URL'),
-            'host' => env('REDIS_HOST') ?: env('CLOUDRON_REDIS_HOST', '127.0.0.1'),
+            'host' => env('CLOUDRON_REDIS_HOST') ?: env('REDIS_HOST', '127.0.0.1'),
             'username' => env('REDIS_USERNAME'),
-            'password' => env('REDIS_PASSWORD') ?: env('CLOUDRON_REDIS_PASSWORD'),
-            'port' => env('REDIS_PORT') ?: env('CLOUDRON_REDIS_PORT', '6379'),
+            'password' => env('CLOUDRON_REDIS_PASSWORD') ?: env('REDIS_PASSWORD'),
+            'port' => env('CLOUDRON_REDIS_PORT') ?: env('REDIS_PORT', '6379'),
             'database' => env('REDIS_DB', '0'),
             'max_retries' => env('REDIS_MAX_RETRIES', 3),
             'backoff_algorithm' => env('REDIS_BACKOFF_ALGORITHM', 'decorrelated_jitter'),
@@ -168,10 +168,10 @@ return [
 
         'cache' => [
             'url' => env('REDIS_URL'),
-            'host' => env('REDIS_HOST') ?: env('CLOUDRON_REDIS_HOST', '127.0.0.1'),
+            'host' => env('CLOUDRON_REDIS_HOST') ?: env('REDIS_HOST', '127.0.0.1'),
             'username' => env('REDIS_USERNAME'),
-            'password' => env('REDIS_PASSWORD') ?: env('CLOUDRON_REDIS_PASSWORD'),
-            'port' => env('REDIS_PORT') ?: env('CLOUDRON_REDIS_PORT', '6379'),
+            'password' => env('CLOUDRON_REDIS_PASSWORD') ?: env('REDIS_PASSWORD'),
+            'port' => env('CLOUDRON_REDIS_PORT') ?: env('REDIS_PORT', '6379'),
             'database' => env('REDIS_CACHE_DB', '1'),
             'max_retries' => env('REDIS_MAX_RETRIES', 3),
             'backoff_algorithm' => env('REDIS_BACKOFF_ALGORITHM', 'decorrelated_jitter'),

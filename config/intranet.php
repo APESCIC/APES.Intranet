@@ -21,9 +21,9 @@ return [
     | variables are used. Never commit real values.
     */
     'oidc' => [
-        'issuer' => env('OIDC_ISSUER', env('CLOUDRON_OIDC_ISSUER')),
-        'client_id' => env('OIDC_CLIENT_ID', env('CLOUDRON_OIDC_CLIENT_ID')),
-        'client_secret' => env('OIDC_CLIENT_SECRET', env('CLOUDRON_OIDC_CLIENT_SECRET')),
+        'issuer' => env('CLOUDRON_OIDC_ISSUER') ?: env('OIDC_ISSUER'),
+        'client_id' => env('CLOUDRON_OIDC_CLIENT_ID') ?: env('OIDC_CLIENT_ID'),
+        'client_secret' => env('CLOUDRON_OIDC_CLIENT_SECRET') ?: env('OIDC_CLIENT_SECRET'),
         'redirect_uri' => env('OIDC_REDIRECT_URI', rtrim((string) env('CLOUDRON_APP_ORIGIN', ''), '/').'/auth/callback'),
         'scopes' => $csv(env('OIDC_SCOPES', 'openid,profile,email')),
     ],
@@ -32,12 +32,12 @@ return [
     | Cloudron LDAP, read-only, used to look up a person's groups at sign-in.
     */
     'ldap' => [
-        'host' => env('LDAP_HOST', env('CLOUDRON_LDAP_HOST')),
-        'port' => (int) env('LDAP_PORT', env('CLOUDRON_LDAP_PORT', 389)),
-        'base_dn' => env('LDAP_BASE_DN', env('CLOUDRON_LDAP_USERS_BASE_DN')),
-        'groups_base_dn' => env('LDAP_GROUPS_BASE_DN', env('CLOUDRON_LDAP_GROUPS_BASE_DN')),
-        'bind_dn' => env('LDAP_BIND_DN', env('CLOUDRON_LDAP_BIND_DN')),
-        'bind_password' => env('LDAP_BIND_PASSWORD', env('CLOUDRON_LDAP_BIND_PASSWORD')),
+        'host' => env('CLOUDRON_LDAP_HOST') ?: env('LDAP_HOST'),
+        'port' => (int) (env('CLOUDRON_LDAP_PORT') ?: env('LDAP_PORT', 389)),
+        'base_dn' => env('CLOUDRON_LDAP_USERS_BASE_DN') ?: env('LDAP_BASE_DN'),
+        'groups_base_dn' => env('CLOUDRON_LDAP_GROUPS_BASE_DN') ?: env('LDAP_GROUPS_BASE_DN'),
+        'bind_dn' => env('CLOUDRON_LDAP_BIND_DN') ?: env('LDAP_BIND_DN'),
+        'bind_password' => env('CLOUDRON_LDAP_BIND_PASSWORD') ?: env('LDAP_BIND_PASSWORD'),
         'user_filter' => env('LDAP_USER_FILTER', '(mail=%s)'),
         'group_attribute' => env('LDAP_GROUP_ATTRIBUTE', 'memberOf'),
         'timeout_seconds' => 5,

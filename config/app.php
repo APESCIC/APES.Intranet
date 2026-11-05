@@ -52,7 +52,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL') ?: env('CLOUDRON_APP_ORIGIN', 'http://localhost'),
+    'url' => env('CLOUDRON_APP_ORIGIN') ?: env('APP_URL', 'http://localhost'),
 
     /*
     |--------------------------------------------------------------------------

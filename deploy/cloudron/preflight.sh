@@ -39,6 +39,18 @@ if [[ -f "$ENV_FILE" ]]; then
     else
         fail "shared/.env has no APP_KEY=base64: line"
     fi
+    # Addons supply these. A copy in .env would go stale after a rotation or restore.
+    copied=""
+    for key in DB_PASSWORD REDIS_PASSWORD MAIL_PASSWORD LDAP_BIND_PASSWORD; do
+        if grep -qE "^${key}=.+" "$ENV_FILE" && ! grep -qE "^${key}=(null|\"\")[[:space:]]*$" "$ENV_FILE"; then
+            copied+=" $key"
+        fi
+    done
+    if [[ -z "$copied" ]]; then
+        pass "shared/.env holds no addon passwords"
+    else
+        fail "shared/.env sets$copied; remove them, the Cloudron addons supply them"
+    fi
 else
     fail "$ENV_FILE is missing (first-time set-up step 3)"
 fi
