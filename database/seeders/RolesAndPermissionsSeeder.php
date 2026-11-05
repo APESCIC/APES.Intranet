@@ -30,6 +30,17 @@ class RolesAndPermissionsSeeder extends Seeder
             Role::findOrCreate($roleName, 'web')->syncPermissions($permissions);
         }
 
+        // A role dropped from the matrix goes once nobody holds it. One that is
+        // still assigned stays until those people sign in again.
+        Role::query()->whereNotIn('name', array_keys(AccessMatrix::grants()))->withCount('users')->get()
+            ->each(function (Role $role) {
+                if ($role->users_count === 0) {
+                    $role->delete();
+                } else {
+                    $this->command?->warn("Role {$role->name} is not in the matrix but {$role->users_count} people still hold it.");
+                }
+            });
+
         $registrar->forgetCachedPermissions();
     }
 }
