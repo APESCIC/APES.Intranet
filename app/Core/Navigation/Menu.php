@@ -38,6 +38,7 @@ final class Menu
             new NavGroup('support', 'Support', [
                 NavItem::soon('help-desk', 'Help desk', 'life-buoy', AccessMatrix::INTRANET_ACCESS),
                 NavItem::soon('handbook', 'Handbook and training', 'book-open', AccessMatrix::INTRANET_ACCESS),
+                NavItem::route('access-guide', 'Who can see what', 'key-round', AccessMatrix::INTRANET_ACCESS, 'access-guide'),
             ]),
             new NavGroup('hr-legal', 'HR and legal', [
                 NavItem::soon('hr', 'HR', 'briefcase', AccessMatrix::HR_ACCESS),

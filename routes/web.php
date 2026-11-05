@@ -1,6 +1,7 @@
 <?php
 
 use App\Core\Access\AccessMatrix;
+use App\Core\Access\Http\Controllers\AccessGuideController;
 use App\Core\Access\Http\Controllers\RoleIndexController;
 use App\Core\Audit\Http\Controllers\AuditLogIndexController;
 use App\Core\Auth\Http\Controllers\OidcController;
@@ -23,6 +24,10 @@ Route::middleware('auth')->group(function () {
     Route::view('/dashboard', 'core.dashboard')
         ->middleware('can:'.AccessMatrix::INTRANET_ACCESS)
         ->name('dashboard');
+
+    Route::get('/access', AccessGuideController::class)
+        ->middleware('can:'.AccessMatrix::INTRANET_ACCESS)
+        ->name('access-guide');
 
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/roles', RoleIndexController::class)->name('roles.index');

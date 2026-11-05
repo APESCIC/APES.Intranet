@@ -31,6 +31,10 @@ Create these groups in Cloudron (**Users > Groups**) and add people to them.
 
 Every role also has `intranet.access`. A person can be in more than one group.
 
+Signed-in people can read a plain-English version of this table, with who
+can see HR and legal records and how access is audited, at **Support > Who can
+see what** (`/access`).
+
 Only these 8 groups grant access. Any other group is ignored, including any
 other name that starts with `intranet.`. The list and the mapping live in
 `config/intranet.php` (`group_roles`).
