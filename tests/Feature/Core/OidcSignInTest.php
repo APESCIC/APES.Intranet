@@ -1,5 +1,6 @@
 <?php
 
+use App\Core\Access\AccessMatrix;
 use App\Core\Auth\OidcIdentity;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
@@ -32,14 +33,40 @@ it('gives a staff group member the staff role', function () {
 });
 
 it('maps several intranet groups and ignores other groups', function () {
-    signInWithCloudron($this, ['intranet.staff', 'intranet.manager', 'lms.teacher', 'Intranet.HR']);
+    signInWithCloudron($this, ['intranet.staff', 'intranet.management', 'lms.teacher', 'Intranet.HR']);
 
     expect(User::where('email', 'alex@example.test')->firstOrFail()->getRoleNames()->sort()->values()->all())
-        ->toBe(['hr', 'manager', 'staff']);
+        ->toBe(['hr', 'management', 'staff']);
+});
+
+it('gives a supervisor group member team.supervise but not team.manage', function () {
+    signInWithCloudron($this, ['intranet.volunteer', 'intranet.supervisor']);
+
+    $user = User::where('email', 'alex@example.test')->firstOrFail();
+    expect($user->getRoleNames()->sort()->values()->all())->toBe(['supervisor', 'volunteer'])
+        ->and($user->can(AccessMatrix::TEAM_SUPERVISE))->toBeTrue()
+        ->and($user->can(AccessMatrix::TEAM_MANAGE))->toBeFalse()
+        ->and($user->can(AccessMatrix::HR_ACCESS))->toBeFalse();
+});
+
+it('gives a management group member team.supervise, team.manage and HR access', function () {
+    signInWithCloudron($this, ['intranet.staff', 'intranet.management']);
+
+    $user = User::where('email', 'alex@example.test')->firstOrFail();
+    expect($user->getRoleNames()->sort()->values()->all())->toBe(['management', 'staff'])
+        ->and($user->can(AccessMatrix::TEAM_SUPERVISE))->toBeTrue()
+        ->and($user->can(AccessMatrix::TEAM_MANAGE))->toBeTrue()
+        ->and($user->can(AccessMatrix::HR_ACCESS))->toBeTrue();
+});
+
+it('no longer maps the old intranet.manager group', function () {
+    signInWithCloudron($this, ['intranet.manager'])->assertForbidden();
+
+    $this->assertGuest();
 });
 
 it('removes a role at the next sign-in when the group is removed', function () {
-    signInWithCloudron($this, ['intranet.staff', 'intranet.manager']);
+    signInWithCloudron($this, ['intranet.staff', 'intranet.management']);
     $this->post(route('logout'));
 
     signInWithCloudron($this, ['intranet.staff']);

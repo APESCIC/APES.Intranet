@@ -30,15 +30,15 @@ it('records a sign-in with the time, person and IP address', function () {
 });
 
 it('records role changes with what was added and removed', function () {
-    signInWithCloudron($this, ['intranet.staff', 'intranet.manager']);
+    signInWithCloudron($this, ['intranet.staff', 'intranet.management']);
     $this->post(route('logout'));
     signInWithCloudron($this, ['intranet.staff', 'intranet.hr']);
 
     $changes = AuditLog::where('event', 'roles.changed')->orderBy('id')->get();
 
     expect($changes)->toHaveCount(2)
-        ->and($changes[0]->context)->toMatchArray(['added' => ['staff', 'manager'], 'removed' => []])
-        ->and($changes[1]->context)->toMatchArray(['added' => ['hr'], 'removed' => ['manager']]);
+        ->and($changes[0]->context)->toMatchArray(['added' => ['staff', 'management'], 'removed' => []])
+        ->and($changes[1]->context)->toMatchArray(['added' => ['hr'], 'removed' => ['management']]);
 });
 
 it('does not record a role change when nothing changed', function () {
@@ -64,7 +64,7 @@ it('shows the audit log to admins only', function (RoleName $role, int $status) 
     $this->actingAs($user)->get(route('admin.audit.index'))->assertStatus($status);
 })->with([
     'staff' => [RoleName::Staff, 403],
-    'manager' => [RoleName::Manager, 403],
+    'management' => [RoleName::Management, 403],
     'hr' => [RoleName::Hr, 403],
     'legal' => [RoleName::Legal, 403],
     'admin' => [RoleName::Admin, 200],

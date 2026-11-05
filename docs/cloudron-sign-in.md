@@ -9,19 +9,27 @@ the current chat does the steps below.
 
 ## Groups
 
-Create these groups in Cloudron (**Users > Groups**) and add people to them:
+Create these groups in Cloudron (**Users > Groups**) and add people to them.
 
-| Cloudron group | Intranet role |
-| --- | --- |
-| `intranet.staff` | staff |
-| `intranet.volunteer` | volunteer |
-| `intranet.student` | student |
-| `intranet.manager` | manager |
-| `intranet.hr` | HR |
-| `intranet.legal` | legal |
-| `intranet.admin` | admin |
+**Account types** say who someone is. Everyone has one:
 
-A person can be in more than one group. Groups that do not start with
+| Cloudron group | Intranet role | Permissions |
+| --- | --- | --- |
+| `intranet.staff` | staff | `intranet.access` |
+| `intranet.volunteer` | volunteer | `intranet.access` |
+| `intranet.student` | student | `intranet.access` |
+
+**Permission roles** say what someone can do, on top of an account type:
+
+| Cloudron group | Intranet role | Permissions |
+| --- | --- | --- |
+| `intranet.supervisor` | supervisor | `team.supervise`: oversee their own team, meaning view it and approve its shifts, swaps and timesheets |
+| `intranet.management` | management | `team.supervise`, `team.manage` and `hr.access` (all HR records) |
+| `intranet.hr` | HR | `hr.access` |
+| `intranet.legal` | legal | `legal.access` |
+| `intranet.admin` | admin | Every permission |
+
+Every role also has `intranet.access`. A person can be in more than one group. Groups that do not start with
 `intranet.` are ignored. The mapping lives in `config/intranet.php`
 (`group_roles`).
 

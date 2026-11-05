@@ -48,8 +48,9 @@ php artisan db:seed --class="Database\Seeders\RolesAndPermissionsSeeder" --force
 
 | Role | Base permissions |
 | --- | --- |
-| staff, volunteer, student | `intranet.access` |
-| manager | `intranet.access`, `team.manage` |
+| staff, volunteer, student (account types) | `intranet.access` |
+| supervisor | `intranet.access`, `team.supervise` |
+| management | `intranet.access`, `team.supervise`, `team.manage`, `hr.access` |
 | HR | `intranet.access`, `hr.access` |
 | legal | `intranet.access`, `legal.access` |
 | admin | Every permission |
@@ -63,8 +64,9 @@ Rules for new code:
   register it in the layer's service provider. `RolePolicy` is the example.
 - A module adds its permissions in its own seeder and grants them to admin
   there.
-- `User::isSupervisor()` is true for the manager role and for anyone with the
-  `is_supervisor` flag. Use it for "my team" features such as rota approvals.
+- `User::isSupervisor()` is `can('team.supervise')`: true for the supervisor,
+  management and admin roles. Use it for "my team" features such as rota
+  approvals.
 
 ## Audit log
 

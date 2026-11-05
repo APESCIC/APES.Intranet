@@ -10,6 +10,8 @@ final class AccessMatrix
 {
     public const INTRANET_ACCESS = 'intranet.access';
 
+    public const TEAM_SUPERVISE = 'team.supervise';
+
     public const TEAM_MANAGE = 'team.manage';
 
     public const HR_ACCESS = 'hr.access';
@@ -27,6 +29,7 @@ final class AccessMatrix
     {
         return [
             self::INTRANET_ACCESS => 'Use the intranet',
+            self::TEAM_SUPERVISE => 'Oversee their own team: view it and approve its shifts, swaps and timesheets',
             self::TEAM_MANAGE => 'Manage a team, rota or group of people',
             self::HR_ACCESS => 'Open the HR area',
             self::LEGAL_ACCESS => 'Open the agreements and legal area',
@@ -44,7 +47,8 @@ final class AccessMatrix
             RoleName::Staff->value => [self::INTRANET_ACCESS],
             RoleName::Volunteer->value => [self::INTRANET_ACCESS],
             RoleName::Student->value => [self::INTRANET_ACCESS],
-            RoleName::Manager->value => [self::INTRANET_ACCESS, self::TEAM_MANAGE],
+            RoleName::Supervisor->value => [self::INTRANET_ACCESS, self::TEAM_SUPERVISE],
+            RoleName::Management->value => [self::INTRANET_ACCESS, self::TEAM_SUPERVISE, self::TEAM_MANAGE, self::HR_ACCESS],
             RoleName::Hr->value => [self::INTRANET_ACCESS, self::HR_ACCESS],
             RoleName::Legal->value => [self::INTRANET_ACCESS, self::LEGAL_ACCESS],
             RoleName::Admin->value => array_keys(self::permissions()),

@@ -58,7 +58,8 @@ Decided.
 
 - Cloudron OIDC, with LDAP groups, in the same way as MyAPES Account.
 - Volunteers and students are Cloudron directory users in `intranet.*` groups.
-- Roles: staff, volunteer, student, manager, HR, legal, admin.
+- Account types: staff, volunteer, student. Permission roles: supervisor,
+  management, HR, legal, admin.
 
 ## Decided features
 

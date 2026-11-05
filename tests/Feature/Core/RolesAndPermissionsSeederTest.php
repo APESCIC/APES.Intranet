@@ -9,7 +9,7 @@ use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
 
-it('creates the seven intranet roles with their permissions', function () {
+it('creates the eight intranet roles with their permissions', function () {
     $this->seed(RolesAndPermissionsSeeder::class);
 
     expect(Role::pluck('name')->sort()->values()->all())

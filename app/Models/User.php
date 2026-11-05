@@ -13,7 +13,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['name', 'email', 'password', 'is_supervisor'])]
+#[Fillable(['name', 'email', 'password'])]
 #[Hidden(['password', 'remember_token', 'oidc_sub'])]
 class User extends Authenticatable
 {
@@ -21,12 +21,12 @@ class User extends Authenticatable
     use HasFactory, HasRoles, Notifiable;
 
     /**
-     * Whether this person leads others: the manager role, or a supervisor
-     * flag for staff who oversee volunteers or students.
+     * Whether this person oversees a team: the supervisor, management or
+     * admin role.
      */
     public function isSupervisor(): bool
     {
-        return $this->is_supervisor || $this->can(AccessMatrix::TEAM_MANAGE);
+        return $this->can(AccessMatrix::TEAM_SUPERVISE);
     }
 
     public function primaryRoleLabel(): ?string
@@ -61,7 +61,6 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'is_supervisor' => 'boolean',
         ];
     }
 }
