@@ -11,6 +11,23 @@
     @if (session('status'))
         <p class="mb-4 rounded-sg-field bg-sg-ok-mist p-3 text-sg-ok" role="status">{{ session('status') }}</p>
     @endif
+    @if (session('error'))
+        <p class="mb-4 rounded-sg-field bg-sg-error-mist p-3 text-sg-error" role="alert">{{ session('error') }}</p>
+    @endif
+
+    <section class="sg-card mb-4 flex flex-wrap items-center justify-between gap-3 p-5" aria-labelledby="test-email-heading">
+        <div>
+            <h2 id="test-email-heading" class="font-serif text-lg font-semibold">Test email</h2>
+            <p class="text-sm text-sg-muted">
+                Sends a test email to you at {{ auth()->user()->email }}, to prove Sendmail works.
+                Up to {{ \App\Core\System\Http\Controllers\SendTestEmailController::PER_HOUR }} an hour.
+            </p>
+        </div>
+        <form method="post" action="{{ route('admin.system.test-email') }}">
+            @csrf
+            <button type="submit" class="sg-btn sg-btn-secondary">Send me a test email</button>
+        </form>
+    </section>
 
     <div class="grid gap-4 md:grid-cols-2">
         @foreach ($addons as $addon)
