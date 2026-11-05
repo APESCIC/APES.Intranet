@@ -10,6 +10,9 @@ done by the owner, the APES IT Administrator, or an agent with the owner's
 approval in the current chat. It was done on 5 November 2026 with v0.0.1. The
 steps below stay as the record and for going back.
 
+The commands use `$app` from [cloudron.md](cloudron.md) and run as written in
+Windows PowerShell 5.1.
+
 ## Before the switch
 
 - [ ] The owner has approved the switch on issue #13.
@@ -47,7 +50,7 @@ still serves `/app/data/public`.
 If any check fails and cannot be fixed quickly:
 
 ```powershell
-cloudron exec --app $app -- rm /app/data/apache/app.conf
+cloudron exec --app $app '--' rm /app/data/apache/app.conf
 cloudron restart --app $app
 ```
 
