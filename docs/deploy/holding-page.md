@@ -6,7 +6,12 @@ app's default web root, `/app/data/public`. DNS already points at the app, so
 no DNS change is needed.
 
 The switch happens **only after the owner approves it** on issue #13, and is
-done by the owner or the APES IT Administrator.
+done by the owner, the APES IT Administrator, or an agent with the owner's
+approval in the current chat. It was done on 5 November 2026 with v0.0.1. The
+steps below stay as the record and for going back.
+
+The commands use `$app` from [cloudron.md](cloudron.md) and run as written in
+Windows PowerShell 5.1.
 
 ## Before the switch
 
@@ -45,7 +50,7 @@ still serves `/app/data/public`.
 If any check fails and cannot be fixed quickly:
 
 ```powershell
-cloudron exec --app $app -- rm /app/data/apache/app.conf
+cloudron exec --app $app '--' rm /app/data/apache/app.conf
 cloudron restart --app $app
 ```
 

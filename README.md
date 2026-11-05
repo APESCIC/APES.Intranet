@@ -20,11 +20,11 @@ The app runs on Cloudron as an empty LAMP stack (PHP 8.x).
 and AAAA records are unproxied, and the certificate is a valid Let's Encrypt
 certificate. The SharePoint redirect has been removed.
 
-Until the Laravel app is deployed, the APES IT Administrator is putting up a
-simple APES "coming soon" holding page on that app. Agents do not change DNS,
-Cloudflare or Cloudron.
+The Laravel app has been live since v0.0.1. Agents do not change DNS or
+Cloudflare. They may run Cloudron deploys once the owner has approved the
+deploy in the current chat.
 
-Deploys are manual and follow [docs/deploy/cloudron.md](docs/deploy/cloudron.md).
+Deploys follow [docs/deploy/cloudron.md](docs/deploy/cloudron.md).
 Accessibility notes and checks are in [docs/accessibility.md](docs/accessibility.md).
 After a deploy, check <https://intranet.apes.org.uk/healthz>.
 

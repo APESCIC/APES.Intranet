@@ -4,8 +4,8 @@ Staff, volunteers and students sign in with their Cloudron account through
 OpenID Connect (OIDC). At each sign-in, the intranet reads the person's
 groups from Cloudron LDAP and sets their intranet roles to match.
 
-Agents do not change Cloudron. The owner or the APES IT Administrator does the
-steps below.
+The owner, the APES IT Administrator, or an agent with the owner's approval in
+the current chat does the steps below.
 
 ## Groups
 
@@ -36,27 +36,60 @@ Someone who is already signed in keeps their roles until they sign in again.
 
 ## OIDC client
 
-The intranet reads the `CLOUDRON_OIDC_*` and `CLOUDRON_LDAP_*` variables that
-Cloudron gives the app. If the LAMP app does not provide the OIDC variables,
-create a client in the Cloudron dashboard (**User Directory > OpenID Connect
-clients**):
+The intranet reads `OIDC_*` settings from the shared `.env`, and falls back to
+`CLOUDRON_OIDC_*` variables. It reads groups through the `CLOUDRON_LDAP_*`
+variables. The LAMP app has an LDAP addon but no OIDC addon, so it never gets
+`CLOUDRON_OIDC_*` variables. Production needs an OIDC client, created once by
+hand.
 
-| Field | Value |
-| --- | --- |
-| Name | APES Intranet |
-| Login redirect URI | `https://intranet.apes.org.uk/auth/callback` |
+1. **Create the client** in the Cloudron dashboard (**User Directory > OpenID
+   Connect clients**):
 
-Then put its values in `/app/data/.env` on the app, never in git:
+   | Field | Value |
+   | --- | --- |
+   | Name | APES Intranet |
+   | Login redirect URI | `https://intranet.apes.org.uk/auth/callback` |
+   | Token signature algorithm | RS256 |
 
-```dotenv
-OIDC_ISSUER=
-OIDC_CLIENT_ID=
-OIDC_CLIENT_SECRET=
-OIDC_REDIRECT_URI=https://intranet.apes.org.uk/auth/callback
-```
+2. **Write the settings to a local file**, `$env:TEMP\intranet-oidc.env`, and
+   never to git or chat. Use these four lines, filling in the client id and
+   secret from the dashboard:
 
-`OIDC_ISSUER` is the Cloudron dashboard URL followed by `/openid`. The
-`OIDC_*` values override the Cloudron ones.
+   ```dotenv
+   OIDC_ISSUER=https://my.cloudron.apes.org.uk/openid
+   OIDC_CLIENT_ID=
+   OIDC_CLIENT_SECRET=
+   OIDC_REDIRECT_URI=https://intranet.apes.org.uk/auth/callback
+   ```
+
+   `OIDC_ISSUER` is the Cloudron dashboard URL followed by `/openid`. It must
+   match the `issuer` in
+   <https://my.cloudron.apes.org.uk/openid/.well-known/openid-configuration>.
+3. **Copy them into `/app/data/shared/.env`** and restart, so `run.sh`
+   re-caches the config. `set-oidc.sh` accepts only `OIDC_*` lines, replaces
+   any old ones, prints key names only, and deletes the uploaded file. Use
+   `$app` from [deploy/cloudron.md](deploy/cloudron.md). This changes
+   production, so it needs a Cloudron backup first and, for an agent, the
+   owner's ship-gate deploy answer in the current chat:
+
+   ```powershell
+   cloudron backup create --app $app
+   cloudron push --app $app "$env:TEMP\intranet-oidc.env" /tmp/intranet-oidc.env
+   cloudron push --app $app .\deploy\cloudron\set-oidc.sh /tmp/set-oidc.sh
+   cloudron exec --app $app '--' bash /tmp/set-oidc.sh /tmp/intranet-oidc.env
+   cloudron exec --app $app '--' rm -f /tmp/set-oidc.sh
+   Remove-Item "$env:TEMP\intranet-oidc.env"
+   cloudron restart --app $app
+   ```
+
+4. **Check.**
+   - Run the preflight
+     ([deploy/cloudron.md](deploy/cloudron.md#preflight)). It should show
+     `PASS OIDC issuer, client id and client secret are set`.
+   - An `intranet.admin` member signs in at <https://intranet.apes.org.uk>
+     and opens **Admin > Audit log**.
+   - A Cloudron user in no `intranet.*` group gets the "No intranet access"
+     page.
 
 The PHP `ldap` extension must be enabled on the app. The Cloudron LAMP image
 includes it.
