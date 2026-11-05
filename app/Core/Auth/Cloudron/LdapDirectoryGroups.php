@@ -3,10 +3,12 @@
 namespace App\Core\Auth\Cloudron;
 
 use App\Core\Auth\Contracts\DirectoryGroups;
+use App\Core\Auth\Contracts\DirectoryRoster;
+use App\Core\Auth\DirectoryPerson;
 use App\Core\Auth\Exceptions\DirectoryUnavailable;
 use LDAP\Connection;
 
-class LdapDirectoryGroups implements DirectoryGroups
+class LdapDirectoryGroups implements DirectoryGroups, DirectoryRoster
 {
     public function groupsForEmail(string $email): array
     {
@@ -28,7 +30,7 @@ class LdapDirectoryGroups implements DirectoryGroups
                 $ldap,
                 $this->config('base_dn'),
                 sprintf($filter, ldap_escape($email, '', LDAP_ESCAPE_FILTER)),
-                [$attribute],
+                [$attribute, 'cn', 'displayname', 'mail', 'uid'],
                 0,
                 2,
                 (int) config('intranet.ldap.timeout_seconds', 5),
@@ -61,6 +63,80 @@ class LdapDirectoryGroups implements DirectoryGroups
         }
 
         return array_values(array_unique($groups));
+    }
+
+    /**
+     * @return list<DirectoryPerson>
+     */
+    public function listPeople(): array
+    {
+        if (! function_exists('ldap_connect')) {
+            throw new DirectoryUnavailable('The PHP LDAP extension is not installed.');
+        }
+
+        $ldap = $this->connect();
+        $attribute = strtolower($this->config('group_attribute'));
+
+        try {
+            // Read-only search of the users tree. Cloudron keeps disabled
+            // accounts in LDAP; we treat a missing mail as inactive and leave
+            // group membership to decide intranet access.
+            $search = @ldap_search(
+                $ldap,
+                $this->config('base_dn'),
+                '(objectClass=*)',
+                ['mail', 'cn', 'displayname', 'uid', $attribute],
+                0,
+                0,
+                (int) config('intranet.ldap.timeout_seconds', 5),
+            );
+
+            if ($search === false) {
+                throw new DirectoryUnavailable('LDAP directory search failed.');
+            }
+
+            $entries = ldap_get_entries($ldap, $search);
+        } finally {
+            @ldap_unbind($ldap);
+        }
+
+        if (! is_array($entries)) {
+            throw new DirectoryUnavailable('LDAP directory search returned an unexpected result.');
+        }
+
+        $people = [];
+
+        for ($i = 0; $i < (int) ($entries['count'] ?? 0); $i++) {
+            $entry = $entries[$i];
+            $email = $this->firstAttribute($entry, 'mail');
+
+            if ($email === null) {
+                continue;
+            }
+
+            $groups = [];
+            $values = $entry[$attribute] ?? [];
+
+            for ($g = 0; $g < (int) ($values['count'] ?? 0); $g++) {
+                if (is_string($values[$g] ?? null)) {
+                    $groups[] = $this->groupName($values[$g]);
+                }
+            }
+
+            $name = $this->firstAttribute($entry, 'displayname')
+                ?? $this->firstAttribute($entry, 'cn')
+                ?? $email;
+
+            $people[] = new DirectoryPerson(
+                email: strtolower($email),
+                name: $name,
+                username: $this->firstAttribute($entry, 'uid'),
+                groups: array_values(array_unique($groups)),
+                active: true,
+            );
+        }
+
+        return $people;
     }
 
     /**
@@ -106,6 +182,22 @@ class LdapDirectoryGroups implements DirectoryGroups
         $first = explode(',', $value)[0];
 
         return strtolower(trim((string) preg_replace('/^cn=/i', '', trim($first))));
+    }
+
+    /**
+     * @param  array<string, mixed>  $entry
+     */
+    private function firstAttribute(array $entry, string $name): ?string
+    {
+        $values = $entry[strtolower($name)] ?? null;
+
+        if (! is_array($values) || (int) ($values['count'] ?? 0) < 1 || ! is_string($values[0] ?? null)) {
+            return null;
+        }
+
+        $value = trim($values[0]);
+
+        return $value === '' ? null : $value;
     }
 
     private function config(string $key): string

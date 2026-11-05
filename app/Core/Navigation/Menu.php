@@ -26,8 +26,11 @@ final class Menu
                 NavItem::external('teams', 'Chat in Teams', 'messages-square', AccessMatrix::INTRANET_ACCESS, self::TEAMS_URL),
             ]),
             new NavGroup('people', 'People', [
-                NavItem::soon('directory', 'Directory', 'users', AccessMatrix::INTRANET_ACCESS),
-                NavItem::soon('org-chart', 'Organisation chart', 'network', AccessMatrix::INTRANET_ACCESS),
+                NavItem::route('directory', 'Directory', 'users', AccessMatrix::INTRANET_ACCESS, 'people.directory.index', 'people.directory.*'),
+                NavItem::route('org-chart', 'Organisation chart', 'network', AccessMatrix::INTRANET_ACCESS, 'people.org-chart'),
+                NavItem::route('profile', 'My profile', 'circle-user', AccessMatrix::INTRANET_ACCESS, 'people.profile.edit'),
+                NavItem::route('security', 'Security', 'shield', AccessMatrix::INTRANET_ACCESS, 'people.security'),
+                NavItem::route('students', 'Student placements', 'graduation-cap', AccessMatrix::INTRANET_ACCESS, 'people.students.index', 'people.students.*'),
             ]),
             new NavGroup('operations', 'Operations', [
                 NavItem::soon('rota', 'Rota', 'calendar-days', AccessMatrix::INTRANET_ACCESS),
@@ -49,6 +52,7 @@ final class Menu
                 NavItem::route('audit', 'Audit log', 'scroll-text', AccessMatrix::ADMIN_AUDIT_VIEW, 'admin.audit.index'),
                 NavItem::route('access-review', 'Access review', 'clipboard-check', AccessMatrix::ACCESS_REVIEW_VIEW, 'admin.access-review.index'),
                 NavItem::route('system', 'System status', 'activity', AccessMatrix::ADMIN_SYSTEM_VIEW, 'admin.system.index', 'admin.system.*'),
+                NavItem::route('totp', '2FA status', 'shield-half', AccessMatrix::ADMIN_SYSTEM_VIEW, 'admin.totp.index'),
             ]),
         ];
     }

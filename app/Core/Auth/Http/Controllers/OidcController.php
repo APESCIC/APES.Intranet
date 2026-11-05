@@ -99,6 +99,13 @@ class OidcController
                 $before = $user->getRoleNames()->all();
                 $user->syncRoles([]);
                 $this->audit->recordRoleChange($user, $before, [], 'cloudron');
+                if ($user->is_active) {
+                    $user->forceFill([
+                        'is_active' => false,
+                        'deactivated_at' => now(),
+                    ])->save();
+                    $this->audit->record('people.member_deactivated', $user, ['source' => 'cloudron_sign_in']);
+                }
             }
 
             return $this->denied($user, 'no_intranet_group');
@@ -114,6 +121,8 @@ class OidcController
             'email' => $email,
             'name' => $identity->name ?? $email,
             'email_verified_at' => $user->email_verified_at ?? now(),
+            'is_active' => true,
+            'deactivated_at' => null,
         ])->save();
 
         $before = $user->getRoleNames()->all();

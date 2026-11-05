@@ -79,4 +79,14 @@ return [
         'intranet.admin' => 'admin',
     ],
 
+    /*
+    | Cloudron dashboard links and optional read-only API access. The API
+    | token is for the 2FA status view only; never commit a real value.
+    */
+    'cloudron' => [
+        'profile_url' => env('CLOUDRON_PROFILE_URL', 'https://my.cloudron.apes.org.uk/#/profile'),
+        'api_base' => env('CLOUDRON_API_BASE', 'https://my.cloudron.apes.org.uk'),
+        'api_token' => env('CLOUDRON_API_TOKEN'),
+    ],
+
 ];

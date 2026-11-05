@@ -11,7 +11,7 @@
         <section class="sg-card p-5" aria-labelledby="dashboard-coming">
             <h2 id="dashboard-coming" class="font-serif text-xl font-semibold">Coming soon</h2>
             <p class="mt-2 text-sg-muted">
-                Updates, the directory, rotas, the help desk, HR and agreements arrive over the next releases.
+                Updates, rotas, the help desk, HR and agreements arrive over the next releases. The people directory and organisation chart are ready now.
             </p>
         </section>
     </div>

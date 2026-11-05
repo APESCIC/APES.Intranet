@@ -3,7 +3,11 @@
     "name": "apescic/apes-intranet",
     "type": "project",
     "description": "Private intranet for APES CIC staff, volunteers and students.",
-    "keywords": ["apes", "intranet", "laravel"],
+    "keywords": [
+        "apes",
+        "intranet",
+        "laravel"
+    ],
     "license": "proprietary",
     "require": {
         "php": "^8.3",
@@ -28,7 +32,8 @@
         "psr-4": {
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
-            "Database\\Seeders\\": "database/seeders/"
+            "Database\\Seeders\\": "database/seeders/",
+            "Modules\\People\\": "modules/people/src/"
         }
     },
     "autoload-dev": {
