@@ -10,7 +10,7 @@
 
 set -euo pipefail
 
-ENV_FILE=/app/data/shared/.env
+ENV_FILE="${ENV_FILE:-/app/data/shared/.env}"
 
 [[ -f "$ENV_FILE" ]] || { echo "Create $ENV_FILE first." >&2; exit 1; }
 if grep -q '^APP_KEY=base64:' "$ENV_FILE"; then
