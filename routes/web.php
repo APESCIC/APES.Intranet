@@ -18,6 +18,7 @@ Route::view('/privacy', 'core.privacy')->name('privacy');
 Route::get('/login', [OidcController::class, 'show'])->name('login');
 Route::get('/auth/redirect', [OidcController::class, 'redirect'])->name('auth.redirect');
 Route::get('/auth/callback', [OidcController::class, 'callback'])->name('auth.callback');
+Route::get('/auth/reauth', [OidcController::class, 'reauthenticate'])->middleware('auth')->name('auth.reauth');
 Route::post('/logout', [OidcController::class, 'logout'])->middleware('auth')->name('logout');
 
 Route::middleware('auth')->group(function () {

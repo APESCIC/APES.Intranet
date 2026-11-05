@@ -69,6 +69,25 @@ Rules for new code:
   management and admin roles. Use it for "my team" features such as rota
   approvals.
 
+## Fresh sign-in
+
+Put the `fresh-signin` middleware on HR, agreements and other sensitive
+routes, after `auth`:
+
+```php
+Route::middleware(['auth', 'can:hr.access', 'fresh-signin'])->group(...);
+```
+
+At sign-in the intranet keeps Cloudron's `auth_time` claim, the time the person
+last signed in to Cloudron. If that is older than `FRESH_SIGNIN_MINUTES`
+(default 15), the middleware sends them to `/auth/reauth`. That asks Cloudron
+for a new sign-in with `prompt=login` and `max_age=0`, then brings them back to
+the page they asked for. It applies to every role, admin included. If Cloudron
+returns without a new sign-in, the person sees a page that asks them to sign
+out of Cloudron and try again, and `auth.fresh_signin_not_honoured` is
+audited. Cloudron sends no `amr` or `acr` claim, so the intranet cannot require
+MFA by claim.
+
 ## Audit log
 
 Record who did what with `App\Core\Audit\AuditLogger`:

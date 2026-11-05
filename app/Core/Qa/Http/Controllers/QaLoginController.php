@@ -5,6 +5,7 @@ namespace App\Core\Qa\Http\Controllers;
 use App\Core\Access\RoleName;
 use App\Core\Access\RoleStacks;
 use App\Core\Audit\AuditLogger;
+use App\Core\Auth\FreshSignIn;
 use App\Core\Qa\QaLogin;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -38,6 +39,7 @@ class QaLoginController
         $user = QaLogin::userFor($validated['profile']);
         Auth::login($user);
         $request->session()->regenerate();
+        (new FreshSignIn($request->session()))->record(now()->getTimestamp());
         $audit->record('auth.signed_in', $user, ['method' => 'qa', 'roles' => $user->getRoleNames()->all()], $user);
 
         return redirect()->route('dashboard');

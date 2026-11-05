@@ -14,7 +14,7 @@ return [
     | HR and agreements pages ask for a new Cloudron sign-in when the last one
     | is older than this many minutes.
     */
-    'fresh_signin_minutes' => max(1, (int) env('FRESH_SIGNIN_MINUTES', 15)),
+    'fresh_signin_minutes' => max(1, (int) (env('FRESH_SIGNIN_MINUTES') ?: 15)),
 
     /*
     | Cloudron OIDC. The OIDC_* values win; otherwise the Cloudron addon

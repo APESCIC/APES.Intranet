@@ -108,6 +108,16 @@ hand.
 The PHP `ldap` extension must be enabled on the app. The Cloudron LAMP image
 includes it.
 
+## Fresh sign-in for HR and agreements
+
+HR and agreements pages need a Cloudron sign-in from the last
+`FRESH_SIGNIN_MINUTES` minutes (default 15), for every role, admin included.
+After that the intranet sends the person back to Cloudron with
+`prompt=login` and `max_age=0`, and they return to the same page. It does not
+depend on how the person signs in (password, passkey or two-factor), only on
+Cloudron's `auth_time` claim. Details are in
+[architecture.md](architecture.md#fresh-sign-in).
+
 ## Locally
 
 Laragon has no Cloudron. Use the QA role switcher at
