@@ -114,9 +114,11 @@ Always run and check every change in the Laragon live preview at
   label and that milestone on the issue. The form does not apply them itself.
 - Work one milestone at a time, in the order below. Only Foundations is in
   progress until the owner says otherwise.
-- Branch from `main` as `cursor/{feature|fix|chore}/<issue>-<slug>`. Never
-  commit on `main`.
-- Pull requests include `Closes #<n>` for the leaf issue they finish.
+- Each milestone has one branch, `milestone/<milestone-slug>`, created from
+  `main` when work on it starts. Commit issue work on that branch, or on a
+  `cursor/{feature|fix|chore}/<issue>-<slug>` branch off it. Never commit on
+  `main`. See [Milestone shipping](#milestone-shipping).
+- Commits include `Refs #<n>` for the issue they work on.
 
 ## Milestones
 
@@ -142,14 +144,47 @@ Open, in this order:
 
 Do not draft Foundations issues until the owner has approved that report.
 
+## Milestone shipping
+
+Decided by Bambie. Work ships once per milestone, in four stages, in this
+order:
+
+1. Complete **all** the issues in the milestone before moving on.
+2. Put all the milestone's work on `main` in **one merge**: a merge commit,
+   never a squash or a rebase.
+3. Release.
+4. Deploy.
+
+Commit and push on the milestone branch whenever needed. Nothing reaches
+`main`, and nothing is tagged, released or deployed, until stage 2.
+
+Hotfixes: a fix may reach `main`, or be released or deployed, ahead of its
+milestone only with Bambie's written approval on the issue.
+
+Definition of done:
+
+- An issue is done when its acceptance criteria are met and committed on its
+  branch. Close it then, with a link to the commit.
+- A milestone is done only after the single merge, the release and the deploy.
+
+The Cursor rule `.cursor/rules/milestone-shipping.mdc` says the same for
+Cursor agents.
+
 ## Ship flow
 
-1. Open a pull request. Continuous integration runs the `ci` check.
-2. Wait until `ci` is green.
-3. The owner merges. Agents do not merge unless the owner has said to.
-4. Deploy to Cloudron by hand. The deploy workflow is added during
-   Foundations. A green `main` does not deploy itself.
-5. Check `https://intranet.apes.org.uk/healthz` after a deploy.
+Once per milestone, after every other issue in it is closed:
+
+1. Open one pull request from the milestone branch into `main`. Continuous
+   integration runs the `ci` check.
+2. Wait until `ci` is green and Bambie has recorded her review on the
+   milestone's ship issue.
+3. Merge with a merge commit. The owner merges. Agents do not merge unless the
+   owner has said to.
+4. Release once.
+5. Deploy to Cloudron by hand, following
+   [docs/deploy/cloudron.md](docs/deploy/cloudron.md). A green `main` does not
+   deploy itself.
+6. Check `https://intranet.apes.org.uk/healthz` after the deploy.
 
 ## Before going public
 
@@ -161,6 +196,7 @@ Do not draft Foundations issues until the owner has approved that report.
 
 ## Where to find things
 
+- How work ships, for contributors: [CONTRIBUTING.md](CONTRIBUTING.md).
 - Security: [SECURITY.md](SECURITY.md).
 - Conduct: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 - Issue forms: `.github/ISSUE_TEMPLATE`.
