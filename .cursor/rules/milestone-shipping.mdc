@@ -1,5 +1,5 @@
 ---
-description: APES milestone shipping - finish every issue in a milestone, then one merge to main, one release and one deploy
+description: APES milestone shipping - every issue committed on one milestone branch behind one draft PR, then the ship gate, one merge commit to main, one release, one deploy and close-out
 alwaysApply: true
 ---
 
@@ -12,20 +12,34 @@ Work in this repository ships once per milestone, in four stages, in this order:
 3. Release.
 4. Deploy.
 
-## Branches
+Run the milestone end to end from one plan, following the `github-milestone-completion` skill. When a new chat resumes a milestone, carry on with its existing plan.
 
-- Work happens on the milestone branch, `milestone/<milestone-slug>`, created from `main` when work on the milestone starts.
-- Commit and push on the milestone branch (or an issue branch off it) whenever needed.
-- Nothing reaches `main` before stage 2. Do not open a pull request into `main`, merge, tag, release or deploy for a single issue.
-- Stage 2 is one pull request from the milestone branch into `main`, merged with a merge commit after Bambie has recorded her review on the milestone's ship issue.
+## Before work
+
+- Run `repo-sync`, then the `live-preview-gate` skill, so that <http://apes-intranet.test> has loaded in Cursor's browser. Call `SetActiveBranch` after any branch change.
+- Ask every decision with AskQuestion, following `decision-prompts`: Recommended first, a safe stop option, and "Or choose Other to type your own."
+
+## Branch and pull request
+
+- Work happens on one milestone branch, `milestone/<milestone-slug>`, created from `origin/main`. This takes precedence over the skills' `cursor/feature/...` default. Do not create per-issue branches.
+- Commit with `Refs #<n>` and push whenever needed. Bring `main` in by merging (`repo-sync`), never by rebasing or force-pushing.
+- Open **one draft pull request** into `main` after the first commit. It lists `Closes #<n>` for every issue in the milestone, including the Epic. No other pull request goes into `main`.
+- Work every issue in order without asking between them. Stop only for a failure or blocker that the plan does not settle.
+
+## Ship gate
+
+- When every issue is committed: `gh pr ready`, then wait for `ci` to go green.
+- Follow the `ship-gate` skill. Summarise the state, then ask with exactly these options, in this order, marking one `(Recommended)`: a. Merge, b. Release, c. Deploy, d. Merge, release and deploy, e. Stop here. That answer is the only approval. Post it on the Epic.
+- Merge: `gh pr merge --merge`. Release: the milestone version tag (there are no version files). Deploy: the `cloudron-deploy` skill with `deploy/cloudron/deploy.ps1 -Tag vX.Y.Z`, never a branch. After each single step, ask again with only the steps that remain.
 
 ## Hotfixes
 
-A hotfix may go to `main`, or be released or deployed, ahead of its milestone only with Bambie's written approval on the issue. Without that approval, it waits for the milestone.
+A hotfix may go to `main`, or be released or deployed, ahead of its milestone only after Bambie approves it through an AskQuestion answer. It gets its own `cursor/fix/<issue>-<slug>` branch off `origin/main`, is squash-merged and released as a patch, and `main` is then merged back into the open milestone branch.
 
 ## Definition of done
 
-- An issue is done when its acceptance criteria are met and committed on its branch. Close it then, with a link to the commit.
-- A milestone is done only after the single merge, the release and the deploy.
+- An issue is done when its acceptance criteria are met and committed on the milestone branch. Post the Committed comment with `Add-IssueUpdate.ps1` and leave the issue open. It closes when the milestone pull request merges.
+- A milestone is done only after the single merge, the release, a verified deploy (`/healthz` shows the tag's revision), and close-out with `Close-IssueTree.ps1` and `Close-Milestone.ps1`.
+- Never close an issue because it is committed or its pull request is open, or after a failed deploy.
 
-See the "Milestone shipping" section of `AGENTS.md` for the full process.
+See "Milestone shipping", "Ship flow" and "Cursor skills and tools" in `AGENTS.md` for the full process.

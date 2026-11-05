@@ -1,6 +1,6 @@
 name: Chore
 description: Track a concrete piece of maintenance or setup work
-title: "[v0.N.x] NN "
+title: "[Chore] "
 assignees:
   - apescic-director
 type: Task

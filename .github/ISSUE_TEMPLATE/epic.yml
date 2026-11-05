@@ -1,14 +1,16 @@
 name: Epic
-description: Track one milestone slice and its sub-issues
-title: "[v0.N.x] 00 "
+description: Track one milestone and its sub-issues
+title: "[Epic] "
 assignees:
   - apescic-director
 body:
   - type: markdown
     attributes:
       value: |
-        `00` is the epic for this slice. Keep a sub-issue checklist in the
-        body (`- [ ] #123 Short title`) and link each child as a sub-issue.
+        One Epic per milestone, titled `[Epic] <milestone title>`. It is the
+        milestone's ship issue: the ship-gate answer and the deploy evidence
+        are posted here. Keep a sub-issue checklist in the body
+        (`- [ ] #123 [Chore] Short title`) and link each child as a sub-issue.
         Remove credentials, personal data, and real HR, student, volunteer
         or agreement details.
         After opening, set the area label and the milestone to match the

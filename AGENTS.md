@@ -12,18 +12,29 @@ pull requests.
 
 - Never print, paste or commit passwords, secrets, tokens or keys. Not in
   chat, issues, pull requests, logs or docs.
-- Before creating milestones, epics or issues, write a report or Page for the
-  owner to approve.
-- End every report with next options and one recommended option.
+- Ask the owner for every decision with Cursor's AskQuestion tool, following
+  the `decision-prompts` skill: the best option first, ending in
+  `(Recommended)`, with the reason in one line; two to five options; a safe
+  `Stop here` last; and the prompt ending "Or choose Other to type your own."
+  Never list choices as text in chat and wait. Do not ask again about
+  something a confirmed plan, a rule or an earlier answer already settles.
+- Before creating a milestone or an Epic, get the owner's answer to an
+  AskQuestion. For a large batch of new issues, such as a new milestone's
+  scope, write a report or Page for her to approve first.
 - Work only in `APESCIC/APES.Intranet`. Do not open issues in another
   repository.
 - Do not rename or delete labels. The `area:` labels mark the area of work.
-  GitHub's default labels may mark type only.
+  The issue type goes in the title prefix (see
+  [Issues and milestones](#issues-and-milestones)).
 - Agents may change Cloudron: deploys, first-time set-up, rollbacks and app
-  settings. Only after the owner has answered the ship-gate deploy question in
-  the current chat, and only after taking a Cloudron backup. Never print `.env`
-  values, `APP_KEY` or addon credentials.
+  settings. Read-only commands (status, logs, preflight) run freely. A deploy
+  needs the owner's answer to the ship-gate deploy question in the current
+  chat. Any other change needs an AskQuestion answer with
+  `Back up, then <change> (Recommended)` first. Every change starts with a
+  Cloudron backup. Never print `.env` values, `APP_KEY` or addon credentials.
 - Do not change DNS or Cloudflare from an agent session.
+- Security reviews use PHPUnit and the `review-security` skill. Do not use
+  Aikido.
 
 ## Stack
 
@@ -90,6 +101,21 @@ Bambie's approval.
 Always run and check every change in the Laragon live preview at
 <http://apes-intranet.test> before any Cloudron deploy.
 
+Before any change-making work (code, tests, docs or config), follow the
+`live-preview-gate` skill:
+
+1. Pull the latest changes with `repo-sync`. It merges `origin/main` into the
+   milestone branch with a merge commit and never rebases.
+2. Reuse the running Laragon site and Vite server. Start them with
+   `laragon-local-preview` only if they are not running.
+3. Open <http://apes-intranet.test> in Cursor's browser
+   (`cursor-browser-preview`). Confirm that it loaded, then say "Preview ready,
+   starting work".
+
+`composer install` and `npm ci` may run without asking when `vendor/` or
+`node_modules/` is missing. Ask before running migrations or installing any
+system tool.
+
 | Item | Value |
 | --- | --- |
 | App URL | `http://apes-intranet.test` |
@@ -108,10 +134,24 @@ Always run and check every change in the Laragon live preview at
 
 ## Issues and milestones
 
+Follow the `github-issue-types`, `github-work-tracking` and `github-closeout`
+skills.
+
 - Assignee: `apescic-director`.
-- Title prefix `[v0.N.x] NN`, with a two-digit index. `00` is the epic. The
-  epic body keeps a checklist of sub-issues (`- [ ] #123 Short title`), and
-  each child is linked as a sub-issue.
+- Every issue has a milestone. Ask before creating a new milestone.
+- Title: `[Type] Short title`. The type is one of `Epic`, `Story`, `Task`,
+  `Bug`, `Chore` or `Spike`, for example `[Chore] Add a read-only Cloudron
+  preflight check`.
+- Each milestone has one Epic, titled `[Epic] <milestone title>`. Its body
+  keeps a checklist of sub-issues (`- [ ] #123 [Chore] Short title`), and each
+  child is linked as a sub-issue. Stories sit under the Epic. Tasks, bugs and
+  chores sit under a Story or straight under the Epic.
+- The Epic is the milestone's ship issue. The ship-gate answer and the deploy
+  evidence are posted on it.
+- Post progress with the `github-closeout` scripts, not by hand:
+  `Add-IssueUpdate.ps1` for Started, Decision, Blocked, Split and Committed
+  comments, and `Update-MilestoneStatus.ps1` to keep the milestone's status
+  block current.
 - Area labels (do not invent new ones): `area:cloudron`, `area:local-dev`,
   `area:auth`, `area:people`, `area:comms`, `area:operations`,
   `area:helpdesk`, `area:hr`, `area:agreements`, `area:integrations`,
@@ -121,9 +161,11 @@ Always run and check every change in the Laragon live preview at
 - Work one milestone at a time, in the order below. Only Foundations is in
   progress until the owner says otherwise.
 - Each milestone has one branch, `milestone/<milestone-slug>`, created from
-  `main` when work on it starts. Commit issue work on that branch, or on a
-  `cursor/{feature|fix|chore}/<issue>-<slug>` branch off it. Never commit on
-  `main`. See [Milestone shipping](#milestone-shipping).
+  `origin/main` when work on it starts. This name takes precedence over the
+  skills' default `cursor/feature/<epic>-v<x-y-z>-<slug>`. Commit every issue
+  in the milestone on that one branch. Do not create per-issue branches. Never
+  commit on `main`. After creating or switching branch, call `SetActiveBranch`.
+  See [Milestone shipping](#milestone-shipping).
 - Commits include `Refs #<n>` for the issue they work on.
 
 ## Milestones
@@ -161,37 +203,114 @@ order:
 3. Release.
 4. Deploy.
 
-Commit and push on the milestone branch whenever needed. Nothing reaches
-`main`, and nothing is tagged, released or deployed, until stage 2.
+Agents run a milestone end to end from one Cursor plan, following the
+`github-milestone-completion` skill. The plan covers set-up, every issue, the
+pull request, the ship gate (merge, release and deploy) and close-out. When a
+new chat resumes a milestone, it carries on with the existing plan and does
+not make a new one.
 
-Hotfixes: a fix may reach `main`, or be released or deployed, ahead of its
-milestone only with Bambie's written approval on the issue.
+- Open **one draft pull request** from the milestone branch into `main` as
+  soon as the branch has its first commit. Its title is the Epic's title, and
+  its body lists `Closes #<n>` for every issue in the milestone, including the
+  Epic. Continuous integration runs the `ci` check on every push.
+- Commit and push on the milestone branch whenever needed. No other pull
+  request goes into `main`. Nothing is tagged, released or deployed until
+  stage 2.
+- After the plan is confirmed, work every issue in order without stopping to
+  ask between them. Stop and ask only for a failure or blocker that the plan
+  does not settle: red checks after one fix attempt, a blocker outside the
+  plan, or new scope.
 
-Definition of done:
+### Definition of done
 
-- An issue is done when its acceptance criteria are met and committed on its
-  branch. Close it then, with a link to the commit.
-- A milestone is done only after the single merge, the release and the deploy.
+- An issue is done when its acceptance criteria are met and committed on the
+  milestone branch. Post the "Committed" comment (`Add-IssueUpdate.ps1 -Kind
+  Committed`) and leave the issue open. It closes when the milestone pull
+  request merges.
+- A milestone is done only after the single merge, the release, a verified
+  deploy, and close-out. Close-out posts the deploy evidence, rolls up the
+  parents (`Close-IssueTree.ps1`), then closes the Epic and the milestone
+  (`Close-Milestone.ps1`).
+- Never close an issue because it is committed, its pull request is open, or
+  it "looks merged". If a deploy fails, nothing closes. Reopen any issues that
+  closed on the merge until the deploy is fixed or rolled back.
+- Work that is dropped is closed as not planned, with the reason
+  (`Add-IssueUpdate.ps1 -Kind Abandoned`).
+
+### Hotfixes
+
+A fix may reach `main`, or be released or deployed, ahead of its milestone
+only after Bambie has approved it through an AskQuestion answer in the
+current chat. Record that answer on the issue.
+
+1. Create a `cursor/fix/<issue>-<slug>` branch from `origin/main`.
+2. Open its own pull request, squash-merge it after the ship gate, and release
+   it as a patch.
+3. Merge `main` back into the open milestone branch with `repo-sync`. Never
+   rebase or force-push a milestone branch.
 
 The Cursor rule `.cursor/rules/milestone-shipping.mdc` says the same for
 Cursor agents.
 
 ## Ship flow
 
-Once per milestone, after every other issue in it is closed:
+Once per milestone, after every issue in it is committed:
 
-1. Open one pull request from the milestone branch into `main`. Continuous
-   integration runs the `ci` check.
-2. Wait until `ci` is green and Bambie has recorded her review on the
-   milestone's ship issue.
-3. Merge with a merge commit. The owner merges. Agents do not merge unless the
-   owner has said to.
-4. Release once.
-5. Deploy the release to Cloudron, following
-   [docs/deploy/cloudron.md](docs/deploy/cloudron.md). The owner, the APES IT
-   Administrator, or an agent after the ship-gate deploy answer runs it. A
-   green `main` does not deploy itself.
-6. Check `https://intranet.apes.org.uk/healthz` after the deploy.
+1. Run `repo-sync` on the milestone branch. Mark the draft pull request ready
+   (`gh pr ready`) and wait for `ci` to go green
+   (`gh pr checks --watch --fail-fast`). Fix failures on the same branch.
+2. Check that every open issue in the milestone is closed by the pull request
+   (`Closes #<n>`), or has been moved out with the owner's answer.
+3. Ask the ship-gate question, following the `ship-gate` skill. First
+   summarise the milestone, the pull request, the checks, the merge method, the
+   release tag and the deploy target. Then ask with these options, in this
+   order, marking one `(Recommended)`: **a. Merge**, **b. Release**,
+   **c. Deploy**, **d. Merge, release and deploy**, **e. Stop here**. The
+   answer is the owner's approval, and nothing else counts as consent: not a
+   confirmed plan, and not "ship it". Post the answer on the Epic.
+4. Run only the chosen steps, in order, and verify each one. After each single
+   step, ask again with only the steps that remain.
+   - **Merge:** `gh pr merge <pr> --merge --delete-branch`. A merge commit,
+     never a squash or a rebase.
+   - **Release:** tag the merge commit with the milestone's version, for
+     example `v0.0.3`, and publish a GitHub release. This repository keeps no
+     version files. The tag is the version, and `/healthz` reports the
+     revision.
+   - **Deploy:** follow the `cloudron-deploy` skill and
+     [docs/deploy/cloudron.md](docs/deploy/cloudron.md):
+     `deploy/cloudron/deploy.ps1 -Tag vX.Y.Z`. It runs the preflight, takes a
+     backup, deploys the release tag (never a branch), verifies `/healthz` and
+     rolls back on failure. A green `main` does not deploy itself.
+5. Check `https://intranet.apes.org.uk/healthz` and confirm that `revision`
+   matches the tag's commit. Post the deploy summary on the Epic.
+6. Close out with the `github-closeout` scripts. Then post a completion
+   message in chat with the milestone, the pull request and its merge commit,
+   the issues shipped, the release and the deploy evidence.
+
+## Cursor skills and tools
+
+Agents in Cursor use these skills. The steps above come from them. If a skill
+disagrees with this file, follow this file.
+
+| Step | Skills |
+| --- | --- |
+| Starting any change | `repo-sync`, `live-preview-gate`, `laragon-local-preview`, `cursor-browser-preview` |
+| Asking for a decision | `decision-prompts` (AskQuestion) |
+| Delivering a milestone | `github-milestone-completion`, `github-cli` (its milestone-to-deploy playbook) |
+| Issues, comments and close-out | `github-issue-types`, `github-work-tracking`, `github-closeout` |
+| Continuous integration | `github-actions`, `loop-on-ci`, `fix-ci` |
+| Merge, release and deploy | `ship-gate`, `cloudron-deploy` |
+| Operating the Cloudron app | `cloudron-ops` (status, logs, backups, env, restarts) |
+| Security review | `review-security` and PHPUnit |
+
+Tools:
+
+- `gh` for GitHub: issues, sub-issues, pull requests, checks and releases.
+  Write Markdown bodies to a file and pass `--body-file`.
+- The `cloudron` CLI, signed in to `my.cloudron.apes.org.uk`, for the app.
+- AskQuestion for every decision, and `SetActiveBranch` after a branch
+  change.
+- Cursor's browser for the live preview.
 
 ## Before going public
 
@@ -204,6 +323,8 @@ Once per milestone, after every other issue in it is closed:
 ## Where to find things
 
 - How work ships, for contributors: [CONTRIBUTING.md](CONTRIBUTING.md).
+- Deploying to Cloudron: [docs/deploy/cloudron.md](docs/deploy/cloudron.md).
+- Pull request form: `.github/pull_request_template.md`.
 - Security: [SECURITY.md](SECURITY.md).
 - Conduct: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 - Issue forms: `.github/ISSUE_TEMPLATE`.
