@@ -57,8 +57,13 @@ PHP 8.3. Both meet the PHP 8.3 floor. Do not pin Cloudron back to 8.3.
 Decided.
 
 - Cloudron OIDC, with LDAP groups, in the same way as MyAPES Account.
-- Volunteers and students are Cloudron directory users in `intranet.*` groups.
-- Roles: staff, volunteer, student, manager, HR, legal, admin.
+- Volunteers and students are Cloudron directory users. Access comes only
+  from the 8 approved groups in `config/intranet.php`: `intranet.staff`,
+  `intranet.volunteer`, `intranet.student`, `intranet.supervisor`,
+  `intranet.management`, `intranet.hr`, `intranet.legal` and
+  `intranet.admin`.
+- Account types: staff, volunteer, student. Permission roles: supervisor,
+  management, HR, legal, admin.
 
 ## Decided features
 
@@ -237,6 +242,24 @@ not make a new one.
 - Work that is dropped is closed as not planned, with the reason
   (`Add-IssueUpdate.ps1 -Kind Abandoned`).
 
+### Dependency updates
+
+Decided by Bambie on 5 November 2026 (#123). Dependabot opens one grouped
+pull request a week per ecosystem (Composer, npm and GitHub Actions) into the
+long-lived `dependencies` branch, never into `main`.
+
+1. Merge Dependabot pull requests into `dependencies` once `ci` is green. They
+   are not ship-gated, because nothing reaches `main` from them directly.
+2. When work on a milestone starts, merge `origin/dependencies` into the
+   milestone branch with a merge commit (`git merge --no-edit
+   origin/dependencies`), then push. The updates ship in the milestone's single
+   merge.
+3. After each milestone ships, merge `origin/main` into `dependencies` so the
+   next updates start from the released code.
+
+A security update that cannot wait for the milestone follows the hotfix route
+below.
+
 ### Hotfixes
 
 A fix may reach `main`, or be released or deployed, ahead of its milestone
@@ -244,8 +267,10 @@ only after Bambie has approved it through an AskQuestion answer in the
 current chat. Record that answer on the issue.
 
 1. Create a `cursor/fix/<issue>-<slug>` branch from `origin/main`.
-2. Open its own pull request, squash-merge it after the ship gate, and release
-   it as a patch.
+2. Open its own pull request, merge it after the ship gate with a merge
+   commit (`gh pr merge --merge`), and release it as a patch. `main` accepts
+   merge commits only: its ruleset and the repository settings turn off
+   squash and rebase merges.
 3. Merge `main` back into the open milestone branch with `repo-sync`. Never
    rebase or force-push a milestone branch.
 

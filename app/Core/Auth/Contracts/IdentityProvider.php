@@ -9,9 +9,11 @@ use Illuminate\Http\RedirectResponse;
 interface IdentityProvider
 {
     /**
+     * @param  bool  $forceLogin  Ask Cloudron for a new sign-in even if its own session is still open.
+     *
      * @throws IdentityProviderUnavailable
      */
-    public function authorizationRedirect(): RedirectResponse;
+    public function authorizationRedirect(bool $forceLogin = false): RedirectResponse;
 
     /**
      * @throws IdentityProviderUnavailable

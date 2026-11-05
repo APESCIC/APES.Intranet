@@ -2,6 +2,7 @@
 
 use App\Core\Access\AccessMatrix;
 use App\Core\Access\RoleName;
+use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Permission;
@@ -9,7 +10,7 @@ use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
 
-it('creates the seven intranet roles with their permissions', function () {
+it('creates the eight intranet roles with their permissions', function () {
     $this->seed(RolesAndPermissionsSeeder::class);
 
     expect(Role::pluck('name')->sort()->values()->all())
@@ -27,6 +28,18 @@ it('is idempotent', function () {
 
     expect(Role::count())->toBe(count(RoleName::cases()))
         ->and(Permission::count())->toBe(count(AccessMatrix::permissions()));
+});
+
+it('removes a role that left the matrix once nobody holds it', function () {
+    $this->seed(RolesAndPermissionsSeeder::class);
+    Role::findOrCreate('manager', 'web');
+    $held = Role::findOrCreate('retired', 'web');
+    User::factory()->create()->assignRole($held);
+
+    $this->seed(RolesAndPermissionsSeeder::class);
+
+    expect(Role::where('name', 'manager')->exists())->toBeFalse()
+        ->and(Role::where('name', 'retired')->exists())->toBeTrue();
 });
 
 it('removes a permission that was granted to a role by hand', function () {

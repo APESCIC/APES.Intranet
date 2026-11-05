@@ -34,7 +34,8 @@ created, for example `"Modules\\People\\": "modules/people/src/"`.
 
 ## Roles and permissions
 
-Roles come from Cloudron directory groups (`intranet.*`) at each sign-in. The
+Roles come from the 8 approved Cloudron directory groups (see
+[cloudron-sign-in.md](cloudron-sign-in.md)) at each sign-in. The
 intranet never edits them. `spatie/laravel-permission` stores them.
 
 `App\Core\Access\AccessMatrix` is the single list of Core roles and base
@@ -48,9 +49,11 @@ php artisan db:seed --class="Database\Seeders\RolesAndPermissionsSeeder" --force
 
 | Role | Base permissions |
 | --- | --- |
-| staff, volunteer, student | `intranet.access` |
-| manager | `intranet.access`, `team.manage` |
-| HR | `intranet.access`, `hr.access` |
+| staff, volunteer (account types) | `intranet.access` |
+| student (account type) | `intranet.access`, `student.area` |
+| supervisor | `intranet.access`, `team.supervise` |
+| management | `intranet.access`, `team.supervise`, `team.manage`, `hr.access`, `hr.special_category.view` |
+| HR | `intranet.access`, `hr.access`, `hr.special_category.view` |
 | legal | `intranet.access`, `legal.access` |
 | admin | Every permission |
 
@@ -63,8 +66,62 @@ Rules for new code:
   register it in the layer's service provider. `RolePolicy` is the example.
 - A module adds its permissions in its own seeder and grants them to admin
   there.
-- `User::isSupervisor()` is true for the manager role and for anyone with the
-  `is_supervisor` flag. Use it for "my team" features such as rota approvals.
+- `User::isSupervisor()` is `can('team.supervise')`: true for the supervisor,
+  management and admin roles. Use it for "my team" features such as rota
+  approvals.
+
+### The permissions matrix
+
+The approved matrix (5 November 2026) has one gate per row, listed in
+`AccessMatrix::rows()` and registered by `MatrixPolicies`. Modules call the
+gate, never a role name:
+
+| Gate | Who |
+| --- | --- |
+| `viewTeamRota`, `approveTeamSwap`, `approveTeamTimesheet`, `viewTeamChecklist`, `approveStudentHours` | Supervisors for their own team; management and admin for every team |
+| `useStudentArea` | Students and admin |
+| `viewHrRecord` | HR, management and admin |
+| `viewSpecialCategory` (DBS and health) | HR, management and admin |
+| `viewLegalRecord` | Legal and admin |
+
+"Own team" works through `App\Core\Access\Contracts\BelongsToTeam`: a module's
+rota, swap, timesheet, checklist or student hours model implements
+`isSupervisedBy(User $user)`.
+
+Open HR, DBS, health and legal records only through
+`App\Core\Access\SensitiveData`:
+
+```php
+$data->openHrRecord($record);
+$data->openSpecialCategory($record, SensitiveData::DBS);
+$data->openLegalRecord($agreement);
+```
+
+It checks the gate and a fresh sign-in for every role, admin included, even
+if a route forgot the `fresh-signin` middleware. It also writes the audit
+entries. Every view of DBS or health data is audited
+(`hr.special_category.viewed`, with the category but never the contents), and
+so is every admin or management view of an HR or legal record
+(`hr.record.viewed`, `legal.record.viewed`).
+
+## Fresh sign-in
+
+Put the `fresh-signin` middleware on HR, agreements and other sensitive
+routes, after `auth`:
+
+```php
+Route::middleware(['auth', 'can:hr.access', 'fresh-signin'])->group(...);
+```
+
+At sign-in the intranet keeps Cloudron's `auth_time` claim, the time the person
+last signed in to Cloudron. If that is older than `FRESH_SIGNIN_MINUTES`
+(default 15), the middleware sends them to `/auth/reauth`. That asks Cloudron
+for a new sign-in with `prompt=login` and `max_age=0`, then brings them back to
+the page they asked for. It applies to every role, admin included. If Cloudron
+returns without a new sign-in, the person sees a page that asks them to sign
+out of Cloudron and try again, and `auth.fresh_signin_not_honoured` is
+audited. Cloudron sends no `amr` or `acr` claim, so the intranet cannot require
+MFA by claim.
 
 ## Audit log
 
@@ -81,8 +138,18 @@ browser and any context. Entries cannot be edited or deleted one at a time.
 cron must run `php artisan schedule:run` every minute for this to happen.
 
 Core already records `auth.signed_in`, `auth.signed_out`,
-`auth.sign_in_denied`, `roles.changed`, `admin.roles.viewed` and
-`admin.audit.viewed`. Admins read the log at `/admin/audit`.
+`auth.sign_in_denied`, `auth.fresh_signin_required`,
+`auth.fresh_signin_not_honoured`, `roles.changed`, `admin.roles.viewed`,
+`admin.audit.viewed`, `admin.system.viewed`, `admin.system.test_email`,
+`admin.access_review.viewed`, `hr.record.viewed`,
+`hr.special_category.viewed` and `legal.record.viewed`. Admins read the log at
+`/admin/audit`.
+
+Admin and HR run the quarterly access review at **Admin > Access review**. It
+lists people with more than one senior role, role holders who have not signed
+in for 90 days, people in no group, and admin or management views of DBS and
+health data. `access-review:remind` emails admin and HR on the first day of
+each quarter at 09:00.
 
 Do not put special category data (health, DBS results, and so on) in the
 context. Record ids, not contents.

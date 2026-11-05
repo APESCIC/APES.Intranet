@@ -11,10 +11,13 @@ use Throwable;
 
 class CloudronIdentityProvider implements IdentityProvider
 {
-    public function authorizationRedirect(): RedirectResponse
+    public function authorizationRedirect(bool $forceLogin = false): RedirectResponse
     {
         try {
             $client = $this->client();
+            if ($forceLogin) {
+                $client->addAuthParam(['prompt' => 'login', 'max_age' => 0]);
+            }
             $authenticated = $client->authenticate();
             $redirect = $client->capturedRedirect();
         } catch (Throwable $exception) {
@@ -38,6 +41,7 @@ class CloudronIdentityProvider implements IdentityProvider
             }
 
             $subject = $this->claim($client->getVerifiedClaims('sub'));
+            $authTime = $client->getVerifiedClaims('auth_time');
             $userInfo = $client->requestUserInfo();
         } catch (IdentityProviderUnavailable $exception) {
             throw $exception;
@@ -59,6 +63,7 @@ class CloudronIdentityProvider implements IdentityProvider
             subject: $subject,
             email: $this->claim($userInfo->email ?? null),
             name: $this->claim($userInfo->name ?? null),
+            authTime: is_numeric($authTime) ? (int) $authTime : null,
         );
     }
 

@@ -9,28 +9,42 @@ the current chat does the steps below.
 
 ## Groups
 
-Create these groups in Cloudron (**Users > Groups**) and add people to them:
+Create these groups in Cloudron (**Users > Groups**) and add people to them.
 
-| Cloudron group | Intranet role |
-| --- | --- |
-| `intranet.staff` | staff |
-| `intranet.volunteer` | volunteer |
-| `intranet.student` | student |
-| `intranet.manager` | manager |
-| `intranet.hr` | HR |
-| `intranet.legal` | legal |
-| `intranet.admin` | admin |
+**Account types** say who someone is. Everyone has one:
 
-A person can be in more than one group. Groups that do not start with
-`intranet.` are ignored. The mapping lives in `config/intranet.php`
-(`group_roles`).
+| Cloudron group | Intranet role | Permissions |
+| --- | --- | --- |
+| `intranet.staff` | staff | `intranet.access` |
+| `intranet.volunteer` | volunteer | `intranet.access` |
+| `intranet.student` | student | `intranet.access` |
+
+**Permission roles** say what someone can do, on top of an account type:
+
+| Cloudron group | Intranet role | Permissions |
+| --- | --- | --- |
+| `intranet.supervisor` | supervisor | `team.supervise`: oversee their own team, meaning view it and approve its shifts, swaps and timesheets |
+| `intranet.management` | management | `team.supervise`, `team.manage` and `hr.access` (all HR records) |
+| `intranet.hr` | HR | `hr.access` |
+| `intranet.legal` | legal | `legal.access` |
+| `intranet.admin` | admin | Every permission |
+
+Every role also has `intranet.access`. A person can be in more than one group.
+
+Signed-in people can read a plain-English version of this table, with who
+can see HR and legal records and how access is audited, at **Support > Who can
+see what** (`/access`).
+
+Only these 8 groups grant access. Any other group is ignored, including any
+other name that starts with `intranet.`. The list and the mapping live in
+`config/intranet.php` (`group_roles`).
 
 At every sign-in:
 
-- Each `intranet.*` group gives its role.
+- Each approved group gives its role.
 - A role is removed when the person has left its group.
-- A person with no `intranet.*` group sees a "No intranet access" page, and
-  any roles they had are removed.
+- A person in none of the 8 groups sees a "No intranet access" page, and any
+  roles they had are removed.
 
 Someone who is already signed in keeps their roles until they sign in again.
 
@@ -88,11 +102,21 @@ hand.
      `PASS OIDC issuer, client id and client secret are set`.
    - An `intranet.admin` member signs in at <https://intranet.apes.org.uk>
      and opens **Admin > Audit log**.
-   - A Cloudron user in no `intranet.*` group gets the "No intranet access"
+   - A Cloudron user in none of the 8 approved groups gets the "No intranet access"
      page.
 
 The PHP `ldap` extension must be enabled on the app. The Cloudron LAMP image
 includes it.
+
+## Fresh sign-in for HR and agreements
+
+HR and agreements pages need a Cloudron sign-in from the last
+`FRESH_SIGNIN_MINUTES` minutes (default 15), for every role, admin included.
+After that the intranet sends the person back to Cloudron with
+`prompt=login` and `max_age=0`, and they return to the same page. It does not
+depend on how the person signs in (password, passkey or two-factor), only on
+Cloudron's `auth_time` claim. Details are in
+[architecture.md](architecture.md#fresh-sign-in).
 
 ## Locally
 

@@ -22,6 +22,7 @@ Run the milestone end to end from one plan, following the `github-milestone-comp
 ## Branch and pull request
 
 - Work happens on one milestone branch, `milestone/<milestone-slug>`, created from `origin/main`. This takes precedence over the skills' `cursor/feature/...` default. Do not create per-issue branches.
+- When work on a milestone starts, merge `origin/dependencies` (Dependabot's target branch) into the milestone branch with a merge commit. After a milestone ships, merge `origin/main` into `dependencies`. See "Dependency updates" in `AGENTS.md`.
 - Commit with `Refs #<n>` and push whenever needed. Bring `main` in by merging (`repo-sync`), never by rebasing or force-pushing.
 - Open **one draft pull request** into `main` after the first commit. It lists `Closes #<n>` for every issue in the milestone, including the Epic. No other pull request goes into `main`.
 - Work every issue in order without asking between them. Stop only for a failure or blocker that the plan does not settle.
@@ -34,7 +35,7 @@ Run the milestone end to end from one plan, following the `github-milestone-comp
 
 ## Hotfixes
 
-A hotfix may go to `main`, or be released or deployed, ahead of its milestone only after Bambie approves it through an AskQuestion answer. It gets its own `cursor/fix/<issue>-<slug>` branch off `origin/main`, is squash-merged and released as a patch, and `main` is then merged back into the open milestone branch.
+A hotfix may go to `main`, or be released or deployed, ahead of its milestone only after Bambie approves it through an AskQuestion answer. It gets its own `cursor/fix/<issue>-<slug>` branch off `origin/main`, is merged with a merge commit (`main` accepts merge commits only) and released as a patch, and `main` is then merged back into the open milestone branch.
 
 ## Definition of done
 

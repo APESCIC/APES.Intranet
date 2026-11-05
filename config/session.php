@@ -18,7 +18,7 @@ return [
     |
     */
 
-    'driver' => env('SESSION_DRIVER') ?: (env('CLOUDRON_REDIS_HOST') ? 'redis' : 'database'),
+    'driver' => env('CLOUDRON_REDIS_HOST') ? 'redis' : (env('SESSION_DRIVER') ?: 'database'),
 
     /*
     |--------------------------------------------------------------------------

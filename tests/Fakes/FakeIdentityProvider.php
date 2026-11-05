@@ -13,13 +13,17 @@ final class FakeIdentityProvider implements IdentityProvider
 
     public bool $unavailable = false;
 
-    public function authorizationRedirect(): RedirectResponse
+    public ?bool $lastForceLogin = null;
+
+    public function authorizationRedirect(bool $forceLogin = false): RedirectResponse
     {
         if ($this->unavailable) {
             throw new IdentityProviderUnavailable('down');
         }
 
-        return redirect()->away('https://my.cloudron.example.test/openid/auth');
+        $this->lastForceLogin = $forceLogin;
+
+        return redirect()->away('https://my.cloudron.example.test/openid/auth'.($forceLogin ? '?prompt=login&max_age=0' : ''));
     }
 
     public function callbackIdentity(): OidcIdentity

@@ -38,6 +38,7 @@ final class Menu
             new NavGroup('support', 'Support', [
                 NavItem::soon('help-desk', 'Help desk', 'life-buoy', AccessMatrix::INTRANET_ACCESS),
                 NavItem::soon('handbook', 'Handbook and training', 'book-open', AccessMatrix::INTRANET_ACCESS),
+                NavItem::route('access-guide', 'Who can see what', 'key-round', AccessMatrix::INTRANET_ACCESS, 'access-guide'),
             ]),
             new NavGroup('hr-legal', 'HR and legal', [
                 NavItem::soon('hr', 'HR', 'briefcase', AccessMatrix::HR_ACCESS),
@@ -46,6 +47,8 @@ final class Menu
             new NavGroup('admin', 'Admin', [
                 NavItem::route('roles', 'Roles', 'shield-check', AccessMatrix::ADMIN_ROLES_VIEW, 'admin.roles.index', 'admin.roles.*'),
                 NavItem::route('audit', 'Audit log', 'scroll-text', AccessMatrix::ADMIN_AUDIT_VIEW, 'admin.audit.index'),
+                NavItem::route('access-review', 'Access review', 'clipboard-check', AccessMatrix::ACCESS_REVIEW_VIEW, 'admin.access-review.index'),
+                NavItem::route('system', 'System status', 'activity', AccessMatrix::ADMIN_SYSTEM_VIEW, 'admin.system.index', 'admin.system.*'),
             ]),
         ];
     }
