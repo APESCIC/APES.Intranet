@@ -1,5 +1,7 @@
 <?php
 
+use App\Core\System\CloudronAddons;
+
 $csv = static fn (?string $value): array => array_values(array_filter(array_map('trim', explode(',', (string) $value))));
 
 return [
@@ -42,6 +44,15 @@ return [
         'group_attribute' => env('LDAP_GROUP_ATTRIBUTE', 'memberOf'),
         'timeout_seconds' => 5,
     ],
+
+    /*
+    | Names (never values) of the addon variables that are set, worked out
+    | when the config is cached, for Admin > System status.
+    */
+    'cloudron_variables' => array_values(array_filter(
+        array_merge(...array_column(CloudronAddons::definitions(), 'variables')),
+        fn (string $name) => filled(env($name)),
+    )),
 
     /*
     | How long records are kept. A blank or too-small value falls back to a

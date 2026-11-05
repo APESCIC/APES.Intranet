@@ -7,6 +7,7 @@ use App\Core\Audit\Http\Controllers\AuditLogIndexController;
 use App\Core\Auth\Http\Controllers\OidcController;
 use App\Core\Qa\Http\Controllers\QaLoginController;
 use App\Core\Qa\Http\Middleware\EnsureQaLoginEnabled;
+use App\Core\System\Http\Controllers\SystemStatusController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -35,6 +36,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/audit', AuditLogIndexController::class)
             ->middleware('can:'.AccessMatrix::ADMIN_AUDIT_VIEW)
             ->name('audit.index');
+        Route::middleware(['can:'.AccessMatrix::ADMIN_SYSTEM_VIEW, 'fresh-signin'])->group(function () {
+            Route::get('/system', SystemStatusController::class)->name('system.index');
+        });
     });
 });
 

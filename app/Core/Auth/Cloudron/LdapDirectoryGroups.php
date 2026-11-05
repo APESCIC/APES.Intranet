@@ -63,6 +63,20 @@ class LdapDirectoryGroups implements DirectoryGroups
         return array_values(array_unique($groups));
     }
 
+    /**
+     * Binds with the service account and disconnects, for health checks.
+     *
+     * @throws DirectoryUnavailable
+     */
+    public function checkBind(): void
+    {
+        if (! function_exists('ldap_connect')) {
+            throw new DirectoryUnavailable('The PHP LDAP extension is not installed.');
+        }
+
+        @ldap_unbind($this->connect());
+    }
+
     private function connect(): Connection
     {
         $ldap = @ldap_connect('ldap://'.$this->config('host').':'.(int) config('intranet.ldap.port', 389));

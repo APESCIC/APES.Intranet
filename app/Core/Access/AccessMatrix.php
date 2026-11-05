@@ -22,6 +22,8 @@ final class AccessMatrix
 
     public const ADMIN_AUDIT_VIEW = 'admin.audit.view';
 
+    public const ADMIN_SYSTEM_VIEW = 'admin.system.view';
+
     /**
      * @return array<string, string> Permission name => description.
      */
@@ -35,6 +37,7 @@ final class AccessMatrix
             self::LEGAL_ACCESS => 'Open the agreements and legal area',
             self::ADMIN_ROLES_VIEW => 'View roles and permissions',
             self::ADMIN_AUDIT_VIEW => 'View the audit log',
+            self::ADMIN_SYSTEM_VIEW => 'View system status and send a test email',
         ];
     }
 

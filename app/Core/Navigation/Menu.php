@@ -47,6 +47,7 @@ final class Menu
             new NavGroup('admin', 'Admin', [
                 NavItem::route('roles', 'Roles', 'shield-check', AccessMatrix::ADMIN_ROLES_VIEW, 'admin.roles.index', 'admin.roles.*'),
                 NavItem::route('audit', 'Audit log', 'scroll-text', AccessMatrix::ADMIN_AUDIT_VIEW, 'admin.audit.index'),
+                NavItem::route('system', 'System status', 'activity', AccessMatrix::ADMIN_SYSTEM_VIEW, 'admin.system.index', 'admin.system.*'),
             ]),
         ];
     }

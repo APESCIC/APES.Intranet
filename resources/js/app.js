@@ -1,4 +1,5 @@
 import {
+    Activity,
     BookOpen,
     Briefcase,
     CalendarDays,
@@ -26,6 +27,7 @@ import {
 import { initDrawer } from './shell/drawer.js';
 
 const icons = {
+    Activity,
     BookOpen,
     Briefcase,
     CalendarDays,
