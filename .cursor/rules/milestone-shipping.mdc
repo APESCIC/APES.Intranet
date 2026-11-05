@@ -34,7 +34,7 @@ Run the milestone end to end from one plan, following the `github-milestone-comp
 
 ## Hotfixes
 
-A hotfix may go to `main`, or be released or deployed, ahead of its milestone only after Bambie approves it through an AskQuestion answer. It gets its own `cursor/fix/<issue>-<slug>` branch off `origin/main`, is squash-merged and released as a patch, and `main` is then merged back into the open milestone branch.
+A hotfix may go to `main`, or be released or deployed, ahead of its milestone only after Bambie approves it through an AskQuestion answer. It gets its own `cursor/fix/<issue>-<slug>` branch off `origin/main`, is merged with a merge commit (`main` accepts merge commits only) and released as a patch, and `main` is then merged back into the open milestone branch.
 
 ## Definition of done
 

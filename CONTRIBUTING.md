@@ -23,8 +23,9 @@ milestone pull request merges. The Epic and the milestone close after a
 verified deploy.
 
 A hotfix may ship earlier only with Bambie's approval. It goes on its own
-`cursor/fix/<issue>-<slug>` branch, is squash-merged and released as a patch,
-and `main` is then merged back into the milestone branch.
+`cursor/fix/<issue>-<slug>` branch, is merged with a merge commit and released
+as a patch, and `main` is then merged back into the milestone branch. `main`
+accepts merge commits only.
 
 Issue titles start with the type: `[Epic]`, `[Story]`, `[Task]`, `[Bug]`,
 `[Chore]` or `[Spike]`.

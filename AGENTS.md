@@ -244,8 +244,10 @@ only after Bambie has approved it through an AskQuestion answer in the
 current chat. Record that answer on the issue.
 
 1. Create a `cursor/fix/<issue>-<slug>` branch from `origin/main`.
-2. Open its own pull request, squash-merge it after the ship gate, and release
-   it as a patch.
+2. Open its own pull request, merge it after the ship gate with a merge
+   commit (`gh pr merge --merge`), and release it as a patch. `main` accepts
+   merge commits only: its ruleset and the repository settings turn off
+   squash and rebase merges.
 3. Merge `main` back into the open milestone branch with `repo-sync`. Never
    rebase or force-push a milestone branch.
 
