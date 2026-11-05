@@ -164,7 +164,7 @@ If `php` or `composer` are not on `PATH`, add Laragon's, for example
 9. On any failure from step 7 on, rolls back to the earlier release, restarts,
    verifies again, and exits 1.
 10. Prints a summary (release id, revision, backup id, `/healthz` output). Paste
-    it on the ship issue.
+    it on the milestone's Epic, which is its ship issue.
 
 Exit code 0 means the release is live and verified. Exit code 1 means nothing
 changed, or the app was rolled back. The summary says which.
@@ -258,7 +258,7 @@ Use this only if `deploy.ps1` cannot run. It does the same steps.
     ```
 
 11. **Record** the release id, revision, backup id and `/healthz` output on the
-    ship issue.
+    milestone's Epic.
 
 ## Troubleshooting
 
