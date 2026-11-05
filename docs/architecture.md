@@ -34,7 +34,8 @@ created, for example `"Modules\\People\\": "modules/people/src/"`.
 
 ## Roles and permissions
 
-Roles come from Cloudron directory groups (`intranet.*`) at each sign-in. The
+Roles come from the 8 approved Cloudron directory groups (see
+[cloudron-sign-in.md](cloudron-sign-in.md)) at each sign-in. The
 intranet never edits them. `spatie/laravel-permission` stores them.
 
 `App\Core\Access\AccessMatrix` is the single list of Core roles and base

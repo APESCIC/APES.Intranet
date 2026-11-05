@@ -46,8 +46,10 @@ return [
     ],
 
     /*
-    | Cloudron directory groups that grant an intranet role. Other groups are
-    | ignored.
+    | The 8 approved Cloudron directory groups and the role each one grants
+    | (decided by Bambie, 5 Nov 2026). Only these grant access: any other
+    | group, including other intranet.* names, is ignored, and a person in
+    | none of them sees the "No intranet access" page.
     */
     'group_roles' => [
         'intranet.staff' => 'staff',

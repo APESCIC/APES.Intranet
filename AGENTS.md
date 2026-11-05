@@ -57,7 +57,11 @@ PHP 8.3. Both meet the PHP 8.3 floor. Do not pin Cloudron back to 8.3.
 Decided.
 
 - Cloudron OIDC, with LDAP groups, in the same way as MyAPES Account.
-- Volunteers and students are Cloudron directory users in `intranet.*` groups.
+- Volunteers and students are Cloudron directory users. Access comes only
+  from the 8 approved groups in `config/intranet.php`: `intranet.staff`,
+  `intranet.volunteer`, `intranet.student`, `intranet.supervisor`,
+  `intranet.management`, `intranet.hr`, `intranet.legal` and
+  `intranet.admin`.
 - Account types: staff, volunteer, student. Permission roles: supervisor,
   management, HR, legal, admin.
 

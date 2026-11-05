@@ -29,16 +29,18 @@ Create these groups in Cloudron (**Users > Groups**) and add people to them.
 | `intranet.legal` | legal | `legal.access` |
 | `intranet.admin` | admin | Every permission |
 
-Every role also has `intranet.access`. A person can be in more than one group. Groups that do not start with
-`intranet.` are ignored. The mapping lives in `config/intranet.php`
-(`group_roles`).
+Every role also has `intranet.access`. A person can be in more than one group.
+
+Only these 8 groups grant access. Any other group is ignored, including any
+other name that starts with `intranet.`. The list and the mapping live in
+`config/intranet.php` (`group_roles`).
 
 At every sign-in:
 
-- Each `intranet.*` group gives its role.
+- Each approved group gives its role.
 - A role is removed when the person has left its group.
-- A person with no `intranet.*` group sees a "No intranet access" page, and
-  any roles they had are removed.
+- A person in none of the 8 groups sees a "No intranet access" page, and any
+  roles they had are removed.
 
 Someone who is already signed in keeps their roles until they sign in again.
 
@@ -96,7 +98,7 @@ hand.
      `PASS OIDC issuer, client id and client secret are set`.
    - An `intranet.admin` member signs in at <https://intranet.apes.org.uk>
      and opens **Admin > Audit log**.
-   - A Cloudron user in no `intranet.*` group gets the "No intranet access"
+   - A Cloudron user in none of the 8 approved groups gets the "No intranet access"
      page.
 
 The PHP `ldap` extension must be enabled on the app. The Cloudron LAMP image

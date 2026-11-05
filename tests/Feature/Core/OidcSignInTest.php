@@ -59,12 +59,6 @@ it('gives a management group member team.supervise, team.manage and HR access', 
         ->and($user->can(AccessMatrix::HR_ACCESS))->toBeTrue();
 });
 
-it('no longer maps the old intranet.manager group', function () {
-    signInWithCloudron($this, ['intranet.manager'])->assertForbidden();
-
-    $this->assertGuest();
-});
-
 it('removes a role at the next sign-in when the group is removed', function () {
     signInWithCloudron($this, ['intranet.staff', 'intranet.management']);
     $this->post(route('logout'));

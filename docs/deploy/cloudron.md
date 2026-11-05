@@ -279,4 +279,4 @@ Use this only if `deploy.ps1` cannot run. It does the same steps.
   audit log should still be there, which shows the data survives a restart.
 - The logs show "Starting queue worker" and "Starting scheduler". The
   scheduler runs `audit:prune` every night at 03:15.
-- Sign in with a Cloudron account in an `intranet.*` group.
+- Sign in with a Cloudron account in one of the 8 approved groups.
