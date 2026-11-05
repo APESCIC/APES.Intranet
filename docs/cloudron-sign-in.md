@@ -4,8 +4,8 @@ Staff, volunteers and students sign in with their Cloudron account through
 OpenID Connect (OIDC). At each sign-in, the intranet reads the person's
 groups from Cloudron LDAP and sets their intranet roles to match.
 
-Agents do not change Cloudron. The owner or the APES IT Administrator does the
-steps below.
+The owner, the APES IT Administrator, or an agent with the owner's approval in
+the current chat does the steps below.
 
 ## Groups
 

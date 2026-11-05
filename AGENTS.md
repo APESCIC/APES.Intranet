@@ -19,7 +19,11 @@ pull requests.
   repository.
 - Do not rename or delete labels. The `area:` labels mark the area of work.
   GitHub's default labels may mark type only.
-- Do not change DNS, Cloudflare or Cloudron from an agent session.
+- Agents may change Cloudron: deploys, first-time set-up, rollbacks and app
+  settings. Only after the owner has answered the ship-gate deploy question in
+  the current chat, and only after taking a Cloudron backup. Never print `.env`
+  values, `APP_KEY` or addon credentials.
+- Do not change DNS or Cloudflare from an agent session.
 
 ## Stack
 
@@ -75,9 +79,11 @@ The domain already points straight at the Cloudron app. The A and AAAA
 records are unproxied. The certificate is a valid Let's Encrypt certificate.
 The SharePoint redirect has been removed.
 
-Until the Laravel app is deployed, the APES IT Administrator is putting up a
-simple APES "coming soon" holding page. Further DNS changes, if any are ever
-needed, are made by the APES IT Administrator with Bambie's approval.
+The Laravel app has been live since v0.0.1 (5 November 2026). The old "coming
+soon" holding page stays in `/app/data/public` as a fallback
+([docs/deploy/holding-page.md](docs/deploy/holding-page.md)). Further DNS
+changes, if any are ever needed, are made by the APES IT Administrator with
+Bambie's approval.
 
 ## Local development
 
@@ -181,9 +187,10 @@ Once per milestone, after every other issue in it is closed:
 3. Merge with a merge commit. The owner merges. Agents do not merge unless the
    owner has said to.
 4. Release once.
-5. Deploy to Cloudron by hand, following
-   [docs/deploy/cloudron.md](docs/deploy/cloudron.md). A green `main` does not
-   deploy itself.
+5. Deploy the release to Cloudron, following
+   [docs/deploy/cloudron.md](docs/deploy/cloudron.md). The owner, the APES IT
+   Administrator, or an agent after the ship-gate deploy answer runs it. A
+   green `main` does not deploy itself.
 6. Check `https://intranet.apes.org.uk/healthz` after the deploy.
 
 ## Before going public

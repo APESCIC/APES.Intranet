@@ -1,7 +1,9 @@
 # Deploying to Cloudron
 
-Deploys are manual. The owner or the APES IT Administrator runs them, because
-agents do not change Cloudron. A merge to `main` never deploys by itself.
+Deploys are run by the owner, the APES IT Administrator, or an agent once the
+owner has answered the ship-gate deploy question in the current chat. Every
+deploy starts with a Cloudron backup. A merge to `main` never deploys by
+itself.
 
 | Item | Value |
 | --- | --- |
