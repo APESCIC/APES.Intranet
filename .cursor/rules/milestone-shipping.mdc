@@ -1,0 +1,31 @@
+---
+description: APES milestone shipping - finish every issue in a milestone, then one merge to main, one release and one deploy
+alwaysApply: true
+---
+
+# Milestone shipping
+
+Work in this repository ships once per milestone, in four stages, in this order:
+
+1. Complete **all** the issues in the milestone before moving on to stage 2.
+2. Put all the milestone's work on `main` in **one merge**: a merge commit, never a squash or a rebase.
+3. Release.
+4. Deploy.
+
+## Branches
+
+- Work happens on the milestone branch, `milestone/<milestone-slug>`, created from `main` when work on the milestone starts.
+- Commit and push on the milestone branch (or an issue branch off it) whenever needed.
+- Nothing reaches `main` before stage 2. Do not open a pull request into `main`, merge, tag, release or deploy for a single issue.
+- Stage 2 is one pull request from the milestone branch into `main`, merged with a merge commit after Bambie has recorded her review on the milestone's ship issue.
+
+## Hotfixes
+
+A hotfix may go to `main`, or be released or deployed, ahead of its milestone only with Bambie's written approval on the issue. Without that approval, it waits for the milestone.
+
+## Definition of done
+
+- An issue is done when its acceptance criteria are met and committed on its branch. Close it then, with a link to the commit.
+- A milestone is done only after the single merge, the release and the deploy.
+
+See the "Milestone shipping" section of `AGENTS.md` for the full process.
