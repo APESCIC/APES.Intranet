@@ -196,6 +196,7 @@ Once per milestone, after every other issue in it is closed:
 
 ## Where to find things
 
+- How work ships, for contributors: [CONTRIBUTING.md](CONTRIBUTING.md).
 - Security: [SECURITY.md](SECURITY.md).
 - Conduct: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 - Issue forms: `.github/ISSUE_TEMPLATE`.
