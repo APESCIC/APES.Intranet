@@ -49,10 +49,11 @@ php artisan db:seed --class="Database\Seeders\RolesAndPermissionsSeeder" --force
 
 | Role | Base permissions |
 | --- | --- |
-| staff, volunteer, student (account types) | `intranet.access` |
+| staff, volunteer (account types) | `intranet.access` |
+| student (account type) | `intranet.access`, `student.area` |
 | supervisor | `intranet.access`, `team.supervise` |
-| management | `intranet.access`, `team.supervise`, `team.manage`, `hr.access` |
-| HR | `intranet.access`, `hr.access` |
+| management | `intranet.access`, `team.supervise`, `team.manage`, `hr.access`, `hr.special_category.view` |
+| HR | `intranet.access`, `hr.access`, `hr.special_category.view` |
 | legal | `intranet.access`, `legal.access` |
 | admin | Every permission |
 
@@ -68,6 +69,40 @@ Rules for new code:
 - `User::isSupervisor()` is `can('team.supervise')`: true for the supervisor,
   management and admin roles. Use it for "my team" features such as rota
   approvals.
+
+### The permissions matrix
+
+The approved matrix (5 November 2026) has one gate per row, listed in
+`AccessMatrix::rows()` and registered by `MatrixPolicies`. Modules call the
+gate, never a role name:
+
+| Gate | Who |
+| --- | --- |
+| `viewTeamRota`, `approveTeamSwap`, `approveTeamTimesheet`, `viewTeamChecklist`, `approveStudentHours` | Supervisors for their own team; management and admin for every team |
+| `useStudentArea` | Students and admin |
+| `viewHrRecord` | HR, management and admin |
+| `viewSpecialCategory` (DBS and health) | HR, management and admin |
+| `viewLegalRecord` | Legal and admin |
+
+"Own team" works through `App\Core\Access\Contracts\BelongsToTeam`: a module's
+rota, swap, timesheet, checklist or student hours model implements
+`isSupervisedBy(User $user)`.
+
+Open HR, DBS, health and legal records only through
+`App\Core\Access\SensitiveData`:
+
+```php
+$data->openHrRecord($record);
+$data->openSpecialCategory($record, SensitiveData::DBS);
+$data->openLegalRecord($agreement);
+```
+
+It checks the gate and a fresh sign-in for every role, admin included, even
+if a route forgot the `fresh-signin` middleware. It also writes the audit
+entries. Every view of DBS or health data is audited
+(`hr.special_category.viewed`, with the category but never the contents), and
+so is every admin or management view of an HR or legal record
+(`hr.record.viewed`, `legal.record.viewed`).
 
 ## Fresh sign-in
 

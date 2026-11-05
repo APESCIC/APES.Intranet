@@ -2,6 +2,7 @@
 
 namespace App\Core;
 
+use App\Core\Access\Policies\MatrixPolicies;
 use App\Core\Access\Policies\RolePolicy;
 use App\Core\Audit\Console\PruneAuditLog;
 use App\Core\Auth\Cloudron\CloudronIdentityProvider;
@@ -44,6 +45,7 @@ class CoreServiceProvider extends ServiceProvider
         $this->commands([PruneAuditLog::class, RunSystemChecks::class]);
 
         Gate::policy(Role::class, RolePolicy::class);
+        MatrixPolicies::register();
 
         View::composer('components.layouts.app', function (ViewInstance $view) {
             $user = auth()->user();
