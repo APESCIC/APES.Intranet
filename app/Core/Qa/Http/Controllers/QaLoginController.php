@@ -42,7 +42,7 @@ class QaLoginController
         (new FreshSignIn($request->session()))->record(now()->getTimestamp());
         $audit->record('auth.signed_in', $user, ['method' => 'qa', 'roles' => $user->getRoleNames()->all()], $user);
 
-        return redirect()->route('dashboard');
+        return redirect()->intended(route('dashboard'));
     }
 
     public function destroy(Request $request, AuditLogger $audit): RedirectResponse

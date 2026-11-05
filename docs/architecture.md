@@ -138,8 +138,18 @@ browser and any context. Entries cannot be edited or deleted one at a time.
 cron must run `php artisan schedule:run` every minute for this to happen.
 
 Core already records `auth.signed_in`, `auth.signed_out`,
-`auth.sign_in_denied`, `roles.changed`, `admin.roles.viewed` and
-`admin.audit.viewed`. Admins read the log at `/admin/audit`.
+`auth.sign_in_denied`, `auth.fresh_signin_required`,
+`auth.fresh_signin_not_honoured`, `roles.changed`, `admin.roles.viewed`,
+`admin.audit.viewed`, `admin.system.viewed`, `admin.system.test_email`,
+`admin.access_review.viewed`, `hr.record.viewed`,
+`hr.special_category.viewed` and `legal.record.viewed`. Admins read the log at
+`/admin/audit`.
+
+Admin and HR run the quarterly access review at **Admin > Access review**. It
+lists people with more than one senior role, role holders who have not signed
+in for 90 days, people in no group, and admin or management views of DBS and
+health data. `access-review:remind` emails admin and HR on the first day of
+each quarter at 09:00.
 
 Do not put special category data (health, DBS results, and so on) in the
 context. Record ids, not contents.

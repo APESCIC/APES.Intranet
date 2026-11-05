@@ -28,6 +28,8 @@ final class AccessMatrix
 
     public const ADMIN_SYSTEM_VIEW = 'admin.system.view';
 
+    public const ACCESS_REVIEW_VIEW = 'admin.access_review.view';
+
     /**
      * @return array<string, string> Permission name => description.
      */
@@ -44,6 +46,7 @@ final class AccessMatrix
             self::ADMIN_ROLES_VIEW => 'View roles and permissions',
             self::ADMIN_AUDIT_VIEW => 'View the audit log',
             self::ADMIN_SYSTEM_VIEW => 'View system status and send a test email',
+            self::ACCESS_REVIEW_VIEW => 'Run the quarterly group membership and access review',
         ];
     }
 
@@ -58,7 +61,7 @@ final class AccessMatrix
             RoleName::Student->value => [self::INTRANET_ACCESS, self::STUDENT_AREA],
             RoleName::Supervisor->value => [self::INTRANET_ACCESS, self::TEAM_SUPERVISE],
             RoleName::Management->value => [self::INTRANET_ACCESS, self::TEAM_SUPERVISE, self::TEAM_MANAGE, self::HR_ACCESS, self::HR_SPECIAL_CATEGORY_VIEW],
-            RoleName::Hr->value => [self::INTRANET_ACCESS, self::HR_ACCESS, self::HR_SPECIAL_CATEGORY_VIEW],
+            RoleName::Hr->value => [self::INTRANET_ACCESS, self::HR_ACCESS, self::HR_SPECIAL_CATEGORY_VIEW, self::ACCESS_REVIEW_VIEW],
             RoleName::Legal->value => [self::INTRANET_ACCESS, self::LEGAL_ACCESS],
             RoleName::Admin->value => array_keys(self::permissions()),
         ];

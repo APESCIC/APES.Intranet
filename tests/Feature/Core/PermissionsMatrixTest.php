@@ -19,10 +19,10 @@ const EXPECTED_GRANTS = [
     'student' => ['intranet.access', 'student.area'],
     'supervisor' => ['intranet.access', 'team.supervise'],
     'management' => ['hr.access', 'hr.special_category.view', 'intranet.access', 'team.manage', 'team.supervise'],
-    'hr' => ['hr.access', 'hr.special_category.view', 'intranet.access'],
+    'hr' => ['admin.access_review.view', 'hr.access', 'hr.special_category.view', 'intranet.access'],
     'legal' => ['intranet.access', 'legal.access'],
     'admin' => [
-        'admin.audit.view', 'admin.roles.view', 'admin.system.view', 'hr.access', 'hr.special_category.view',
+        'admin.access_review.view', 'admin.audit.view', 'admin.roles.view', 'admin.system.view', 'hr.access', 'hr.special_category.view',
         'intranet.access', 'legal.access', 'student.area', 'team.manage', 'team.supervise',
     ],
 ];

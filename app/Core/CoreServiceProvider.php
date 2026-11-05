@@ -2,6 +2,7 @@
 
 namespace App\Core;
 
+use App\Core\Access\Console\RemindAccessReview;
 use App\Core\Access\Policies\MatrixPolicies;
 use App\Core\Access\Policies\RolePolicy;
 use App\Core\Audit\Console\PruneAuditLog;
@@ -42,7 +43,7 @@ class CoreServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        $this->commands([PruneAuditLog::class, RunSystemChecks::class]);
+        $this->commands([PruneAuditLog::class, RunSystemChecks::class, RemindAccessReview::class]);
 
         Gate::policy(Role::class, RolePolicy::class);
         MatrixPolicies::register();

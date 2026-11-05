@@ -50,6 +50,10 @@ class OidcController
      */
     public function reauthenticate(Request $request, IdentityProvider $identityProvider): RedirectResponse
     {
+        if (QaLogin::enabled()) {
+            return redirect()->route('qa.index')->with('status', 'Sign in again to open that page.');
+        }
+
         (new FreshSignIn($request->session()))->markRequested();
 
         try {

@@ -97,6 +97,16 @@ it('seeds one fake account per group and stack', function () {
     expect(User::where('email', 'like', 'qa-%@example.test')->count())->toBe(count(RoleName::cases()) + count(RoleStacks::common()));
 });
 
+it('sends a stale QA session to the switcher to sign in again, then back to the page', function () {
+    enableQa();
+    $this->post(route('qa.login'), ['profile' => 'admin']);
+    $this->travel(16)->minutes();
+
+    $this->get(route('admin.system.index'))->assertRedirect(route('auth.reauth'));
+    $this->get(route('auth.reauth'))->assertRedirect(route('qa.index'));
+    $this->post(route('qa.login'), ['profile' => 'admin'])->assertRedirect(route('admin.system.index'));
+});
+
 it('signs out', function () {
     enableQa();
     $this->post(route('qa.login'), ['profile' => 'admin']);

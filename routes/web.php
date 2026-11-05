@@ -2,6 +2,7 @@
 
 use App\Core\Access\AccessMatrix;
 use App\Core\Access\Http\Controllers\AccessGuideController;
+use App\Core\Access\Http\Controllers\AccessReviewController;
 use App\Core\Access\Http\Controllers\RoleIndexController;
 use App\Core\Audit\Http\Controllers\AuditLogIndexController;
 use App\Core\Auth\Http\Controllers\OidcController;
@@ -37,6 +38,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/audit', AuditLogIndexController::class)
             ->middleware('can:'.AccessMatrix::ADMIN_AUDIT_VIEW)
             ->name('audit.index');
+        Route::get('/access-review', AccessReviewController::class)
+            ->middleware(['can:'.AccessMatrix::ACCESS_REVIEW_VIEW, 'fresh-signin'])
+            ->name('access-review.index');
         Route::middleware(['can:'.AccessMatrix::ADMIN_SYSTEM_VIEW, 'fresh-signin'])->group(function () {
             Route::get('/system', SystemStatusController::class)->name('system.index');
             Route::post('/system/test-email', SendTestEmailController::class)->name('system.test-email');

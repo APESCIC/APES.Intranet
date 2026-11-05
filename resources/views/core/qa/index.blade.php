@@ -1,4 +1,7 @@
 <x-layouts.app title="QA role switcher" subtitle="Local only. Signs you in as a fake @example.test account in one approved group, or a common stack of groups.">
+    @if (session('status'))
+        <p class="mb-4 rounded-sg-field bg-sg-warn-mist p-3 text-sg-warn" role="status">{{ session('status') }}</p>
+    @endif
     @if ($current)
         <p>
             Signed in as <strong>{{ $current->name }}</strong> ({{ $current->email }}).
