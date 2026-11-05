@@ -43,6 +43,36 @@ it('lists every role and offers no way to change them', function () {
     expect((string) $main)->not->toContain('<form');
 });
 
+it('shows each approved group next to its role, permissions and member count', function () {
+    $admin = User::factory()->create()->assignRole(RoleName::Admin->value);
+    User::factory()->count(2)->create()->each->assignRole(RoleName::Volunteer->value);
+
+    $html = $this->actingAs($admin)->get(route('admin.roles.index'))->assertOk()->getContent();
+
+    foreach (config('intranet.group_roles') as $group => $roleName) {
+        $row = (string) str($html)->after('data-role="'.$roleName.'"')->before('</tr>');
+        expect($row)->toContain($group)
+            ->and($row)->toContain(RoleName::from($roleName)->label());
+
+        foreach (Role::findByName($roleName)->permissions as $permission) {
+            expect($row)->toContain($permission->name);
+        }
+    }
+
+    $volunteers = (string) str($html)->after('data-role="volunteer"')->before('</tr>');
+    expect($volunteers)->toMatch('/<td class="p-4">2<\/td>/');
+});
+
+it('shows counts but no names or emails of members', function () {
+    $admin = User::factory()->create(['name' => 'Ada Admin'])->assignRole(RoleName::Admin->value);
+    $volunteer = User::factory()->create(['name' => 'Vera Volunteer', 'email' => 'vera@example.test'])->assignRole(RoleName::Volunteer->value);
+
+    $main = (string) str($this->actingAs($admin)->get(route('admin.roles.index'))->getContent())->after('<main')->before('</main>');
+
+    expect($main)->not->toContain($volunteer->name)
+        ->and($main)->not->toContain($volunteer->email);
+});
+
 it('treats supervisors, management and admins as supervisors', function (RoleName $role, bool $supervises) {
     $user = User::factory()->create()->assignRole($role->value);
 
