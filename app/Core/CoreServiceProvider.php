@@ -15,6 +15,7 @@ use App\Core\System\Checks\MysqlCheck;
 use App\Core\System\Checks\OidcCheck;
 use App\Core\System\Checks\RedisCheck;
 use App\Core\System\Checks\SmtpCheck;
+use App\Core\System\Console\RunSystemChecks;
 use App\Core\System\SystemStatus;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
@@ -40,7 +41,7 @@ class CoreServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        $this->commands([PruneAuditLog::class]);
+        $this->commands([PruneAuditLog::class, RunSystemChecks::class]);
 
         Gate::policy(Role::class, RolePolicy::class);
 

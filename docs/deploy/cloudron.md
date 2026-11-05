@@ -316,5 +316,9 @@ Use this only if `deploy.ps1` cannot run. It does the same steps.
 - Restart the app, then check `/healthz` again. Signed-in sessions and the
   audit log should still be there, which shows the data survives a restart.
 - The logs show "Starting queue worker" and "Starting scheduler". The
-  scheduler runs `audit:prune` every night at 03:15.
+  scheduler runs `system:check` every 5 minutes and `audit:prune` every night
+  at 03:15.
+- **Admin > System status** shows every addon `OK` and the scheduler `OK`.
+  The sendmail check only connects and says `QUIT`, so it sends nothing.
+  After 3 failed checks in a row, admins get one email per outage.
 - Sign in with a Cloudron account in one of the 8 approved groups.
