@@ -21,6 +21,16 @@
         <dl class="grid gap-3 sm:grid-cols-2">
             @if (in_array('email', $visible, true))
                 <div><dt class="text-sm text-sg-muted">Email</dt><dd>{{ $person->email }}</dd></div>
+                <div class="sm:col-span-2">
+                    <a
+                        class="sg-btn sg-btn-secondary sg-btn-sm"
+                        href="https://teams.microsoft.com/l/chat/0/0?users={{ rawurlencode($person->email) }}"
+                        target="_blank"
+                        rel="noopener"
+                    >
+                        Start a Teams chat<span class="sr-only"> (opens in a new tab)</span>
+                    </a>
+                </div>
             @endif
             @if (in_array('team', $visible, true) && $person->team)
                 <div><dt class="text-sm text-sg-muted">Team</dt><dd>{{ $person->team }}</dd></div>

@@ -15,7 +15,8 @@
         "laravel/framework": "^13.17",
         "laravel/tinker": "^3.0",
         "predis/predis": "^3.7",
-        "spatie/laravel-permission": "^8.3"
+        "spatie/laravel-permission": "^8.3",
+        "symfony/html-sanitizer": "^7.4"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -33,7 +34,8 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/",
-            "Modules\\People\\": "modules/people/src/"
+            "Modules\\People\\": "modules/people/src/",
+            "Modules\\Communications\\": "modules/communications/src/"
         }
     },
     "autoload-dev": {

@@ -1,0 +1,59 @@
+.tiptap-field {
+    display: grid;
+    gap: 0.5rem;
+}
+
+.tiptap-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    padding: 0.35rem;
+    border: 1px solid var(--sg-border, #c9d5d1);
+    border-radius: 0.5rem 0.5rem 0 0;
+    background: color-mix(in srgb, var(--sg-teal, #0f6b5c) 6%, white);
+}
+
+.tiptap-btn {
+    min-height: 2.25rem;
+    min-width: 2.25rem;
+    padding: 0.35rem 0.6rem;
+    border: 1px solid transparent;
+    border-radius: 0.35rem;
+    background: white;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+
+.tiptap-btn:focus-visible {
+    outline: 2px solid var(--sg-teal, #0f6b5c);
+    outline-offset: 2px;
+}
+
+.tiptap-btn[aria-pressed='true'] {
+    border-color: var(--sg-teal, #0f6b5c);
+    background: color-mix(in srgb, var(--sg-teal, #0f6b5c) 12%, white);
+}
+
+.tiptap-surface {
+    min-height: 10rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--sg-border, #c9d5d1);
+    border-top: 0;
+    border-radius: 0 0 0.5rem 0.5rem;
+    background: white;
+}
+
+.tiptap-prose:focus {
+    outline: none;
+}
+
+.tiptap-prose p {
+    margin: 0 0 0.75rem;
+}
+
+.tiptap-prose ul,
+.tiptap-prose ol {
+    margin: 0 0 0.75rem;
+    padding-left: 1.25rem;
+}

@@ -43,6 +43,9 @@ Decided. Do not swap these without the owner's approval.
 - PHP 8.3 or newer, Laravel 13, `spatie/laravel-permission`.
 - Tailwind 4, Vite, Lucide, Fraunces and Nunito Sans. The same look and
   sidebar menu as MyAPES Account.
+- Sidebar menus: Normal (member) vs Admin mode for the Admin role only.
+  See docs/communications/admin-menu-mode.md. Do not mix system-admin items
+  into the Normal or Microsoft 365 menu groups.
 - Core, then Modules, then Plugins, as in MyAPES Account ADR 0001. Core never
   depends on a Module or a Plugin.
 - TipTap, free core extensions only, for every rich-text box. Sanitise the

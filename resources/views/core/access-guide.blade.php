@@ -50,6 +50,13 @@
             </li>
         </ul>
 
+        <h2 class="font-serif text-xl font-semibold">Admin menu mode</h2>
+        <p>
+            People with the Admin role can switch the sidebar between a <strong>Normal</strong> (member) menu and an
+            <strong>Admin</strong> menu. That switch is a navigation preference only: it does not change your roles
+            or permissions. HR and legal stay on the Normal menu. The Laragon QA “Switch role” control is separate.
+        </p>
+
         <h2 class="font-serif text-xl font-semibold">Access is audited</h2>
         <p>
             The intranet keeps an audit log. Every time anyone opens DBS or health information, and every time

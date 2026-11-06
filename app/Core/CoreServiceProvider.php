@@ -5,12 +5,14 @@ namespace App\Core;
 use App\Core\Access\Console\RemindAccessReview;
 use App\Core\Access\Policies\MatrixPolicies;
 use App\Core\Access\Policies\RolePolicy;
+use App\Core\Access\RoleName;
 use App\Core\Audit\Console\PruneAuditLog;
 use App\Core\Auth\Cloudron\CloudronIdentityProvider;
 use App\Core\Auth\Cloudron\LdapDirectoryGroups;
 use App\Core\Auth\Contracts\DirectoryGroups;
 use App\Core\Auth\Contracts\IdentityProvider;
 use App\Core\Navigation\Menu;
+use App\Core\Navigation\MenuMode;
 use App\Core\Qa\QaLogin;
 use App\Core\System\Checks\LdapCheck;
 use App\Core\System\Checks\MysqlCheck;
@@ -52,8 +54,11 @@ class CoreServiceProvider extends ServiceProvider
             $user = auth()->user();
             $user = $user instanceof User ? $user : null;
 
+            $mode = $user ? Menu::resolveMode($user) : MenuMode::Normal;
             $view->with([
-                'menu' => Menu::for($user),
+                'menu' => Menu::for($user, $mode),
+                'menuMode' => $mode,
+                'showMenuModeSwitcher' => $user?->hasRole(RoleName::Admin->value) ?? false,
                 'shellUser' => $user,
                 'qaEnabled' => QaLogin::enabled(),
             ]);

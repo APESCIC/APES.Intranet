@@ -16,5 +16,12 @@
             <li>Create app passwords if you need them.</li>
             <li>Review and end login sessions.</li>
         </ol>
+
+        <h2 class="font-serif text-xl font-semibold">Handbook guidance</h2>
+        <p>
+            Read the
+            <a class="underline" href="{{ route('communications.handbook.show', 'sign-in-and-2fa') }}">sign-in methods and 2FA handbook chapter</a>
+            for plain-English help, including options without a smartphone.
+        </p>
     </article>
 </x-layouts.app>
