@@ -18,7 +18,13 @@
         <div class="sg-page" data-workspace-page>
             @if ($shellUser)
                 <aside class="sg-rail-dock" aria-label="Main menu" data-workspace-rail-dock>
-                    <x-shell.rail :menu="$menu" :user="$shellUser" :qa-enabled="$qaEnabled" />
+                    <x-shell.rail
+                        :menu="$menu"
+                        :user="$shellUser"
+                        :qa-enabled="$qaEnabled"
+                        :show-menu-mode-switcher="$showMenuModeSwitcher ?? false"
+                        :menu-mode="$menuMode ?? null"
+                    />
                 </aside>
             @endif
 

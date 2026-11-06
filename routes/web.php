@@ -25,10 +25,6 @@ Route::get('/auth/reauth', [OidcController::class, 'reauthenticate'])->middlewar
 Route::post('/logout', [OidcController::class, 'logout'])->middleware('auth')->name('logout');
 
 Route::middleware('auth')->group(function () {
-    Route::view('/dashboard', 'core.dashboard')
-        ->middleware('can:'.AccessMatrix::INTRANET_ACCESS)
-        ->name('dashboard');
-
     Route::get('/access', AccessGuideController::class)
         ->middleware('can:'.AccessMatrix::INTRANET_ACCESS)
         ->name('access-guide');

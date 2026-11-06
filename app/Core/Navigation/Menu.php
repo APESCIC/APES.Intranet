@@ -3,26 +3,32 @@
 namespace App\Core\Navigation;
 
 use App\Core\Access\AccessMatrix;
+use App\Core\Access\RoleName;
 use App\Models\User;
 
 /**
  * The sidebar menu. Each item shows only to people with its permission.
+ * Admins may switch between Normal (member) and Admin inventories.
+ * Modules add extra groups through MenuContributor bindings.
  */
 final class Menu
 {
     public const TEAMS_URL = 'https://teams.microsoft.com/';
 
     /**
+     * Member-facing groups. System admin screens are not listed here.
+     *
      * @return list<NavGroup>
      */
-    public static function definition(): array
+    public static function normalDefinition(): array
     {
         return [
             new NavGroup('home', 'Home', [
                 NavItem::route('dashboard', 'Dashboard', 'layout-dashboard', AccessMatrix::INTRANET_ACCESS, 'dashboard'),
             ]),
             new NavGroup('communications', 'Communications', [
-                NavItem::soon('updates', 'Updates', 'newspaper', AccessMatrix::INTRANET_ACCESS),
+                NavItem::route('updates', 'Updates', 'newspaper', AccessMatrix::INTRANET_ACCESS, 'communications.updates.index', 'communications.updates.*'),
+                NavItem::route('events', 'Events', 'calendar-days', AccessMatrix::INTRANET_ACCESS, 'communications.events.index', 'communications.events.*'),
                 NavItem::external('teams', 'Chat in Teams', 'messages-square', AccessMatrix::INTRANET_ACCESS, self::TEAMS_URL),
             ]),
             new NavGroup('people', 'People', [
@@ -40,13 +46,25 @@ final class Menu
             ]),
             new NavGroup('support', 'Support', [
                 NavItem::soon('help-desk', 'Help desk', 'life-buoy', AccessMatrix::INTRANET_ACCESS),
-                NavItem::soon('handbook', 'Handbook and training', 'book-open', AccessMatrix::INTRANET_ACCESS),
+                NavItem::route('handbook', 'Handbook', 'book-open', AccessMatrix::INTRANET_ACCESS, 'communications.handbook.index', 'communications.handbook.*'),
+                NavItem::route('policies', 'Policies', 'file-text', AccessMatrix::INTRANET_ACCESS, 'communications.policies.index', 'communications.policies.*'),
                 NavItem::route('access-guide', 'Who can see what', 'key-round', AccessMatrix::INTRANET_ACCESS, 'access-guide'),
             ]),
             new NavGroup('hr-legal', 'HR and legal', [
                 NavItem::soon('hr', 'HR', 'briefcase', AccessMatrix::HR_ACCESS),
                 NavItem::soon('agreements', 'Agreements', 'file-pen-line', AccessMatrix::LEGAL_ACCESS),
             ]),
+        ];
+    }
+
+    /**
+     * System administration inventory. Shown only in Admin menu mode.
+     *
+     * @return list<NavGroup>
+     */
+    public static function adminDefinition(): array
+    {
+        return [
             new NavGroup('admin', 'Admin', [
                 NavItem::route('roles', 'Roles', 'shield-check', AccessMatrix::ADMIN_ROLES_VIEW, 'admin.roles.index', 'admin.roles.*'),
                 NavItem::route('audit', 'Audit log', 'scroll-text', AccessMatrix::ADMIN_AUDIT_VIEW, 'admin.audit.index'),
@@ -60,25 +78,79 @@ final class Menu
     /**
      * @return list<NavGroup>
      */
-    public static function for(?User $user): array
+    public static function definition(): array
+    {
+        return self::normalDefinition();
+    }
+
+    /**
+     * @return list<NavGroup>
+     */
+    public static function for(?User $user, ?MenuMode $mode = null): array
     {
         if ($user === null) {
             return [];
         }
 
-        $groups = [];
+        $mode ??= self::resolveMode($user);
+        $groups = $mode === MenuMode::Admin && $user->hasRole(RoleName::Admin->value)
+            ? self::adminDefinition()
+            : self::normalDefinition();
 
-        foreach (self::definition() as $group) {
+        $groups = self::filterGroups($user, $groups);
+
+        foreach (app()->tagged('intranet.menu') as $contributor) {
+            if ($contributor instanceof MenuContributor) {
+                $groups = array_merge($groups, self::filterGroups($user, $contributor->groups($user, $mode)));
+            }
+        }
+
+        return $groups;
+    }
+
+    public static function resolveMode(User $user): MenuMode
+    {
+        if (! $user->hasRole(RoleName::Admin->value)) {
+            session()->forget(MenuMode::SESSION_KEY);
+
+            return MenuMode::Normal;
+        }
+
+        if (self::currentRouteIsAdmin()) {
+            session([MenuMode::SESSION_KEY => MenuMode::Admin->value]);
+
+            return MenuMode::Admin;
+        }
+
+        $raw = session(MenuMode::SESSION_KEY);
+
+        return MenuMode::tryFrom(is_string($raw) ? $raw : '') ?? MenuMode::Normal;
+    }
+
+    public static function currentRouteIsAdmin(): bool
+    {
+        return request()->routeIs('admin.*');
+    }
+
+    /**
+     * @param  list<NavGroup>  $groups
+     * @return list<NavGroup>
+     */
+    private static function filterGroups(User $user, array $groups): array
+    {
+        $filtered = [];
+
+        foreach ($groups as $group) {
             $items = array_values(array_filter(
                 $group->items,
                 fn (NavItem $item) => $user->can($item->permission),
             ));
 
             if ($items !== []) {
-                $groups[] = new NavGroup($group->key, $group->heading, $items);
+                $filtered[] = new NavGroup($group->key, $group->heading, $items);
             }
         }
 
-        return $groups;
+        return $filtered;
     }
 }
