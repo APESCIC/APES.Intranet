@@ -14,6 +14,14 @@
         <ul class="list-disc space-y-1 pl-6">
             <li>Your name, email address and intranet roles, taken from your APES Cloudron account when you sign in.</li>
             <li>
+                Profile details you choose to share (team, skills, contact details, photo) and, for HR and management,
+                emergency contact details and employee number.
+            </li>
+            <li>
+                A yes/no flag for whether Cloudron reports that you have authenticator-app (TOTP) two-factor
+                authentication turned on. Passkeys and secrets are never stored here.
+            </li>
+            <li>
                 An audit log of sign-ins, sign-outs, role changes and admin actions, with the time, your account, your
                 IP address and your browser.
             </li>

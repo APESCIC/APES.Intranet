@@ -29,6 +29,25 @@
         </form>
     </section>
 
+    <section class="sg-card mb-4 p-5" aria-labelledby="directory-sync-heading">
+        <h2 id="directory-sync-heading" class="font-serif text-lg font-semibold">Directory sync</h2>
+        <p class="mt-2 text-sm text-sg-muted">
+            Nightly LDAP sync creates, updates and deactivates members. Leavers lose their intranet sessions at the next run.
+        </p>
+        @if ($directorySync)
+            <dl class="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
+                <dt class="text-sg-muted">Last run</dt>
+                <dd>{{ $directorySync->occurred_at?->timezone('Europe/London')->format('j M Y, H:i:s') }}</dd>
+                @foreach (($directorySync->context ?? []) as $key => $value)
+                    <dt class="text-sg-muted">{{ ucfirst($key) }}</dt>
+                    <dd>{{ is_scalar($value) ? $value : json_encode($value) }}</dd>
+                @endforeach
+            </dl>
+        @else
+            <p class="mt-3 text-sm text-sg-muted">No directory sync has been recorded yet.</p>
+        @endif
+    </section>
+
     <div class="grid gap-4 md:grid-cols-2">
         @foreach ($addons as $addon)
             @php([$statusText, $statusClass] = $statusLabels[$addon['status']] ?? [$addon['status'], 'bg-sg-info-mist text-sg-muted'])

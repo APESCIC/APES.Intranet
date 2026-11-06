@@ -12,34 +12,47 @@ use Illuminate\Support\Str;
  */
 class UserFactory extends Factory
 {
-    /**
-     * The current password being used by the factory.
-     */
     protected static ?string $password;
 
     /**
-     * Define the model's default state.
-     *
      * @return array<string, mixed>
      */
     public function definition(): array
     {
+        $teams = ['Care', 'Education', 'Operations', 'Fundraising', 'Office'];
+
         return [
             'name' => fake()->name(),
             'email' => fake()->unique()->userName().'@example.test',
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            'is_active' => true,
+            'job_title' => fake()->optional()->jobTitle(),
+            'team' => fake()->randomElement($teams),
+            'phone' => fake()->optional()->numerify('01### ######'),
+            'mobile' => fake()->optional()->numerify('07### ######'),
+            'location' => fake()->optional()->city(),
+            'skills' => fake()->randomElements(['First aid', 'Driving', 'Admin', 'Animal care', 'Fundraising', 'IT'], fake()->numberBetween(0, 3)),
+            'bio' => fake()->optional()->sentence(),
+            'emergency_contact_name' => fake()->name(),
+            'emergency_contact_phone' => fake()->numerify('07### ######'),
+            'employee_number' => 'E'.fake()->unique()->numerify('####'),
         ];
     }
 
-    /**
-     * Indicate that the model's email address should be unverified.
-     */
     public function unverified(): static
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    public function inactive(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_active' => false,
+            'deactivated_at' => now(),
         ]);
     }
 }
