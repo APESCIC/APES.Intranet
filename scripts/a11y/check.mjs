@@ -50,6 +50,9 @@ async function keyboardChecks(desktop, mobile) {
     state = await focused(desktop);
     expectKeyboard(state.id === 'main-content', 'skip link moves focus to the main content');
 
+    // Staff has no Admin menu switcher, so the first rail tab after the skip
+    // link reaches the Dashboard item. Admins see Normal/Admin controls first.
+    await signInAs(desktop, 'Staff');
     await desktop.goto(`${baseUrl}/dashboard`, { waitUntil: 'networkidle' });
     await desktop.keyboard.press('Tab');
     await desktop.keyboard.press('Tab');
