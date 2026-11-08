@@ -115,9 +115,9 @@ not Laragon. Always run and check every change in the Docker live preview at
 Use the containers for all work. Run every PHP, Artisan, Composer, test, Pint
 and Larastan command as `docker compose exec app ...`, and every npm command
 as `docker compose exec node ...`. Do not use host PHP, Composer or Node, and
-do not serve this repository from Laragon. The one exception is the Cloudron
-release build: `deploy/cloudron/deploy.ps1` still builds with host PHP and
-Composer until its own issue moves it. The Cursor rule
+do not serve this repository from Laragon. The Cloudron release build runs in
+Docker too (#206): `deploy/cloudron/deploy.ps1` needs Docker Desktop running,
+and its `-HostTools` switch is for emergencies only. The Cursor rule
 `.cursor/rules/docker-local-dev.mdc` says the same for agents.
 
 Before any change-making work (code, tests, docs or config), follow the

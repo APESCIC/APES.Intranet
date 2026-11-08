@@ -182,8 +182,11 @@ merged, and the release `vX.Y.Z` is published from the merge commit.
 powershell -NoProfile -ExecutionPolicy Bypass -File deploy\cloudron\deploy.ps1 -Tag vX.Y.Z
 ```
 
-If `php` or `composer` are not on `PATH`, add Laragon's, for example
-`-Php C:\laragon\bin\php\php-8.4.27-Win32-vs17-x64\php.exe -Composer C:\laragon\bin\composer\composer.phar`.
+Docker Desktop must be running: the build runs Composer in the
+`apes-intranet-app` image (PHP 8.4, as on Cloudron) and Vite in
+`node:22-bookworm-slim`, and refuses to start without Docker. Only in an
+emergency, pass `-HostTools` (with `-Php` and `-Composer` if they are not on
+`PATH`) to build with host tools instead.
 
 `deploy.ps1`:
 
@@ -192,7 +195,7 @@ If `php` or `composer` are not on `PATH`, add Laragon's, for example
 2. Runs the [preflight](#preflight) and stops on any `FAIL`.
 3. Takes a Cloudron backup and notes its id.
 4. Notes the live release, for a rollback.
-5. Builds the tag with `build-release.ps1` and uploads it to
+5. Builds the tag in Docker with `build-release.ps1` and uploads it to
    `/app/data/releases/<ReleaseId>`.
 6. Checks the uploaded `REVISION` is the tag's commit.
 7. Runs `activate-release.sh`, then restarts the app.
@@ -250,7 +253,8 @@ Use this only if `deploy.ps1` cannot run. It does the same steps.
    $previous = "$(cloudron exec --app $app '--' readlink -f /app/data/current)".Trim()
    ```
 
-5. **Build** the tag, never `main`. This uses a temporary git worktree:
+5. **Build** the tag, never `main`. This uses a temporary git worktree, and
+   Composer and Vite run in Docker:
 
    ```powershell
    powershell -NoProfile -ExecutionPolicy Bypass -File deploy\cloudron\build-release.ps1 -Ref $tag

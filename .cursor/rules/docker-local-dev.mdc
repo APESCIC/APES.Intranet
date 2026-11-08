@@ -28,6 +28,6 @@ Run everything in the containers, from the repository root:
 | Accessibility check | `docker compose run --rm a11y` |
 
 - Never run host `php`, `composer`, `npm` or `node` for this repository. The `node` container keeps its own Linux `node_modules` in a volume.
-- The one exception is the Cloudron release build: `deploy/cloudron/deploy.ps1` still builds with host PHP and Composer.
+- The Cloudron release build also runs in Docker: `deploy/cloudron/deploy.ps1` needs Docker Desktop running. Use its `-HostTools` switch only in an emergency, after asking.
 - `docker compose exec app composer install` may run without asking when `vendor/` is missing. Ask before migrations, `docker compose down -v` (it deletes the local database) or any system tool install.
 - Fake data only in the local database. See `docs/local-development.md` for the full guide.
