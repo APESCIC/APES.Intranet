@@ -9,6 +9,12 @@ The intranet follows the same three layers as MyAPES Account (its ADR 0001,
 | Modules | `modules/<slug>/` | `Modules\<Studly>\` | Areas of the intranet, each with its own navigation and route prefix |
 | Plugins | `plugins/<slug>/` | `Plugins\<Studly>\` | Reusable features, enabled per module |
 
+Terminology (Modules, Integrations, reserved Plugins and Cloudron addons) and
+the proposed enable and disable registry are in
+[ADR 0001](adr/0001-modules-and-integrations.md). Until a Plugins mechanism
+is approved, `plugins/` stays empty and shared features go into Core
+contracts.
+
 ## Dependency rules
 
 1. Core never imports a Module or a Plugin.
