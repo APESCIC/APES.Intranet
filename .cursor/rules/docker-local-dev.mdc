@@ -25,7 +25,7 @@ Run everything in the containers, from the repository root:
 | Pint | `docker compose exec app vendor/bin/pint` |
 | Larastan | `docker compose exec app vendor/bin/phpstan analyse --memory-limit=1G` |
 | npm | `docker compose exec node npm <command>` |
-| Accessibility check | `docker compose exec -e BASE_URL=http://intranet.apes.test:8080 node npm run test:a11y` |
+| Accessibility check | `docker compose run --rm a11y` |
 
 - Never run host `php`, `composer`, `npm` or `node` for this repository. The `node` container keeps its own Linux `node_modules` in a volume.
 - The one exception is the Cloudron release build: `deploy/cloudron/deploy.ps1` still builds with host PHP and Composer.

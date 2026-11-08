@@ -2,7 +2,7 @@
 // keyboard checks. Fails on any serious or critical axe issue or keyboard
 // failure. Needs a running app with the QA role switcher on.
 //
-//   docker compose exec -e BASE_URL=http://intranet.apes.test:8080 node npm run test:a11y
+//   docker compose run --rm a11y
 //
 // A11Y_BROWSER_CHANNEL uses an installed browser (msedge, chrome) instead of
 // Playwright's own Chromium.

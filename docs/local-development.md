@@ -108,7 +108,11 @@ docker compose exec app vendor/bin/pint --test
 docker compose exec app vendor/bin/phpstan analyse --memory-limit=1G
 docker compose exec app php artisan test
 docker compose exec node npm run build
+docker compose run --rm a11y
 ```
+
+The last line runs the accessibility check (axe and keyboard) against the
+preview. See [accessibility.md](accessibility.md).
 
 Tests use an in-memory SQLite database, so they never touch `apes_intranet`.
 CI runs the same tests on PHP 8.3.

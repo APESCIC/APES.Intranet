@@ -16,12 +16,12 @@ pull request. It:
   mobile menu's focus trap
 - fails on any serious or critical axe issue, or any keyboard failure
 
-Run it locally in the `node` container against the Docker preview. Install
-Playwright's Chromium once per `node_modules` volume:
+Run it locally against the Docker preview with the on-demand `a11y` service,
+which uses Playwright's own image with Chromium. Start the preview first
+(`docker compose up -d`), so the `node` service has installed the packages:
 
 ```powershell
-docker compose exec node npx playwright install --with-deps chromium
-docker compose exec -e BASE_URL=http://intranet.apes.test:8080 node npm run test:a11y
+docker compose run --rm a11y
 ```
 
 ## Baseline audit, 4 November 2026
