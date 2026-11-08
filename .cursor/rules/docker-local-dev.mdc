@@ -1,0 +1,33 @@
+---
+description: Local development, preview and tests run in the Docker containers, not Laragon
+alwaysApply: true
+---
+
+# Docker local development
+
+Decided by Bambie on 8 November 2026 (#195). This repository runs locally in Docker (`compose.yaml`), not Laragon. This rule takes precedence over the Laragon defaults in the `live-preview-gate`, `laragon-local-preview` and `cursor-browser-preview` skills.
+
+## Preview
+
+- The live preview is <http://intranet.apes.test:8080>. Vite hot reload is on `intranet.apes.test:5174` and Mailpit is at <http://localhost:8026>.
+- Live preview gate: run `repo-sync`, then `docker compose ps`. If the services are not up, run `docker compose up -d` (add `--build` after a change under `docker/`). Then open the preview in Cursor's browser, confirm it loaded, and say "Preview ready, starting work".
+- Do not link this repository into `C:\laragon\www`, start Laragon for it, or use `php artisan serve`.
+
+## Commands
+
+Run everything in the containers, from the repository root:
+
+| Task | Command |
+| --- | --- |
+| Artisan | `docker compose exec app php artisan <command>` |
+| Composer | `docker compose exec app composer <command>` |
+| Tests | `docker compose exec app php artisan test` |
+| Pint | `docker compose exec app vendor/bin/pint` |
+| Larastan | `docker compose exec app vendor/bin/phpstan analyse --memory-limit=1G` |
+| npm | `docker compose exec node npm <command>` |
+| Accessibility check | `docker compose exec -e BASE_URL=http://intranet.apes.test:8080 node npm run test:a11y` |
+
+- Never run host `php`, `composer`, `npm` or `node` for this repository. The `node` container keeps its own Linux `node_modules` in a volume.
+- The one exception is the Cloudron release build: `deploy/cloudron/deploy.ps1` still builds with host PHP and Composer.
+- `docker compose exec app composer install` may run without asking when `vendor/` is missing. Ask before migrations, `docker compose down -v` (it deletes the local database) or any system tool install.
+- Fake data only in the local database. See `docs/local-development.md` for the full guide.

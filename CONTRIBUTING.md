@@ -2,7 +2,7 @@
 
 APES Intranet is maintained by APES CIC. Set-up steps are in
 [docs/local-development.md](docs/local-development.md). Check every change in
-the Laragon preview before it ships.
+the Docker preview at <http://intranet.apes.test:8080> before it ships.
 
 ## How work ships
 

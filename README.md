@@ -30,8 +30,9 @@ After a deploy, check <https://intranet.apes.org.uk/healthz>.
 
 ## Local preview
 
-Day-to-day development uses Laragon at <http://apes-intranet.test>. Check
-every change there before any Cloudron deploy. Set-up steps are in
+Day-to-day development runs in Docker (`docker compose up -d`) at
+<http://intranet.apes.test:8080>. Check every change there before any Cloudron
+deploy. Set-up steps are in
 [docs/local-development.md](docs/local-development.md). See also
 [AGENTS.md](AGENTS.md).
 

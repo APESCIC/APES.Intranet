@@ -78,7 +78,7 @@ body:
     attributes:
       label: Affected version or environment
       description: Version, environment, browser or device, where relevant.
-      placeholder: main, Laragon, Firefox on Windows 11
+      placeholder: main, Docker preview, Firefox on Windows 11
     validations:
       required: true
 

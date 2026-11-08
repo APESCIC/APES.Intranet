@@ -12,4 +12,4 @@ inventories. The switcher is a navigation preference only:
 - Microsoft 365 links stay on the Normal menu (#90). Do not put system-admin
   items into the Microsoft 365 group.
 
-This is separate from the Laragon QA “Switch role” control.
+This is separate from the local QA “Switch role” control.

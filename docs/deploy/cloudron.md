@@ -52,7 +52,7 @@ mode `0640`.
 
 The database, Redis, mail and the directory come from Cloudron addons. The
 config files read the live `CLOUDRON_*` variable first and only fall back to
-`.env` when it is missing (on Laragon). So a password rotation, a restore or a
+`.env` when it is missing (in local development). So a password rotation, a restore or a
 clone never leaves the app using an old copy. `run.sh` rebuilds the config
 cache on every start, which picks up any changed value.
 

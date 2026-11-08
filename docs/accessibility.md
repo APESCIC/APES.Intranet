@@ -16,12 +16,12 @@ pull request. It:
   mobile menu's focus trap
 - fails on any serious or critical axe issue, or any keyboard failure
 
-Run it locally against Laragon with the Edge browser that comes with Windows:
+Run it locally in the `node` container against the Docker preview. Install
+Playwright's Chromium once per `node_modules` volume:
 
 ```powershell
-$env:BASE_URL = 'http://apes-intranet.test'
-$env:A11Y_BROWSER_CHANNEL = 'msedge'
-npm run test:a11y
+docker compose exec node npx playwright install --with-deps chromium
+docker compose exec -e BASE_URL=http://intranet.apes.test:8080 node npm run test:a11y
 ```
 
 ## Baseline audit, 4 November 2026
@@ -61,7 +61,7 @@ only.
 ### Keyboard
 
 Checked with real key presses in the automated check, and by hand in the
-Laragon preview:
+local preview:
 
 - The first Tab shows "Skip to main content". Enter moves focus to the main
   content.
