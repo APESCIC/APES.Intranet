@@ -1,7 +1,7 @@
-# Local development with Laragon
+# Local development with Docker
 
 This guide takes a fresh clone to a running preview at
-<http://apes-intranet.test>. Check every change there before any Cloudron
+<http://intranet.apes.test:8080>. Check every change there before any Cloudron
 deploy.
 
 Use fake data only. Never put real HR, student, volunteer or agreement data in
@@ -9,61 +9,74 @@ a local database, a fixture or this repository.
 
 ## What you need
 
-Everything comes with Laragon 8 at `C:\laragon`:
+- Docker Desktop, with the WSL 2 engine on Windows.
+- Git.
 
-| Tool | Where | Notes |
+Everything else runs in containers defined in `compose.yaml`:
+
+| Service | What it runs | Address |
 | --- | --- | --- |
-| PHP 8.3 or newer | `C:\laragon\bin\php` | 8.3 is the floor. Cloudron runs 8.4 |
-| Composer | `C:\laragon\bin\composer` | |
-| Node 22 | `C:\laragon\bin\nodejs\node-v22` | For Vite |
-| MySQL | Laragon service | User `root`, no password |
-| Redis | Laragon service | Port 6379 |
-| Mailpit | Laragon service | Optional, see below |
+| `web` | Caddy, serving `public/` | <http://intranet.apes.test:8080> |
+| `app` | PHP 8.4 FPM, Composer 2 | Internal |
+| `node` | Node 22 and the Vite dev server | `intranet.apes.test:5174` |
+| `mysql` | MySQL 8.4, database `apes_intranet`, user `root`, no password | Internal |
+| `redis` | Redis 7 | Internal |
+| `mailpit` | Catches all mail | <http://localhost:8026> |
 
-The app uses the `predis/predis` package for Redis, so PHP does not need the
-`redis` extension.
+PHP 8.4 matches Cloudron. PHP 8.3 is still the floor (`composer.json` pins the
+platform to 8.3, and CI runs 8.3). The app uses the `predis/predis` package for
+Redis, so PHP does not need the `redis` extension.
 
-Laragon's PHP version is shared by every Laragon site. Any version from 8.3 up
-works. To test on the floor, run the PHP 8.3 CLI from
-`C:\laragon\bin\php\php-8.3.*` for Composer and tests.
+MySQL and Redis are not published on the host, so they do not clash with any
+other local MySQL or Redis. Vite uses port 5174, so it does not clash with
+another project's Vite on the usual 5173.
 
 ## First run
 
-1. Clone the repository into `C:\Users\<you>\Documents\GitHub\APES.Intranet`.
-2. Link it into Laragon's web root as `apes-intranet`, from PowerShell:
+1. Clone the repository, for example into
+   `C:\Users\<you>\Documents\GitHub\APES.Intranet`.
+2. Point `intranet.apes.test` at your machine. From an elevated PowerShell:
 
    ```powershell
-   New-Item -ItemType Junction -Path C:\laragon\www\apes-intranet -Target C:\Users\<you>\Documents\GitHub\APES.Intranet
+   Add-Content -Path C:\Windows\System32\drivers\etc\hosts -Value "127.0.0.1 intranet.apes.test"
    ```
 
-3. Open Laragon and click **Start All**. Laragon creates the
-   `apes-intranet.test` virtual host and serves the `public/` folder.
-4. Create the database. In Laragon, open **Database** (HeidiSQL), or run:
+3. From the repository root, copy the env file and start the containers:
 
    ```powershell
-   mysql -uroot -e "CREATE DATABASE IF NOT EXISTS apes_intranet CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-   ```
-
-5. Install dependencies and set up the app, from the repository root:
-
-   ```powershell
-   composer install
-   Copy-Item .env.laragon.example .env
-   php artisan key:generate
-   php artisan migrate --seed
-   npm ci
+   Copy-Item .env.docker.example .env
+   docker compose up -d --build
    ```
 
    `.env` stays on your machine. Git ignores it. Never commit it.
 
-6. Start Vite for hot reload, and leave it running:
+4. Install PHP packages, create the key and load fake data:
 
    ```powershell
-   npm run dev
+   docker compose exec app composer install
+   docker compose exec app php artisan key:generate
+   docker compose exec app php artisan migrate --seed
    ```
 
-7. Open <http://apes-intranet.test>. Vite serves the CSS and JavaScript from
-   port 5173 while `npm run dev` runs. Without it, run `npm run build` once.
+5. Open <http://intranet.apes.test:8080>. The `node` container runs `npm ci`
+   and then Vite, which serves the CSS and JavaScript with hot reload. The first
+   start takes a minute or two.
+
+## Everyday commands
+
+Run every PHP, Composer and npm command in the containers, never on the host:
+
+```powershell
+docker compose up -d                                  # start
+docker compose down                                   # stop (data is kept)
+docker compose exec app php artisan <command>
+docker compose exec app composer <command>
+docker compose exec node npm <command>
+docker compose logs -f node                           # Vite output
+```
+
+The `node` container keeps its own Linux `node_modules` in a Docker volume. Any
+Windows `node_modules` folder on the host is not used.
 
 ## Fake data
 
@@ -71,45 +84,51 @@ works. To test on the floor, run the PHP 8.3 CLI from
 The seeders refuse to run outside the `local` and `testing` environments. You
 can run them again safely, because they do not create duplicates.
 
-## Preview as each role
-
-The QA role switcher at <http://apes-intranet.test/qa> signs you in as a fake
-account for any role, such as `qa-admin@example.test`. It only works when
-`QA_LOGIN_ENABLED=true` and `APP_ENV=local`, as in `.env.laragon.example`.
-Anywhere else, every `/qa` route returns 404. Leave the flag off on Cloudron.
-
 To start again from an empty database:
 
 ```powershell
-php artisan migrate:fresh --seed
+docker compose exec app php artisan migrate:fresh --seed
 ```
+
+To remove the database volume completely: `docker compose down -v`.
+
+## Preview as each role
+
+The QA role switcher at <http://intranet.apes.test:8080/qa> signs you in as a
+fake account for any role, such as `qa-admin@example.test`. It only works when
+`QA_LOGIN_ENABLED=true` and `APP_ENV=local`, as in `.env.docker.example`.
+Anywhere else, every `/qa` route returns 404. Leave the flag off on Cloudron.
 
 ## Checks before a pull request
 
 These match the `ci` check on GitHub:
 
 ```powershell
-vendor\bin\pint --test
-vendor\bin\phpstan analyse --memory-limit=1G
-php artisan test
-npm run build
+docker compose exec app vendor/bin/pint --test
+docker compose exec app vendor/bin/phpstan analyse --memory-limit=1G
+docker compose exec app php artisan test
+docker compose exec node npm run build
+docker compose run --rm a11y
 ```
 
+The last line runs the accessibility check (axe and keyboard) against the
+preview. See [accessibility.md](accessibility.md).
+
 Tests use an in-memory SQLite database, so they never touch `apes_intranet`.
-CI runs the same tests against MySQL.
+CI runs the same tests on PHP 8.3.
 
 ## Mail
 
-`MAIL_MAILER=log` writes mail to `storage/logs/laravel.log`. To see mail in a
-browser, set `MAIL_MAILER=smtp` in `.env`, then open Mailpit at
-<http://localhost:8025>.
+All mail goes to the `mailpit` container. Read it at <http://localhost:8026>.
 
 ## Common problems
 
 | Problem | Fix |
 | --- | --- |
-| The site does not load | In Laragon, click **Start All**, then **Apache > Reload** |
+| `intranet.apes.test` does not resolve | Add the hosts entry from step 2 |
+| The site does not load | `docker compose ps` should show every service up. Read `docker compose logs web app` |
 | `500` error | Read `storage/logs/laravel.log`. Check `.env` exists and has an `APP_KEY` |
-| `Connection refused` for Redis | Start Redis in Laragon. As a stop-gap, set `CACHE_STORE`, `SESSION_DRIVER` and `QUEUE_CONNECTION` to `file`, `file` and `sync` |
-| Unstyled page or "Vite manifest not found" | Run `npm run dev`, or `npm run build` |
-| Database errors | Check MySQL runs and `DB_*` in `.env` matches the table above |
+| Unstyled page or "Vite manifest not found" | Read `docker compose logs node`. Vite writes `public/hot` once it is ready |
+| Changes do not hot reload | Vite polls for changes over the Windows bind mount; wait a second, or restart with `docker compose restart node` |
+| Database errors | Check `docker compose ps mysql` shows `healthy`, and `DB_HOST=mysql` in `.env` |
+| Port 8080, 5174 or 8026 in use | Stop whatever holds the port, or change the left-hand port in `compose.yaml` on your machine only |

@@ -135,7 +135,7 @@ it('signs out', function () {
 });
 
 it('keeps OIDC and LDAP secrets blank in the committed env examples', function () {
-    foreach (['.env.example', '.env.laragon.example'] as $file) {
+    foreach (['.env.example', '.env.docker.example'] as $file) {
         $lines = file(base_path($file), FILE_IGNORE_NEW_LINES);
 
         foreach (['OIDC_CLIENT_ID', 'OIDC_CLIENT_SECRET', 'LDAP_BIND_DN', 'LDAP_BIND_PASSWORD'] as $key) {

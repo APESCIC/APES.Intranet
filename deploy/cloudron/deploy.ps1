@@ -10,8 +10,8 @@
       2. Runs preflight.ps1 and stops on any FAIL.
       3. Takes a Cloudron backup and notes its id.
       4. Notes the live release, for a rollback.
-      5. Builds the tag with build-release.ps1 and uploads it to
-         /app/data/releases/<ReleaseId>.
+      5. Builds the tag with build-release.ps1 (in Docker, so Docker Desktop
+         must be running) and uploads it to /app/data/releases/<ReleaseId>.
       6. Checks the uploaded REVISION is the tag's commit.
       7. Runs activate-release.sh, then restarts the app.
       8. Verifies /healthz (200, "status":"ok", revision = first 12 characters
@@ -26,17 +26,22 @@
     Test only. Verifies against a deliberately wrong revision, so the new
     release is activated and then rolled back. Proves the rollback works.
 
+.PARAMETER HostTools
+    Emergency only. Builds with host PHP, Composer and npm (-Php, -Composer)
+    instead of Docker.
+
 .EXAMPLE
     powershell -NoProfile -ExecutionPolicy Bypass -File deploy\cloudron\deploy.ps1 -Tag v0.0.2
 
 .EXAMPLE
-    ... deploy.ps1 -Tag v0.0.2 -Php C:\laragon\bin\php\php-8.4.24-Win32-vs17-x64\php.exe -Composer C:\laragon\bin\composer\composer.phar
+    ... deploy.ps1 -Tag v0.0.2 -HostTools -Php C:\path\to\php.exe -Composer C:\path\to\composer.phar
 #>
 param(
     [Parameter(Mandatory = $true)][string]$Tag,
     [string]$App = '8bd0acdc-ca6d-467e-aa1e-5c9eb52e3264',
     [string]$Url = 'https://intranet.apes.org.uk',
     [string]$Repo = 'APESCIC/APES.Intranet',
+    [switch]$HostTools,
     [string]$Php = 'php',
     [string]$Composer = 'composer',
     [switch]$ForceVerifyFailure
@@ -189,7 +194,7 @@ try {
     Write-Step "Building $Tag ($sha)"
     $build = @{}
     try {
-        & (Join-Path $PSScriptRoot 'build-release.ps1') -Ref $sha -Php $Php -Composer $Composer | ForEach-Object {
+        & (Join-Path $PSScriptRoot 'build-release.ps1') -Ref $sha -HostTools:$HostTools -Php $Php -Composer $Composer | ForEach-Object {
             if ("$_" -match '^(ReleaseId|ReleaseDir|Revision)=(.+)$') { $build[$Matches[1]] = $Matches[2] } else { Write-Host $_ }
         }
     }

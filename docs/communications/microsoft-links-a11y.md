@@ -8,10 +8,10 @@
   `target="_blank"`, `rel="noopener"` and visible `sr-only` “opens in a new tab”
   text (same as Teams).
 
-## Manual viewport notes (Laragon / Cloudron)
+## Manual viewport notes (local preview / Cloudron)
 
-Recorded for Agents on Linux cloud without Laragon: verify on Windows Laragon
-at 390, 820 and 1440 px before ship.
+Verify in the Docker preview at <http://intranet.apes.test:8080> at 390, 820
+and 1440 px before ship.
 
 | Width | Expected |
 | --- | --- |

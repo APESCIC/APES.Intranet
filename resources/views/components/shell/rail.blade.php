@@ -34,7 +34,7 @@
                     aria-label="Admin menu mode, currently {{ $menuMode->label() }}"
                 >Admin</button>
             </div>
-            <p class="px-3 pb-3 text-xs text-sg-muted">Navigation preference only. This is not the Laragon QA role switcher.</p>
+            <p class="px-3 pb-3 text-xs text-sg-muted">Navigation preference only. This is not the local QA role switcher.</p>
         </form>
     @endif
     <x-shell.nav :menu="$menu" />

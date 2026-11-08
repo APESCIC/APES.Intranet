@@ -52,8 +52,9 @@ Decided. Do not swap these without the owner's approval.
   output.
 - Responsive on desktop, tablet and mobile, and installable as a PWA.
 
-Cloudron runs PHP 8.4, chosen by `/app/data/PHP_VERSION`. Local Laragon uses
-PHP 8.3. Both meet the PHP 8.3 floor. Do not pin Cloudron back to 8.3.
+Cloudron runs PHP 8.4, chosen by `/app/data/PHP_VERSION`. The local Docker
+`app` container also runs PHP 8.4, and CI tests on 8.3. All meet the PHP 8.3
+floor. Do not pin Cloudron back to 8.3.
 
 ## Sign-in
 
@@ -106,35 +107,46 @@ Bambie's approval.
 
 ## Local development
 
-Always run and check every change in the Laragon live preview at
-<http://apes-intranet.test> before any Cloudron deploy.
+Decided by Bambie on 8 November 2026 (#195): local development runs in Docker,
+not Laragon. Always run and check every change in the Docker live preview at
+<http://intranet.apes.test:8080> before any Cloudron deploy. Full guide:
+[docs/local-development.md](docs/local-development.md).
+
+Use the containers for all work. Run every PHP, Artisan, Composer, test, Pint
+and Larastan command as `docker compose exec app ...`, and every npm command
+as `docker compose exec node ...`. Do not use host PHP, Composer or Node, and
+do not serve this repository from Laragon. The Cloudron release build runs in
+Docker too (#206): `deploy/cloudron/deploy.ps1` needs Docker Desktop running,
+and its `-HostTools` switch is for emergencies only. The Cursor rule
+`.cursor/rules/docker-local-dev.mdc` says the same for agents.
 
 Before any change-making work (code, tests, docs or config), follow the
-`live-preview-gate` skill:
+`live-preview-gate` skill, using Docker in place of its Laragon defaults:
 
 1. Pull the latest changes with `repo-sync`. It merges `origin/main` into the
    milestone branch with a merge commit and never rebases.
-2. Reuse the running Laragon site and Vite server. Start them with
-   `laragon-local-preview` only if they are not running.
-3. Open <http://apes-intranet.test> in Cursor's browser
+2. Reuse the running containers (`docker compose ps`). Start them with
+   `docker compose up -d` only if they are not running.
+3. Open <http://intranet.apes.test:8080> in Cursor's browser
    (`cursor-browser-preview`). Confirm that it loaded, then say "Preview ready,
    starting work".
 
-`composer install` and `npm ci` may run without asking when `vendor/` or
-`node_modules/` is missing. Ask before running migrations or installing any
-system tool.
+`docker compose exec app composer install` may run without asking when
+`vendor/` is missing, and the `node` container runs `npm ci` itself. Ask before
+running migrations or installing any system tool.
 
 | Item | Value |
 | --- | --- |
-| App URL | `http://apes-intranet.test` |
-| PHP | Laragon PHP 8.3 |
-| Database | MySQL, database `apes_intranet` (matches Cloudron) |
-| Cache | Redis when it is available (`CACHE_STORE=redis`) |
-| Front end | Node, with Vite hot reload |
-| Env file | Copy `.env.laragon.example` to `.env` |
+| App URL | `http://intranet.apes.test:8080` (hosts entry `127.0.0.1 intranet.apes.test`) |
+| Containers | `compose.yaml`: `web` (Caddy), `app` (PHP 8.4 FPM, Composer), `node` (Vite), `mysql`, `redis`, `mailpit` |
+| Database | MySQL 8.4, database `apes_intranet` (matches Cloudron) |
+| Cache | Redis (`CACHE_STORE=redis`) |
+| Front end | Vite hot reload from `intranet.apes.test:5174` |
+| Mail | Mailpit at `http://localhost:8026` |
+| Env file | Copy `.env.docker.example` to `.env` |
 
 - Local QA role switcher, with fake accounts only. `QA_LOGIN_ENABLED=true`
-  in the Laragon example. Leave it off on Cloudron.
+  in the Docker example. Leave it off on Cloudron.
 - Seeders create fake data only. Never put real HR, student, volunteer or
   agreement data in a local database, a fixture, or this repository.
 - Copy `.env.example` for Cloudron-style keys. Leave those values blank.
@@ -328,7 +340,7 @@ disagrees with this file, follow this file.
 
 | Step | Skills |
 | --- | --- |
-| Starting any change | `repo-sync`, `live-preview-gate`, `laragon-local-preview`, `cursor-browser-preview` |
+| Starting any change | `repo-sync`, `live-preview-gate` (with Docker, not Laragon), `cursor-browser-preview` |
 | Asking for a decision | `decision-prompts` (AskQuestion) |
 | Delivering a milestone | `github-milestone-completion`, `github-cli` (its milestone-to-deploy playbook) |
 | Issues, comments and close-out | `github-issue-types`, `github-work-tracking`, `github-closeout` |
@@ -344,13 +356,14 @@ Tools:
 - The `cloudron` CLI, signed in to `my.cloudron.apes.org.uk`, for the app.
 - AskQuestion for every decision, and `SetActiveBranch` after a branch
   change.
+- Docker Compose (`compose.yaml`) for the local app, its tools and its tests.
 - Cursor's browser for the live preview.
 
 ## Before going public
 
 - Secret scan of the git history is clean.
 - No `.env` file is committed, other than `.env.example` and
-  `.env.laragon.example`.
+  `.env.docker.example`.
 - No real HR, student, volunteer or agreement data is in the repository.
 - A licence has been chosen.
 
@@ -363,4 +376,6 @@ Tools:
 - Conduct: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 - Issue forms: `.github/ISSUE_TEMPLATE`.
 - Discussion forms: `.github/DISCUSSION_TEMPLATE`.
-- Local env: `.env.laragon.example`. Cloudron env keys: `.env.example`.
+- Local development: [docs/local-development.md](docs/local-development.md),
+  `compose.yaml` and `docker/`.
+- Local env: `.env.docker.example`. Cloudron env keys: `.env.example`.

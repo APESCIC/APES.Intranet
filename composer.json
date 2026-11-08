@@ -46,7 +46,7 @@
     "scripts": {
         "setup": [
             "composer install",
-            "@php -r \"file_exists('.env') || copy('.env.laragon.example', '.env');\"",
+            "@php -r \"file_exists('.env') || copy('.env.docker.example', '.env');\"",
             "@php artisan key:generate",
             "@php artisan migrate --force",
             "npm install --ignore-scripts",

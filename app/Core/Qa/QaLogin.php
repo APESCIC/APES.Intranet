@@ -8,7 +8,7 @@ use App\Models\User;
 use InvalidArgumentException;
 
 /**
- * Fake accounts for previewing the intranet on Laragon as each approved group
+ * Fake accounts for previewing the intranet locally as each approved group
  * and each common stack of groups.
  */
 final class QaLogin

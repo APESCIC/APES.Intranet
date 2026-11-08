@@ -106,7 +106,7 @@ jobs:
           while IFS= read -r -d '' path; do
             base="${path##*/}"
             case "${base}" in
-              .env.example|.env.laragon.example)
+              .env.example|.env.docker.example)
                 ;;
               .env|.env.*)
                 printf 'Unexpected env file committed: %s\n' "${path}"
@@ -155,7 +155,7 @@ jobs:
 
       - name: Prepare environment
         run: |
-          cp .env.laragon.example .env
+          cp .env.docker.example .env
           php artisan key:generate
 
       - name: Tests
@@ -166,11 +166,13 @@ jobs:
         run: |
           set -euo pipefail
           sed -i \
+            -e 's/^DB_HOST=.*/DB_HOST=127.0.0.1/' \
             -e 's/^DB_DATABASE=.*/DB_DATABASE=apes_intranet_testing/' \
             -e 's/^DB_PASSWORD=.*/DB_PASSWORD=password/' \
             -e 's/^SESSION_DRIVER=.*/SESSION_DRIVER=file/' \
             -e 's/^CACHE_STORE=.*/CACHE_STORE=file/' \
             -e 's/^QUEUE_CONNECTION=.*/QUEUE_CONNECTION=sync/' \
+            -e 's/^MAIL_MAILER=.*/MAIL_MAILER=log/' \
             -e 's|^APP_URL=.*|APP_URL=http://127.0.0.1:8000|' \
             .env
           php artisan migrate:fresh --seed --force

@@ -120,8 +120,8 @@ Cloudron's `auth_time` claim. Details are in
 
 ## Locally
 
-Laragon has no Cloudron. Use the QA role switcher at
-<http://apes-intranet.test/qa> instead. "Sign in with Cloudron" shows a
+The local Docker preview has no Cloudron. Use the QA role switcher at
+<http://intranet.apes.test:8080/qa> instead. "Sign in with Cloudron" shows a
 "temporarily unavailable" page locally, because the OIDC values are blank.
 
 ## Signing out
