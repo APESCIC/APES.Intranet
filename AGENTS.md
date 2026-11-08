@@ -186,7 +186,13 @@ Open, in this order:
 2. **v0.2.x People.** Directory, organisation chart, and profiles for staff,
    volunteers and students, with Cloudron sign-in and roles.
 3. **v0.3.x Communications.** Internal updates. Chat stays in Teams, as a
-   link only.
+ link only.
+   - **v0.3.5 Platform discovery.** Discovery and planning only: the LMS
+     inventory ([docs/discovery/lms-inventory.md](docs/discovery/lms-inventory.md))
+     and the Modules and Integrations ADR
+     ([docs/adr/0001-modules-and-integrations.md](docs/adr/0001-modules-and-integrations.md)).
+     It authorises no build work: a registry pilot or a Training Module each
+     needs Bambie's separate approval.
 4. **v0.4.x Operations.** Rotas, tasks, forms, and clock in/out.
 5. **v0.5.x Help desk.** Help desk in Laravel, with IT and Management queues.
 6. **v0.6.x HR and training.** Handbook, training, appraisals and
