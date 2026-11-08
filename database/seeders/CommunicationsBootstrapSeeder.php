@@ -9,8 +9,9 @@ use Modules\Communications\Models\HandbookVersion;
 use Modules\Communications\Models\MicrosoftLink;
 
 /**
- * Deploy-safe communications defaults (no fake personal data).
- * Safe to run on Cloudron: php artisan db:seed --class=Database\\Seeders\\CommunicationsBootstrapSeeder --force
+ * Deploy-safe communications defaults (no fake personal data). Runs on every
+ * Cloudron deploy after RolesAndPermissionsSeeder (deploy/cloudron/activate-release.sh).
+ * Existing links and chapters are left as admins edited them.
  */
 class CommunicationsBootstrapSeeder extends Seeder
 {
@@ -30,7 +31,7 @@ class CommunicationsBootstrapSeeder extends Seeder
         ];
 
         foreach ($defaults as $row) {
-            MicrosoftLink::query()->updateOrCreate(
+            MicrosoftLink::query()->firstOrCreate(
                 ['key' => $row['key']],
                 $row + ['active' => true, 'opens_in_new_tab' => true],
             );
@@ -62,7 +63,7 @@ HTML),
 
     private function publishChapter(string $slug, string $title, int $sortOrder, string $body): void
     {
-        $chapter = HandbookChapter::query()->updateOrCreate(
+        $chapter = HandbookChapter::query()->firstOrCreate(
             ['slug' => $slug],
             ['title' => $title, 'sort_order' => $sortOrder, 'published' => true],
         );

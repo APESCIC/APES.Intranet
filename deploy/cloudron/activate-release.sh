@@ -89,6 +89,8 @@ artisan package:discover
 artisan storage:link --force
 artisan migrate --force
 artisan db:seed --class='Database\Seeders\RolesAndPermissionsSeeder' --force
+# After the core seeder: its syncPermissions drops module grants, and this puts them back.
+artisan db:seed --class='Database\Seeders\CommunicationsBootstrapSeeder' --force
 artisan optimize
 
 echo "==> Switching $CURRENT to $(basename "$target")"
