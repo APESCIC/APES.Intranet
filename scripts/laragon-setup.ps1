@@ -6,7 +6,8 @@
     Reads docs/laragon/profile.json, then:
       1. finds Laragon's PHP, Composer, Node and MySQL that match the profile and
          puts them first on PATH for this PowerShell session only;
-      2. warns if Laragon's Apache is not running the profile's PHP version;
+      2. warns if Laragon's Apache is not running the profile's PHP build through
+         FastCGI (mod_fcgid), and checks public/.htaccess is safe under FastCGI;
       3. links C:\laragon\www\apes-intranet to this clone (a junction), unless it
          is already there;
       4. writes the "apes-intranet" Laragon profile (C:\laragon\usr\profile),
@@ -89,8 +90,10 @@ if (-not (Test-Path (Join-Path $LaragonRoot 'laragon.exe'))) {
 }
 
 $phpMinor = [regex]::Escape($p.php)
-$phpDir = Get-NewestFolder "$LaragonRoot\bin\php" "^php-$phpMinor\.\d+-(nts-)?Win32" '^php-(\d+\.\d+\.\d+)'
-if (-not $phpDir) { throw "PHP $($p.php) is not installed in Laragon. Add it with Menu > Tools > Quick add, then run this again." }
+$phpBuild = if ($p.phpThreadSafe) { 'thread-safe' } else { 'NTS' }
+$phpPattern = "^php-$phpMinor\.\d+(-\d+)?-" + $(if ($p.phpThreadSafe) { '' } else { 'nts-' }) + 'Win32'
+$phpDir = Get-NewestFolder "$LaragonRoot\bin\php" $phpPattern '^php-(\d+\.\d+\.\d+)'
+if (-not $phpDir) { throw "Laragon has no $phpBuild PHP $($p.php). Add it with Menu > PHP > Version > Get more (the $phpBuild x64 build), then run this again." }
 
 $composerPhar = Join-Path $LaragonRoot 'bin\composer\composer.phar'
 if (-not (Test-Path $composerPhar)) { throw "Composer was not found at $composerPhar." }
@@ -123,20 +126,49 @@ if ($missing.Count -gt 0) {
 }
 Write-Ok "PHP extensions: $($p.phpExtensions -join ', ')"
 
-# 2. Laragon's Apache PHP -------------------------------------------------------
-$modPhp = Join-Path $LaragonRoot 'etc\apache2\mod_php.conf'
-$apachePhp = $null
-if (Test-Path $modPhp) {
-    $iniDir = Select-String -Path $modPhp -Pattern '^PHPIniDir\s+"([^"]+)"' | Select-Object -First 1
-    if ($iniDir) { $apachePhp = Split-Path $iniDir.Matches[0].Groups[1].Value -Leaf }
+# 2. Laragon's Apache PHP (FastCGI) ---------------------------------------------
+$switchPhp = "In Laragon choose Menu > PHP > Version > $($phpDir.Name), or Menu > Profile > $($p.laragonProfile)."
+$httpdConf = Join-Path $apacheDir.FullName 'conf\httpd.conf'
+$phpInclude = if (Test-Path $httpdConf) {
+    Select-String -Path $httpdConf -Pattern '^\s*Include\s+"?[^"]*[\\/]etc[\\/]apache2[\\/](mod_php|fcgid)\.conf' | Select-Object -First 1
 }
-if (-not $apachePhp) {
-    Write-Warn "Could not tell which PHP Laragon's Apache runs. Check Menu > PHP > Version is $($p.php)."
-} elseif ($apachePhp -notlike "php-$($p.php).*") {
-    Write-Warn "Laragon's Apache runs $apachePhp, but this project needs PHP $($p.php). Choose Menu > Profile > $($p.laragonProfile) (or Menu > PHP > Version > $($p.php)) in Laragon."
+if (-not $phpInclude) {
+    Write-Warn "Could not tell how Laragon's Apache runs PHP from $httpdConf. Start Laragon once, then run this again."
+} elseif ($phpInclude.Matches[0].Groups[1].Value -ne $p.apacheHandler) {
+    Write-Warn "Laragon's Apache runs PHP through $($phpInclude.Matches[0].Groups[1].Value), shared by every site, so another project's .env values can leak into this one. $switchPhp"
 } else {
-    Write-Ok "Laragon's Apache runs $apachePhp"
+    $handlerConf = Join-Path $LaragonRoot "etc\apache2\$($p.apacheHandler).conf"
+    $wrapper = Select-String -Path $handlerConf -Pattern 'FcgidWrapper\s+"([^"]+)[\\/]php-cgi\.exe"' -ErrorAction SilentlyContinue | Select-Object -First 1
+    $apachePhp = if ($wrapper) { Split-Path $wrapper.Matches[0].Groups[1].Value -Leaf } else { $null }
+    if ($apachePhp -eq $phpDir.Name) {
+        Write-Ok "Apache runs $apachePhp through FastCGI, the same build as the command line"
+    } else {
+        Write-Warn "Laragon's Apache runs $(if ($apachePhp) { $apachePhp } else { 'an unknown PHP' }) through FastCGI, but this project needs $($phpDir.Name). $switchPhp"
+    }
 }
+
+$opcache = "$(php -r "echo extension_loaded('Zend OPcache') ? ini_get('opcache.enable').'/'.ini_get('opcache.validate_timestamps') : 'off';")".Trim()
+if ($opcache -eq '1/1') {
+    Write-Ok 'OPcache is on and checks for changed files'
+} else {
+    Write-Warn "OPcache is $(if ($opcache -eq 'off') { 'not loaded' } else { "set to enable/validate_timestamps $opcache" }) in $($phpDir.Name)\php.ini. For faster pages, turn it on in Menu > PHP > php.ini (zend_extension=opcache, opcache.enable=1, opcache.validate_timestamps=1)."
+}
+
+$htaccess = Join-Path $repo 'public\.htaccess'
+$depth = 0
+$problems = @()
+foreach ($line in Get-Content $htaccess) {
+    if ($line -match '^\s*<IfModule\s+(php_module|mod_php\d*\.c)\s*>') { $depth++ }
+    elseif ($depth -gt 0 -and $line -match '^\s*</IfModule>') { $depth-- }
+    elseif ($depth -eq 0 -and $line -match '^\s*php_(value|flag|admin_value|admin_flag)\b') { $problems += $line.Trim() }
+}
+if ($problems.Count -gt 0) {
+    throw "public\.htaccess has PHP settings that FastCGI answers with a 500 error: $($problems -join '; '). Put them inside <IfModule php_module> and add the same settings to public\.user.ini."
+}
+if (-not (Select-String -Path $htaccess -Pattern 'HTTP_AUTHORIZATION' -Quiet)) {
+    Write-Warn 'public\.htaccess no longer passes the Authorization header to PHP. Sign-in and API tokens need the HTTP_AUTHORIZATION rewrite rule.'
+}
+Write-Ok 'public\.htaccess is safe under FastCGI'
 
 if (-not (Get-Process httpd -ErrorAction SilentlyContinue)) { Write-Warn 'Apache is not running. Click Start All in Laragon.' }
 

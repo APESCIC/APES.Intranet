@@ -7,6 +7,8 @@
     "webServer": "apache",
     "apache": "2.4",
     "php": "8.4",
+    "phpThreadSafe": false,
+    "apacheHandler": "fcgid",
     "phpExtensions": [
         "ctype",
         "curl",

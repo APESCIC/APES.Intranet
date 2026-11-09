@@ -1,7 +1,15 @@
 <?php
 
 use App\Core\Health\HealthCheck;
+use App\Core\Health\LocalRevision;
 use Illuminate\Support\Facades\Redis;
+
+function gitHeadRevision(): ?string
+{
+    $sha = trim((string) shell_exec('git -C '.escapeshellarg(base_path()).' rev-parse HEAD'));
+
+    return preg_match('/^[0-9a-f]{40}$/', $sha) === 1 ? substr($sha, 0, 12) : null;
+}
 
 function redisAnswers(bool $up): void
 {
@@ -102,6 +110,42 @@ it('reports dev when the VERSION file is malformed', function () {
         $this->getJson('/healthz')->assertOk()->assertJsonPath('version', 'dev');
     } finally {
         unlink(base_path('VERSION'));
+    }
+});
+
+it('reports the PHP handler and git revision on the local preview only', function () {
+    redisAnswers(true);
+    app()->instance('env', 'local');
+
+    $local = $this->getJson('/healthz')->assertOk()->json('local');
+
+    expect($local)->toHaveKeys(['php', 'php_sapi', 'git_revision'])
+        ->and($local['php'])->toBe(PHP_VERSION)
+        ->and($local['php_sapi'])->toBe(PHP_SAPI)
+        ->and($local['git_revision'])->toBe(gitHeadRevision());
+});
+
+it('leaves out the local block outside the local environment', function () {
+    redisAnswers(true);
+
+    expect($this->getJson('/healthz')->json())->not->toHaveKey('local');
+});
+
+it('reads a detached HEAD and a packed ref', function () {
+    $dir = sys_get_temp_dir().'/healthz-git-'.bin2hex(random_bytes(4));
+    mkdir($dir.'/.git', recursive: true);
+
+    try {
+        file_put_contents($dir.'/.git/HEAD', str_repeat('a', 40)."\n");
+        expect((new LocalRevision($dir))->current())->toBe(str_repeat('a', 12));
+
+        file_put_contents($dir.'/.git/HEAD', "ref: refs/heads/milestone/v1-2-3\n");
+        file_put_contents($dir.'/.git/packed-refs', "# pack-refs\n".str_repeat('b', 40)." refs/heads/milestone/v1-2-3\n");
+        expect((new LocalRevision($dir))->current())->toBe(str_repeat('b', 12));
+    } finally {
+        array_map('unlink', glob($dir.'/.git/*'));
+        rmdir($dir.'/.git');
+        rmdir($dir);
     }
 });
 
