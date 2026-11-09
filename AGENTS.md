@@ -363,6 +363,25 @@ Once per milestone, after every issue in it is committed:
    message in chat with the milestone, the pull request and its merge commit,
    the issues shipped, the release and the deploy evidence.
 
+## Milestone versioning
+
+Every milestone, branch, PR title, release note, tag and release uses the
+milestone's version (`v0.4.0`), never GitHub's milestone number. The rule is
+[`.cursor/rules/milestone-versioning.mdc`](.cursor/rules/milestone-versioning.mdc).
+
+- `composer milestone:next` prints the next milestone (the lowest open version
+  above the latest tag) and its branch name. `composer milestone:pr-title --
+  <issue>` prints the PR title.
+- `composer milestone:check-title -- "<title>"`, `milestone:check-branch --
+  "<branch>"` and `milestone:check-release -- vX.Y.Z "<release title>"` fail
+  with the reason. CI runs the title and branch checks on every pull request
+  (`.github/workflows/milestone-version-check.yml`).
+- Skills: [`start-next-milestone`](.cursor/skills/start-next-milestone/SKILL.md),
+  [`milestone-release-titles`](.cursor/skills/milestone-release-titles/SKILL.md)
+  and `/next-milestone`. Script: `scripts/milestone-version`.
+- New milestone branches carry the version: `milestone/v0-4-0-operations`.
+- Optional local check before each push: `git config core.hooksPath .githooks`.
+
 ## Cursor skills and tools
 
 Agents in Cursor use these skills. The steps above come from them. If a skill
@@ -373,6 +392,7 @@ disagrees with this file, follow this file.
 | Starting any change | `repo-sync`, `live-preview-gate` (with Laragon), `cursor-browser-preview` |
 | Asking for a decision | `decision-prompts` (AskQuestion) |
 | Delivering a milestone | `github-milestone-completion`, `github-cli` (its milestone-to-deploy playbook) |
+| Milestone versions | `start-next-milestone`, `milestone-release-titles`, `/next-milestone` (this repository) |
 | Issues, comments and close-out | `github-issue-types`, `github-work-tracking`, `github-closeout` |
 | Continuous integration | `github-actions`, `loop-on-ci`, `fix-ci` |
 | Merge, release and deploy | `ship-gate`, `cloudron-deploy` |
