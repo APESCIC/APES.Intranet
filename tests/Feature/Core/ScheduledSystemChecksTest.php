@@ -116,6 +116,6 @@ it('leaves /healthz unchanged', function () {
     $this->redis->up = false;
     runChecksEveryFiveMinutes($this, 3);
 
-    expect(array_keys($this->getJson('/healthz')->json()))->toBe(['status', 'checks', 'revision'])
+    expect(array_keys($this->getJson('/healthz')->json()))->toBe(['status', 'checks', 'version', 'revision'])
         ->and(array_keys($this->getJson('/healthz')->json('checks')))->toBe(['app', 'database', 'redis']);
 });
