@@ -16,5 +16,5 @@
   "internal_notes": [
     "Release notes are reviewed files in the repository, synced into the hub on every deploy. The health check now reports the deployed version as well as the revision."
   ],
-  "published": false
+  "published": true
 }
