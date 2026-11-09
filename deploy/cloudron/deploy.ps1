@@ -10,8 +10,8 @@
       2. Runs preflight.ps1 and stops on any FAIL.
       3. Takes a Cloudron backup and notes its id.
       4. Notes the live release, for a rollback.
-      5. Builds the tag with build-release.ps1 (WampServer's PHP 8.4, Composer
-         and host npm) and uploads it to /app/data/releases/<ReleaseId>.
+      5. Builds the tag with build-release.ps1 (Laragon's PHP 8.4, Composer
+         and npm) and uploads it to /app/data/releases/<ReleaseId>.
       6. Checks the uploaded REVISION is the tag's commit.
       7. Runs activate-release.sh, then restarts the app.
       8. Verifies /healthz (200, "status":"ok", revision = first 12 characters
@@ -27,10 +27,11 @@
     release is activated and then rolled back. Proves the rollback works.
 
 .PARAMETER Php
-    PHP 8.4 for the build. Defaults to WampServer's newest PHP 8.4.
+    PHP 8.4 for the build. Defaults to Laragon's newest PHP 8.4.
 
 .PARAMETER Composer
-    Path to composer.phar. Defaults to the one next to composer on PATH.
+    Path to composer.phar. Defaults to the one next to composer on PATH, or
+    Laragon's.
 
 .EXAMPLE
     powershell -NoProfile -ExecutionPolicy Bypass -File deploy\cloudron\deploy.ps1 -Tag v0.0.2

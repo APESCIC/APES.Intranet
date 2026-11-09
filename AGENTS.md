@@ -53,7 +53,7 @@ Decided. Do not swap these without the owner's approval.
 - Responsive on desktop, tablet and mobile, and installable as a PWA.
 
 Cloudron runs PHP 8.4, chosen by `/app/data/PHP_VERSION`. Local development
-and the release build use WampServer's PHP 8.4 too, and CI tests on 8.3. All
+and the release build use Laragon's PHP 8.4 too, and CI tests on 8.3. All
 meet the PHP 8.3 floor. Do not pin Cloudron back to 8.3.
 
 ## Sign-in
@@ -105,54 +105,68 @@ soon" holding page stays in `/app/data/public` as a fallback
 changes, if any are ever needed, are made by the APES IT Administrator with
 Bambie's approval.
 
-## Local development
+## Local development (Laragon)
 
-Decided by Bambie on 9 November 2026 (#209): local development runs on
-WampServer, replacing the Docker set-up from #195. Always run and check every
-change in the WampServer live preview at <http://intranet.apes.test> before
-any Cloudron deploy. Full guide:
-[docs/local-development.md](docs/local-development.md).
+Decided by Bambie on 9 November 2026 (#213): Laragon is the only supported
+local set-up, replacing the earlier set-up from #209. This repository is its own Laragon
+project, so it runs side by side with the other APES repositories. Always run
+and check every change in the Laragon live preview at
+<http://apes-intranet.test> before any Cloudron deploy, and test against the
+demo data. Never suggest containers, virtual machines or another local server
+stack. Full guide: [docs/local-development.md](docs/local-development.md).
+
+- Profile: [docs/laragon/profile.md](docs/laragon/profile.md) (values in
+  `docs/laragon/profile.json`, which the setup script reads).
+- Set up or repair: `scripts/laragon-setup.ps1`. It links
+  `C:\laragon\www\apes-intranet` to the clone, writes the `apes-intranet`
+  Laragon profile, creates the `apes_intranet_local` database and migrates.
+  It is safe to run twice and only touches this project.
+- Demo data: `php artisan demo:seed` loads it and `php artisan demo:reset`
+  empties the local database and reloads it (also `composer demo:seed` and
+  `composer demo:reset`). Both refuse unless `APP_ENV=local`. Contents and
+  test logins: [docs/laragon/demo-data.md](docs/laragon/demo-data.md).
+- Live preview: `npm run dev` (or `composer dev`) for Vite hot reload.
 
 Run every PHP, Artisan, Composer, test, Pint and Larastan command with
-WampServer's newest PHP 8.4 (`C:\wamp64\bin\php\php8.4.*`), put first on
-`PATH` for the session, and every npm command with the host Node. Do not use
-any other PHP, and do not serve this repository from Laragon. Laragon must be
-stopped while WampServer runs, because both use ports 80 and 3306. The
-Cloudron release build uses the same tools: `deploy/cloudron/deploy.ps1` stops
-if the PHP is not 8.4. The Cursor rule `.cursor/rules/wampserver-local-dev.mdc`
-says the same for agents.
+Laragon's newest PHP 8.4 (`C:\laragon\bin\php\php-8.4.*`), put first on
+`PATH` for the session, and every npm command with Laragon's Node 22. Do not
+use any other PHP, and do not use `php artisan serve`. The Cloudron release
+build uses the same PHP: `deploy/cloudron/deploy.ps1` stops if the PHP is not
+8.4. The Cursor rule `.cursor/rules/laragon-local-dev.mdc` says the same for
+agents.
 
 Before any change-making work (code, tests, docs or config), follow the
-`live-preview-gate` skill, using WampServer in place of its Laragon defaults:
+`live-preview-gate` skill with Laragon:
 
 1. Pull the latest changes with `repo-sync`. It merges `origin/main` into the
    milestone branch with a merge commit and never rebases.
-2. Check that the `wampapache64` and `wampmysqld64` services are running
-   (`Get-Service wamp*`), and start Vite with `npm run dev` if it is not
-   running. WampServer's tray app runs as administrator, so starting its
-   services or switching its PHP version needs the owner's click: ask with
-   AskQuestion.
-3. Open <http://intranet.apes.test> in Cursor's browser
+2. Check that Laragon is running and `http://apes-intranet.test/login`
+   returns 200, and start Vite with `npm run dev` if nothing listens on port
+   5174. Starting Laragon, clicking Reload or switching its profile or PHP
+   version needs the owner's click: ask with AskQuestion.
+3. Open <http://apes-intranet.test> in Cursor's browser
    (`cursor-browser-preview`). Confirm that it loaded, then say "Preview ready,
    starting work".
 
 `composer install` and `npm ci` may run without asking when `vendor/` or
-`node_modules/` is missing. Ask before running migrations or installing any
-system tool.
+`node_modules/` is missing. Ask before running migrations, `demo:reset` or
+installing any system tool.
 
 | Item | Value |
 | --- | --- |
-| App URL | `http://intranet.apes.test` (hosts entry `127.0.0.1 intranet.apes.test`) |
-| Web server | WampServer's Apache 2.4 on port 80, virtual host pointing at `public/` |
-| PHP | WampServer's PHP 8.4, for Apache and the command line |
-| Database | WampServer's MySQL 8.4 on port 3306 with InnoDB as the default engine, database `apes_intranet` (matches Cloudron) |
+| App URL | `http://apes-intranet.test` (Laragon's Auto Virtual Hosts, from the folder name) |
+| Project folder | `C:\laragon\www\apes-intranet`, a junction to the clone |
+| Web server | Laragon's Apache 2.4 on port 80, document root `public/` |
+| PHP | Laragon's PHP 8.4, for Apache and the command line |
+| Database | Laragon's MySQL 8.4 on port 3306 with InnoDB, database `apes_intranet_local`, user `root`, no password |
 | Cache and sessions | Files (`CACHE_STORE=file`, `SESSION_DRIVER=file`), queue `sync` |
-| Front end | Vite hot reload on port 5174 (`npm run dev`) |
+| Front end | Vite hot reload on port 5174 (`npm run dev`), unique among the APES repositories |
 | Mail | Written to `storage/logs/laravel.log` (`MAIL_MAILER=log`) |
-| Env file | Copy `.env.wamp.example` to `.env` |
+| Env file | Copy `.env.laragon.example` to `.env` (the setup script does this) |
 
-- Local QA role switcher, with fake accounts only. `QA_LOGIN_ENABLED=true`
-  in the WampServer example. Leave it off on Cloudron.
+- Local QA role switcher at <http://apes-intranet.test/qa>, with fake
+  accounts only. `QA_LOGIN_ENABLED=true` in the Laragon example. Leave it off
+  on Cloudron.
 - Seeders create fake data only. Never put real HR, student, volunteer or
   agreement data in a local database, a fixture, or this repository.
 - Copy `.env.example` for Cloudron-style keys. Leave those values blank.
@@ -346,7 +360,7 @@ disagrees with this file, follow this file.
 
 | Step | Skills |
 | --- | --- |
-| Starting any change | `repo-sync`, `live-preview-gate` (with WampServer, not Laragon), `cursor-browser-preview` |
+| Starting any change | `repo-sync`, `live-preview-gate` (with Laragon), `cursor-browser-preview` |
 | Asking for a decision | `decision-prompts` (AskQuestion) |
 | Delivering a milestone | `github-milestone-completion`, `github-cli` (its milestone-to-deploy playbook) |
 | Issues, comments and close-out | `github-issue-types`, `github-work-tracking`, `github-closeout` |
@@ -362,15 +376,15 @@ Tools:
 - The `cloudron` CLI, signed in to `my.cloudron.apes.org.uk`, for the app.
 - AskQuestion for every decision, and `SetActiveBranch` after a branch
   change.
-- WampServer (Apache, PHP 8.4, MySQL 8.4) and the host Node for the local
-  app, its tools, its tests and the release build.
+- Laragon (Apache, PHP 8.4, MySQL 8.4, Node 22) for the local app, its
+  tools, its tests, the demo data and the release build.
 - Cursor's browser for the live preview.
 
 ## Before going public
 
 - Secret scan of the git history is clean.
 - No `.env` file is committed, other than `.env.example` and
-  `.env.wamp.example`.
+  `.env.laragon.example`.
 - No real HR, student, volunteer or agreement data is in the repository.
 - A licence has been chosen.
 
@@ -384,4 +398,5 @@ Tools:
 - Issue forms: `.github/ISSUE_TEMPLATE`.
 - Discussion forms: `.github/DISCUSSION_TEMPLATE`.
 - Local development: [docs/local-development.md](docs/local-development.md).
-- Local env: `.env.wamp.example`. Cloudron env keys: `.env.example`.
+- Laragon profile and demo data: [docs/laragon/](docs/laragon/profile.md).
+- Local env: `.env.laragon.example`. Cloudron env keys: `.env.example`.

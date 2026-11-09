@@ -16,12 +16,13 @@ pull request. It:
   mobile menu's focus trap
 - fails on any serious or critical axe issue, or any keyboard failure
 
-Run it locally against the WampServer preview, using the installed Microsoft
+Run it locally against the Laragon preview, using the installed Microsoft
 Edge, so Playwright does not need to download its own Chromium. The preview
-must be running, with `QA_LOGIN_ENABLED=true` in `.env`:
+must be running, with `QA_LOGIN_ENABLED=true` in `.env` and the demo data
+loaded (`php artisan demo:seed`):
 
 ```powershell
-$env:BASE_URL = 'http://intranet.apes.test'; $env:A11Y_BROWSER_CHANNEL = 'msedge'; npm run test:a11y
+$env:BASE_URL = 'http://apes-intranet.test'; $env:A11Y_BROWSER_CHANNEL = 'msedge'; npm run test:a11y
 ```
 
 ## Baseline audit, 4 November 2026

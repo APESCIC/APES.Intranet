@@ -1,135 +1,157 @@
-# Local development with WampServer
+# Local development with Laragon
 
-This guide takes a fresh clone to a running preview at
-<http://intranet.apes.test>. Check every change there before any Cloudron
-deploy.
+Laragon on Windows is the only supported local set-up for APES Intranet. The
+app is its own Laragon project at <http://apes-intranet.test>, with its own
+folder, database and Vite port, so it runs side by side with the other APES
+projects. Check every change there, with the demo data loaded, before any
+Cloudron deploy.
 
 Use fake data only. Never put real HR, student, volunteer or agreement data in
 a local database, a fixture or this repository.
 
 ## What you need
 
-- [WampServer](https://www.wampserver.com/) 3.4 or newer (64-bit), with
-  Apache 2.4, PHP 8.4 and MySQL 8.4.
-- [Composer](https://getcomposer.org/) 2.
-- [Node.js](https://nodejs.org/) 22 or newer, with npm.
-- Git.
+- [Laragon](https://laragon.org/) (Full) 8 or newer, installed in
+  `C:\laragon`. It brings Apache 2.4, PHP, MySQL 8.4, Node, Composer and Git.
+- PHP 8.4 in Laragon. If Menu, then **PHP**, then **Version** has no 8.4,
+  add it with Menu, then **Tools**, then **Quick add**.
+- Node 22 in Laragon (Menu, then **Node.js**, then **Version**).
 
 | Part | What runs it | Address |
 | --- | --- | --- |
-| Web server | WampServer's Apache, serving `public/` | <http://intranet.apes.test> |
-| PHP | WampServer's PHP 8.4, for Apache and the command line | |
-| Database | WampServer's MySQL 8.4, database `apes_intranet`, user `root`, no password | `127.0.0.1:3306` |
+| Web server | Laragon's Apache, serving `public/` | <http://apes-intranet.test> |
+| PHP | Laragon's PHP 8.4, for Apache and the command line | |
+| Database | Laragon's MySQL 8.4, database `apes_intranet_local`, user `root`, no password | `127.0.0.1:3306` |
 | Front end | Vite (`npm run dev`) | Port 5174 |
 | Mail | Written to `storage/logs/laravel.log` | |
 
-PHP 8.4 matches Cloudron. PHP 8.3 is still the floor (`composer.json` pins the
+The full profile is in [laragon/profile.md](laragon/profile.md). PHP 8.4
+matches Cloudron. PHP 8.3 is still the floor (`composer.json` pins the
 platform to 8.3, and CI runs 8.3). Locally, sessions and the cache use files
 and the queue runs straight away (`sync`), so Redis is not needed.
 
-Laragon must be stopped while WampServer runs, because both use ports 80 and
-3306. WampServer's MariaDB on port 3307 is not used.
-
 ## First run
 
-1. Clone the repository, for example into
-   `C:\Users\<you>\Documents\GitHub\APES.Intranet`.
-2. Point `intranet.apes.test` at your machine. From an elevated PowerShell:
+1. Start Laragon and click **Start All**.
+2. Clone the repository wherever you keep your code, for example:
 
    ```powershell
-   Add-Content -Path C:\Windows\System32\drivers\etc\hosts -Value "127.0.0.1 intranet.apes.test"
+   cd $HOME\Documents\GitHub
+   git clone https://github.com/APESCIC/APES.Intranet.git
+   cd APES.Intranet
    ```
 
-3. In the WampServer tray menu:
-   - choose **PHP**, then **Version**, then the newest **8.4**;
-   - make sure **MySQL** is on (WampServer's default database);
-   - choose **Start All Services**, and wait for the W icon to turn green.
-4. Make InnoDB MySQL's default table engine, as on Cloudron. WampServer
-   defaults to MyISAM, which cannot hold the app's indexes. In
-   `C:\wamp64\bin\mysql\mysql8.4.x\my.ini`, comment out
-   `default_storage_engine=MYISAM` and remove the `;` in front of
-   `default_storage_engine=InnoDB`. Then restart MySQL from the tray menu.
-5. Add a virtual host for the app at the end of
-   `C:\wamp64\bin\apache\apache2.4.x\conf\extra\httpd-vhosts.conf`, using your
-   own path to the repository, and restart Apache from the tray menu:
+   You can also clone it straight into `C:\laragon\www\apes-intranet`. The
+   setup script accepts either.
 
-   ```apache
-   <VirtualHost *:80>
-     ServerName intranet.apes.test
-     DocumentRoot "c:/users/<you>/documents/github/apes.intranet/public"
-     <Directory "c:/users/<you>/documents/github/apes.intranet/public/">
-       Options +FollowSymLinks
-       AllowOverride All
-       Require local
-     </Directory>
-   </VirtualHost>
-   ```
-
-6. Create the database:
+3. Run the setup script from the repository root:
 
    ```powershell
-   & C:\wamp64\bin\mysql\mysql8.4.x\bin\mysql.exe -u root -h 127.0.0.1 -e "CREATE DATABASE apes_intranet CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
+   powershell -NoProfile -ExecutionPolicy Bypass -File scripts\laragon-setup.ps1
    ```
 
-7. From the repository root, put WampServer's PHP first on `PATH` for this
-   session, then copy the env file and install everything:
+   It:
+   - checks that Laragon has PHP 8.4 (with the extensions the app needs),
+     Composer, Node 22 and MySQL 8.4, and uses them for this session;
+   - warns if Laragon's Apache runs a different PHP version;
+   - links `C:\laragon\www\apes-intranet` to your clone, and reloads Laragon
+     so it creates `http://apes-intranet.test`;
+   - writes the `apes-intranet` Laragon profile;
+   - copies `.env.laragon.example` to `.env` if you have no `.env`, and warns
+     if your `.env` does not match the profile;
+   - runs `composer install`, and `npm ci` if `node_modules` is missing;
+   - generates `APP_KEY` if it is blank;
+   - creates the `apes_intranet_local` database if it is missing, and runs the
+     migrations;
+   - asks whether to load the demo data. Add `-SeedDemo` or `-NoDemo` to skip
+     the question.
 
-   ```powershell
-   $env:Path = 'C:\wamp64\bin\php\php8.4.x;' + $env:Path; $env:XDEBUG_MODE = 'off'
-   Copy-Item .env.wamp.example .env
-   composer install
-   php artisan key:generate
-   php artisan migrate --seed
-   npm ci
-   ```
+   It is safe to run again at any time. It never touches another project's
+   folder, database, profile or site. `composer setup` runs it too. `.env`
+   stays on your machine: Git ignores it, so never commit it.
 
-   `.env` stays on your machine. Git ignores it. Never commit it.
-
-8. Start Vite, and leave it running:
+4. Apply the Laragon profile: Menu, then **Profile**, then **apes-intranet**.
+   This sets Laragon to the versions in the profile. If you only ever run
+   projects on the same versions, Laragon's default profile works as well.
+5. Start Vite, and leave it running:
 
    ```powershell
    npm run dev
    ```
 
-9. Open <http://intranet.apes.test>.
+6. Open <http://apes-intranet.test/qa> and sign in as a fake account for any
+   role.
 
-Replace `8.4.x` and `2.4.x` with the versions in your `C:\wamp64\bin` folders,
-for example `php8.4.15`.
+If <http://apes-intranet.test> shows Laragon's own page, click **Reload** in
+Laragon.
 
 ## Everyday commands
 
-Start each PowerShell session from the repository root with WampServer's PHP
-first on `PATH`, so `php` and `composer` use it:
+The setup script sets `PATH` for its own run only. For your own commands,
+start each PowerShell session from the repository root with Laragon's PHP
+8.4, Composer and Node first on `PATH`. Use your version folders from
+`C:\laragon\bin`:
 
 ```powershell
-$env:Path = 'C:\wamp64\bin\php\php8.4.x;' + $env:Path; $env:XDEBUG_MODE = 'off'
-php artisan <command>
-composer <command>
-npm <command>
-npm run dev                                           # Vite with hot reload
+$env:Path = 'C:\laragon\bin\php\php-8.4.27-Win32-vs17-x64;C:\laragon\bin\composer;C:\laragon\bin\nodejs\node-v22;' + $env:Path; $env:XDEBUG_MODE = 'off'
 ```
 
-`XDEBUG_MODE=off` turns off WampServer's Xdebug on the command line, which
-makes Composer and the tests much faster. Leave it out when you want to debug.
+Laragon's own terminal (the **Terminal** button) puts Laragon's active PHP,
+Composer and Node on `PATH` for you.
 
-## Fake data
+| Task | Command |
+| --- | --- |
+| Live preview with hot reload | `npm run dev` (or `composer dev`) |
+| Load the demo data | `php artisan demo:seed` (or `composer demo:seed`) |
+| Empty the database and reload the demo data | `php artisan demo:reset` (or `composer demo:reset`) |
+| Set up or repair | `composer setup` |
+| Production build of the assets | `npm run build` (or `composer build`) |
+| Artisan | `php artisan <command>` |
 
-`php artisan migrate --seed` adds fake people with `@example.test` addresses.
-The seeders refuse to run outside the `local` and `testing` environments. You
-can run them again safely, because they do not create duplicates.
+## Live preview
 
-To start again from an empty database:
+`npm run dev` starts Vite on port 5174 and writes `public/hot`, so the pages
+at <http://apes-intranet.test> load their CSS and JavaScript from Vite. Saving
+a CSS or JavaScript file updates the browser straight away. Saving a Blade
+template (in `resources/views` or a module's `resources/views`) or a routes
+file reloads the page. You never need to rebuild by hand.
 
-```powershell
-php artisan migrate:fresh --seed
-```
+`npm run build` writes `public/build` for production. Stop and start
+`npm run dev` afterwards, so the preview uses Vite again.
 
-## Preview as each role
+## Demo data
 
-The QA role switcher at <http://intranet.apes.test/qa> signs you in as a fake
-account for any role, such as `qa-admin@example.test`. It only works when
-`QA_LOGIN_ENABLED=true` and `APP_ENV=local`, as in `.env.wamp.example`.
-Anywhere else, every `/qa` route returns 404. Leave the flag off on Cloudron.
+`php artisan demo:seed` fills every main page and list with fake people,
+placements, updates, events, handbook chapters, policies and audit entries.
+It uses a fixed random seed, so the data is the same on every run and in
+every bug report. `php artisan demo:reset` empties the local database,
+migrates it and loads the demo data again. Both refuse to run unless
+`APP_ENV=local`.
+
+What it contains, and the test logins, are in
+[laragon/demo-data.md](laragon/demo-data.md).
+
+## Test logins
+
+Sign-in is through Cloudron only, so there are no passwords. Locally, the QA
+role switcher at <http://apes-intranet.test/qa> signs you in as a fake account
+for any role or common stack of roles, such as `qa-admin@example.test` or
+`qa-staff-hr@example.test`. It only works when `QA_LOGIN_ENABLED=true` and
+`APP_ENV=local`, as in `.env.laragon.example`. Anywhere else, every `/qa`
+route returns 404. Leave the flag off on Cloudron.
+
+## Running several APES projects side by side
+
+Each APES repository is its own Laragon project, with its own:
+
+- folder in `C:\laragon\www`, and so its own `http://<folder>.test` address;
+- database on the shared MySQL server;
+- Vite port: this project uses 5174, the others use 5173 or their own.
+
+They all share Laragon's Apache on port 80 and MySQL on port 3306. Laragon
+runs one PHP version for Apache at a time, so every project you run together
+needs to work on that version. APES Intranet needs PHP 8.4. If another project
+needs a different version, switch profile when you switch project.
 
 ## Checks before a pull request
 
@@ -140,16 +162,14 @@ php vendor/bin/pint --test
 php vendor/bin/phpstan analyse --memory-limit=1G
 php artisan test
 npm run build
-$env:BASE_URL = 'http://intranet.apes.test'; $env:A11Y_BROWSER_CHANNEL = 'msedge'; npm run test:a11y
+$env:BASE_URL = 'http://apes-intranet.test'; $env:A11Y_BROWSER_CHANNEL = 'msedge'; npm run test:a11y
 ```
 
 The last line runs the accessibility check (axe and keyboard) against the
 preview, using Microsoft Edge. See [accessibility.md](accessibility.md).
-`npm run build` writes `public/build`. Stop and start `npm run dev` afterwards,
-so the preview uses Vite again.
 
-Tests use an in-memory SQLite database, so they never touch `apes_intranet`.
-CI runs the same tests on PHP 8.3.
+Tests use an in-memory SQLite database, so they never touch
+`apes_intranet_local`. CI runs the same tests on PHP 8.3.
 
 ## Mail
 
@@ -160,12 +180,15 @@ Mail is never sent locally. `MAIL_MAILER=log` writes each message to
 
 | Problem | Fix |
 | --- | --- |
-| `intranet.apes.test` does not resolve | Add the hosts entry from step 2 |
-| The W icon stays orange | Another program holds port 80 or 3306, usually Laragon. Stop it, then choose Restart All Services |
-| WampServer's localhost page opens instead of the app | Check the virtual host from step 5, then restart Apache |
+| The setup script says PHP 8.4 is not installed | Add it with Menu, then **Tools**, then **Quick add**, then run the script again |
+| The script warns that Apache runs another PHP version | Choose Menu, then **Profile**, then **apes-intranet**, or Menu, then **PHP**, then **Version**, then 8.4 |
+| `php -v` is not 8.4 in your own terminal | Put Laragon's PHP 8.4 first on `PATH`, as in [Everyday commands](#everyday-commands) |
+| `apes-intranet.test` does not resolve | Laragon adds it to the Windows hosts file on **Reload**. Run Laragon as administrator once, or add `127.0.0.1 apes-intranet.test` to `C:\Windows\System32\drivers\etc\hosts` |
+| Laragon's own page opens instead of the app | Click **Reload** in Laragon, so Apache loads `auto.apes-intranet.test.conf`. [laragon/apes-intranet.test.conf](laragon/apes-intranet.test.conf) shows what it should contain |
+| Port 80 or 3306 is in use, and Apache or MySQL will not start | Another web server or MySQL is running. Find it with `Get-NetTCPConnection -State Listen -LocalPort 80,3306`, stop it, then click **Start All** |
+| Port 5174 is in use | Another Vite server is running, usually this project in another terminal. Stop it. Vite will not move to another port, because the preview expects 5174 |
 | `500` error | Read `storage/logs/laravel.log`. Check `.env` exists and has an `APP_KEY` |
 | Unstyled page or "Vite manifest not found" | Start `npm run dev`. Vite writes `public/hot` once it is ready |
-| `Specified key was too long; max key length is 1000 bytes` | MySQL is creating MyISAM tables. Make InnoDB the default (step 4), drop and recreate `apes_intranet`, and migrate again |
-| Database errors | Check the `wampmysqld64` service is running and `DB_HOST=127.0.0.1` in `.env` |
-| `php -v` is not 8.4 | Put WampServer's PHP 8.4 first on `PATH`, as in [Everyday commands](#everyday-commands) |
-| Port 5174 in use | Stop the other Vite server, or another project using that port |
+| Database errors | Check MySQL is running in Laragon, and that `.env` has `DB_HOST=127.0.0.1` and `DB_DATABASE=apes_intranet_local` |
+| `Permission denied` writing to `storage` or `bootstrap/cache` | Close anything holding the file open (another `artisan` run, an editor or an antivirus scan), then try again. If it keeps happening, give your Windows user full control of the clone folder |
+| The demo commands refuse to run | Set `APP_ENV=local` in `.env`. They never run anywhere else |
