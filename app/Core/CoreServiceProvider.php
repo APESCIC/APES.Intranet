@@ -11,6 +11,8 @@ use App\Core\Auth\Cloudron\CloudronIdentityProvider;
 use App\Core\Auth\Cloudron\LdapDirectoryGroups;
 use App\Core\Auth\Contracts\DirectoryGroups;
 use App\Core\Auth\Contracts\IdentityProvider;
+use App\Core\Changelog\Console\SyncChangelog;
+use App\Core\Changelog\Console\ValidateChangelog;
 use App\Core\Navigation\Menu;
 use App\Core\Navigation\MenuMode;
 use App\Core\Qa\QaLogin;
@@ -45,7 +47,13 @@ class CoreServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        $this->commands([PruneAuditLog::class, RunSystemChecks::class, RemindAccessReview::class]);
+        $this->commands([
+            PruneAuditLog::class,
+            RunSystemChecks::class,
+            RemindAccessReview::class,
+            ValidateChangelog::class,
+            SyncChangelog::class,
+        ]);
 
         Gate::policy(Role::class, RolePolicy::class);
         MatrixPolicies::register();

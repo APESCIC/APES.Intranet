@@ -63,6 +63,12 @@ return [
     ],
 
     /*
+    | Folder of reviewed release notes, one vX.Y.Z.json per release, that
+    | changelog:sync copies into the change log hub (docs/release-notes.md).
+    */
+    'changelog_path' => base_path('changelog/releases'),
+
+    /*
     | The 8 approved Cloudron directory groups and the role each one grants
     | (decided by Bambie, 5 Nov 2026). Only these grant access: any other
     | group, including other intranet.* names, is ignored, and a person in

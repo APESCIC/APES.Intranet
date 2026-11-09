@@ -1,0 +1,16 @@
+{
+  "version": "v0.3.9",
+  "released_at": "2026-11-09",
+  "title": "Developer set-up (WampServer)",
+  "summary": "No changes you will notice. The development team changed how they run the intranet on their own computers.",
+  "audiences": ["staff"],
+  "changes": {
+    "changed": [
+      "Developer set-up only. The intranet itself did not change."
+    ]
+  },
+  "internal_notes": [
+    "Local development moved from Docker to WampServer. Version v0.3.8 was never released."
+  ],
+  "published": true
+}

@@ -158,6 +158,9 @@ jobs:
           cp .env.laragon.example .env
           php artisan key:generate
 
+      - name: Check release notes
+        run: php artisan changelog:validate
+
       - name: Tests
         run: php artisan test --compact
 

@@ -1,0 +1,17 @@
+{
+  "version": "v0.0.2",
+  "released_at": "2026-11-05",
+  "title": "Reliable updates",
+  "summary": "Behind-the-scenes work so that intranet updates are installed safely, with an automatic return to the previous version if something goes wrong.",
+  "audiences": ["staff"],
+  "changes": {
+    "changed": [
+      "Updates are installed in one step, with a backup first and an automatic return to the previous version if the checks fail."
+    ]
+  },
+  "internal_notes": [
+    "Added the read-only Cloudron preflight check and the one-command deploy script with rollback.",
+    "Documented the production sign-in client set-up."
+  ],
+  "published": true
+}

@@ -1,0 +1,17 @@
+{
+  "version": "vX.Y.Z",
+  "released_at": "YYYY-MM-DD",
+  "title": "Short release name",
+  "summary": "One or two plain-language sentences on what this release means for the people who use the intranet.",
+  "audiences": ["staff", "volunteers", "students"],
+  "changes": {
+    "added": ["Something new you can do."],
+    "changed": ["Something that now works differently."],
+    "fixed": ["Something that did not work and now does."],
+    "removed": ["Something that has gone."],
+    "security": ["A protection that was added or tightened."],
+    "accessibility": ["Something that is easier to use with a keyboard, screen reader or zoom."]
+  },
+  "internal_notes": ["Optional. Shown to admins only."],
+  "published": false
+}
