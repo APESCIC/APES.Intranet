@@ -7,7 +7,15 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Support\Env;
 use Illuminate\Support\Facades\Route;
+
+// On Windows, Apache's mod_php (Laragon) serves every site from one process,
+// so putenv() would leak this app's .env values into other sites, and theirs
+// into this one. Linux servers and the command line are unaffected.
+if (PHP_OS_FAMILY === 'Windows' && PHP_SAPI === 'apache2handler') {
+    Env::disablePutenv();
+}
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(

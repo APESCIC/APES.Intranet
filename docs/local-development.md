@@ -148,7 +148,10 @@ Each APES repository is its own Laragon project, with its own:
 - database on the shared MySQL server;
 - Vite port: this project uses 5174, the others use 5173 or their own.
 
-They all share Laragon's Apache on port 80 and MySQL on port 3306. Laragon
+They all share Laragon's Apache on port 80 and MySQL on port 3306. Apache
+runs PHP inside one Windows process for every site, so `bootstrap/app.php`
+stops Laravel from using `putenv()` there. Each project then keeps its own
+`.env` values, such as `APP_KEY` and `DB_DATABASE`, even under load. Laragon
 runs one PHP version for Apache at a time, so every project you run together
 needs to work on that version. APES Intranet needs PHP 8.4. If another project
 needs a different version, switch profile when you switch project.
