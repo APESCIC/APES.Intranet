@@ -2,11 +2,12 @@
 
 namespace App\Core\Health;
 
+use App\Core\Version\AppVersion;
 use Illuminate\Http\JsonResponse;
 
 class HealthzController
 {
-    public function __invoke(HealthCheck $health): JsonResponse
+    public function __invoke(HealthCheck $health, AppVersion $version): JsonResponse
     {
         $checks = $health->run();
         $healthy = ! in_array('fail', $checks, true);
@@ -15,6 +16,7 @@ class HealthzController
         return response()->json([
             'status' => $healthy ? 'ok' : 'fail',
             'checks' => $checks,
+            'version' => $version->current(),
             'revision' => $revision,
         ], $healthy ? 200 : 503, [
             'Cache-Control' => 'no-store',

@@ -21,6 +21,7 @@ it('returns 200 when the app, database and Redis are up', function () {
         ->assertExactJson([
             'status' => 'ok',
             'checks' => ['app' => 'ok', 'database' => 'ok', 'redis' => 'ok'],
+            'version' => 'dev',
             'revision' => null,
         ]);
 });
@@ -53,7 +54,7 @@ it('never includes secrets or settings in the output', function () {
 
     $body = $this->getJson('/healthz')->getContent();
 
-    expect(json_decode($body, true))->toHaveKeys(['status', 'checks', 'revision'])->toHaveCount(3)
+    expect(json_decode($body, true))->toHaveKeys(['status', 'checks', 'version', 'revision'])->toHaveCount(4)
         ->and($body)->not->toContain((string) config('app.key'))
         ->and($body)->not->toContain((string) config('database.connections.mysql.host'));
 });
@@ -75,6 +76,32 @@ it('reports the deployed revision when a REVISION file exists', function () {
         $this->getJson('/healthz')->assertJsonPath('revision', 'abc123def456');
     } finally {
         unlink(base_path('REVISION'));
+    }
+});
+
+it('reports the deployed version and revision from the release bundle', function () {
+    redisAnswers(true);
+    file_put_contents(base_path('VERSION'), "v0.3.11\n");
+    file_put_contents(base_path('REVISION'), "abc123def4567890\n");
+
+    try {
+        $this->getJson('/healthz')
+            ->assertJsonPath('version', 'v0.3.11')
+            ->assertJsonPath('revision', 'abc123def456');
+    } finally {
+        unlink(base_path('VERSION'));
+        unlink(base_path('REVISION'));
+    }
+});
+
+it('reports dev when the VERSION file is malformed', function () {
+    redisAnswers(true);
+    file_put_contents(base_path('VERSION'), "main\n");
+
+    try {
+        $this->getJson('/healthz')->assertOk()->assertJsonPath('version', 'dev');
+    } finally {
+        unlink(base_path('VERSION'));
     }
 });
 
