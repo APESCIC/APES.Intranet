@@ -16,7 +16,7 @@ Run the milestone end to end from one plan, following the `github-milestone-comp
 
 ## Before work
 
-- Run `repo-sync`, then the `live-preview-gate` skill with Docker (see `docker-local-dev.mdc`), so that <http://intranet.apes.test:8080> has loaded in Cursor's browser. Call `SetActiveBranch` after any branch change.
+- Run `repo-sync`, then the `live-preview-gate` skill with WampServer (see `wampserver-local-dev.mdc`), so that <http://intranet.apes.test> has loaded in Cursor's browser. Call `SetActiveBranch` after any branch change.
 - Ask every decision with AskQuestion, following `decision-prompts`: Recommended first, a safe stop option, and "Or choose Other to type your own."
 
 ## Branch and pull request
