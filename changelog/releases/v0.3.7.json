@@ -1,7 +1,7 @@
 {
   "version": "v0.3.7",
   "released_at": "2026-11-08",
-  "title": "Developer set-up (Docker)",
+  "title": "Developer set-up",
   "summary": "No changes you will notice. The development team changed how they run the intranet on their own computers.",
   "audiences": ["staff"],
   "changes": {
@@ -10,7 +10,7 @@
     ]
   },
   "internal_notes": [
-    "Local development moved to Docker containers, and releases were built in Docker."
+    "Local development and the release build moved to containers. Both later moved to Laragon (v0.3.10)."
   ],
   "published": true
 }

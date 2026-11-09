@@ -1,7 +1,7 @@
 {
   "version": "v0.3.9",
   "released_at": "2026-11-09",
-  "title": "Developer set-up (WampServer)",
+  "title": "Developer set-up",
   "summary": "No changes you will notice. The development team changed how they run the intranet on their own computers.",
   "audiences": ["staff"],
   "changes": {
@@ -10,7 +10,7 @@
     ]
   },
   "internal_notes": [
-    "Local development moved from Docker to WampServer. Version v0.3.8 was never released."
+    "Local development moved from containers to a Windows server stack. It later moved to Laragon (v0.3.10). Version v0.3.8 was never released."
   ],
   "published": true
 }

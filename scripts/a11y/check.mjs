@@ -2,7 +2,9 @@
 // keyboard checks. Fails on any serious or critical axe issue or keyboard
 // failure. Needs a running app with the QA role switcher on.
 //
-//   BASE_URL=http://apes-intranet.test A11Y_BROWSER_CHANNEL=msedge npm run test:a11y
+//   A11Y_BROWSER_CHANNEL=msedge npm run test:a11y
+//
+// BASE_URL defaults to the Laragon preview, http://apes-intranet.test.
 //
 // A11Y_BROWSER_CHANNEL uses an installed browser (msedge, chrome) instead of
 // Playwright's own Chromium.
@@ -10,7 +12,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { chromium } from 'playwright';
 
-const baseUrl = (process.env.BASE_URL ?? 'http://127.0.0.1:8000').replace(/\/$/, '');
+const baseUrl = (process.env.BASE_URL ?? 'http://apes-intranet.test').replace(/\/$/, '');
 const channel = process.env.A11Y_BROWSER_CHANNEL || undefined;
 const blocking = new Set(['serious', 'critical']);
 const tags = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
