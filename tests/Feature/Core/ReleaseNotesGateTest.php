@@ -22,13 +22,15 @@ it('refuses to deploy a tag without a published release note', function () {
         ->and($script)->toContain('release note is not published');
 });
 
-it('documents the publish step and the rollback in AGENTS.md and the release-notes guide', function () {
+it('documents the publish step in the shipping rule and the rollback in the release-notes guide', function () {
     $agents = (string) file_get_contents(base_path('AGENTS.md'));
+    $rule = (string) file_get_contents(base_path('.cursor/rules/version-shipping.mdc'));
     $guide = (string) file_get_contents(base_path('docs/release-notes.md'));
 
-    expect($agents)->toContain('changelog/releases/vX.Y.Z.json')
-        ->and($agents)->toContain('"published": true')
-        ->and($agents)->toContain('docs/release-notes.md')
+    expect($agents)->toContain('.cursor/rules/version-shipping.mdc')
+        ->and($rule)->toContain('changelog/releases/vX.Y.Z.json')
+        ->and($rule)->toContain('"published": true')
+        ->and($rule)->toContain('docs/release-notes.md')
         ->and($guide)->toContain('## Rolling back')
         ->and($guide)->toContain('## Unpublishing or correcting a note')
         ->and($guide)->toContain('full version');
