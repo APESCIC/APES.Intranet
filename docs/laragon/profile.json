@@ -1,0 +1,37 @@
+{
+    "project": "apes-intranet",
+    "folder": "C:\\laragon\\www\\apes-intranet",
+    "hostname": "apes-intranet.test",
+    "appUrl": "http://apes-intranet.test",
+    "documentRoot": "public",
+    "webServer": "apache",
+    "apache": "2.4",
+    "php": "8.4",
+    "phpExtensions": [
+        "ctype",
+        "curl",
+        "dom",
+        "fileinfo",
+        "intl",
+        "ldap",
+        "mbstring",
+        "openssl",
+        "pdo_mysql",
+        "pdo_sqlite",
+        "tokenizer",
+        "zip"
+    ],
+    "database": {
+        "engine": "mysql",
+        "version": "8.4",
+        "host": "127.0.0.1",
+        "port": 3306,
+        "name": "apes_intranet_local",
+        "username": "root",
+        "charset": "utf8mb4",
+        "collation": "utf8mb4_unicode_ci"
+    },
+    "node": "22",
+    "viteDevServerPort": 5174,
+    "laragonProfile": "apes-intranet"
+}
