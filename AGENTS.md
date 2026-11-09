@@ -322,34 +322,44 @@ Cursor agents.
 
 Once per milestone, after every issue in it is committed:
 
-1. Run `repo-sync` on the milestone branch. Mark the draft pull request ready
+1. Publish the release note. The milestone pull request adds
+   `changelog/releases/vX.Y.Z.json` for the milestone's full version, written
+   by the rules in [docs/release-notes.md](docs/release-notes.md). As the last
+   commit on the milestone branch (`chore: release vX.Y.Z`), review it and set
+   `"published": true`. CI fails on the tag if the note is missing or not
+   published, and `deploy.ps1` refuses to deploy it. To roll a note back, set
+   `"published": false` and deploy; never delete a released note's file.
+2. Run `repo-sync` on the milestone branch. Mark the draft pull request ready
    (`gh pr ready`) and wait for `ci` to go green
    (`gh pr checks --watch --fail-fast`). Fix failures on the same branch.
-2. Check that every open issue in the milestone is closed by the pull request
+3. Check that every open issue in the milestone is closed by the pull request
    (`Closes #<n>`), or has been moved out with the owner's answer.
-3. Ask the ship-gate question, following the `ship-gate` skill. First
+4. Ask the ship-gate question, following the `ship-gate` skill. First
    summarise the milestone, the pull request, the checks, the merge method, the
    release tag and the deploy target. Then ask with these options, in this
    order, marking one `(Recommended)`: **a. Merge**, **b. Release**,
    **c. Deploy**, **d. Merge, release and deploy**, **e. Stop here**. The
    answer is the owner's approval, and nothing else counts as consent: not a
    confirmed plan, and not "ship it". Post the answer on the Epic.
-4. Run only the chosen steps, in order, and verify each one. After each single
+5. Run only the chosen steps, in order, and verify each one. After each single
    step, ask again with only the steps that remain.
    - **Merge:** `gh pr merge <pr> --merge --delete-branch`. A merge commit,
      never a squash or a rebase.
    - **Release:** tag the merge commit with the milestone's version, for
      example `v0.0.3`, and publish a GitHub release. This repository keeps no
-     version files. The tag is the version, and `/healthz` reports the
-     revision.
+     version files. The tag is the version. The release build stamps it into
+     a `VERSION` file, so `/healthz` reports `version` as well as `revision`,
+     and the footer pill shows the version that is deployed, never the newest
+     tag.
    - **Deploy:** follow the `cloudron-deploy` skill and
      [docs/deploy/cloudron.md](docs/deploy/cloudron.md):
      `deploy/cloudron/deploy.ps1 -Tag vX.Y.Z`. It runs the preflight, takes a
      backup, deploys the release tag (never a branch), verifies `/healthz` and
      rolls back on failure. A green `main` does not deploy itself.
-5. Check `https://intranet.apes.org.uk/healthz` and confirm that `revision`
-   matches the tag's commit. Post the deploy summary on the Epic.
-6. Close out with the `github-closeout` scripts. Then post a completion
+6. Check `https://intranet.apes.org.uk/healthz` and confirm that `version` is
+   the tag and `revision` matches the tag's commit. Post the deploy summary on
+   the Epic.
+7. Close out with the `github-closeout` scripts. Then post a completion
    message in chat with the milestone, the pull request and its merge commit,
    the issues shipped, the release and the deploy evidence.
 
@@ -392,6 +402,7 @@ Tools:
 
 - How work ships, for contributors: [CONTRIBUTING.md](CONTRIBUTING.md).
 - Deploying to Cloudron: [docs/deploy/cloudron.md](docs/deploy/cloudron.md).
+- Release notes and the change log hub: [docs/release-notes.md](docs/release-notes.md).
 - Pull request form: `.github/pull_request_template.md`.
 - Security: [SECURITY.md](SECURITY.md).
 - Conduct: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).

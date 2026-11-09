@@ -5,8 +5,9 @@
 
 .DESCRIPTION
     In order:
-      1. Refuses unless the tag exists, is a published GitHub release, and the
-         ci check is green on its commit.
+      1. Refuses unless the tag exists, is a published GitHub release, the
+         ci check is green on its commit, and the tag has a published release
+         note in changelog/releases (docs/release-notes.md).
       2. Runs preflight.ps1 and stops on any FAIL.
       3. Takes a Cloudron backup and notes its id.
       4. Notes the live release, for a rollback.
@@ -168,6 +169,11 @@ try {
     if (($release | ConvertFrom-Json).isDraft) { Stop-Deploy "the $Tag release is still a draft" }
     $ci = "$(gh api "repos/$Repo/commits/$sha/check-runs?check_name=ci&filter=latest" --jq '.check_runs[0].conclusion')".Trim()
     if ($ci -ne 'success') { Stop-Deploy "ci on $sha is '$ci', not success" }
+    $note = "$(git show "$($sha):changelog/releases/$Tag.json" 2> $null | Out-String)".Trim()
+    if ($LASTEXITCODE -ne 0 -or -not $note) { Stop-Deploy "$Tag has no release note (changelog/releases/$Tag.json)" }
+    $published = $null
+    try { $published = ($note | ConvertFrom-Json).published } catch { $published = $null }
+    if ($published -ne $true) { Stop-Deploy "the $Tag release note is not published; see docs/release-notes.md" }
     $expected = $sha.Substring(0, 12)
     if ($ForceVerifyFailure) {
         $expected = '000000000000'

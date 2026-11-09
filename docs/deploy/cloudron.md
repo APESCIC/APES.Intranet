@@ -189,8 +189,9 @@ Composer.
 
 `deploy.ps1`:
 
-1. Refuses unless the tag exists, is a published GitHub release, and the `ci`
-   check is green on its commit.
+1. Refuses unless the tag exists, is a published GitHub release, the `ci`
+   check is green on its commit, and the tag has a published release note in
+   `changelog/releases/` ([docs/release-notes.md](../release-notes.md)).
 2. Runs the [preflight](#preflight) and stops on any `FAIL`.
 3. Takes a Cloudron backup and notes its id.
 4. Notes the live release, for a rollback.

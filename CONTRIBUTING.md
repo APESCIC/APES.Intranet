@@ -15,7 +15,9 @@ Work ships once per milestone, in four stages, in this order:
    `main`. The pull request lists `Closes #<n>` for each issue.
 2. All the milestone's work goes to `main` in one merge: a merge commit, not a
    squash or a rebase.
-3. Release, tagged with the milestone's version.
+3. Release, tagged with the milestone's version. The milestone pull request
+   includes a reviewed, published release note for that version in
+   `changelog/releases/` (see [docs/release-notes.md](docs/release-notes.md)).
 4. Deploy that release.
 
 Nothing reaches `main`, and nothing is tagged, released or deployed, before
