@@ -49,7 +49,7 @@ class ReleaseChangelogSync
                     'released_at' => $payload['released_at'],
                     'summary' => $payload['summary'],
                     'audiences' => $payload['audiences'],
-                    'changes' => $payload['changes'],
+                    'changes_by_type' => $payload['changes'],
                     'internal_notes' => $payload['internal_notes'] ?? null,
                     'is_published' => $payload['published'],
                 ]);

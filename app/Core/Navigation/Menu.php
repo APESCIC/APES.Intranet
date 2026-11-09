@@ -49,6 +49,7 @@ final class Menu
                 NavItem::route('handbook', 'Handbook', 'book-open', AccessMatrix::INTRANET_ACCESS, 'communications.handbook.index', 'communications.handbook.*'),
                 NavItem::route('policies', 'Policies', 'file-text', AccessMatrix::INTRANET_ACCESS, 'communications.policies.index', 'communications.policies.*'),
                 NavItem::route('access-guide', 'Who can see what', 'key-round', AccessMatrix::INTRANET_ACCESS, 'access-guide'),
+                NavItem::route('change-log', 'Change log', 'history', AccessMatrix::INTRANET_ACCESS, 'change-log.index', 'change-log.*'),
             ]),
             new NavGroup('hr-legal', 'HR and legal', [
                 NavItem::soon('hr', 'HR', 'briefcase', AccessMatrix::HR_ACCESS),

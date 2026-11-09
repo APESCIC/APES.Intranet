@@ -18,7 +18,7 @@ return new class extends Migration
             $table->date('released_at');
             $table->text('summary');
             $table->json('audiences');
-            $table->json('changes');
+            $table->json('changes_by_type');
             $table->json('internal_notes')->nullable();
             $table->boolean('is_published')->default(false)->index();
             $table->timestamps();

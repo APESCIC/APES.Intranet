@@ -13,6 +13,8 @@ use App\Core\Auth\Contracts\DirectoryGroups;
 use App\Core\Auth\Contracts\IdentityProvider;
 use App\Core\Changelog\Console\SyncChangelog;
 use App\Core\Changelog\Console\ValidateChangelog;
+use App\Core\Changelog\Release;
+use App\Core\Changelog\ReleasePolicy;
 use App\Core\Navigation\Menu;
 use App\Core\Navigation\MenuMode;
 use App\Core\Qa\QaLogin;
@@ -56,6 +58,7 @@ class CoreServiceProvider extends ServiceProvider
         ]);
 
         Gate::policy(Role::class, RolePolicy::class);
+        Gate::policy(Release::class, ReleasePolicy::class);
         MatrixPolicies::register();
 
         View::composer('components.layouts.app', function (ViewInstance $view) {
