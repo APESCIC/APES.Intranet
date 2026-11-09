@@ -8,8 +8,9 @@
     trailing slash on the source) creates /app/data/releases/<ReleaseId>.
     deploy.ps1 runs this for you.
 
-    Composer runs with WampServer's newest PHP 8.4 (as on Cloudron), and npm
-    with the host Node. The build stops if the PHP is not 8.4.
+    Composer runs with Laragon's newest PHP 8.4 (as on Cloudron), and npm
+    with Node from PATH, or Laragon's Node. The build stops if the PHP is not
+    8.4.
 
 .EXAMPLE
     powershell -NoProfile -ExecutionPolicy Bypass -File deploy\cloudron\build-release.ps1 -Ref v0.0.2
@@ -32,23 +33,29 @@ $repo = (git rev-parse --show-toplevel).Trim()
 $sha = (git -C $repo rev-parse --verify "$Ref^{commit}").Trim()
 if ($LASTEXITCODE -ne 0 -or $sha -notmatch '^[0-9a-f]{40}$') { throw "Unknown ref: $Ref" }
 
+$laragon = 'C:\laragon\bin'
 if (-not $Php) {
-    $wampPhp = Get-ChildItem 'C:\wamp64\bin\php' -Directory -Filter 'php8.4.*' -ErrorAction SilentlyContinue |
-        Sort-Object { [version]($_.Name -replace '^php', '') } -Descending |
+    $laragonPhp = Get-ChildItem "$laragon\php" -Directory -ErrorAction SilentlyContinue |
+        Where-Object { $_.Name -match '^php-8\.4\.\d+-' } |
+        Sort-Object { [version]($_.Name -replace '^php-(\d+\.\d+\.\d+)-.*$', '$1') } -Descending |
         Select-Object -First 1
-    $Php = if ($wampPhp) { Join-Path $wampPhp.FullName 'php.exe' } else { 'php' }
+    $Php = if ($laragonPhp) { Join-Path $laragonPhp.FullName 'php.exe' } else { 'php' }
 }
 $phpVersion = "$(& $Php -r 'echo PHP_VERSION;')".Trim()
 if ($LASTEXITCODE -ne 0 -or $phpVersion -notlike '8.4.*') {
-    throw "PHP 8.4 is needed to match Cloudron, but $Php is '$phpVersion'. Install PHP 8.4 in WampServer, or pass -Php."
+    throw "PHP 8.4 is needed to match Cloudron, but $Php is '$phpVersion'. Add PHP 8.4 to Laragon (Menu > Tools > Quick add), or pass -Php."
 }
 
 if (-not $Composer) {
     $command = Get-Command composer -ErrorAction SilentlyContinue | Select-Object -First 1
-    if ($command) { $Composer = Join-Path (Split-Path $command.Source) 'composer.phar' }
+    $Composer = if ($command) { Join-Path (Split-Path $command.Source) 'composer.phar' } else { "$laragon\composer\composer.phar" }
 }
-if (-not $Composer -or -not (Test-Path $Composer)) { throw 'composer.phar was not found. Install Composer, or pass -Composer C:\path\to\composer.phar.' }
-if (-not (Get-Command npm -ErrorAction SilentlyContinue)) { throw 'npm was not found. Install Node.js.' }
+if (-not (Test-Path $Composer)) { throw 'composer.phar was not found. Use Laragon (Full), or pass -Composer C:\path\to\composer.phar.' }
+if (-not (Get-Command npm -ErrorAction SilentlyContinue)) {
+    $laragonNode = Get-ChildItem "$laragon\nodejs" -Directory -ErrorAction SilentlyContinue | Sort-Object Name -Descending | Select-Object -First 1
+    if ($laragonNode) { $env:Path = "$($laragonNode.FullName);$env:Path" }
+}
+if (-not (Get-Command npm -ErrorAction SilentlyContinue)) { throw 'npm was not found. Use Laragon (Full), or put Node.js on PATH.' }
 
 # Xdebug slows Composer down and is not needed for a build.
 $env:XDEBUG_MODE = 'off'

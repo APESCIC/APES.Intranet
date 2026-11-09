@@ -106,7 +106,7 @@ jobs:
           while IFS= read -r -d '' path; do
             base="${path##*/}"
             case "${base}" in
-              .env.example|.env.wamp.example)
+              .env.example|.env.laragon.example)
                 ;;
               .env|.env.*)
                 printf 'Unexpected env file committed: %s\n' "${path}"
@@ -155,7 +155,7 @@ jobs:
 
       - name: Prepare environment
         run: |
-          cp .env.wamp.example .env
+          cp .env.laragon.example .env
           php artisan key:generate
 
       - name: Tests

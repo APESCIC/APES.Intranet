@@ -10,7 +10,7 @@
 
 ## Manual viewport notes (local preview / Cloudron)
 
-Verify in the WampServer preview at <http://intranet.apes.test> at 390, 820
+Verify in the Laragon preview at <http://apes-intranet.test> at 390, 820
 and 1440 px before ship.
 
 | Width | Expected |

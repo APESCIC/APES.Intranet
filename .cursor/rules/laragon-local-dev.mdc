@@ -1,0 +1,38 @@
+---
+description: Local development, preview, demo data and tests run on Laragon as its own project, never another local tool
+alwaysApply: true
+---
+
+# Laragon local development
+
+Decided by Bambie on 9 November 2026 (#213). Laragon is the only supported local set-up. This repository is its own Laragon project: Apache, PHP 8.4, MySQL 8.4 and Node 22, with the values in `docs/laragon/profile.json`. Never suggest containers, virtual machines or any other local server stack, and never use `php artisan serve`.
+
+## Preview
+
+- The live preview is <http://apes-intranet.test>, served by Laragon's Apache from `public/` through the junction `C:\laragon\www\apes-intranet`. Vite hot reload is on port 5174. Mail goes to `storage/logs/laravel.log`.
+- Live preview gate: run `repo-sync`, then check Laragon is running (`Get-Process laragon, httpd, mysqld`) and that `http://apes-intranet.test/login` returns 200. Start Vite with `npm run dev` if nothing listens on port 5174. Then open the preview in Cursor's browser, confirm it loaded, and say "Preview ready, starting work".
+- If the site is missing, run `scripts/laragon-setup.ps1 -NoDemo`. It only touches this project. Starting Laragon, clicking Reload or switching its profile or PHP version needs Bambie's click in Laragon: ask her with AskQuestion.
+
+## Commands
+
+Start each PowerShell session from the repository root with Laragon's PHP 8.4, Composer and Node first on `PATH`:
+
+```powershell
+$env:Path = 'C:\laragon\bin\php\php-8.4.27-Win32-vs17-x64;C:\laragon\bin\composer;C:\laragon\bin\nodejs\node-v22;' + $env:Path; $env:XDEBUG_MODE = 'off'
+```
+
+| Task | Command |
+| --- | --- |
+| Set up or repair | `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\laragon-setup.ps1` |
+| Load the demo data | `php artisan demo:seed` (or `composer demo:seed`) |
+| Reset and reload the demo data | `php artisan demo:reset` (or `composer demo:reset`) |
+| Vite hot reload | `npm run dev` (or `composer dev`) |
+| Tests | `php artisan test` |
+| Pint | `php vendor/bin/pint` |
+| Larastan | `php vendor/bin/phpstan analyse --memory-limit=1G` |
+| Accessibility check | `$env:BASE_URL = 'http://apes-intranet.test'; $env:A11Y_BROWSER_CHANNEL = 'msedge'; npm run test:a11y` |
+
+- Use Laragon's newest PHP 8.4 (`C:\laragon\bin\php\php-8.4.*`), as on Cloudron. The Cloudron release build (`deploy/cloudron/deploy.ps1`) uses it too, and stops if the PHP is not 8.4.
+- Test against the demo data. Sign in as any role with the QA role switcher at <http://apes-intranet.test/qa> (fake `qa-<role>@example.test` accounts, no password). See `docs/laragon/demo-data.md`.
+- `composer install` and `npm ci` may run without asking when `vendor/` or `node_modules/` is missing. Ask before migrations, `demo:reset` (it empties the local database), or any system tool install.
+- Fake data only in the local database. See `docs/local-development.md` for the full guide.

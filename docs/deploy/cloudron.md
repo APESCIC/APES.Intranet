@@ -182,8 +182,8 @@ merged, and the release `vX.Y.Z` is published from the merge commit.
 powershell -NoProfile -ExecutionPolicy Bypass -File deploy\cloudron\deploy.ps1 -Tag vX.Y.Z
 ```
 
-The build runs Composer with WampServer's newest PHP 8.4 (as on Cloudron) and
-Vite with the host Node, and stops if the PHP is not 8.4. Pass `-Php` or
+The build runs Composer with Laragon's newest PHP 8.4 (as on Cloudron) and
+Vite with Laragon's Node, and stops if the PHP is not 8.4. Pass `-Php` or
 `-Composer` (the path to `composer.phar`) to use a different PHP 8.4 or
 Composer.
 
@@ -253,7 +253,7 @@ Use this only if `deploy.ps1` cannot run. It does the same steps.
    ```
 
 5. **Build** the tag, never `main`. This uses a temporary git worktree, with
-   Composer on WampServer's PHP 8.4 and Vite on the host Node:
+   Composer on Laragon's PHP 8.4 and Vite on Laragon's Node:
 
    ```powershell
    powershell -NoProfile -ExecutionPolicy Bypass -File deploy\cloudron\build-release.ps1 -Ref $tag

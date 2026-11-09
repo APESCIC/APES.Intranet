@@ -28,12 +28,27 @@ Deploys follow [docs/deploy/cloudron.md](docs/deploy/cloudron.md).
 Accessibility notes and checks are in [docs/accessibility.md](docs/accessibility.md).
 After a deploy, check <https://intranet.apes.org.uk/healthz>.
 
-## Local preview
+## Local development with Laragon
 
-Day-to-day development runs on WampServer (Apache, PHP 8.4 and MySQL 8.4) at
-<http://intranet.apes.test>, with Vite from `npm run dev`. Check every change
-there before any Cloudron deploy. Set-up steps are in
-[docs/local-development.md](docs/local-development.md). See also
+Laragon on Windows is the only supported local set-up. APES Intranet is its
+own Laragon project at <http://apes-intranet.test> (Apache, PHP 8.4, MySQL
+8.4 and Node 22), so it runs side by side with the other APES projects. Check
+every change there before any Cloudron deploy.
+
+```powershell
+git clone https://github.com/APESCIC/APES.Intranet.git
+cd APES.Intranet
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\laragon-setup.ps1 -SeedDemo
+npm run dev
+```
+
+Then open <http://apes-intranet.test/qa> and sign in as a fake account for
+any role. The full guide, with the prerequisites, the profile, the demo data,
+running several projects side by side and common fixes, is
+[docs/local-development.md](docs/local-development.md). The project's
+Laragon profile is [docs/laragon/profile.md](docs/laragon/profile.md), and
+the demo data and test logins are in
+[docs/laragon/demo-data.md](docs/laragon/demo-data.md). See also
 [AGENTS.md](AGENTS.md).
 
 ## Related sites

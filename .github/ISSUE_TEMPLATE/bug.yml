@@ -78,7 +78,7 @@ body:
     attributes:
       label: Affected version or environment
       description: Version, environment, browser or device, where relevant.
-      placeholder: main, WampServer preview, Firefox on Windows 11
+      placeholder: main, Laragon preview with demo data, Firefox on Windows 11
     validations:
       required: true
 

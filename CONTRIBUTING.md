@@ -1,8 +1,10 @@
 # Contributing
 
-APES Intranet is maintained by APES CIC. Set-up steps are in
+APES Intranet is maintained by APES CIC. Laragon is the only supported local
+set-up. Set-up steps are in
 [docs/local-development.md](docs/local-development.md). Check every change in
-the WampServer preview at <http://intranet.apes.test> before it ships.
+the Laragon preview at <http://apes-intranet.test>, with the demo data loaded,
+before it ships.
 
 ## How work ships
 

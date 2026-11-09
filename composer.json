@@ -45,17 +45,16 @@
     },
     "scripts": {
         "setup": [
-            "composer install",
-            "@php -r \"file_exists('.env') || copy('.env.wamp.example', '.env');\"",
-            "@php artisan key:generate",
-            "@php artisan migrate --force",
-            "npm install --ignore-scripts",
-            "npm run build"
+            "Composer\\Config::disableProcessTimeout",
+            "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/laragon-setup.ps1"
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
-            "@php artisan dev"
+            "npm run dev"
         ],
+        "build": "npm run build",
+        "demo:seed": "@php artisan demo:seed",
+        "demo:reset": "@php artisan demo:reset",
         "test": [
             "@php artisan config:clear --ansi @no_additional_args",
             "@php artisan test"
