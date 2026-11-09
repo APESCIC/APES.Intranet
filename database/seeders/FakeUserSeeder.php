@@ -51,7 +51,7 @@ class FakeUserSeeder extends Seeder
                 'student_id' => $student->getKey(),
                 'supervisor_id' => $supervisors[$index % max(1, $supervisors->count())]->getKey() ?? null,
                 'title' => 'Placement '.($index + 1),
-                'organisation' => 'APES CIC',
+                'organisation' => 'Demo placement provider (fake)',
                 'starts_on' => now()->subMonths(1)->toDateString(),
                 'ends_on' => now()->addMonths(5)->toDateString(),
                 'guidance' => 'Fake placement guidance for local testing only.',

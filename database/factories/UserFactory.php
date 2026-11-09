@@ -30,13 +30,14 @@ class UserFactory extends Factory
             'is_active' => true,
             'job_title' => fake()->optional()->jobTitle(),
             'team' => fake()->randomElement($teams),
-            'phone' => fake()->optional()->numerify('01### ######'),
-            'mobile' => fake()->optional()->numerify('07### ######'),
+            // Ofcom's drama ranges, so no fake number can belong to anyone.
+            'phone' => fake()->optional()->numerify('0113 496 0###'),
+            'mobile' => fake()->optional()->numerify('07700 900###'),
             'location' => fake()->optional()->city(),
             'skills' => fake()->randomElements(['First aid', 'Driving', 'Admin', 'Animal care', 'Fundraising', 'IT'], fake()->numberBetween(0, 3)),
             'bio' => fake()->optional()->sentence(),
             'emergency_contact_name' => fake()->name(),
-            'emergency_contact_phone' => fake()->numerify('07### ######'),
+            'emergency_contact_phone' => fake()->numerify('07700 900###'),
             'employee_number' => 'E'.fake()->unique()->numerify('####'),
         ];
     }
