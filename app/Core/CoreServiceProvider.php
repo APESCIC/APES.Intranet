@@ -13,6 +13,7 @@ use App\Core\Auth\Contracts\DirectoryGroups;
 use App\Core\Auth\Contracts\IdentityProvider;
 use App\Core\Changelog\Console\SyncChangelog;
 use App\Core\Changelog\Console\ValidateChangelog;
+use App\Core\Changelog\FooterVersion;
 use App\Core\Changelog\Release;
 use App\Core\Changelog\ReleasePolicy;
 use App\Core\Navigation\Menu;
@@ -72,6 +73,7 @@ class CoreServiceProvider extends ServiceProvider
                 'showMenuModeSwitcher' => $user?->hasRole(RoleName::Admin->value) ?? false,
                 'shellUser' => $user,
                 'qaEnabled' => QaLogin::enabled(),
+                'footerVersion' => app(FooterVersion::class)->for($user),
             ]);
         });
     }
