@@ -191,6 +191,7 @@ Mail is never sent locally. `MAIL_MAILER=log` writes each message to
 | Port 80 or 3306 is in use, and Apache or MySQL will not start | Another web server or MySQL is running. Find it with `Get-NetTCPConnection -State Listen -LocalPort 80,3306`, stop it, then click **Start All** |
 | Port 5174 is in use | Another Vite server is running, usually this project in another terminal. Stop it. Vite will not move to another port, because the preview expects 5174 |
 | `500` error | Read `storage/logs/laravel.log`. Check `.env` exists and has an `APP_KEY` |
+| `/healthz` says `"redis": "fail"` | Expected locally. The health check always tries Redis, which Cloudron provides, but the Laragon set-up does not use it. `app` and `database` should say `ok` |
 | Unstyled page or "Vite manifest not found" | Start `npm run dev`. Vite writes `public/hot` once it is ready |
 | Database errors | Check MySQL is running in Laragon, and that `.env` has `DB_HOST=127.0.0.1` and `DB_DATABASE=apes_intranet_local` |
 | `Permission denied` writing to `storage` or `bootstrap/cache` | Close anything holding the file open (another `artisan` run, an editor or an antivirus scan), then try again. If it keeps happening, give your Windows user full control of the clone folder |
