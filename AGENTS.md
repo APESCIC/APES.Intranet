@@ -52,9 +52,9 @@ Decided. Do not swap these without the owner's approval.
   output.
 - Responsive on desktop, tablet and mobile, and installable as a PWA.
 
-Cloudron runs PHP 8.4, chosen by `/app/data/PHP_VERSION`. The local Docker
-`app` container also runs PHP 8.4, and CI tests on 8.3. All meet the PHP 8.3
-floor. Do not pin Cloudron back to 8.3.
+Cloudron runs PHP 8.4, chosen by `/app/data/PHP_VERSION`. Local development
+and the release build use WampServer's PHP 8.4 too, and CI tests on 8.3. All
+meet the PHP 8.3 floor. Do not pin Cloudron back to 8.3.
 
 ## Sign-in
 
@@ -107,46 +107,52 @@ Bambie's approval.
 
 ## Local development
 
-Decided by Bambie on 8 November 2026 (#195): local development runs in Docker,
-not Laragon. Always run and check every change in the Docker live preview at
-<http://intranet.apes.test:8080> before any Cloudron deploy. Full guide:
+Decided by Bambie on 9 November 2026 (#209): local development runs on
+WampServer, replacing the Docker set-up from #195. Always run and check every
+change in the WampServer live preview at <http://intranet.apes.test> before
+any Cloudron deploy. Full guide:
 [docs/local-development.md](docs/local-development.md).
 
-Use the containers for all work. Run every PHP, Artisan, Composer, test, Pint
-and Larastan command as `docker compose exec app ...`, and every npm command
-as `docker compose exec node ...`. Do not use host PHP, Composer or Node, and
-do not serve this repository from Laragon. The Cloudron release build runs in
-Docker too (#206): `deploy/cloudron/deploy.ps1` needs Docker Desktop running,
-and its `-HostTools` switch is for emergencies only. The Cursor rule
-`.cursor/rules/docker-local-dev.mdc` says the same for agents.
+Run every PHP, Artisan, Composer, test, Pint and Larastan command with
+WampServer's newest PHP 8.4 (`C:\wamp64\bin\php\php8.4.*`), put first on
+`PATH` for the session, and every npm command with the host Node. Do not use
+any other PHP, and do not serve this repository from Laragon. Laragon must be
+stopped while WampServer runs, because both use ports 80 and 3306. The
+Cloudron release build uses the same tools: `deploy/cloudron/deploy.ps1` stops
+if the PHP is not 8.4. The Cursor rule `.cursor/rules/wampserver-local-dev.mdc`
+says the same for agents.
 
 Before any change-making work (code, tests, docs or config), follow the
-`live-preview-gate` skill, using Docker in place of its Laragon defaults:
+`live-preview-gate` skill, using WampServer in place of its Laragon defaults:
 
 1. Pull the latest changes with `repo-sync`. It merges `origin/main` into the
    milestone branch with a merge commit and never rebases.
-2. Reuse the running containers (`docker compose ps`). Start them with
-   `docker compose up -d` only if they are not running.
-3. Open <http://intranet.apes.test:8080> in Cursor's browser
+2. Check that the `wampapache64` and `wampmysqld64` services are running
+   (`Get-Service wamp*`), and start Vite with `npm run dev` if it is not
+   running. WampServer's tray app runs as administrator, so starting its
+   services or switching its PHP version needs the owner's click: ask with
+   AskQuestion.
+3. Open <http://intranet.apes.test> in Cursor's browser
    (`cursor-browser-preview`). Confirm that it loaded, then say "Preview ready,
    starting work".
 
-`docker compose exec app composer install` may run without asking when
-`vendor/` is missing, and the `node` container runs `npm ci` itself. Ask before
-running migrations or installing any system tool.
+`composer install` and `npm ci` may run without asking when `vendor/` or
+`node_modules/` is missing. Ask before running migrations or installing any
+system tool.
 
 | Item | Value |
 | --- | --- |
-| App URL | `http://intranet.apes.test:8080` (hosts entry `127.0.0.1 intranet.apes.test`) |
-| Containers | `compose.yaml`: `web` (Caddy), `app` (PHP 8.4 FPM, Composer), `node` (Vite), `mysql`, `redis`, `mailpit` |
-| Database | MySQL 8.4, database `apes_intranet` (matches Cloudron) |
-| Cache | Redis (`CACHE_STORE=redis`) |
-| Front end | Vite hot reload from `intranet.apes.test:5174` |
-| Mail | Mailpit at `http://localhost:8026` |
-| Env file | Copy `.env.docker.example` to `.env` |
+| App URL | `http://intranet.apes.test` (hosts entry `127.0.0.1 intranet.apes.test`) |
+| Web server | WampServer's Apache 2.4 on port 80, virtual host pointing at `public/` |
+| PHP | WampServer's PHP 8.4, for Apache and the command line |
+| Database | WampServer's MySQL 8.4 on port 3306 with InnoDB as the default engine, database `apes_intranet` (matches Cloudron) |
+| Cache and sessions | Files (`CACHE_STORE=file`, `SESSION_DRIVER=file`), queue `sync` |
+| Front end | Vite hot reload on port 5174 (`npm run dev`) |
+| Mail | Written to `storage/logs/laravel.log` (`MAIL_MAILER=log`) |
+| Env file | Copy `.env.wamp.example` to `.env` |
 
 - Local QA role switcher, with fake accounts only. `QA_LOGIN_ENABLED=true`
-  in the Docker example. Leave it off on Cloudron.
+  in the WampServer example. Leave it off on Cloudron.
 - Seeders create fake data only. Never put real HR, student, volunteer or
   agreement data in a local database, a fixture, or this repository.
 - Copy `.env.example` for Cloudron-style keys. Leave those values blank.
@@ -340,7 +346,7 @@ disagrees with this file, follow this file.
 
 | Step | Skills |
 | --- | --- |
-| Starting any change | `repo-sync`, `live-preview-gate` (with Docker, not Laragon), `cursor-browser-preview` |
+| Starting any change | `repo-sync`, `live-preview-gate` (with WampServer, not Laragon), `cursor-browser-preview` |
 | Asking for a decision | `decision-prompts` (AskQuestion) |
 | Delivering a milestone | `github-milestone-completion`, `github-cli` (its milestone-to-deploy playbook) |
 | Issues, comments and close-out | `github-issue-types`, `github-work-tracking`, `github-closeout` |
@@ -356,14 +362,15 @@ Tools:
 - The `cloudron` CLI, signed in to `my.cloudron.apes.org.uk`, for the app.
 - AskQuestion for every decision, and `SetActiveBranch` after a branch
   change.
-- Docker Compose (`compose.yaml`) for the local app, its tools and its tests.
+- WampServer (Apache, PHP 8.4, MySQL 8.4) and the host Node for the local
+  app, its tools, its tests and the release build.
 - Cursor's browser for the live preview.
 
 ## Before going public
 
 - Secret scan of the git history is clean.
 - No `.env` file is committed, other than `.env.example` and
-  `.env.docker.example`.
+  `.env.wamp.example`.
 - No real HR, student, volunteer or agreement data is in the repository.
 - A licence has been chosen.
 
@@ -376,6 +383,5 @@ Tools:
 - Conduct: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 - Issue forms: `.github/ISSUE_TEMPLATE`.
 - Discussion forms: `.github/DISCUSSION_TEMPLATE`.
-- Local development: [docs/local-development.md](docs/local-development.md),
-  `compose.yaml` and `docker/`.
-- Local env: `.env.docker.example`. Cloudron env keys: `.env.example`.
+- Local development: [docs/local-development.md](docs/local-development.md).
+- Local env: `.env.wamp.example`. Cloudron env keys: `.env.example`.

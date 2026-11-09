@@ -182,11 +182,10 @@ merged, and the release `vX.Y.Z` is published from the merge commit.
 powershell -NoProfile -ExecutionPolicy Bypass -File deploy\cloudron\deploy.ps1 -Tag vX.Y.Z
 ```
 
-Docker Desktop must be running: the build runs Composer in the
-`apes-intranet-app` image (PHP 8.4, as on Cloudron) and Vite in
-`node:22-bookworm-slim`, and refuses to start without Docker. Only in an
-emergency, pass `-HostTools` (with `-Php` and `-Composer` if they are not on
-`PATH`) to build with host tools instead.
+The build runs Composer with WampServer's newest PHP 8.4 (as on Cloudron) and
+Vite with the host Node, and stops if the PHP is not 8.4. Pass `-Php` or
+`-Composer` (the path to `composer.phar`) to use a different PHP 8.4 or
+Composer.
 
 `deploy.ps1`:
 
@@ -195,7 +194,7 @@ emergency, pass `-HostTools` (with `-Php` and `-Composer` if they are not on
 2. Runs the [preflight](#preflight) and stops on any `FAIL`.
 3. Takes a Cloudron backup and notes its id.
 4. Notes the live release, for a rollback.
-5. Builds the tag in Docker with `build-release.ps1` and uploads it to
+5. Builds the tag with `build-release.ps1` and uploads it to
    `/app/data/releases/<ReleaseId>`.
 6. Checks the uploaded `REVISION` is the tag's commit.
 7. Runs `activate-release.sh`, then restarts the app.
@@ -253,8 +252,8 @@ Use this only if `deploy.ps1` cannot run. It does the same steps.
    $previous = "$(cloudron exec --app $app '--' readlink -f /app/data/current)".Trim()
    ```
 
-5. **Build** the tag, never `main`. This uses a temporary git worktree, and
-   Composer and Vite run in Docker:
+5. **Build** the tag, never `main`. This uses a temporary git worktree, with
+   Composer on WampServer's PHP 8.4 and Vite on the host Node:
 
    ```powershell
    powershell -NoProfile -ExecutionPolicy Bypass -File deploy\cloudron\build-release.ps1 -Ref $tag

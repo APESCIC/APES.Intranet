@@ -2,9 +2,6 @@ import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import tailwindcss from '@tailwindcss/vite';
 
-// Set by compose.yaml when Vite runs in the node container.
-const devHost = process.env.VITE_DEV_HOST;
-
 export default defineConfig({
     plugins: [
         laravel({
@@ -16,18 +13,11 @@ export default defineConfig({
         tailwindcss(),
     ],
     server: {
+        // 5174, so it does not clash with other projects' Vite on 5173.
+        port: 5174,
+        strictPort: true,
         watch: {
             ignored: ['**/storage/framework/views/**'],
-            // File events do not cross a Windows bind mount into the container.
-            usePolling: Boolean(devHost),
-            interval: 300,
         },
-        ...(devHost ? {
-            host: '0.0.0.0',
-            port: Number(process.env.VITE_PORT ?? 5173),
-            strictPort: true,
-            allowedHosts: [devHost],
-            hmr: { host: devHost },
-        } : {}),
     },
 });

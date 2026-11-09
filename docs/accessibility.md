@@ -16,12 +16,12 @@ pull request. It:
   mobile menu's focus trap
 - fails on any serious or critical axe issue, or any keyboard failure
 
-Run it locally against the Docker preview with the on-demand `a11y` service,
-which uses Playwright's own image with Chromium. Start the preview first
-(`docker compose up -d`), so the `node` service has installed the packages:
+Run it locally against the WampServer preview, using the installed Microsoft
+Edge, so Playwright does not need to download its own Chromium. The preview
+must be running, with `QA_LOGIN_ENABLED=true` in `.env`:
 
 ```powershell
-docker compose run --rm a11y
+$env:BASE_URL = 'http://intranet.apes.test'; $env:A11Y_BROWSER_CHANNEL = 'msedge'; npm run test:a11y
 ```
 
 ## Baseline audit, 4 November 2026

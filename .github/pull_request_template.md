@@ -19,7 +19,7 @@ List every issue in the milestone, including the Epic.
 
 ## Checklist
 
-- [ ] Checked in the Docker preview at http://intranet.apes.test:8080
+- [ ] Checked in the WampServer preview at http://intranet.apes.test
 - [ ] No secrets or real personal data
 - [ ] Tests pass and `ci` is green
 - [ ] Every issue is committed on the milestone branch
