@@ -5,17 +5,19 @@
 
 .DESCRIPTION
     In order:
-      1. Refuses unless the tag exists, is a published GitHub release, and the
-         ci check is green on its commit.
+      1. Refuses unless the tag exists, is a published GitHub release, the
+         ci check is green on its commit, and the tag has a published release
+         note in changelog/releases (docs/release-notes.md).
       2. Runs preflight.ps1 and stops on any FAIL.
       3. Takes a Cloudron backup and notes its id.
       4. Notes the live release, for a rollback.
       5. Builds the tag with build-release.ps1 (Laragon's PHP 8.4, Composer
          and npm) and uploads it to /app/data/releases/<ReleaseId>.
-      6. Checks the uploaded REVISION is the tag's commit.
+      6. Checks the uploaded REVISION is the tag's commit and VERSION is the tag.
       7. Runs activate-release.sh, then restarts the app.
-      8. Verifies /healthz (200, "status":"ok", revision = first 12 characters
-         of the commit), the queue worker and scheduler processes, and the logs.
+      8. Verifies /healthz (200, "status":"ok", version = the tag, revision =
+         first 12 characters of the commit), the queue worker and scheduler
+         processes, and the logs.
       9. On any failure from step 7 on: rollback-release.sh to the earlier
          release, restart, verify again, and exit 1.
      10. Prints a summary to paste on the ship issue.
@@ -105,7 +107,7 @@ function Get-Health {
     }
 }
 
-function Test-Live([string]$ExpectedRevision) {
+function Test-Live([string]$ExpectedRevision, [string]$ExpectedVersion = '') {
     $health = Get-Health
     for ($i = 0; $i -lt 24 -and $health.Code -ne 200; $i++) {
         Start-Sleep -Seconds 5
@@ -123,6 +125,10 @@ function Test-Live([string]$ExpectedRevision) {
     }
     if ($json.revision -ne $ExpectedRevision) {
         Write-Host "  /healthz revision is $($json.revision), expected $ExpectedRevision"
+        return $false
+    }
+    if ($ExpectedVersion -and $json.version -ne $ExpectedVersion) {
+        Write-Host "  /healthz version is $($json.version), expected $ExpectedVersion"
         return $false
     }
     foreach ($worker in 'queue:work', 'schedule:work') {
@@ -163,6 +169,11 @@ try {
     if (($release | ConvertFrom-Json).isDraft) { Stop-Deploy "the $Tag release is still a draft" }
     $ci = "$(gh api "repos/$Repo/commits/$sha/check-runs?check_name=ci&filter=latest" --jq '.check_runs[0].conclusion')".Trim()
     if ($ci -ne 'success') { Stop-Deploy "ci on $sha is '$ci', not success" }
+    $note = "$(git show "$($sha):changelog/releases/$Tag.json" 2> $null | Out-String)".Trim()
+    if ($LASTEXITCODE -ne 0 -or -not $note) { Stop-Deploy "$Tag has no release note (changelog/releases/$Tag.json)" }
+    $published = $null
+    try { $published = ($note | ConvertFrom-Json).published } catch { $published = $null }
+    if ($published -ne $true) { Stop-Deploy "the $Tag release note is not published; see docs/release-notes.md" }
     $expected = $sha.Substring(0, 12)
     if ($ForceVerifyFailure) {
         $expected = '000000000000'
@@ -196,14 +207,14 @@ try {
     Write-Step "Building $Tag ($sha)"
     $build = @{}
     try {
-        & (Join-Path $PSScriptRoot 'build-release.ps1') -Ref $sha -Php $Php -Composer $Composer | ForEach-Object {
-            if ("$_" -match '^(ReleaseId|ReleaseDir|Revision)=(.+)$') { $build[$Matches[1]] = $Matches[2] } else { Write-Host $_ }
+        & (Join-Path $PSScriptRoot 'build-release.ps1') -Ref $sha -Version $Tag -Php $Php -Composer $Composer | ForEach-Object {
+            if ("$_" -match '^(ReleaseId|ReleaseDir|Revision|Version)=(.+)$') { $build[$Matches[1]] = $Matches[2] } else { Write-Host $_ }
         }
     }
     catch {
         Stop-Deploy "build failed: $($_.Exception.Message)"
     }
-    if (-not $build.ReleaseId -or $build.Revision -ne $sha) { Stop-Deploy 'build failed' }
+    if (-not $build.ReleaseId -or $build.Revision -ne $sha -or $build.Version -ne $Tag) { Stop-Deploy 'build failed' }
     $id = $build.ReleaseId
     $target = "$releases/$id"
 
@@ -214,6 +225,11 @@ try {
     if ($uploaded -ne $sha) {
         Invoke-App rm -rf $target | Out-Null
         Stop-Deploy "uploaded REVISION is '$uploaded', expected $sha"
+    }
+    $uploadedVersion = "$(Invoke-App cat "$target/VERSION")".Trim()
+    if ($uploadedVersion -ne $Tag) {
+        Invoke-App rm -rf $target | Out-Null
+        Stop-Deploy "uploaded VERSION is '$uploadedVersion', expected $Tag"
     }
     Remove-Item -Recurse -Force $build.ReleaseDir
 
@@ -227,7 +243,7 @@ try {
     }
     if ($ok) {
         Write-Step "Verifying $Url/healthz"
-        $ok = Test-Live $expected
+        $ok = Test-Live $expected $Tag
     }
     if ($ok) {
         Write-Step "Deployed $id"

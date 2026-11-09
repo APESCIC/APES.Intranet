@@ -1,0 +1,16 @@
+{
+  "version": "v0.3.5",
+  "released_at": "2026-11-08",
+  "title": "Planning for training and modules",
+  "summary": "Planning work only. Nothing changes on the intranet.",
+  "audiences": ["staff"],
+  "changes": {
+    "changed": [
+      "Planning documents for future training features were added for the development team."
+    ]
+  },
+  "internal_notes": [
+    "Added the learning systems inventory and the decision record on modules and integrations. No build work is authorised by this release."
+  ],
+  "published": true
+}

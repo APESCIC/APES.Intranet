@@ -1,0 +1,14 @@
+{
+  "version": "v0.3.6",
+  "released_at": "2026-11-08",
+  "title": "Communications fix",
+  "summary": "Fixes Communications features that were missing from the live intranet.",
+  "audiences": ["staff", "volunteers", "students"],
+  "changes": {
+    "fixed": [
+      "The Microsoft 365 apps card and menu group, publishing rights for updates and events, and the default handbook chapters now appear as intended.",
+      "Updates to the intranet no longer overwrite Microsoft 365 links or handbook chapters that an admin has edited."
+    ]
+  },
+  "published": true
+}

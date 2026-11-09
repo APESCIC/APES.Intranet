@@ -1,0 +1,24 @@
+{
+  "version": "v0.2.0",
+  "released_at": "2026-11-06",
+  "title": "People",
+  "summary": "Find colleagues in the new people directory and organisation chart, and keep your own profile up to date.",
+  "audiences": ["staff", "volunteers", "students"],
+  "changes": {
+    "added": [
+      "Your own profile, which you can edit. HR-only details stay hidden from everyone else.",
+      "A people directory with search and filters.",
+      "An organisation chart, built from who reports to whom.",
+      "Student placements: log your hours and have them signed off by your supervisor.",
+      "A Security page that links to your Cloudron account settings."
+    ],
+    "changed": [
+      "Your intranet account is created or updated when you sign in, and closed when you leave APES."
+    ]
+  },
+  "internal_notes": [
+    "A read-only directory sync runs on a schedule and ends the sessions of deactivated members.",
+    "Admins can see who has two-factor sign-in turned on."
+  ],
+  "published": true
+}

@@ -29,7 +29,8 @@ Run the milestone end to end from one plan, following the `github-milestone-comp
 
 ## Ship gate
 
-- When every issue is committed: `gh pr ready`, then wait for `ci` to go green.
+- When every issue is committed, publish the release note: the last commit on the milestone branch (`chore: release vX.Y.Z`) sets `"published": true` in the reviewed `changelog/releases/vX.Y.Z.json` (see `docs/release-notes.md`). CI on the tag and `deploy.ps1` refuse a version without one.
+- Then `gh pr ready`, and wait for `ci` to go green.
 - Follow the `ship-gate` skill. Summarise the state, then ask with exactly these options, in this order, marking one `(Recommended)`: a. Merge, b. Release, c. Deploy, d. Merge, release and deploy, e. Stop here. That answer is the only approval. Post it on the Epic.
 - Merge: `gh pr merge --merge`. Release: the milestone version tag (there are no version files). Deploy: the `cloudron-deploy` skill with `deploy/cloudron/deploy.ps1 -Tag vX.Y.Z`, never a branch. After each single step, ask again with only the steps that remain.
 
@@ -40,7 +41,7 @@ A hotfix may go to `main`, or be released or deployed, ahead of its milestone on
 ## Definition of done
 
 - An issue is done when its acceptance criteria are met and committed on the milestone branch. Post the Committed comment with `Add-IssueUpdate.ps1` and leave the issue open. It closes when the milestone pull request merges.
-- A milestone is done only after the single merge, the release, a verified deploy (`/healthz` shows the tag's revision), and close-out with `Close-IssueTree.ps1` and `Close-Milestone.ps1`.
+- A milestone is done only after the single merge, the release, a verified deploy (`/healthz` shows the tag as `version` and the tag's revision), and close-out with `Close-IssueTree.ps1` and `Close-Milestone.ps1`.
 - Never close an issue because it is committed or its pull request is open, or after a failed deploy.
 
 See "Milestone shipping", "Ship flow" and "Cursor skills and tools" in `AGENTS.md` for the full process.

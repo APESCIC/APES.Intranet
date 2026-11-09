@@ -1,0 +1,22 @@
+{
+  "version": "v0.0.1",
+  "released_at": "2026-11-05",
+  "title": "First release",
+  "summary": "The first release of the APES intranet. Sign in with your APES Cloudron account and find your way round with the new menu.",
+  "audiences": ["staff", "volunteers", "students"],
+  "changes": {
+    "added": [
+      "Sign in with your APES Cloudron account. What you can see depends on your intranet groups.",
+      "A menu that shows only the pages you can use, on desktop, tablet and mobile.",
+      "You can install the intranet on your phone or computer, like an app.",
+      "Friendly error pages and a privacy notice."
+    ],
+    "accessibility": [
+      "Every change is checked for keyboard use, contrast and screen-reader labels."
+    ]
+  },
+  "internal_notes": [
+    "From this release, work ships once per milestone: one merge, one release and one deploy."
+  ],
+  "published": true
+}

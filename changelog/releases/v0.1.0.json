@@ -1,0 +1,26 @@
+{
+  "version": "v0.1.0",
+  "released_at": "2026-11-05",
+  "title": "Foundations",
+  "summary": "Access now comes only from the approved intranet groups, sensitive pages ask you to sign in again, and admins have new tools to keep the intranet healthy.",
+  "audiences": ["staff", "volunteers", "students"],
+  "changes": {
+    "added": [
+      "Supervisor and management roles.",
+      "A plain-English guide, Who can see what, under Support.",
+      "Sensitive pages, such as HR and agreements, ask you to sign in again if your last sign-in was a while ago.",
+      "For admins: a System status page, outage emails, a test email button, a Roles page that shows each group, and a quarterly access review."
+    ],
+    "changed": [
+      "Only the eight approved intranet groups give access. Anyone else sees a No intranet access page."
+    ],
+    "security": [
+      "The rules on who can see HR, DBS, health and legal records are enforced on every page, and each look at those records is logged."
+    ]
+  },
+  "internal_notes": [
+    "The main branch accepts merge commits only, and dependency updates collect on a separate branch that each milestone merges in.",
+    "Live Cloudron addon settings are read before the local settings file, so rotated passwords and restores keep working."
+  ],
+  "published": true
+}

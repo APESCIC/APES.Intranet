@@ -1,0 +1,21 @@
+{
+  "version": "v0.3.0",
+  "released_at": "2026-11-06",
+  "title": "Communications",
+  "summary": "Updates, events, the handbook and policies now live on the intranet, with a dashboard that shows what matters to you.",
+  "audiences": ["staff", "volunteers", "students"],
+  "changes": {
+    "added": [
+      "A dashboard for your role.",
+      "Updates, with comments, written in a new rich-text editor.",
+      "Events, with RSVPs and reminders.",
+      "The handbook, where you can confirm you have read each chapter.",
+      "An index of APES policies.",
+      "Links to Teams chats and the Microsoft 365 apps, in the menu and on the dashboard."
+    ]
+  },
+  "internal_notes": [
+    "Admins switch between the normal menu and the admin menu."
+  ],
+  "published": true
+}

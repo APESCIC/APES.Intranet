@@ -18,8 +18,8 @@ const tags = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 const results = [];
 const keyboardFailures = [];
 
-function expectKeyboard(condition, message) {
-    console.log(`${condition ? 'PASS' : 'FAIL'}  keyboard: ${message}`);
+function expectKeyboard(condition, message, kind = 'keyboard') {
+    console.log(`${condition ? 'PASS' : 'FAIL'}  ${kind}: ${message}`);
     if (!condition) {
         keyboardFailures.push(message);
     }
@@ -81,6 +81,31 @@ async function keyboardChecks(desktop, mobile) {
     await mobile.keyboard.press('Escape');
     state = await focused(mobile);
     expectKeyboard(state.label === 'Open menu', 'Escape closes the menu and returns focus to Open menu');
+
+    // The footer version pill sits just before the Privacy notice link.
+    await desktop.goto(`${baseUrl}/dashboard`, { waitUntil: 'networkidle' });
+    await desktop.getByRole('link', { name: 'Privacy notice' }).focus();
+    await desktop.keyboard.press('Shift+Tab');
+    state = await focused(desktop);
+    expectKeyboard(state.label.startsWith('View the intranet change log') && state.outline, 'footer version pill is reached by keyboard with a visible focus ring');
+
+    await desktop.goto(`${baseUrl}/change-log`, { waitUntil: 'networkidle' });
+    await desktop.getByRole('navigation', { name: 'Filter by type of change' }).getByRole('link', { name: 'All changes' }).focus();
+    await desktop.keyboard.press('Tab');
+    await desktop.keyboard.press('Enter');
+    await desktop.waitForURL(/[?&]type=added/);
+    const current = await desktop.getByRole('link', { name: 'Added', exact: true }).getAttribute('aria-current');
+    expectKeyboard(current === 'page', 'change log filter works from the keyboard and marks the chosen type');
+}
+
+async function narrowScreenChecks(narrow) {
+    await signInAs(narrow, 'Staff');
+    for (const path of ['/dashboard', '/change-log']) {
+        await narrow.goto(baseUrl + path, { waitUntil: 'networkidle' });
+        const fits = await narrow.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
+        const pill = await narrow.locator('[data-app-version]').boundingBox();
+        expectKeyboard(fits && pill !== null && pill.height >= 44 && pill.width >= 44, `${path} fits 320px with a 44px version pill`, 'layout');
+    }
 }
 
 async function audit(page, label) {
@@ -117,9 +142,12 @@ try {
     await visit(desktop, '/dashboard', 'Dashboard (desktop)');
     await visit(desktop, '/admin/roles', 'Roles');
     await visit(desktop, '/admin/audit', 'Audit log');
+    await visit(desktop, '/change-log', 'Change log (desktop)');
+    await visit(desktop, '/change-log?type=fixed', 'Change log filtered (desktop)');
 
     const mobile = await (await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true })).newPage();
     await signInAs(mobile, 'Volunteer');
+    await visit(mobile, '/change-log', 'Change log (mobile)');
     await visit(mobile, '/dashboard', 'Dashboard (mobile)');
     await mobile.getByRole('button', { name: 'Open menu' }).click();
     await mobile.getByRole('dialog', { name: 'Main menu' }).waitFor();
@@ -127,6 +155,9 @@ try {
     await audit(mobile, 'Menu drawer (mobile)');
 
     await keyboardChecks(desktop, mobile);
+
+    const narrow = await (await browser.newContext({ viewport: { width: 320, height: 640 }, isMobile: true, hasTouch: true })).newPage();
+    await narrowScreenChecks(narrow);
 } finally {
     await browser.close();
 }

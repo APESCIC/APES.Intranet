@@ -1,0 +1,16 @@
+{
+  "version": "v0.3.7",
+  "released_at": "2026-11-08",
+  "title": "Developer set-up (Docker)",
+  "summary": "No changes you will notice. The development team changed how they run the intranet on their own computers.",
+  "audiences": ["staff"],
+  "changes": {
+    "changed": [
+      "Developer set-up only. The intranet itself did not change."
+    ]
+  },
+  "internal_notes": [
+    "Local development moved to Docker containers, and releases were built in Docker."
+  ],
+  "published": true
+}

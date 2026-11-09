@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - main
+    tags:
+      - 'v*'
 
 permissions:
   contents: read
@@ -157,6 +159,15 @@ jobs:
         run: |
           cp .env.laragon.example .env
           php artisan key:generate
+
+      - name: Check release notes
+        run: php artisan changelog:validate
+
+      - name: Check the tag has a published release note
+        if: github.ref_type == 'tag'
+        env:
+          TAG: ${{ github.ref_name }}
+        run: php artisan changelog:validate --require-published="$TAG"
 
       - name: Tests
         run: php artisan test --compact

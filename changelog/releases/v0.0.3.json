@@ -1,0 +1,16 @@
+{
+  "version": "v0.0.3",
+  "released_at": "2026-11-05",
+  "title": "Development team notes",
+  "summary": "No changes you will notice. The working notes for the people who build the intranet were brought up to date.",
+  "audiences": ["staff"],
+  "changes": {
+    "changed": [
+      "Internal working notes for the development team were updated."
+    ]
+  },
+  "internal_notes": [
+    "Agent docs, rules and templates now match the Cursor skills: decisions by AskQuestion, one draft pull request per milestone, and issues close on merge, not on commit."
+  ],
+  "published": true
+}

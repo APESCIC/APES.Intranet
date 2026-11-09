@@ -1,0 +1,20 @@
+{
+  "version": "v0.3.11",
+  "released_at": "2026-11-09",
+  "title": "Version pill and change log",
+  "summary": "See which version of the intranet you are using, and read what changed in each release.",
+  "audiences": ["staff", "volunteers", "students"],
+  "changes": {
+    "added": [
+      "The footer shows the version of the intranet that is running. Select it to open the change log.",
+      "A change log page, under Support, that lists the changes in each release that are relevant to you, with a filter by type of change."
+    ],
+    "accessibility": [
+      "The version link and the change log filter work with a keyboard and with screen readers."
+    ]
+  },
+  "internal_notes": [
+    "Release notes are reviewed files in the repository, synced into the hub on every deploy. The health check now reports the deployed version as well as the revision."
+  ],
+  "published": true
+}

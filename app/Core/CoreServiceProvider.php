@@ -11,6 +11,11 @@ use App\Core\Auth\Cloudron\CloudronIdentityProvider;
 use App\Core\Auth\Cloudron\LdapDirectoryGroups;
 use App\Core\Auth\Contracts\DirectoryGroups;
 use App\Core\Auth\Contracts\IdentityProvider;
+use App\Core\Changelog\Console\SyncChangelog;
+use App\Core\Changelog\Console\ValidateChangelog;
+use App\Core\Changelog\FooterVersion;
+use App\Core\Changelog\Release;
+use App\Core\Changelog\ReleasePolicy;
 use App\Core\Navigation\Menu;
 use App\Core\Navigation\MenuMode;
 use App\Core\Qa\QaLogin;
@@ -45,9 +50,16 @@ class CoreServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        $this->commands([PruneAuditLog::class, RunSystemChecks::class, RemindAccessReview::class]);
+        $this->commands([
+            PruneAuditLog::class,
+            RunSystemChecks::class,
+            RemindAccessReview::class,
+            ValidateChangelog::class,
+            SyncChangelog::class,
+        ]);
 
         Gate::policy(Role::class, RolePolicy::class);
+        Gate::policy(Release::class, ReleasePolicy::class);
         MatrixPolicies::register();
 
         View::composer('components.layouts.app', function (ViewInstance $view) {
@@ -61,6 +73,7 @@ class CoreServiceProvider extends ServiceProvider
                 'showMenuModeSwitcher' => $user?->hasRole(RoleName::Admin->value) ?? false,
                 'shellUser' => $user,
                 'qaEnabled' => QaLogin::enabled(),
+                'footerVersion' => app(FooterVersion::class)->for($user),
             ]);
         });
     }

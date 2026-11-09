@@ -1,0 +1,19 @@
+{
+  "version": "v0.3.10",
+  "released_at": "2026-11-09",
+  "title": "Developer set-up (Laragon)",
+  "summary": "A small accessibility fix, and a new set-up for the development team.",
+  "audiences": ["staff", "volunteers", "students"],
+  "changes": {
+    "changed": [
+      "The development team now runs the intranet on their own computers with Laragon, with realistic fake demo data for testing."
+    ],
+    "accessibility": [
+      "Page-number controls that you cannot use at the moment are now announced properly by screen readers."
+    ]
+  },
+  "internal_notes": [
+    "Laragon is the only supported local set-up. Demo data loads with the demo seed command and refuses to run outside local development."
+  ],
+  "published": true
+}

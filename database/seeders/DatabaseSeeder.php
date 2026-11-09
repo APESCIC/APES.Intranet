@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             FakeUserSeeder::class,
             CommunicationsSeeder::class,
             QaUserSeeder::class,
+            ReleaseNotesSeeder::class,
         ]);
     }
 }

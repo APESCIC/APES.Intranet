@@ -21,9 +21,15 @@
     ... build-release.ps1 -Ref v0.0.2 -Php C:\path\to\php.exe -Composer C:\path\to\composer.phar
 
     Builds with a different PHP 8.4 or Composer.
+
+.PARAMETER Version
+    The release version to stamp into VERSION, such as v0.3.11. Defaults to
+    -Ref when -Ref is a vMAJOR.MINOR.PATCH tag. Without either, no VERSION
+    file is written and the app reports "dev".
 #>
 param(
     [Parameter(Mandatory = $true)][string]$Ref,
+    [string]$Version = '',
     [string]$Php = '',
     [string]$Composer = ''
 )
@@ -32,6 +38,14 @@ $ErrorActionPreference = 'Stop'
 $repo = (git rev-parse --show-toplevel).Trim()
 $sha = (git -C $repo rev-parse --verify "$Ref^{commit}").Trim()
 if ($LASTEXITCODE -ne 0 -or $sha -notmatch '^[0-9a-f]{40}$') { throw "Unknown ref: $Ref" }
+
+$versionPattern = '^v\d+\.\d+\.\d+$'
+if (-not $Version -and $Ref -match $versionPattern) { $Version = $Ref }
+if ($Version) {
+    if ($Version -notmatch $versionPattern) { throw "Version must look like v1.2.3, not '$Version'." }
+    $tagSha = "$(git -C $repo rev-parse --verify --quiet "refs/tags/$Version^{commit}")".Trim()
+    if ($tagSha -and $tagSha -ne $sha) { throw "Tag $Version is $tagSha, not the commit being built ($sha)." }
+}
 
 $laragon = 'C:\laragon\bin'
 if (-not $Php) {
@@ -76,6 +90,7 @@ try {
     npm run build
     if ($LASTEXITCODE -ne 0) { throw 'npm run build failed' }
     Set-Content -NoNewline -Path REVISION -Value $sha
+    if ($Version) { Set-Content -NoNewline -Path VERSION -Value $Version }
     Pop-Location
 
     robocopy $src $out /E /NFL /NDL /NJH /NJS /NP /XD .git .github docs node_modules tests storage /XF .git .env .env.* | Out-Null
@@ -90,4 +105,5 @@ finally {
 Write-Output "ReleaseId=$id"
 Write-Output "ReleaseDir=$out"
 Write-Output "Revision=$sha"
+Write-Output "Version=$(if ($Version) { $Version } else { 'dev' })"
 exit 0

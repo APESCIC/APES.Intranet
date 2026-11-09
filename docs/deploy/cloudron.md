@@ -189,18 +189,21 @@ Composer.
 
 `deploy.ps1`:
 
-1. Refuses unless the tag exists, is a published GitHub release, and the `ci`
-   check is green on its commit.
+1. Refuses unless the tag exists, is a published GitHub release, the `ci`
+   check is green on its commit, and the tag has a published release note in
+   `changelog/releases/` ([docs/release-notes.md](../release-notes.md)).
 2. Runs the [preflight](#preflight) and stops on any `FAIL`.
 3. Takes a Cloudron backup and notes its id.
 4. Notes the live release, for a rollback.
 5. Builds the tag with `build-release.ps1` and uploads it to
    `/app/data/releases/<ReleaseId>`.
-6. Checks the uploaded `REVISION` is the tag's commit.
+6. Checks the uploaded `REVISION` is the tag's commit, and the uploaded
+   `VERSION` is the tag.
 7. Runs `activate-release.sh`, then restarts the app.
-8. Verifies `/healthz`: 200, `"status":"ok"`, and `revision` equal to the first
-   12 characters of the tag's commit. Also checks that the queue worker and
-   scheduler are running, and that the logs show them start.
+8. Verifies `/healthz`: 200, `"status":"ok"`, `version` equal to the tag, and
+   `revision` equal to the first 12 characters of the tag's commit. Also
+   checks that the queue worker and scheduler are running, and that the logs
+   show them start.
 9. On any failure from step 7 on, rolls back to the earlier release, restarts,
    verifies again, and exits 1.
 10. Prints a summary (release id, revision, backup id, `/healthz` output). Paste
@@ -259,7 +262,11 @@ Use this only if `deploy.ps1` cannot run. It does the same steps.
    powershell -NoProfile -ExecutionPolicy Bypass -File deploy\cloudron\build-release.ps1 -Ref $tag
    ```
 
-   Note the printed `ReleaseId`, `ReleaseDir` and `Revision`.
+   Note the printed `ReleaseId`, `ReleaseDir`, `Revision` and `Version`.
+   Because `-Ref` is a tag, the build also writes a `VERSION` file holding
+   the tag. The footer version pill and `/healthz` read it, so the site shows
+   the version that is actually deployed, not the newest tag. Without a
+   `VERSION` file the app reports `dev`.
 6. **Upload.** Leave the trailing `\` off `ReleaseDir`. That way the folder
    itself, named `<ReleaseId>`, is placed inside `releases/`:
 
@@ -268,7 +275,8 @@ Use this only if `deploy.ps1` cannot run. It does the same steps.
    cloudron exec --app $app '--' cat /app/data/releases/<ReleaseId>/REVISION
    ```
 
-   The `REVISION` must equal the printed `Revision`.
+   The `REVISION` must equal the printed `Revision`, and `VERSION` (same
+   folder) must equal the tag.
 7. **Activate.** This links `.env` and storage, enters maintenance mode, runs
    migrations, re-syncs roles and permissions, caches config, switches
    `current` and leaves maintenance mode:

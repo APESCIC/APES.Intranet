@@ -6,6 +6,7 @@ use App\Core\Access\Http\Controllers\AccessReviewController;
 use App\Core\Access\Http\Controllers\RoleIndexController;
 use App\Core\Audit\Http\Controllers\AuditLogIndexController;
 use App\Core\Auth\Http\Controllers\OidcController;
+use App\Core\Changelog\Http\Controllers\ChangeLogController;
 use App\Core\Qa\Http\Controllers\QaLoginController;
 use App\Core\Qa\Http\Middleware\EnsureQaLoginEnabled;
 use App\Core\System\Http\Controllers\SendTestEmailController;
@@ -28,6 +29,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/access', AccessGuideController::class)
         ->middleware('can:'.AccessMatrix::INTRANET_ACCESS)
         ->name('access-guide');
+
+    Route::middleware('can:'.AccessMatrix::INTRANET_ACCESS)->group(function () {
+        Route::get('/change-log', [ChangeLogController::class, 'index'])->name('change-log.index');
+        Route::get('/change-log/{version}', [ChangeLogController::class, 'show'])
+            ->where('version', 'v[0-9]+\.[0-9]+\.[0-9]+')
+            ->name('change-log.show');
+    });
 
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/roles', RoleIndexController::class)->name('roles.index');
