@@ -12,7 +12,10 @@
       3. Takes a Cloudron backup and notes its id.
       4. Notes the live release, for a rollback.
       5. Builds the tag with build-release.ps1 (Laragon's PHP 8.4, Composer
-         and npm) and uploads it to /app/data/releases/<ReleaseId>.
+         and npm, reusing dependency caches when the lock files are unchanged),
+         packs it into one .tar.gz, uploads it with cloudron push and unpacks
+         it to /app/data/releases/<ReleaseId>. -SyncPush uploads file by file
+         instead, as before.
       6. Checks the uploaded REVISION is the tag's commit and VERSION is the tag.
       7. Runs activate-release.sh, then restarts the app.
       8. Verifies /healthz (200, "status":"ok", version = the tag, revision =
@@ -20,7 +23,8 @@
          processes, and the logs.
       9. On any failure from step 7 on: rollback-release.sh to the earlier
          release, restart, verify again, and exit 1.
-     10. Prints a summary to paste on the ship issue.
+     10. Prints a summary to paste on the ship issue, with the seconds each
+         stage took.
 
     Works in Windows PowerShell 5.1. Never prints .env values or APP_KEY.
 
@@ -35,6 +39,10 @@
     Path to composer.phar. Defaults to the one next to composer on PATH, or
     Laragon's.
 
+.PARAMETER SyncPush
+    Upload the release folder file by file with cloudron sync push (the old,
+    slower way) instead of as one .tar.gz.
+
 .EXAMPLE
     powershell -NoProfile -ExecutionPolicy Bypass -File deploy\cloudron\deploy.ps1 -Tag v0.0.2
 
@@ -48,7 +56,8 @@ param(
     [string]$Repo = 'APESCIC/APES.Intranet',
     [string]$Php = '',
     [string]$Composer = '',
-    [switch]$ForceVerifyFailure
+    [switch]$ForceVerifyFailure,
+    [switch]$SyncPush
 )
 
 $ErrorActionPreference = 'Continue'
@@ -67,10 +76,21 @@ function Restart-App {
     cloudron restart --app $App | Out-Host
 }
 
-function Write-Step([string]$Message) { Write-Host "==> $Message" }
+$script:timings = [ordered]@{}
+$script:stage = $null
+$script:stageStarted = $null
+
+function Write-Step([string]$Message) {
+    if ($script:stage) { $script:timings[$script:stage] = [int]([datetime]::UtcNow - $script:stageStarted).TotalSeconds }
+    $script:stage = $Message
+    $script:stageStarted = [datetime]::UtcNow
+    Write-Host "==> $Message"
+}
 
 function Write-Summary([string]$Outcome) {
+    Write-Step 'Summary'
     $previousId = if ($previous) { $previous.Split('/')[-1] } else { 'none' }
+    $total = ($script:timings.Values | Measure-Object -Sum).Sum
     Write-Output ''
     Write-Output '```text'
     Write-Output "Outcome:  $Outcome"
@@ -79,6 +99,8 @@ function Write-Summary([string]$Outcome) {
     Write-Output "Previous: $previousId"
     Write-Output "Backup:   $backupId"
     Write-Output "/healthz: $($script:lastHealth.Code) $($script:lastHealth.Body)"
+    Write-Output "Timings:  $total s in total"
+    foreach ($name in $script:timings.Keys) { Write-Output ('  {0,5} s  {1}' -f $script:timings[$name], $name) }
     Write-Output '```'
 }
 
@@ -218,9 +240,30 @@ try {
     $id = $build.ReleaseId
     $target = "$releases/$id"
 
-    Write-Step "Uploading $id"
-    cloudron sync push --app $App $build.ReleaseDir "$releases/" | Out-Host
-    if ($LASTEXITCODE -ne 0) { Stop-Deploy 'upload failed' }
+    if ($SyncPush) {
+        Write-Step "Uploading $id (file by file)"
+        cloudron sync push --app $App $build.ReleaseDir "$releases/" | Out-Host
+        if ($LASTEXITCODE -ne 0) { Stop-Deploy 'upload failed' }
+    } else {
+        Write-Step "Packing $id"
+        $archive = Join-Path (Split-Path $build.ReleaseDir) "$id.tar.gz"
+        tar -czf $archive -C $build.ReleaseDir .
+        if ($LASTEXITCODE -ne 0) { Stop-Deploy 'tar failed' }
+        Write-Host ('  {0:N1} MB' -f ((Get-Item $archive).Length / 1MB))
+
+        Write-Step "Uploading $id"
+        cloudron push --app $App $archive "$releases/$id.tar.gz" | Out-Host
+        if ($LASTEXITCODE -ne 0) { Stop-Deploy 'upload failed' }
+        Invoke-App mkdir -p $target | Out-Null
+        Invoke-App tar -xzf "$releases/$id.tar.gz" -C $target | Out-Host
+        $unpacked = $LASTEXITCODE -eq 0
+        Invoke-App rm -f "$releases/$id.tar.gz" | Out-Null
+        Remove-Item -Force $archive
+        if (-not $unpacked) {
+            Invoke-App rm -rf $target | Out-Null
+            Stop-Deploy 'unpacking the release on the app failed'
+        }
+    }
     $uploaded = "$(Invoke-App cat "$target/REVISION")".Trim()
     if ($uploaded -ne $sha) {
         Invoke-App rm -rf $target | Out-Null
