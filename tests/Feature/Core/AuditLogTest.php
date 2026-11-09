@@ -81,6 +81,25 @@ it('lists entries read-only and records that an admin viewed it', function () {
         ->and(AuditLog::where('event', 'admin.audit.viewed')->where('actor_id', $admin->id)->exists())->toBeTrue();
 });
 
+it('labels disabled pagination controls without aria-label on a span', function () {
+    $admin = User::factory()->create()->assignRole(RoleName::Admin->value);
+    foreach (range(1, 60) as $i) {
+        app(AuditLogger::class)->record('demo.entry', null, [], $admin);
+    }
+
+    $first = $this->actingAs($admin)->get(route('admin.audit.index'))->assertOk()->getContent();
+    $last = $this->actingAs($admin)->get(route('admin.audit.index', ['page' => 2]))->assertOk()->getContent();
+
+    foreach ([$first, $last] as $html) {
+        expect($html)->not->toMatch('/<span[^>]*aria-label=/')
+            ->and($html)->toContain('aria-label="'.__('Pagination Navigation').'"');
+    }
+    expect($first)->toContain('<span class="sr-only">'.__('pagination.previous').'</span>')
+        ->and($first)->toContain('rel="next"')
+        ->and($last)->toContain('<span class="sr-only">'.__('pagination.next').'</span>')
+        ->and($last)->toContain('rel="prev"');
+});
+
 it('refuses to change or delete a single entry', function () {
     $entry = app(AuditLogger::class)->record('auth.signed_in');
 
