@@ -1,6 +1,7 @@
 # Pull request
 
-One pull request per milestone, from `milestone/<milestone-slug>` into `main`.
+One pull request per milestone, from `milestone/vX-Y-Z-<slug>` into `main`,
+titled `vX.Y.Z: <milestone name>` (`composer milestone:next` prints both).
 Open it as a draft after the first commit.
 
 ## Summary
