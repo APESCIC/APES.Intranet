@@ -28,7 +28,7 @@ final class Operations
      */
     public static function member(RoleName $role = RoleName::Staff, array $attributes = []): User
     {
-        return User::factory()->create(['team' => 'Care'] + $attributes)->assignRole($role->value);
+        return User::factory()->create($attributes + ['team' => 'Care'])->assignRole($role->value);
     }
 
     public static function site(string $team = 'Care', string $name = 'Reptile house'): Site

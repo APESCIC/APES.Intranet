@@ -18,11 +18,7 @@
                                 <td>{{ $shift->starts_at->format('D j M H:i') }}–{{ $shift->ends_at->format('H:i') }}</td>
                                 <td>{{ $shift->role }}</td>
                                 <td>{{ $shift->site->name }}</td>
-                                <td>
-                                    @if (Route::has('operations.rota.swap.create'))
-                                        <a class="sg-btn sg-btn-ghost sg-btn-sm" href="{{ route('operations.rota.swap.create', $shift) }}">Ask to swap</a>
-                                    @endif
-                                </td>
+                                <td><a class="sg-btn sg-btn-ghost sg-btn-sm" href="{{ route('operations.rota.swap.create', $shift) }}">Ask to swap<span class="sr-only"> {{ $shift->label() }}</span></a></td>
                             </tr>
                         @endforeach
                     </tbody>

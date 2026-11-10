@@ -2,11 +2,9 @@
     $rotaLinks = [
         ['operations.rota.index', 'My rota'],
         ['operations.rota.availability.index', 'My unavailability'],
+        ['operations.rota.open', 'Open shifts'],
+        ['operations.rota.requests.index', 'Claims and swaps'],
     ];
-    if (Route::has('operations.rota.open')) {
-        $rotaLinks[] = ['operations.rota.open', 'Open shifts'];
-        $rotaLinks[] = ['operations.rota.requests.index', 'Claims and swaps'];
-    }
     if (auth()->user()->can(\Modules\Operations\OperationsPermissions::ROTA_MANAGE)) {
         $rotaLinks[] = ['operations.rota.templates.index', 'Shift templates'];
     }
