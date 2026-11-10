@@ -20,7 +20,8 @@ php artisan demo:reset   # empty the local database, migrate, load it again (com
   (`database/seeders/DemoSeeder.php`) refuses too, so
   `php artisan db:seed --class=...DemoSeeder` cannot load it anywhere else.
 - Nothing calls it on Cloudron. Deploys only run the deploy-safe seeders
-  (`RolesAndPermissionsSeeder` and `CommunicationsBootstrapSeeder`).
+  (`RolesAndPermissionsSeeder`, `CommunicationsBootstrapSeeder` and
+  `OperationsBootstrapSeeder`).
 - Everything is made up:
   - names come from Faker's `en_GB` lists;
   - email addresses use `example.test`, and links use `example.org`;
@@ -55,7 +56,17 @@ data. Dates are set relative to today, so "upcoming" events stay upcoming.
 | Handbook | The 2 deploy-safe chapters plus 4 demo chapters |
 | Policies | 8 policy documents (one overdue for review) with 100 reads |
 | Microsoft 365 links | The 8 deploy-safe links |
+| Operations sites | Reptile house (demo), team Animal care, and Visitor centre (demo), team Office |
+| Rota | Morning feed and Afternoon clean templates for every day, this week's rota published and next week's in draft (28 shifts, every fifth open), 3 holidays next week and 1 claim waiting for approval |
+| Clock and timesheets | Clock records for this week's finished shifts and last week's volunteer work; last week's volunteer timesheets, most approved and locked, some waiting for approval |
+| Tasks | 5 tasks for a person or the Animal care team: one overdue, one weekly, one monthly and one done |
+| Forms | Incident report (to HR, with photo and signature fields) and Maintenance request (to `person04`, with one submission) |
+| Checklists | Reptile house checks on every published shift; earlier ones completed, today's still to do or missed |
 | Audit log | 40 entries over the last 8 days, for the admin audit page |
+
+The QA accounts are put in the Animal care team, so `qa-supervisor` looks
+after the Reptile house rota, and `qa-staff`, `qa-volunteer` and `qa-student`
+have shifts, tasks and checklists.
 
 ## Test logins
 

@@ -20,7 +20,7 @@
 
     <section class="sg-card mb-6 p-6" aria-labelledby="shifts-heading">
         <h2 id="shifts-heading" class="mb-3 font-serif text-xl font-semibold">Shifts</h2>
-        <div class="overflow-x-auto">
+        <x-operations::table-scroll label="Shifts this week">
             <table class="sg-table">
                 <thead>
                     <tr><th scope="col">When</th><th scope="col">Role</th><th scope="col">Member</th><th scope="col">Clashes</th><th scope="col"><span class="sr-only">Remove</span></th></tr>
@@ -62,7 +62,7 @@
                     @endforelse
                 </tbody>
             </table>
-        </div>
+        </x-operations::table-scroll>
     </section>
 
     <section class="sg-card max-w-3xl p-6" aria-labelledby="add-shift">

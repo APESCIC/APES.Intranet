@@ -38,7 +38,7 @@
         <p class="mt-3 text-sm text-sg-muted">The geofence area is used only once the clock-in DPIA is approved and the geofence is switched on.</p>
     </section>
 
-    <section class="sg-card max-w-4xl overflow-x-auto p-6" aria-labelledby="sites-heading">
+    <section class="sg-card max-w-4xl p-6" aria-labelledby="sites-heading">
         <h2 id="sites-heading" class="mb-3 font-serif text-lg font-semibold">Sites</h2>
         @forelse ($sites as $site)
             <form method="post" action="{{ route('admin.operations.sites.update', $site) }}" class="mb-4 grid gap-3 rounded-sg-field border border-sg-info-mist p-3 sm:grid-cols-3" data-site="{{ $site->id }}">

@@ -3,7 +3,7 @@
 
     <section class="sg-card p-6" aria-labelledby="inbox-heading">
         <h2 id="inbox-heading" class="sr-only">Submissions</h2>
-        <div class="overflow-x-auto">
+        <x-operations::table-scroll label="Form submissions">
             <table class="sg-table">
                 <thead>
                     <tr><th scope="col">Form</th><th scope="col">From</th><th scope="col">Sent</th></tr>
@@ -20,7 +20,7 @@
                     @endforelse
                 </tbody>
             </table>
-        </div>
+        </x-operations::table-scroll>
         <div class="mt-4">{{ $submissions->links() }}</div>
     </section>
 </x-layouts.app>

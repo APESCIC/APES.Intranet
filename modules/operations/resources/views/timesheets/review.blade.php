@@ -4,7 +4,7 @@
 
     <section class="sg-card max-w-3xl p-6" aria-labelledby="review-heading">
         <h2 id="review-heading" class="sr-only">Waiting for approval</h2>
-        <div class="overflow-x-auto">
+        <x-operations::table-scroll label="Timesheets to approve">
             <table class="sg-table">
                 <thead>
                     <tr><th scope="col">Member</th><th scope="col">Week of</th><th scope="col">Hours</th></tr>
@@ -21,6 +21,6 @@
                     @endforelse
                 </tbody>
             </table>
-        </div>
+        </x-operations::table-scroll>
     </section>
 </x-layouts.app>

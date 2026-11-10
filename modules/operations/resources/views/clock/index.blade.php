@@ -65,7 +65,7 @@
 
     <section class="sg-card max-w-3xl p-6" aria-labelledby="recent-heading">
         <h2 id="recent-heading" class="mb-3 font-serif text-xl font-semibold">Last 14 days</h2>
-        <div class="overflow-x-auto">
+        <x-operations::table-scroll label="Clock records">
             <table class="sg-table">
                 <thead>
                     <tr><th scope="col">In</th><th scope="col">Out</th><th scope="col">Breaks</th><th scope="col">Worked</th><th scope="col">Where</th></tr>
@@ -87,7 +87,7 @@
                     @endforelse
                 </tbody>
             </table>
-        </div>
+        </x-operations::table-scroll>
         @if ($shifts->isEmpty() && ! $open)
             <p class="mt-3 text-sm text-sg-muted">No shift of yours starts within two hours, so choose the site you are working at.</p>
         @endif

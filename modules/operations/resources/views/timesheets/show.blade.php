@@ -10,7 +10,7 @@
         @if ($timesheet->review_note)
             <p class="mb-3 rounded-sg-field bg-sg-warn-mist p-3 text-sg-warn">Note from {{ $timesheet->reviewer?->name ?? 'your manager' }}: {{ $timesheet->review_note }}</p>
         @endif
-        <div class="overflow-x-auto">
+        <x-operations::table-scroll label="Timesheet entries">
             <table class="sg-table">
                 <thead>
                     <tr><th scope="col">Date</th><th scope="col">Work</th><th scope="col">Time</th></tr>
@@ -27,7 +27,7 @@
                     @endforelse
                 </tbody>
             </table>
-        </div>
+        </x-operations::table-scroll>
 
         @if ($isOwner && $timesheet->isEditable())
             <form method="post" action="{{ route('operations.timesheets.submit', $timesheet) }}" class="mt-4">

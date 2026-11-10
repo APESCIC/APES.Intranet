@@ -19,7 +19,7 @@
 
     <section class="sg-card p-6" aria-labelledby="forms-heading">
         <h2 id="forms-heading" class="mb-3 font-serif text-xl font-semibold">Forms</h2>
-        <div class="overflow-x-auto">
+        <x-operations::table-scroll label="Forms">
             <table class="sg-table">
                 <thead>
                     <tr><th scope="col">Title</th><th scope="col">Fields</th><th scope="col">Submissions</th><th scope="col">Status</th></tr>
@@ -37,6 +37,6 @@
                     @endforelse
                 </tbody>
             </table>
-        </div>
+        </x-operations::table-scroll>
     </section>
 </x-layouts.app>

@@ -7,7 +7,7 @@
         @if ($myShifts->isEmpty())
             <p class="text-sg-muted">You have no published shifts coming up.</p>
         @else
-            <div class="overflow-x-auto">
+            <x-operations::table-scroll label="My shifts">
                 <table class="sg-table">
                     <thead>
                         <tr><th scope="col">When</th><th scope="col">Role</th><th scope="col">Site</th><th scope="col">Checklists</th><th scope="col"><span class="sr-only">Actions</span></th></tr>
@@ -28,7 +28,7 @@
                         @endforeach
                     </tbody>
                 </table>
-            </div>
+            </x-operations::table-scroll>
         @endif
     </section>
 
@@ -60,7 +60,7 @@
             @if ($weeks->isEmpty())
                 <p class="text-sg-muted">No rotas yet.</p>
             @else
-                <div class="overflow-x-auto">
+                <x-operations::table-scroll label="Rotas you look after">
                     <table class="sg-table">
                         <thead>
                             <tr><th scope="col">Week of</th><th scope="col">Site</th><th scope="col">Shifts</th><th scope="col">Open</th><th scope="col">Status</th></tr>
@@ -77,7 +77,7 @@
                             @endforeach
                         </tbody>
                     </table>
-                </div>
+                </x-operations::table-scroll>
             @endif
         </section>
     @endif

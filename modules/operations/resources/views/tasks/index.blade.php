@@ -10,13 +10,13 @@
 
     <section class="sg-card mb-6 p-6" aria-labelledby="my-tasks">
         <h2 id="my-tasks" class="mb-3 font-serif text-xl font-semibold">My tasks</h2>
-        @include('operations::tasks.list', ['tasks' => $mine, 'empty' => 'Nothing for you right now.'])
+        @include('operations::tasks.list', ['tasks' => $mine, 'label' => 'My tasks', 'empty' => 'Nothing for you right now.'])
     </section>
 
     @if ($managed->isNotEmpty())
         <section class="sg-card p-6" aria-labelledby="team-tasks">
             <h2 id="team-tasks" class="mb-3 font-serif text-xl font-semibold">Tasks you look after</h2>
-            @include('operations::tasks.list', ['tasks' => $managed, 'empty' => ''])
+            @include('operations::tasks.list', ['tasks' => $managed, 'label' => 'Tasks you look after', 'empty' => ''])
         </section>
     @endif
 </x-layouts.app>

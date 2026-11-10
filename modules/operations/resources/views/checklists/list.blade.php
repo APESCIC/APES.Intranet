@@ -1,4 +1,4 @@
-<div class="overflow-x-auto">
+<x-operations::table-scroll :label="$label">
     <table class="sg-table">
         <thead>
             <tr>
@@ -31,4 +31,4 @@
             @endforelse
         </tbody>
     </table>
-</div>
+</x-operations::table-scroll>

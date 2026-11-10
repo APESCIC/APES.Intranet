@@ -45,7 +45,7 @@
 
         <section class="sg-card p-6" aria-labelledby="templates-heading">
             <h2 id="templates-heading" class="mb-3 font-serif text-xl font-semibold">Checklists</h2>
-            <div class="overflow-x-auto">
+            <x-operations::table-scroll label="Checklist templates">
                 <table class="sg-table">
                     <thead>
                         <tr><th scope="col">Name</th><th scope="col">Site</th><th scope="col">Shift</th><th scope="col">By</th><th scope="col">Checks</th><th scope="col"><span class="sr-only">Retire</span></th></tr>
@@ -73,7 +73,7 @@
                         @endforelse
                     </tbody>
                 </table>
-            </div>
+            </x-operations::table-scroll>
         </section>
     @endif
 </x-layouts.app>

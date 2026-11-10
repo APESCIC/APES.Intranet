@@ -3,7 +3,7 @@
 
     <section class="sg-card p-6" aria-labelledby="team-clock">
         <h2 id="team-clock" class="sr-only">Clock records</h2>
-        <div class="overflow-x-auto">
+        <x-operations::table-scroll label="Team clock records">
             <table class="sg-table">
                 <thead>
                     <tr><th scope="col">Member</th><th scope="col">In</th><th scope="col">Out</th><th scope="col">Worked</th><th scope="col">Where</th><th scope="col">Location check</th></tr>
@@ -48,7 +48,7 @@
                     @endforelse
                 </tbody>
             </table>
-        </div>
+        </x-operations::table-scroll>
         <p class="mt-3 text-sm text-sg-muted">"Not confirmed" can mean poor signal or that the member said no to sharing their location. Treat it as a prompt to ask, not as proof.</p>
     </section>
 </x-layouts.app>

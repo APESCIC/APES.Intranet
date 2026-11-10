@@ -17,7 +17,7 @@
 
     <section class="sg-card max-w-3xl p-6" aria-labelledby="totals-heading">
         <h2 id="totals-heading" class="mb-3 font-serif text-xl font-semibold">Totals for timesheets starting {{ $from->startOfWeek()->format('j M Y') }} to {{ $to->format('j M Y') }}</h2>
-        <div class="overflow-x-auto">
+        <x-operations::table-scroll label="Volunteer hours totals">
             <table class="sg-table">
                 <thead>
                     <tr><th scope="col">Volunteer</th><th scope="col">Team</th><th scope="col">Approved timesheets</th><th scope="col">Hours</th></tr>
@@ -44,6 +44,6 @@
                     </tfoot>
                 @endif
             </table>
-        </div>
+        </x-operations::table-scroll>
     </section>
 </x-layouts.app>

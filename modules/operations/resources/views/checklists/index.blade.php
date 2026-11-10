@@ -7,13 +7,13 @@
 
     <section class="sg-card mb-6 p-6" aria-labelledby="mine-heading">
         <h2 id="mine-heading" class="mb-3 font-serif text-xl font-semibold">On my shifts</h2>
-        @include('operations::checklists.list', ['runs' => $mine, 'showMember' => false, 'empty' => 'No checklists on your shifts right now.'])
+        @include('operations::checklists.list', ['runs' => $mine, 'label' => 'Checklists on my shifts', 'showMember' => false, 'empty' => 'No checklists on your shifts right now.'])
     </section>
 
     @if ($team->isNotEmpty())
         <section class="sg-card p-6" aria-labelledby="team-heading">
             <h2 id="team-heading" class="mb-3 font-serif text-xl font-semibold">Teams you look after (last 7 days)</h2>
-            @include('operations::checklists.list', ['runs' => $team, 'showMember' => true, 'empty' => ''])
+            @include('operations::checklists.list', ['runs' => $team, 'label' => 'Team checklists', 'showMember' => true, 'empty' => ''])
         </section>
     @endif
 </x-layouts.app>

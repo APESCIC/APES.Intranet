@@ -2,6 +2,7 @@
 
 namespace Modules\Operations;
 
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Modules\Operations\Console\AlertMissedChecklists;
@@ -28,6 +29,7 @@ class OperationsServiceProvider extends ServiceProvider
     {
         $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'operations');
+        Blade::anonymousComponentPath(__DIR__.'/../resources/views/components', 'operations');
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         $this->commands([FlagMissedClockOuts::class, AlertMissedChecklists::class]);
 

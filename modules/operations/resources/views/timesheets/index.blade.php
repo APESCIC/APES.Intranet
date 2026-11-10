@@ -16,7 +16,7 @@
 
     <section class="sg-card max-w-3xl p-6" aria-labelledby="mine-heading">
         <h2 id="mine-heading" class="mb-3 font-serif text-xl font-semibold">My timesheets</h2>
-        <div class="overflow-x-auto">
+        <x-operations::table-scroll label="My timesheets">
             <table class="sg-table">
                 <thead>
                     <tr><th scope="col">Week of</th><th scope="col">Hours</th><th scope="col">Status</th></tr>
@@ -33,6 +33,6 @@
                     @endforelse
                 </tbody>
             </table>
-        </div>
+        </x-operations::table-scroll>
     </section>
 </x-layouts.app>
