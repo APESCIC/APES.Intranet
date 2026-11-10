@@ -8,6 +8,7 @@ use Modules\Operations\Http\Controllers\ClockController;
 use Modules\Operations\Http\Controllers\RotaController;
 use Modules\Operations\Http\Controllers\ShiftRequestController;
 use Modules\Operations\Http\Controllers\ShiftTemplateController;
+use Modules\Operations\Http\Controllers\TimesheetController;
 use Modules\Operations\OperationsPermissions;
 
 Route::middleware(['web', 'auth'])->group(function () {
@@ -39,6 +40,15 @@ Route::middleware(['web', 'auth'])->group(function () {
         Route::post('/clock/break/end', [ClockController::class, 'endBreak'])->name('clock.break.end');
         Route::get('/clock/team', [ClockController::class, 'team'])->name('clock.team');
         Route::post('/clock/records/{record}/correct', [ClockController::class, 'correct'])->name('clock.correct');
+
+        Route::get('/timesheets', [TimesheetController::class, 'index'])->name('timesheets.index');
+        Route::post('/timesheets', [TimesheetController::class, 'build'])->name('timesheets.build');
+        Route::get('/timesheets/review', [TimesheetController::class, 'review'])->name('timesheets.review');
+        Route::get('/timesheets/volunteer-hours', [TimesheetController::class, 'hours'])->name('timesheets.hours');
+        Route::get('/timesheets/volunteer-hours.csv', [TimesheetController::class, 'hoursCsv'])->name('timesheets.hours.csv');
+        Route::get('/timesheets/{timesheet}', [TimesheetController::class, 'show'])->whereNumber('timesheet')->name('timesheets.show');
+        Route::post('/timesheets/{timesheet}/submit', [TimesheetController::class, 'submit'])->name('timesheets.submit');
+        Route::post('/timesheets/{timesheet}/decide', [TimesheetController::class, 'decide'])->name('timesheets.decide');
 
         Route::get('/rota/availability', [AvailabilityController::class, 'index'])->name('rota.availability.index');
         Route::post('/rota/availability', [AvailabilityController::class, 'store'])->name('rota.availability.store');
