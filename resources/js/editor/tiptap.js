@@ -77,6 +77,7 @@ function mount(root) {
                 class: 'tiptap-prose',
                 role: 'textbox',
                 'aria-multiline': 'true',
+                'aria-label': surface.dataset.label || 'Rich text',
             },
         },
     });

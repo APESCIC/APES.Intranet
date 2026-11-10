@@ -39,10 +39,13 @@ final class Menu
                 NavItem::route('students', 'Student placements', 'graduation-cap', AccessMatrix::INTRANET_ACCESS, 'people.students.index', 'people.students.*'),
             ]),
             new NavGroup('operations', 'Operations', [
-                NavItem::soon('rota', 'Rota', 'calendar-days', AccessMatrix::INTRANET_ACCESS),
-                NavItem::soon('clock', 'Clock in and out', 'clock', AccessMatrix::INTRANET_ACCESS),
-                NavItem::soon('tasks', 'Tasks', 'list-checks', AccessMatrix::INTRANET_ACCESS),
-                NavItem::soon('forms', 'Forms', 'clipboard-list', AccessMatrix::INTRANET_ACCESS),
+                NavItem::route('rota', 'Rota', 'calendar-days', AccessMatrix::INTRANET_ACCESS, 'operations.rota.index', 'operations.rota.*'),
+                NavItem::route('clock', 'Clock in and out', 'clock', AccessMatrix::INTRANET_ACCESS, 'operations.clock.index'),
+                NavItem::route('team-clock', 'Team clock', 'users', AccessMatrix::TEAM_SUPERVISE, 'operations.clock.team'),
+                NavItem::route('timesheets', 'Timesheets', 'timer', AccessMatrix::INTRANET_ACCESS, 'operations.timesheets.index', 'operations.timesheets.*'),
+                NavItem::route('tasks', 'Tasks', 'list-checks', AccessMatrix::INTRANET_ACCESS, 'operations.tasks.index', 'operations.tasks.*'),
+                NavItem::route('checklists', 'Checklists', 'clipboard-check', AccessMatrix::INTRANET_ACCESS, 'operations.checklists.index', 'operations.checklists.*'),
+                NavItem::route('forms', 'Forms', 'clipboard-list', AccessMatrix::INTRANET_ACCESS, 'operations.forms.index', 'operations.forms.*'),
             ]),
             new NavGroup('support', 'Support', [
                 NavItem::soon('help-desk', 'Help desk', 'life-buoy', AccessMatrix::INTRANET_ACCESS),

@@ -28,6 +28,7 @@ import {
     LogIn,
     LogOut,
     Mail,
+    MapPin,
     Megaphone,
     Menu,
     MessagesSquare,
@@ -37,9 +38,12 @@ import {
     Shield,
     ShieldCheck,
     ShieldHalf,
+    Timer,
     Users,
     X,
 } from 'lucide';
+import { initClockForm } from './operations/clock.js';
+import { initSignaturePads } from './operations/signature.js';
 import { initDrawer } from './shell/drawer.js';
 
 const icons = {
@@ -71,6 +75,7 @@ const icons = {
     LogIn,
     LogOut,
     Mail,
+    MapPin,
     Megaphone,
     Menu,
     MessagesSquare,
@@ -80,6 +85,7 @@ const icons = {
     Shield,
     ShieldCheck,
     ShieldHalf,
+    Timer,
     Users,
     X,
 };
@@ -93,6 +99,8 @@ function init() {
         },
     });
     initDrawer();
+    initClockForm();
+    initSignaturePads();
 }
 
 if (document.readyState === 'loading') {

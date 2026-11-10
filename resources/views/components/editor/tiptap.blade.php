@@ -59,7 +59,7 @@
         id="{{ $fieldId }}-surface"
         class="tiptap-surface"
         data-tiptap-surface
-        aria-label="{{ $label ?? 'Rich text' }}"
+        data-label="{{ $label ?? 'Rich text' }}"
     >{!! $value !!}</div>
 
     <textarea

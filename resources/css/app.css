@@ -76,3 +76,63 @@
         outline-offset: 2px;
     }
 }
+
+@layer components {
+    .sg-input {
+        border: 1px solid var(--color-sg-info-mist);
+        border-radius: var(--radius-sg-field);
+        background: var(--color-sg-white);
+        padding: 0.5rem 0.75rem;
+        color: var(--color-sg-ink);
+    }
+
+    .sg-label {
+        display: block;
+        margin-bottom: 0.25rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+
+    .sg-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9375rem;
+    }
+
+    .sg-table th,
+    .sg-table td {
+        border-bottom: 1px solid var(--color-sg-info-mist);
+        padding: 0.5rem 0.75rem;
+        text-align: left;
+        vertical-align: top;
+    }
+
+    .sg-table th {
+        font-weight: 700;
+    }
+
+    .sg-badge {
+        display: inline-block;
+        border-radius: 999px;
+        background: var(--color-sg-info-mist);
+        padding: 0.125rem 0.625rem;
+        color: var(--color-sg-info);
+        font-size: 0.8125rem;
+        font-weight: 700;
+    }
+
+    .sg-badge--ok {
+        background: var(--color-sg-ok-mist);
+        color: var(--color-sg-ok);
+    }
+
+    .sg-badge--warn {
+        background: var(--color-sg-warn-mist);
+        color: var(--color-sg-warn);
+    }
+
+    .sg-badge--error {
+        background: var(--color-sg-error-mist);
+        color: var(--color-sg-error);
+    }
+}

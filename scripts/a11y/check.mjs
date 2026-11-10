@@ -190,11 +190,35 @@ try {
     await visit(desktop, '/admin/audit', 'Audit log');
     await visit(desktop, '/change-log', 'Change log (desktop)');
     await visit(desktop, '/change-log?type=fixed', 'Change log filtered (desktop)');
+    await visit(desktop, '/admin/operations/sites', 'Operations sites');
+    await visit(desktop, '/admin/operations/forms', 'Form builder');
+
+    const operations = await (await browser.newContext({ viewport: { width: 1440, height: 900 } })).newPage();
+    await signInAs(operations, 'Supervisor');
+    for (const [path, label] of [
+        ['/operations/rota', 'Rota'],
+        ['/operations/rota/templates', 'Shift templates'],
+        ['/operations/rota/open', 'Open shifts'],
+        ['/operations/rota/requests', 'Claims and swaps'],
+        ['/operations/rota/availability', 'Unavailability'],
+        ['/operations/clock/team', 'Team clock'],
+        ['/operations/timesheets', 'Timesheets'],
+        ['/operations/timesheets/review', 'Timesheets to approve'],
+        ['/operations/tasks', 'Tasks'],
+        ['/operations/tasks/create', 'Add a task'],
+        ['/operations/checklists', 'Checklists'],
+        ['/operations/checklists/templates', 'Checklist templates'],
+        ['/operations/forms', 'Forms'],
+    ]) {
+        await visit(operations, path, label);
+    }
 
     const mobile = await (await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true })).newPage();
     await signInAs(mobile, 'Volunteer');
     await visit(mobile, '/change-log', 'Change log (mobile)');
     await visit(mobile, '/dashboard', 'Dashboard (mobile)');
+    await visit(mobile, '/operations/clock', 'Clock in and out (mobile)');
+    await visit(mobile, '/operations/rota', 'Rota (mobile)');
     await mobile.getByRole('button', { name: 'Open menu' }).click();
     await mobile.getByRole('dialog', { name: 'Main menu' }).waitFor();
     await mobile.waitForTimeout(300);

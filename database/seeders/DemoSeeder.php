@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Core\Access\RoleName;
 use App\Core\Audit\AuditLog;
+use App\Core\Qa\QaLogin;
 use App\Core\Support\HtmlSanitizer;
 use App\Models\User;
 use Carbon\CarbonImmutable;
@@ -21,6 +22,19 @@ use Modules\Communications\Models\PolicyRead;
 use Modules\Communications\Models\UpdateComment;
 use Modules\Communications\Models\UpdatePost;
 use Modules\Communications\Models\UpdateRead;
+use Modules\Operations\Models\Availability;
+use Modules\Operations\Models\ChecklistRun;
+use Modules\Operations\Models\ChecklistTemplate;
+use Modules\Operations\Models\ClockRecord;
+use Modules\Operations\Models\Form;
+use Modules\Operations\Models\RotaWeek;
+use Modules\Operations\Models\Shift;
+use Modules\Operations\Models\ShiftRequest;
+use Modules\Operations\Models\ShiftTemplate;
+use Modules\Operations\Models\Site;
+use Modules\Operations\Models\Task;
+use Modules\Operations\Models\Timesheet;
+use Modules\Operations\Services\Checklists;
 use Modules\People\Models\Placement;
 use Modules\People\Models\PlacementHour;
 use RuntimeException;
@@ -68,7 +82,7 @@ class DemoSeeder extends Seeder
         $registrar->initializeCache();
 
         try {
-            $this->call([RolesAndPermissionsSeeder::class, CommunicationsBootstrapSeeder::class, QaUserSeeder::class, ReleaseNotesSeeder::class]);
+            $this->call([RolesAndPermissionsSeeder::class, CommunicationsBootstrapSeeder::class, OperationsBootstrapSeeder::class, QaUserSeeder::class, ReleaseNotesSeeder::class]);
 
             $this->seedPeople();
             $this->seedPlacements();
@@ -76,6 +90,7 @@ class DemoSeeder extends Seeder
             $this->seedEvents();
             $this->seedHandbook();
             $this->seedPolicies();
+            $this->seedOperations();
             $this->seedAuditLog();
         } finally {
             config(['permission.cache.store' => $store]);
@@ -353,6 +368,171 @@ class DemoSeeder extends Seeder
                 }
             }
         }
+    }
+
+    /**
+     * Two sites, this week's published rota and next week's draft, clock
+     * records, timesheets, tasks, forms and checklists. The QA accounts join
+     * the Animal care team so the role switcher shows real-looking data.
+     */
+    private function seedOperations(): void
+    {
+        User::query()->where('email', 'like', 'qa-%@example.test')->update(['team' => 'Animal care']);
+        $qa = fn (string $profile) => User::query()->where('email', QaLogin::emailFor($profile))->firstOrFail();
+
+        $reptiles = Site::query()->updateOrCreate(['name' => 'Reptile house (demo)'], ['team' => 'Animal care', 'active' => true]);
+        Site::query()->updateOrCreate(['name' => 'Visitor centre (demo)'], ['team' => 'Office', 'active' => true]);
+
+        $templates = collect();
+        foreach ([['Morning feed', '08:00', '12:00'], ['Afternoon clean', '13:00', '17:00']] as [$name, $start, $end]) {
+            foreach (array_keys(ShiftTemplate::WEEKDAYS) as $weekday) {
+                $templates->push(ShiftTemplate::query()->updateOrCreate(
+                    ['site_id' => $reptiles->id, 'name' => $name, 'weekday' => $weekday],
+                    ['role' => 'Animal care', 'starts_at' => $start, 'ends_at' => $end, 'active' => true],
+                ));
+            }
+        }
+
+        $checklist = ChecklistTemplate::query()->updateOrCreate(
+            ['site_id' => $reptiles->id, 'name' => 'Reptile house checks (demo)'],
+            ['due_time' => '11:00', 'items' => ['Basking lamps on and working', 'Thermostats between 26 and 30°C', 'Water bowls cleaned and refilled', 'Enclosures locked'], 'active' => true],
+        );
+
+        $pool = $this->people->filter(fn (User $u) => $u->team === 'Animal care')->values()
+            ->concat([$qa(RoleName::Staff->value), $qa(RoleName::Volunteer->value), $qa(RoleName::Student->value)]);
+        $thisWeek = $this->today->startOfWeek();
+
+        foreach ([[$thisWeek, RotaWeek::STATUS_PUBLISHED], [$thisWeek->addWeek(), RotaWeek::STATUS_DRAFT]] as [$weekStart, $status]) {
+            $week = RotaWeek::query()->where('site_id', $reptiles->id)->whereDate('week_start', $weekStart)->first()
+                ?? RotaWeek::query()->create(['site_id' => $reptiles->id, 'week_start' => $weekStart->toDateString(), 'status' => $status]);
+            $week->forceFill(['status' => $status, 'published_at' => $status === RotaWeek::STATUS_PUBLISHED ? $weekStart->subDays(3)->setTime(16, 0) : null])->save();
+
+            if ($week->shifts()->doesntExist()) {
+                foreach ($templates->values() as $k => $template) {
+                    [$start, $end] = $template->timesInWeek($weekStart);
+                    $week->shifts()->create([
+                        'site_id' => $reptiles->id,
+                        'shift_template_id' => $template->id,
+                        'user_id' => $k % 5 === 4 ? null : $pool[$k % $pool->count()]->getKey(),
+                        'role' => $template->role,
+                        'starts_at' => $start,
+                        'ends_at' => $end,
+                    ]);
+                }
+            }
+
+            if ($status === RotaWeek::STATUS_PUBLISHED) {
+                app(Checklists::class)->scheduleWeek($week);
+            }
+        }
+
+        $published = Shift::query()->where('site_id', $reptiles->id)->whereDate('starts_at', '>=', $thisWeek)->whereDate('starts_at', '<', $thisWeek->addWeek())->orderBy('starts_at')->get();
+
+        foreach ($pool->take(3) as $k => $member) {
+            Availability::query()->updateOrCreate(
+                ['user_id' => $member->getKey(), 'starts_at' => $thisWeek->addWeek()->addDays($k)->setTime(0, 0)],
+                ['ends_at' => $thisWeek->addWeek()->addDays($k + 1)->setTime(0, 0), 'note' => 'Holiday (demo)'],
+            );
+        }
+
+        $openShift = $published->first(fn (Shift $s) => $s->isOpen() && $s->starts_at->isFuture());
+        if ($openShift !== null) {
+            ShiftRequest::query()->firstOrCreate(
+                ['shift_id' => $openShift->id, 'requester_id' => $qa(RoleName::Volunteer->value)->getKey(), 'type' => ShiftRequest::TYPE_CLAIM],
+                ['status' => ShiftRequest::STATUS_PENDING, 'note' => 'Happy to cover this one (demo).'],
+            );
+        }
+
+        foreach ($published->filter(fn (Shift $s) => $s->user_id !== null && $s->ends_at->isPast()) as $shift) {
+            ClockRecord::query()->updateOrCreate(
+                ['user_id' => $shift->user_id, 'clock_in_at' => $shift->starts_at->subMinutes(5)],
+                ['shift_id' => $shift->id, 'site_id' => $shift->site_id, 'clock_out_at' => $shift->ends_at->addMinutes(10)],
+            );
+        }
+
+        $lastWeek = $thisWeek->subWeek();
+        foreach ($pool->filter(fn (User $u) => $u->hasRole(RoleName::Volunteer->value))->values() as $k => $volunteer) {
+            $minutes = 0;
+            for ($day = 0; $day < 3; $day++) {
+                $in = $lastWeek->addDays($day * 2)->setTime(9, 0);
+                $length = 180 + 30 * (($k + $day) % 4);
+                ClockRecord::query()->updateOrCreate(['user_id' => $volunteer->getKey(), 'clock_in_at' => $in], ['site_id' => $reptiles->id, 'clock_out_at' => $in->addMinutes($length)]);
+                $minutes += $length;
+            }
+
+            $approved = $k % 3 !== 2;
+            $timesheet = Timesheet::query()->where('user_id', $volunteer->getKey())->whereDate('period_start', $lastWeek)->first()
+                ?? new Timesheet(['user_id' => $volunteer->getKey(), 'period_start' => $lastWeek->toDateString()]);
+            $timesheet->fill(['period_end' => $lastWeek->addDays(6)->toDateString(), 'total_minutes' => $minutes]);
+            $timesheet->forceFill([
+                'status' => $approved ? Timesheet::STATUS_APPROVED : Timesheet::STATUS_SUBMITTED,
+                'submitted_at' => $thisWeek->setTime(9, 0),
+                'reviewed_by' => $approved ? $qa(RoleName::Supervisor->value)->getKey() : null,
+                'reviewed_at' => $approved ? $thisWeek->setTime(15, 0) : null,
+                'locked_at' => $approved ? $thisWeek->setTime(15, 0) : null,
+            ])->save();
+            if ($timesheet->entries()->doesntExist()) {
+                foreach (ClockRecord::query()->where('user_id', $volunteer->getKey())->whereBetween('clock_in_at', [$lastWeek, $lastWeek->addWeek()])->get() as $record) {
+                    $timesheet->entries()->create(['clock_record_id' => $record->id, 'worked_on' => $record->clock_in_at->toDateString(), 'minutes' => $record->workedMinutes(), 'description' => 'Reptile house (demo)']);
+                }
+            }
+        }
+
+        $sanitizer = app(HtmlSanitizer::class);
+        $manager = $qa(RoleName::Supervisor->value);
+        $tasks = [
+            ['Order more mealworms (demo)', Task::ASSIGN_PERSON, ['user_id' => $qa(RoleName::Staff->value)->getKey()], $this->today->subDay()->setTime(12, 0), null, Task::STATUS_OPEN],
+            ['Deep clean the quarantine room (demo)', Task::ASSIGN_TEAM, ['team' => 'Animal care'], $this->today->addDays(2)->setTime(17, 0), null, Task::STATUS_IN_PROGRESS],
+            ['Weekly weigh-in for the tortoises (demo)', Task::ASSIGN_TEAM, ['team' => 'Animal care'], $this->today->addDays(4)->setTime(10, 0), 'weekly', Task::STATUS_OPEN],
+            ['Check the UV bulbs (demo)', Task::ASSIGN_PERSON, ['user_id' => $qa(RoleName::Volunteer->value)->getKey()], $this->today->addDay()->setTime(11, 0), 'monthly', Task::STATUS_OPEN],
+            ['Restock the first aid box (demo)', Task::ASSIGN_PERSON, ['user_id' => $qa(RoleName::Staff->value)->getKey()], $this->today->subDays(3)->setTime(16, 0), null, Task::STATUS_DONE],
+        ];
+        foreach ($tasks as [$title, $type, $assignee, $due, $recurrence, $status]) {
+            Task::query()->updateOrCreate(['title' => $title], $assignee + [
+                'assignee_type' => $type,
+                'description' => $sanitizer->clean('<p>Demo task for local testing only.</p>'),
+                'due_at' => $due,
+                'recurrence' => $recurrence,
+                'status' => $status,
+                'created_by' => $manager->getKey(),
+            ]);
+        }
+
+        $incident = Form::query()->updateOrCreate(['title' => 'Incident report (demo)'], [
+            'description' => 'Report an accident, injury, escape or near miss. Demo form for local testing only.',
+            'status' => Form::STATUS_PUBLISHED,
+            'route_to_role' => RoleName::Hr->value,
+            'published_at' => $this->today->subMonth(),
+        ]);
+        foreach ([['What happened?', 'textarea', true, null], ['Where?', 'select', true, ['Reptile house', 'Visitor centre', 'Car park', 'Other']], ['Photo', 'photo', false, null], ['Signature', 'signature', true, null]] as $k => [$label, $type, $required, $options]) {
+            $incident->fields()->updateOrCreate(['label' => $label], ['type' => $type, 'required' => $required, 'options' => $options, 'sort_order' => ($k + 1) * 10]);
+        }
+        $maintenance = Form::query()->updateOrCreate(['title' => 'Maintenance request (demo)'], [
+            'description' => 'Ask for a repair. Demo form for local testing only.',
+            'status' => Form::STATUS_PUBLISHED,
+            'route_to_user_id' => $this->person(4)->getKey(),
+            'published_at' => $this->today->subMonth(),
+        ]);
+        foreach ([['What needs fixing?', 'text', true, null], ['How urgent?', 'select', true, ['Today', 'This week', 'When possible']]] as $k => [$label, $type, $required, $options]) {
+            $maintenance->fields()->updateOrCreate(['label' => $label], ['type' => $type, 'required' => $required, 'options' => $options, 'sort_order' => ($k + 1) * 10]);
+        }
+        if ($maintenance->submissions()->doesntExist()) {
+            $submission = $maintenance->submissions()->create(['user_id' => $qa(RoleName::Staff->value)->getKey(), 'routed_to_user_id' => $maintenance->route_to_user_id]);
+            foreach ($maintenance->fields()->get() as $field) {
+                $submission->answers()->create(['field_id' => $field->id, 'value' => $field->type === 'select' ? 'This week' : 'The reptile house side door sticks (demo).']);
+            }
+        }
+
+        ChecklistRun::query()
+            ->where('checklist_template_id', $checklist->id)
+            ->whereNull('completed_at')
+            ->where('due_at', '<', $this->today)
+            ->with('items')
+            ->get()
+            ->each(function (ChecklistRun $run) {
+                $run->items->each(fn ($item) => $item->update(['done' => true]));
+                $run->forceFill(['completed_at' => $run->due_at->subMinutes(20), 'completed_by' => $run->shift?->user_id])->save();
+            });
     }
 
     private function seedAuditLog(): void

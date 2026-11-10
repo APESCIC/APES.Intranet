@@ -12,6 +12,13 @@ use Modules\Communications\Models\PolicyDocument;
 use Modules\Communications\Models\UpdateComment;
 use Modules\Communications\Models\UpdatePost;
 use Modules\Communications\Models\UpdateRead;
+use Modules\Operations\Models\ChecklistRun;
+use Modules\Operations\Models\ClockRecord;
+use Modules\Operations\Models\Form;
+use Modules\Operations\Models\RotaWeek;
+use Modules\Operations\Models\Shift;
+use Modules\Operations\Models\Task;
+use Modules\Operations\Models\Timesheet;
 use Modules\People\Models\Placement;
 use Modules\People\Models\PlacementHour;
 
@@ -30,7 +37,7 @@ function seedDemo(): void
  */
 function demoCounts(): array
 {
-    return collect([User::class, Placement::class, PlacementHour::class, UpdatePost::class, UpdateComment::class, UpdateRead::class, Event::class, EventRsvp::class, HandbookChapter::class, PolicyDocument::class, AuditLog::class])
+    return collect([User::class, Placement::class, PlacementHour::class, UpdatePost::class, UpdateComment::class, UpdateRead::class, Event::class, EventRsvp::class, HandbookChapter::class, PolicyDocument::class, AuditLog::class, RotaWeek::class, Shift::class, ClockRecord::class, Timesheet::class, Task::class, Form::class, ChecklistRun::class])
         ->mapWithKeys(fn (string $model) => [class_basename($model) => $model::query()->count()])
         ->all();
 }
@@ -57,7 +64,13 @@ it('fills every main list', function () {
         ->and($counts['Placement'])->toBeGreaterThan(10)
         ->and($counts['PlacementHour'])->toBe($counts['Placement'] * 6)
         ->and($counts['UpdateComment'])->toBeGreaterThan(40)
-        ->and($counts['EventRsvp'])->toBeGreaterThan(100);
+        ->and($counts['EventRsvp'])->toBeGreaterThan(100)
+        ->and($counts['RotaWeek'])->toBe(2)
+        ->and($counts['Shift'])->toBe(28)
+        ->and($counts['Timesheet'])->toBeGreaterThan(0)
+        ->and($counts['Task'])->toBe(5)
+        ->and($counts['Form'])->toBe(2)
+        ->and($counts['ChecklistRun'])->toBe(14);
 });
 
 it('gives the same data, with no duplicates, when run again', function () {

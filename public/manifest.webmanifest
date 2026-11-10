@@ -10,6 +10,20 @@
     "orientation": "any",
     "background_color": "#d2f4fa",
     "theme_color": "#d2f4fa",
+    "shortcuts": [
+        {
+            "name": "Clock in and out",
+            "short_name": "Clock",
+            "url": "/operations/clock",
+            "icons": [
+                {
+                    "src": "/icons/icon-192.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        }
+    ],
     "icons": [
         {
             "src": "/icons/icon-192.png",

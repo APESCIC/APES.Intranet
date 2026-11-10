@@ -3,6 +3,12 @@ includes:
 
 parameters:
     level: 5
+    parseModelCastsMethod: true
+    databaseMigrationsPath:
+        - database/migrations
+        - modules/people/database/migrations
+        - modules/communications/database/migrations
+        - modules/operations/database/migrations
     paths:
         - app/
         - bootstrap/app.php

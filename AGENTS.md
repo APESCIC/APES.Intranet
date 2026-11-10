@@ -207,8 +207,8 @@ skills.
   `area:accessibility`, `area:tests`.
 - Issue forms ask for an area and a milestone. After opening, set that area
   label and that milestone on the issue. The form does not apply them itself.
-- Work one milestone at a time, in the order below. Only Foundations is in
-  progress until the owner says otherwise.
+- Work one milestone at a time, in the order below, starting with the next
+  version printed by `composer milestone:next`.
 - Each milestone has one branch, `milestone/vX-Y-Z-<slug>` (printed by
   `composer milestone:next`), created from `origin/main` when work on it
   starts. This name takes precedence over the skills' default
@@ -220,33 +220,31 @@ skills.
 
 ## Milestones
 
+Every milestone title starts with a full version, `vMAJOR.MINOR.PATCH`
+with an optional suffix, never a wildcard such as `v0.4.x`. New milestones
+and issue title prefixes use full versions. Released, closed milestones keep
+their historical titles (v0.0.1 to v0.0.3, v0.1.x Foundations, v0.2.x People
+and v0.3.x Communications, including v0.3.5 Platform discovery).
+
 Open, in this order:
 
-1. **v0.1.x Foundations.** Repository, continuous integration, Laragon
-   preview, and the Cloudron deploy path (including `/healthz`). Work this
-   milestone before the others.
-2. **v0.2.x People.** Directory, organisation chart, and profiles for staff,
-   volunteers and students, with Cloudron sign-in and roles.
-3. **v0.3.x Communications.** Internal updates. Chat stays in Teams, as a
- link only.
-   - **v0.3.5 Platform discovery.** Discovery and planning only: the LMS
-     inventory ([docs/discovery/lms-inventory.md](docs/discovery/lms-inventory.md))
-     and the Modules and Integrations ADR
-     ([docs/adr/0001-modules-and-integrations.md](docs/adr/0001-modules-and-integrations.md)).
-     It authorises no build work: a registry pilot or a Training Module each
-     needs Bambie's separate approval.
-4. **v0.4.x Operations.** Rotas, tasks, forms, and clock in/out.
-5. **v0.5.x Help desk.** Help desk in Laravel, with IT and Management queues.
-6. **v0.6.x HR and training.** Handbook, training, appraisals and
+1. **v0.4.0 Operations.** Rotas, tasks, forms, and clock in/out.
+2. **v0.5.0 Help desk.** Help desk in Laravel, with IT and Management queues.
+3. **v0.6.0 HR and training.** Handbook, training, appraisals and
    recognition.
-7. **v0.7.x Agreements and legal.** Agreements register, templates, versions,
+4. **v0.6.5 to v0.6.9 Learning.** Modules registry foundation; learning core
+   (courses, enrolment and progress); assessment and gradebook; learning
+   records, certificates and reporting; new-course pilot and replacement
+   readiness. Each builds on the LMS inventory
+   ([docs/discovery/lms-inventory.md](docs/discovery/lms-inventory.md)) and
+   the Modules and Integrations ADR
+   ([docs/adr/0001-modules-and-integrations.md](docs/adr/0001-modules-and-integrations.md)).
+5. **v0.7.0 Agreements and legal.** Agreements register, templates, versions,
    renewals, and DocuSeal e-signing.
-8. **v0.8.x Hiring and integrations.** Hiring, and links to the LMS, MyAPES
+6. **v0.8.0 Hiring and integrations.** Hiring, and links to the LMS, MyAPES
    and the other APES systems.
-9. **v1.0.0 Launch.** Go-live checks: secret scan, no real data in git,
+7. **v1.0.0 Launch.** Go-live checks: secret scan, no real data in git,
    licence chosen, and owner sign-off. The domain already points at Cloudron.
-
-Do not draft Foundations issues until the owner has approved that report.
 
 ## Shipping and versioning
 
