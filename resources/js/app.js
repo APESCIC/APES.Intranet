@@ -28,6 +28,7 @@ import {
     LogIn,
     LogOut,
     Mail,
+    MapPin,
     Megaphone,
     Menu,
     MessagesSquare,
@@ -37,6 +38,7 @@ import {
     Shield,
     ShieldCheck,
     ShieldHalf,
+    Timer,
     Users,
     X,
 } from 'lucide';
@@ -71,6 +73,7 @@ const icons = {
     LogIn,
     LogOut,
     Mail,
+    MapPin,
     Megaphone,
     Menu,
     MessagesSquare,
@@ -80,6 +83,7 @@ const icons = {
     Shield,
     ShieldCheck,
     ShieldHalf,
+    Timer,
     Users,
     X,
 };

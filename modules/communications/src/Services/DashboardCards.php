@@ -3,6 +3,7 @@
 namespace Modules\Communications\Services;
 
 use App\Core\Access\AccessMatrix;
+use App\Core\Dashboard\DashboardCardContributor;
 use App\Core\Navigation\Menu;
 use App\Models\User;
 use Modules\Communications\Models\DashboardDismissal;
@@ -41,7 +42,6 @@ class DashboardCards
             ];
         }
 
-        // Modules not yet built: hide empty cards (rota/tasks/tickets).
         if ($user->can(AccessMatrix::STUDENT_AREA)) {
             $cards[] = [
                 'key' => 'student-area',
@@ -59,6 +59,12 @@ class DashboardCards
                 'href' => route('people.security'),
                 'dismissible' => true,
             ];
+        }
+
+        foreach (app()->tagged('intranet.dashboard') as $contributor) {
+            if ($contributor instanceof DashboardCardContributor) {
+                array_push($cards, ...$contributor->cards($user));
+            }
         }
 
         $apps = $this->links->forUser($user);

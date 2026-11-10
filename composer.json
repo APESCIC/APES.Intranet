@@ -35,7 +35,8 @@
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/",
             "Modules\\People\\": "modules/people/src/",
-            "Modules\\Communications\\": "modules/communications/src/"
+            "Modules\\Communications\\": "modules/communications/src/",
+            "Modules\\Operations\\": "modules/operations/src/"
         }
     },
     "autoload-dev": {

@@ -1,7 +1,7 @@
 <x-layouts.app title="Dashboard" :subtitle="'Welcome, '.auth()->user()->name.'.'">
     <div class="grid gap-4 sm:grid-cols-2">
         @foreach ($cards as $card)
-            <section class="sg-card p-5" aria-labelledby="card-{{ $card['key'] }}">
+            <section @class(['sg-card p-5', 'border-2 border-sg-warn' => ($card['tone'] ?? null) === 'warn']) aria-labelledby="card-{{ $card['key'] }}" data-card="{{ $card['key'] }}">
                 <div class="flex items-start justify-between gap-3">
                     <h2 id="card-{{ $card['key'] }}" class="font-serif text-xl font-semibold">{{ $card['title'] }}</h2>
                     @if (! empty($card['dismissible']))
