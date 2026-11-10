@@ -39,7 +39,7 @@ final class Menu
                 NavItem::route('students', 'Student placements', 'graduation-cap', AccessMatrix::INTRANET_ACCESS, 'people.students.index', 'people.students.*'),
             ]),
             new NavGroup('operations', 'Operations', [
-                NavItem::soon('rota', 'Rota', 'calendar-days', AccessMatrix::INTRANET_ACCESS),
+                NavItem::route('rota', 'Rota', 'calendar-days', AccessMatrix::INTRANET_ACCESS, 'operations.rota.index', 'operations.rota.*'),
                 NavItem::soon('clock', 'Clock in and out', 'clock', AccessMatrix::INTRANET_ACCESS),
                 NavItem::soon('tasks', 'Tasks', 'list-checks', AccessMatrix::INTRANET_ACCESS),
                 NavItem::soon('forms', 'Forms', 'clipboard-list', AccessMatrix::INTRANET_ACCESS),
