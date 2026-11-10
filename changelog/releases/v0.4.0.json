@@ -1,0 +1,32 @@
+{
+  "version": "v0.4.0",
+  "released_at": "2026-11-10",
+  "title": "Operations: rotas, clock in and out, timesheets, tasks, forms and checklists",
+  "summary": "Day-to-day work now runs in the intranet. See your shifts, swap or pick up shifts, clock in with a tap, send in your timesheet, and keep on top of tasks, forms and daily checklists.",
+  "audiences": ["staff", "volunteers", "students"],
+  "changes": {
+    "added": [
+      "Rota: see your published shifts, tell rota builders when you cannot work, claim open shifts and ask to swap a shift with a colleague. A manager approves each change, and everyone involved gets an email.",
+      "For supervisors and management: shift templates by site and role, a weekly rota you can build from them, clash warnings when someone is unavailable or double-booked, and one click to publish and email the team.",
+      "Clock in and out with a tap on the intranet or the installed app, including breaks. The app has a Clock in and out shortcut. Managers are told about a missed clock-out and can record the time.",
+      "Weekly timesheets built from your clock records. Managers approve them, which locks them, or return them with a note. Management and HR can see and download volunteer hours totals.",
+      "Tasks for a person, a team or a shift, with due dates, repeats and comments. Overdue tasks show on your dashboard. Team projects stay in Microsoft Planner.",
+      "Forms: fill in APES forms, including photos and a signature, and they go straight to the right person or team. Admins build and publish forms in the Admin panel and can download the answers.",
+      "Daily checklists for animal care and sites, attached to each shift, with notes and photos. Managers are told when a checklist is missed, and completed checklists can no longer be changed.",
+      "Your dashboard now shows your next shift, checklists due today and overdue tasks."
+    ],
+    "security": [
+      "Photos and signatures from forms and checklists are kept privately and only shown to the people who need them.",
+      "The optional location check at clock-in is off. If APES switches it on for a site, it only records whether you were near the site when you tapped Clock in, never where you were, and you are always clocked in."
+    ],
+    "accessibility": [
+      "Wide tables can be scrolled with the keyboard on small screens, and the rich text editor is now announced properly by screen readers.",
+      "You can type your name instead of drawing a signature."
+    ]
+  },
+  "internal_notes": [
+    "The geofence needs both the DPIA approval date (approved 10 November 2026) and the switch set in the app's environment, plus a geofence area on each site. Neither is set by this release.",
+    "Developer changes in this release: AGENTS.md uses full milestone versions, Operations permissions are re-seeded on every deploy, Larastan reads the module migrations and model casts, and the accessibility check covers the Operations pages."
+  ],
+  "published": true
+}
