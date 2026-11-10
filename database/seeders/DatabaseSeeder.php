@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             RolesAndPermissionsSeeder::class,
             FakeUserSeeder::class,
             CommunicationsSeeder::class,
+            OperationsBootstrapSeeder::class,
             QaUserSeeder::class,
             ReleaseNotesSeeder::class,
         ]);
