@@ -2,7 +2,7 @@
 
 | Item | Value |
 | --- | --- |
-| Status | **Draft, waiting for the owner's approval** |
+| Status | **Approved by the owner on 10 November 2026** |
 | Controller | Association of Protecting Exotic Species CIC (APES CIC) |
 | Owner and approver | Bambie Murphy, Director |
 | Feature | Optional geofence check at clock-in, intranet v0.4.0 Operations (#35, #36) |
@@ -10,9 +10,9 @@
 | Drafted | 10 November 2026 |
 | Review | Before the geofence is switched on, after any change to how it works, and once a year while it is on |
 
-This assessment is drafted in the repository so it can be reviewed with the code. The approved
-copy is filed in SharePoint. The geofence stays off in code until the approval date is recorded
-(see [Step 7](#step-7-sign-off-and-outcomes)).
+This assessment is kept in the repository so it can be reviewed with the code. The approved
+copy is filed in SharePoint. The geofence stays off until the approval date is also set in the
+Cloudron app's environment (see [Step 7](#step-7-sign-off-and-outcomes)).
 
 ## Step 1: Why a DPIA is needed
 
@@ -50,8 +50,9 @@ intranet has no service worker, so nothing runs when the page is closed.
 - **Special category data:** none.
 - **People:** APES CIC staff, volunteers and students who clock in to a site that has a geofence area.
 - **Volume:** a few clock-ins per member per week.
-- **Retention:** the result lives and is deleted with its clock record. Proposed: clock records and
-  timesheets are kept for 2 years, as working time records, then deleted (owner to confirm).
+- **Retention:** the result lives and is deleted with its clock record. Clock records and
+  timesheets are kept for 2 years, as working time records, then deleted (confirmed by the owner
+  on 10 November 2026).
 - **Area:** the APES sites set up in the intranet's Admin panel.
 
 ### Context
@@ -123,12 +124,12 @@ intranet has no service worker, so nothing runs when the page is closed.
 
 | Item | Name or date | Notes |
 | --- | --- | --- |
-| Measures approved by | | Bambie Murphy, Director |
-| Residual risks approved by | | Must be low or medium; high residual risk would need ICO consultation |
-| Decision | | Approve, approve with changes, or do not switch on |
-| Approval date | | Record this in `OPERATIONS_GEOFENCE_DPIA_APPROVED_AT` |
-| Filed in SharePoint | | Link to the approved copy |
-| Review date | | One year after approval, or on any change |
+| Measures approved by | Bambie Murphy, Director | 10 November 2026 |
+| Residual risks approved by | Bambie Murphy, Director | All residual risks low; no ICO consultation needed |
+| Decision | Approved | Including 2-year retention of clock records and timesheets |
+| Approval date | 2026-11-10 | Set this in `OPERATIONS_GEOFENCE_DPIA_APPROVED_AT` to allow the geofence |
+| Filed in SharePoint | Filed by Bambie Murphy | 10 November 2026 |
+| Review date | 10 November 2027 | Or sooner on any change to how the check works |
 
 ### How the decision is recorded in the intranet
 
