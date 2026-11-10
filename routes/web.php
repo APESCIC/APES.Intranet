@@ -7,6 +7,7 @@ use App\Core\Access\Http\Controllers\RoleIndexController;
 use App\Core\Audit\Http\Controllers\AuditLogIndexController;
 use App\Core\Auth\Http\Controllers\OidcController;
 use App\Core\Changelog\Http\Controllers\ChangeLogController;
+use App\Core\Navigation\Http\Controllers\AdminOverviewController;
 use App\Core\Qa\Http\Controllers\QaLoginController;
 use App\Core\Qa\Http\Middleware\EnsureQaLoginEnabled;
 use App\Core\System\Http\Controllers\SendTestEmailController;
@@ -38,6 +39,7 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::prefix('admin')->name('admin.')->group(function () {
+        Route::get('/', AdminOverviewController::class)->name('overview');
         Route::get('/roles', RoleIndexController::class)->name('roles.index');
         Route::get('/audit', AuditLogIndexController::class)
             ->middleware('can:'.AccessMatrix::ADMIN_AUDIT_VIEW)

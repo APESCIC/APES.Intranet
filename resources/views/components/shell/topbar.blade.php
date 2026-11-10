@@ -1,4 +1,4 @@
-@props(['hasMenu' => false])
+@props(['hasMenu' => false, 'panel' => null])
 <div class="sg-card sg-topbar">
     @if ($hasMenu)
         <button
@@ -12,5 +12,5 @@
             <i data-lucide="menu"></i>
         </button>
     @endif
-    <x-shell.brand />
+    <x-shell.brand :panel="$panel" />
 </div>

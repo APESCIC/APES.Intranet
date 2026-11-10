@@ -2,7 +2,9 @@
 // keyboard checks. Fails on any serious or critical axe issue or keyboard
 // failure. Needs a running app with the QA role switcher on.
 //
-//   BASE_URL=http://apes-intranet.test A11Y_BROWSER_CHANNEL=msedge npm run test:a11y
+//   A11Y_BROWSER_CHANNEL=msedge npm run test:a11y
+//
+// BASE_URL defaults to the Laragon preview, http://apes-intranet.test.
 //
 // A11Y_BROWSER_CHANNEL uses an installed browser (msedge, chrome) instead of
 // Playwright's own Chromium.
@@ -10,7 +12,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { chromium } from 'playwright';
 
-const baseUrl = (process.env.BASE_URL ?? 'http://127.0.0.1:8000').replace(/\/$/, '');
+const baseUrl = (process.env.BASE_URL ?? 'http://apes-intranet.test').replace(/\/$/, '');
 const channel = process.env.A11Y_BROWSER_CHANNEL || undefined;
 const blocking = new Set(['serious', 'critical']);
 const tags = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
@@ -50,8 +52,27 @@ async function keyboardChecks(desktop, mobile) {
     state = await focused(desktop);
     expectKeyboard(state.id === 'main-content', 'skip link moves focus to the main content');
 
-    // Staff has no Admin menu switcher, so the first rail tab after the skip
-    // link reaches the Dashboard item. Admins see Normal/Admin controls first.
+    // Admins reach the Staff and Admin switch straight after the brand link.
+    await desktop.goto(`${baseUrl}/admin/roles`, { waitUntil: 'networkidle' });
+    await desktop.keyboard.press('Tab');
+    await desktop.keyboard.press('Tab');
+    await desktop.keyboard.press('Tab');
+    state = await focused(desktop);
+    expectKeyboard(state.label === 'Staff' && state.outline, 'admins reach the Staff switch after the brand, with a visible focus ring');
+
+    await desktop.keyboard.press('Tab');
+    state = await focused(desktop);
+    const adminCurrent = await desktop.evaluate(() => document.activeElement?.getAttribute('aria-current'));
+    expectKeyboard(state.label === 'Admin' && adminCurrent === 'true', 'the Admin switch comes next and is marked as the current panel');
+
+    await desktop.keyboard.press('Shift+Tab');
+    await desktop.keyboard.press('Enter');
+    await desktop.waitForURL(`${baseUrl}/dashboard`);
+    const staffCurrent = await desktop.getByRole('navigation', { name: 'Switch panel' }).getByRole('link', { name: 'Staff' }).getAttribute('aria-current');
+    expectKeyboard(staffCurrent === 'true', 'the Staff switch opens the dashboard with Staff marked current');
+
+    // Staff has no panel switch, so the first rail tab after the skip link
+    // reaches the Dashboard item.
     await signInAs(desktop, 'Staff');
     await desktop.goto(`${baseUrl}/dashboard`, { waitUntil: 'networkidle' });
     await desktop.keyboard.press('Tab');
@@ -106,6 +127,30 @@ async function narrowScreenChecks(narrow) {
         const pill = await narrow.locator('[data-app-version]').boundingBox();
         expectKeyboard(fits && pill !== null && pill.height >= 44 && pill.width >= 44, `${path} fits 320px with a 44px version pill`, 'layout');
     }
+
+    await signInAs(narrow, 'Admin');
+    await narrow.goto(`${baseUrl}/admin`, { waitUntil: 'networkidle' });
+    await narrow.getByRole('button', { name: 'Open menu' }).click();
+    const drawer = narrow.getByRole('dialog', { name: 'Main menu' });
+    await drawer.waitFor();
+    await narrow.waitForTimeout(300);
+    const links = drawer.getByRole('navigation', { name: 'Switch panel' }).getByRole('link');
+    const boxes = await Promise.all([0, 1].map((i) => links.nth(i).boundingBox()));
+    const fits = await narrow.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
+    expectKeyboard(fits && boxes.every((box) => box !== null && box.height >= 44 && box.width >= 44), 'the Staff and Admin switch fits the 320px menu with 44px targets', 'layout');
+
+    let trapped = true;
+    let reachedSwitch = false;
+    for (let i = 0; i < 15; i++) {
+        await narrow.keyboard.press('Tab');
+        const state = await focused(narrow);
+        trapped &&= state.insideDrawer;
+        reachedSwitch ||= state.label === 'Admin';
+    }
+    expectKeyboard(trapped && reachedSwitch, 'Tab reaches the switch and stays inside the 320px menu');
+
+    await narrow.keyboard.press('Escape');
+    expectKeyboard((await focused(narrow)).label === 'Open menu', 'Escape closes the 320px menu and returns focus to Open menu');
 }
 
 async function audit(page, label) {
@@ -140,6 +185,7 @@ try {
 
     await signInAs(desktop, 'Admin');
     await visit(desktop, '/dashboard', 'Dashboard (desktop)');
+    await visit(desktop, '/admin', 'Admin overview');
     await visit(desktop, '/admin/roles', 'Roles');
     await visit(desktop, '/admin/audit', 'Audit log');
     await visit(desktop, '/change-log', 'Change log (desktop)');

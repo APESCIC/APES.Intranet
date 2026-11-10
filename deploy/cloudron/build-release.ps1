@@ -26,12 +26,19 @@
     The release version to stamp into VERSION, such as v0.3.11. Defaults to
     -Ref when -Ref is a vMAJOR.MINOR.PATCH tag. Without either, no VERSION
     file is written and the app reports "dev".
+
+.PARAMETER NoCache
+    Install vendor/ and node_modules/ from scratch. By default the build reuses
+    them in its own worktree, %LOCALAPPDATA%\APES\apes-intranet-build\worktree,
+    so an unchanged composer.lock leaves composer install nothing to do and an
+    unchanged package-lock.json skips npm ci.
 #>
 param(
     [Parameter(Mandatory = $true)][string]$Ref,
     [string]$Version = '',
     [string]$Php = '',
-    [string]$Composer = ''
+    [string]$Composer = '',
+    [switch]$NoCache
 )
 
 $ErrorActionPreference = 'Stop'
@@ -76,30 +83,61 @@ $env:XDEBUG_MODE = 'off'
 $composerArgs = @('install', '--no-dev', '--no-interaction', '--prefer-dist', '--optimize-autoloader')
 
 $id = '{0}-{1}' -f $sha.Substring(0, 7), (Get-Date -Format 'yyyyMMddHHmm')
-$src = Join-Path $env:TEMP "apes-intranet-src-$id"
 $out = Join-Path (Join-Path $env:TEMP 'apes-intranet-build') $id
 if (Test-Path $out) { Remove-Item -Recurse -Force $out }
 
-git -C $repo worktree add --detach $src $sha | Out-Null
+# One build worktree is kept between builds, so vendor/ and node_modules/ stay in
+# place: an unchanged lock file means composer install has nothing to install,
+# npm ci is skipped, and Windows does not rescan thousands of new files.
+$src = Join-Path $env:LOCALAPPDATA 'APES\apes-intranet-build\worktree'
+git -C $repo worktree prune
+if (-not (Test-Path (Join-Path $src '.git'))) {
+    if (Test-Path $src) { Remove-Item -Recurse -Force $src }
+    git -C $repo worktree add --detach $src $sha | Out-Null
+    if ($LASTEXITCODE -ne 0) { throw "git worktree add $src failed" }
+} else {
+    git -C $src checkout --quiet --detach --force $sha
+    if ($LASTEXITCODE -ne 0) { throw "git checkout $sha in $src failed" }
+}
+$keep = if ($NoCache) { @() } else { @('-e', 'vendor', '-e', 'node_modules') }
+git -C $src clean -ffdxq @keep
+if ($LASTEXITCODE -ne 0) { throw "git clean in $src failed" }
+
 try {
     Push-Location $src
+    $clock = [Diagnostics.Stopwatch]::StartNew()
+    $vendorWarm = Test-Path (Join-Path $src 'vendor\composer\installed.json')
     & $Php $Composer @composerArgs
     if ($LASTEXITCODE -ne 0) { throw 'composer install failed' }
-    npm ci --no-audit --no-fund
-    if ($LASTEXITCODE -ne 0) { throw 'npm ci failed' }
+    Write-Output ("Composer: {0:N0} s ({1})" -f $clock.Elapsed.TotalSeconds, $(if ($vendorWarm) { 'kept vendor' } else { 'cold' }))
+
+    $clock.Restart()
+    $lockHash = (Get-FileHash (Join-Path $src 'package-lock.json') -Algorithm SHA256).Hash
+    $lockMarker = Join-Path $src 'node_modules\.apes-lock-hash'
+    $nodeWarm = (Test-Path $lockMarker) -and ((Get-Content $lockMarker -Raw).Trim() -eq $lockHash)
+    if (-not $nodeWarm) {
+        npm ci --no-audit --no-fund
+        if ($LASTEXITCODE -ne 0) { throw 'npm ci failed' }
+        Set-Content -NoNewline -Path $lockMarker -Value $lockHash
+    }
+    Write-Output ("npm: {0:N0} s ({1})" -f $clock.Elapsed.TotalSeconds, $(if ($nodeWarm) { 'kept node_modules' } else { 'npm ci' }))
+
+    $clock.Restart()
     npm run build
     if ($LASTEXITCODE -ne 0) { throw 'npm run build failed' }
+    Write-Output ("Vite build: {0:N0} s" -f $clock.Elapsed.TotalSeconds)
     Set-Content -NoNewline -Path REVISION -Value $sha
     if ($Version) { Set-Content -NoNewline -Path VERSION -Value $Version }
     Pop-Location
 
-    robocopy $src $out /E /NFL /NDL /NJH /NJS /NP /XD .git .github docs node_modules tests storage /XF .git .env .env.* | Out-Null
+    $clock.Restart()
+    robocopy $src $out /E /MT:16 /NFL /NDL /NJH /NJS /NP /XD .git .github docs node_modules tests storage /XF .git .env .env.* | Out-Null
     if ($LASTEXITCODE -ge 8) { throw "robocopy failed with $LASTEXITCODE" }
     New-Item -ItemType File -Force (Join-Path $out 'bootstrap\cache\.gitkeep') | Out-Null
+    Write-Output ("Copy release folder: {0:N0} s" -f $clock.Elapsed.TotalSeconds)
 }
 finally {
     if ((Get-Location).Path -eq $src) { Pop-Location }
-    git -C $repo worktree remove --force $src
 }
 
 Write-Output "ReleaseId=$id"

@@ -124,8 +124,8 @@ of issues #148 to #153.
 
 - `/admin/modules`, in the **Admin** menu definition from
   [admin-menu-mode.md](../communications/admin-menu-mode.md). It never goes
-  in the Normal or Microsoft 365 groups. Opening it switches an admin into
-  Admin mode, as every `/admin/*` URL already does.
+  in the Staff or Microsoft 365 groups. Opening it shows an admin the Admin
+  panel, as every `/admin/*` URL already does.
 - Admin only, through a new `admin.modules.manage` permission, behind
   `fresh-signin`.
 - One row per Module: name, kind, state, description and addon warnings.

@@ -176,6 +176,41 @@
     font-size: 0.75rem;
 }
 
+/* Staff / Admin panel switch */
+.sg-switch {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.25rem;
+    margin-top: 1rem;
+    border: 1px solid var(--sg-edge);
+    border-radius: 999px;
+    padding: 0.25rem;
+    background: var(--sg-surface-strong);
+}
+
+.sg-switch__link {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    padding: 0.25rem 1rem;
+    color: var(--color-sg-ink);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.sg-switch__link:hover {
+    background: var(--sg-active-surface);
+    color: var(--color-sg-teal-dark);
+}
+
+.sg-switch__link[aria-current='true'] {
+    background: var(--color-sg-teal-dark);
+    color: var(--color-sg-white);
+}
+
 /* Navigation */
 .sg-nav {
     display: flex;

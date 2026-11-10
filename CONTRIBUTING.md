@@ -2,37 +2,30 @@
 
 APES Intranet is maintained by APES CIC. Laragon is the only supported local
 set-up. Set-up steps are in
-[docs/local-development.md](docs/local-development.md). Check every change in
-the Laragon preview at <http://apes-intranet.test>, with the demo data loaded,
-before it ships.
+[docs/local-development.md](docs/local-development.md). Before any work, run
+`scripts\preview.ps1` (it loads the latest code and checks the Laragon
+preview), then check every change at <http://apes-intranet.test> with the demo
+data loaded.
 
 ## How work ships
 
-Work ships once per milestone, in four stages, in this order:
+Every milestone is named by its version and ships once: all its issues are
+committed on one `milestone/vX-Y-Z-<slug>` branch behind one draft pull
+request into `main`, which is merged once with a merge commit, tagged and
+released as `vX.Y.Z`, and deployed. Issues close when that pull request
+merges. A hotfix ships earlier only with Bambie's approval.
 
-1. Every issue in the milestone is finished and committed on the milestone
-   branch, `milestone/<milestone-slug>`, behind one draft pull request into
-   `main`. The pull request lists `Closes #<n>` for each issue.
-2. All the milestone's work goes to `main` in one merge: a merge commit, not a
-   squash or a rebase.
-3. Release, tagged with the milestone's version. The milestone pull request
-   includes a reviewed, published release note for that version in
-   `changelog/releases/` (see [docs/release-notes.md](docs/release-notes.md)).
-4. Deploy that release.
+The rule, with the names, the flow and the hotfix route, is
+[`.cursor/rules/version-shipping.mdc`](.cursor/rules/version-shipping.mdc).
+The decisions behind it are in [AGENTS.md](AGENTS.md#shipping-and-versioning).
 
-Nothing reaches `main`, and nothing is tagged, released or deployed, before
-stage 2. Bambie approves the merge, release and deploy through the ship-gate
-question. Issues stay open when they are committed and close when the
-milestone pull request merges. The Epic and the milestone close after a
-verified deploy.
-
-A hotfix may ship earlier only with Bambie's approval. It goes on its own
-`cursor/fix/<issue>-<slug>` branch, is merged with a merge commit and released
-as a patch, and `main` is then merged back into the milestone branch. `main`
-accepts merge commits only.
+- `composer milestone:next` prints the next version, its branch and its pull
+  request and release titles.
+- `composer milestone:check-title -- "<title>"` and
+  `composer milestone:check-branch -- "<branch>"` tell you what is wrong. The
+  `milestone-version-check` CI job runs them on every pull request.
+- To check your branch name before each push, run
+  `git config core.hooksPath .githooks` once.
 
 Issue titles start with the type: `[Epic]`, `[Story]`, `[Task]`, `[Bug]`,
-`[Chore]` or `[Spike]`.
-
-The full process, including the definition of done, is in the "Milestone
-shipping" section of [AGENTS.md](AGENTS.md#milestone-shipping).
+`[Chore]` or `[Spike]`. Commits use Conventional Commits with `Refs #<n>`.

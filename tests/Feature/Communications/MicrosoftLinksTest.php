@@ -24,8 +24,8 @@ it('hides staff-only Microsoft links from volunteers and students', function () 
     $staff = User::factory()->create()->assignRole(RoleName::Staff->value);
     $volunteer = User::factory()->create()->assignRole(RoleName::Volunteer->value);
 
-    $staffKeys = collect(Menu::for($staff, MenuMode::Normal))->flatMap(fn (NavGroup $g) => array_map(fn (NavItem $i) => $i->key, $g->items))->all();
-    $volKeys = collect(Menu::for($volunteer, MenuMode::Normal))->flatMap(fn (NavGroup $g) => array_map(fn (NavItem $i) => $i->key, $g->items))->all();
+    $staffKeys = collect(Menu::for($staff, MenuMode::Staff))->flatMap(fn (NavGroup $g) => array_map(fn (NavItem $i) => $i->key, $g->items))->all();
+    $volKeys = collect(Menu::for($volunteer, MenuMode::Staff))->flatMap(fn (NavGroup $g) => array_map(fn (NavItem $i) => $i->key, $g->items))->all();
 
     expect($staffKeys)->toContain('m365-bookings', 'm365-loop', 'm365-planner')
         ->and($volKeys)->toContain('m365-planner')

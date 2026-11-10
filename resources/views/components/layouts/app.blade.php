@@ -22,15 +22,14 @@
                         :menu="$menu"
                         :user="$shellUser"
                         :qa-enabled="$qaEnabled"
-                        :show-menu-mode-switcher="$showMenuModeSwitcher ?? false"
-                        :menu-mode="$menuMode ?? null"
+                        :panel="$shellPanel ?? null"
                     />
                 </aside>
             @endif
 
             <div @class(['sg-main-column', 'sg-main-column--rail' => $shellUser])>
                 <div class="sg-content">
-                    <x-shell.topbar :has-menu="(bool) $shellUser" />
+                    <x-shell.topbar :has-menu="(bool) $shellUser" :panel="$shellPanel ?? null" />
 
                     @if ($title)
                         <header class="sg-page-header">

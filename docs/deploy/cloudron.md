@@ -255,8 +255,12 @@ Use this only if `deploy.ps1` cannot run. It does the same steps.
    $previous = "$(cloudron exec --app $app '--' readlink -f /app/data/current)".Trim()
    ```
 
-5. **Build** the tag, never `main`. This uses a temporary git worktree, with
-   Composer on Laragon's PHP 8.4 and Vite on Laragon's Node:
+5. **Build** the tag, never `main`. This uses its own git worktree in
+   `%LOCALAPPDATA%\APES\apes-intranet-build\worktree`, with Composer on
+   Laragon's PHP 8.4 and Vite on Laragon's Node. The worktree keeps
+   `vendor/` and `node_modules/` between builds, so when the lock files have
+   not changed a build takes about 20 seconds instead of about 3 minutes
+   (`-NoCache` starts from scratch):
 
    ```powershell
    powershell -NoProfile -ExecutionPolicy Bypass -File deploy\cloudron\build-release.ps1 -Ref $tag
@@ -267,11 +271,16 @@ Use this only if `deploy.ps1` cannot run. It does the same steps.
    the tag. The footer version pill and `/healthz` read it, so the site shows
    the version that is actually deployed, not the newest tag. Without a
    `VERSION` file the app reports `dev`.
-6. **Upload.** Leave the trailing `\` off `ReleaseDir`. That way the folder
-   itself, named `<ReleaseId>`, is placed inside `releases/`:
+6. **Upload** one archive and unpack it on the app (much faster than
+   uploading thousands of files one by one with `cloudron sync push`, which
+   `deploy.ps1 -SyncPush` still does if you need it):
 
    ```powershell
-   cloudron sync push --app $app "<ReleaseDir>" /app/data/releases/
+   tar -czf "$env:TEMP\<ReleaseId>.tar.gz" -C "<ReleaseDir>" .
+   cloudron push --app $app "$env:TEMP\<ReleaseId>.tar.gz" /app/data/releases/<ReleaseId>.tar.gz
+   cloudron exec --app $app '--' mkdir -p /app/data/releases/<ReleaseId>
+   cloudron exec --app $app '--' tar -xzf /app/data/releases/<ReleaseId>.tar.gz -C /app/data/releases/<ReleaseId>
+   cloudron exec --app $app '--' rm -f /app/data/releases/<ReleaseId>.tar.gz
    cloudron exec --app $app '--' cat /app/data/releases/<ReleaseId>/REVISION
    ```
 

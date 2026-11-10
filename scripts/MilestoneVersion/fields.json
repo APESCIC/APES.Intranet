@@ -1,0 +1,11 @@
+{
+    "fields": [],
+    "releaseNote": {
+        "template": "changelog/releases/_template.json",
+        "path": "changelog/releases/{tag}.json"
+    },
+    "notes": [
+        "There are no version files: the tag is the version, and the release build stamps it into VERSION.",
+        "Write the release note by docs/release-notes.md, then set \"published\": true in the last commit (chore: release vX.Y.Z)."
+    ]
+}

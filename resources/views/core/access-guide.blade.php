@@ -50,11 +50,12 @@
             </li>
         </ul>
 
-        <h2 class="font-serif text-xl font-semibold">Admin menu mode</h2>
+        <h2 class="font-serif text-xl font-semibold">Staff and Admin panels</h2>
         <p>
-            People with the Admin role can switch the sidebar between a <strong>Normal</strong> (member) menu and an
-            <strong>Admin</strong> menu. That switch is a navigation preference only: it does not change your roles
-            or permissions. HR and legal stay on the Normal menu. The local QA “Switch role” control is separate.
+            People with the Admin role can switch the sidebar between the <strong>Staff</strong> panel (the member
+            menu) and the <strong>Admin</strong> panel. Admin pages always show the Admin panel, and every other page
+            shows the Staff panel. The switch is navigation only: it does not change your roles or permissions.
+            HR and legal stay on the Staff menu. The local QA “Switch role” control is separate.
         </p>
 
         <h2 class="font-serif text-xl font-semibold">Access is audited</h2>

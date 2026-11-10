@@ -43,9 +43,10 @@ Decided. Do not swap these without the owner's approval.
 - PHP 8.3 or newer, Laravel 13, `spatie/laravel-permission`.
 - Tailwind 4, Vite, Lucide, Fraunces and Nunito Sans. The same look and
   sidebar menu as MyAPES Account.
-- Sidebar menus: Normal (member) vs Admin mode for the Admin role only.
-  See docs/communications/admin-menu-mode.md. Do not mix system-admin items
-  into the Normal or Microsoft 365 menu groups.
+- Sidebar menus: Staff (member) vs Admin panels for the Admin role only,
+  decided by the route (`admin.*` is Admin). See
+  docs/communications/admin-menu-mode.md. Do not mix system-admin items
+  into the Staff or Microsoft 365 menu groups.
 - Core, then Modules, then Plugins, as in MyAPES Account ADR 0001. Core never
   depends on a Module or a Plugin.
 - TipTap, free core extensions only, for every rich-text box. Sanitise the
@@ -128,25 +129,33 @@ stack. Full guide: [docs/local-development.md](docs/local-development.md).
 - Live preview: `npm run dev` (or `composer dev`) for Vite hot reload.
 
 Run every PHP, Artisan, Composer, test, Pint and Larastan command with
-Laragon's newest PHP 8.4 (`C:\laragon\bin\php\php-8.4.*`), put first on
-`PATH` for the session, and every npm command with Laragon's Node 22. Do not
-use any other PHP, and do not use `php artisan serve`. The Cloudron release
-build uses the same PHP: `deploy/cloudron/deploy.ps1` stops if the PHP is not
-8.4. The Cursor rule `.cursor/rules/laragon-local-dev.mdc` says the same for
-agents.
+Laragon's NTS PHP 8.4 (`C:\laragon\bin\php\php-8.4.*-nts-*`), put first on
+`PATH` for the session, and every npm command with Laragon's Node 22. That is
+the same build Laragon's Apache runs through FastCGI (mod_fcgid), so the
+website and the command line read the same `php.ini`. Do not use any other
+PHP, and do not use `php artisan serve`. The Cloudron release build uses PHP
+8.4 too: `deploy/cloudron/deploy.ps1` stops if the PHP is not 8.4. The Cursor
+rule `.cursor/rules/laragon-local-dev.mdc` says the same for agents.
 
-Before any change-making work (code, tests, docs or config), follow the
-`live-preview-gate` skill with Laragon:
+Before any development or coding work (code, tests, docs or config), run the
+live preview gate:
 
-1. Pull the latest changes with `repo-sync`. It merges `origin/main` into the
-   milestone branch with a merge commit and never rebases.
-2. Check that Laragon is running and `http://apes-intranet.test/login`
-   returns 200, and start Vite with `npm run dev` if nothing listens on port
-   5174. Starting Laragon, clicking Reload or switching its profile or PHP
-   version needs the owner's click: ask with AskQuestion.
-3. Open <http://apes-intranet.test> in Cursor's browser
-   (`cursor-browser-preview`). Confirm that it loaded, then say "Preview ready,
-   starting work".
+1. **Load the latest version and updates.**
+   `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\preview.ps1`
+   merges `origin/main` into the milestone branch (never a rebase), runs
+   `composer install` or `npm ci` when a lock file changed, reports pending
+   migrations (ask before running them), and checks that `/healthz` shows the
+   checked-out revision.
+2. **Start Laragon.** The same script checks that Laragon is running, that the
+   site is served through FastCGI on PHP 8.4, and starts Vite on port 5174 if
+   nothing listens there. Starting Laragon, clicking Reload or switching its
+   profile or PHP version needs the owner's click: ask with AskQuestion.
+3. **Open it in Cursor's browser.** Open <http://apes-intranet.test>
+   (`cursor-browser-preview`), confirm that it loaded, and say "Preview
+   ready, starting work".
+4. **If it won't load after two attempts, stop** and ask how to proceed.
+
+Run the gate again after every branch switch.
 
 `composer install` and `npm ci` may run without asking when `vendor/` or
 `node_modules/` is missing. Ask before running migrations, `demo:reset` or
@@ -157,7 +166,7 @@ installing any system tool.
 | App URL | `http://apes-intranet.test` (Laragon's Auto Virtual Hosts, from the folder name) |
 | Project folder | `C:\laragon\www\apes-intranet`, a junction to the clone |
 | Web server | Laragon's Apache 2.4 on port 80, document root `public/` |
-| PHP | Laragon's PHP 8.4, for Apache and the command line |
+| PHP | Laragon's NTS PHP 8.4, run by Apache through FastCGI (mod_fcgid), and the same build on the command line |
 | Database | Laragon's MySQL 8.4 on port 3306 with InnoDB, database `apes_intranet_local`, user `root`, no password |
 | Cache and sessions | Files (`CACHE_STORE=file`, `SESSION_DRIVER=file`), queue `sync` |
 | Front end | Vite hot reload on port 5174 (`npm run dev`), unique among the APES repositories |
@@ -200,12 +209,13 @@ skills.
   label and that milestone on the issue. The form does not apply them itself.
 - Work one milestone at a time, in the order below. Only Foundations is in
   progress until the owner says otherwise.
-- Each milestone has one branch, `milestone/<milestone-slug>`, created from
-  `origin/main` when work on it starts. This name takes precedence over the
-  skills' default `cursor/feature/<epic>-v<x-y-z>-<slug>`. Commit every issue
+- Each milestone has one branch, `milestone/vX-Y-Z-<slug>` (printed by
+  `composer milestone:next`), created from `origin/main` when work on it
+  starts. This name takes precedence over the skills' default
+  `cursor/feature/<epic>-v<x-y-z>-<slug>`. Commit every issue
   in the milestone on that one branch. Do not create per-issue branches. Never
   commit on `main`. After creating or switching branch, call `SetActiveBranch`.
-  See [Milestone shipping](#milestone-shipping).
+  See [Shipping and versioning](#shipping-and-versioning).
 - Commits include `Refs #<n>` for the issue they work on.
 
 ## Milestones
@@ -238,34 +248,27 @@ Open, in this order:
 
 Do not draft Foundations issues until the owner has approved that report.
 
-## Milestone shipping
+## Shipping and versioning
 
-Decided by Bambie. Work ships once per milestone, in four stages, in this
-order:
+Decided by Bambie. Every milestone is named and worked by its version, never
+by GitHub's milestone number, and ships once: every issue committed on one
+milestone branch, **one merge commit** into `main`, one tag and GitHub
+Release, and one Cloudron deploy of that tag. The single rule is
+[`.cursor/rules/version-shipping.mdc`](.cursor/rules/version-shipping.mdc):
+the next version, the names built from it, the flow, hotfixes and the
+version tooling (`composer milestone:next`, `milestone:bump` and the
+title, branch and release checks). Agents run it with the
+[`complete-next-version`](.cursor/skills/complete-next-version/SKILL.md) and
+[`release-version`](.cursor/skills/release-version/SKILL.md) skills, or the
+`/complete-next-version` command, from one Cursor plan per milestone. When a
+new chat resumes a milestone, it carries on with the existing plan.
 
-1. Complete **all** the issues in the milestone before moving on.
-2. Put all the milestone's work on `main` in **one merge**: a merge commit,
-   never a squash or a rebase.
-3. Release.
-4. Deploy.
-
-Agents run a milestone end to end from one Cursor plan, following the
-`github-milestone-completion` skill. The plan covers set-up, every issue, the
-pull request, the ship gate (merge, release and deploy) and close-out. When a
-new chat resumes a milestone, it carries on with the existing plan and does
-not make a new one.
-
-- Open **one draft pull request** from the milestone branch into `main` as
-  soon as the branch has its first commit. Its title is the Epic's title, and
-  its body lists `Closes #<n>` for every issue in the milestone, including the
-  Epic. Continuous integration runs the `ci` check on every push.
-- Commit and push on the milestone branch whenever needed. No other pull
-  request goes into `main`. Nothing is tagged, released or deployed until
-  stage 2.
-- After the plan is confirmed, work every issue in order without stopping to
-  ask between them. Stop and ask only for a failure or blocker that the plan
-  does not settle: red checks after one fix attempt, a blocker outside the
-  plan, or new scope.
+After the plan is confirmed, work every issue in order without stopping to
+ask between them. Stop and ask only for a failure or blocker that the plan
+does not settle: red checks after one fix attempt, a blocker outside the plan,
+or new scope. Merge, release and deploy only after the ship-gate answer in the
+current chat (`ship-gate` skill); a confirmed plan or "ship it" is not
+consent.
 
 ### Definition of done
 
@@ -299,69 +302,11 @@ long-lived `dependencies` branch, never into `main`.
    next updates start from the released code.
 
 A security update that cannot wait for the milestone follows the hotfix route
-below.
+in the rule.
 
-### Hotfixes
-
-A fix may reach `main`, or be released or deployed, ahead of its milestone
-only after Bambie has approved it through an AskQuestion answer in the
-current chat. Record that answer on the issue.
-
-1. Create a `cursor/fix/<issue>-<slug>` branch from `origin/main`.
-2. Open its own pull request, merge it after the ship gate with a merge
-   commit (`gh pr merge --merge`), and release it as a patch. `main` accepts
-   merge commits only: its ruleset and the repository settings turn off
-   squash and rebase merges.
-3. Merge `main` back into the open milestone branch with `repo-sync`. Never
-   rebase or force-push a milestone branch.
-
-The Cursor rule `.cursor/rules/milestone-shipping.mdc` says the same for
-Cursor agents.
-
-## Ship flow
-
-Once per milestone, after every issue in it is committed:
-
-1. Publish the release note. The milestone pull request adds
-   `changelog/releases/vX.Y.Z.json` for the milestone's full version, written
-   by the rules in [docs/release-notes.md](docs/release-notes.md). As the last
-   commit on the milestone branch (`chore: release vX.Y.Z`), review it and set
-   `"published": true`. CI fails on the tag if the note is missing or not
-   published, and `deploy.ps1` refuses to deploy it. To roll a note back, set
-   `"published": false` and deploy; never delete a released note's file.
-2. Run `repo-sync` on the milestone branch. Mark the draft pull request ready
-   (`gh pr ready`) and wait for `ci` to go green
-   (`gh pr checks --watch --fail-fast`). Fix failures on the same branch.
-3. Check that every open issue in the milestone is closed by the pull request
-   (`Closes #<n>`), or has been moved out with the owner's answer.
-4. Ask the ship-gate question, following the `ship-gate` skill. First
-   summarise the milestone, the pull request, the checks, the merge method, the
-   release tag and the deploy target. Then ask with these options, in this
-   order, marking one `(Recommended)`: **a. Merge**, **b. Release**,
-   **c. Deploy**, **d. Merge, release and deploy**, **e. Stop here**. The
-   answer is the owner's approval, and nothing else counts as consent: not a
-   confirmed plan, and not "ship it". Post the answer on the Epic.
-5. Run only the chosen steps, in order, and verify each one. After each single
-   step, ask again with only the steps that remain.
-   - **Merge:** `gh pr merge <pr> --merge --delete-branch`. A merge commit,
-     never a squash or a rebase.
-   - **Release:** tag the merge commit with the milestone's version, for
-     example `v0.0.3`, and publish a GitHub release. This repository keeps no
-     version files. The tag is the version. The release build stamps it into
-     a `VERSION` file, so `/healthz` reports `version` as well as `revision`,
-     and the footer pill shows the version that is deployed, never the newest
-     tag.
-   - **Deploy:** follow the `cloudron-deploy` skill and
-     [docs/deploy/cloudron.md](docs/deploy/cloudron.md):
-     `deploy/cloudron/deploy.ps1 -Tag vX.Y.Z`. It runs the preflight, takes a
-     backup, deploys the release tag (never a branch), verifies `/healthz` and
-     rolls back on failure. A green `main` does not deploy itself.
-6. Check `https://intranet.apes.org.uk/healthz` and confirm that `version` is
-   the tag and `revision` matches the tag's commit. Post the deploy summary on
-   the Epic.
-7. Close out with the `github-closeout` scripts. Then post a completion
-   message in chat with the milestone, the pull request and its merge commit,
-   the issues shipped, the release and the deploy evidence.
+Security checks use only free GitHub features: Dependabot, dependency review
+and CodeQL (JavaScript and GitHub Actions; CodeQL has no PHP support, so PHP
+is covered by Pint, Larastan and the tests). No paid or third-party scanner.
 
 ## Cursor skills and tools
 
@@ -373,6 +318,7 @@ disagrees with this file, follow this file.
 | Starting any change | `repo-sync`, `live-preview-gate` (with Laragon), `cursor-browser-preview` |
 | Asking for a decision | `decision-prompts` (AskQuestion) |
 | Delivering a milestone | `github-milestone-completion`, `github-cli` (its milestone-to-deploy playbook) |
+| Milestone versions and shipping | `complete-next-version`, `release-version`, `/complete-next-version` (this repository) |
 | Issues, comments and close-out | `github-issue-types`, `github-work-tracking`, `github-closeout` |
 | Continuous integration | `github-actions`, `loop-on-ci`, `fix-ci` |
 | Merge, release and deploy | `ship-gate`, `cloudron-deploy` |

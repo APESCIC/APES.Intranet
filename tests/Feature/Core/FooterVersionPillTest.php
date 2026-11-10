@@ -64,7 +64,7 @@ it('says dev and links to the hub when no version is stamped', function () {
         ->and($footer)->toContain('href="'.route('change-log.index').'"');
 });
 
-it('shows the pill in Admin menu mode too', function () {
+it('shows the pill in the Admin panel too', function () {
     file_put_contents(base_path('VERSION'), 'v0.3.11');
     $admin = User::factory()->create();
     $admin->assignRole(RoleName::Staff->value);

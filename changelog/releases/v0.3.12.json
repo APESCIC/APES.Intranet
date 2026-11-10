@@ -1,0 +1,25 @@
+{
+  "version": "v0.3.12",
+  "released_at": "2026-11-10",
+  "title": "Staff and Admin panels",
+  "summary": "Admins now move between a Staff panel and an Admin panel, with a new admin overview page. Nothing changes for anyone else.",
+  "audiences": ["staff"],
+  "changes": {
+    "added": [
+      "An admin overview page that links to each admin section you can open.",
+      "For admins, a Staff and Admin switch at the top of the menu. The name under the logo says which panel you are in."
+    ],
+    "changed": [
+      "Admin pages always show the Admin menu, and every other page shows the Staff menu, so the menu stays put when you refresh, go back or open a new tab.",
+      "The Normal menu is now called the Staff menu."
+    ],
+    "accessibility": [
+      "The Staff and Admin switch works with a keyboard and with screen readers, marks the panel you are in, and has large targets on small screens."
+    ]
+  },
+  "internal_notes": [
+    "The panel is decided by the page address, and no menu mode is stored any more. Every admin page keeps its own permission and fresh sign-in checks.",
+    "Developer changes ship in this release too: one version-shipping rule with milestone version tooling, the Laragon preview through FastCGI with a live preview gate, GitHub dependency review, and faster release builds and deploys."
+  ],
+  "published": true
+}
