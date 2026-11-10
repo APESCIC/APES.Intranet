@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Modules\Operations\Http\Controllers\Admin\FormBuilderController;
 use Modules\Operations\Http\Controllers\Admin\SiteController;
 use Modules\Operations\Http\Controllers\AvailabilityController;
+use Modules\Operations\Http\Controllers\ChecklistController;
 use Modules\Operations\Http\Controllers\ClockController;
 use Modules\Operations\Http\Controllers\FormController;
 use Modules\Operations\Http\Controllers\RotaController;
@@ -66,6 +67,14 @@ Route::middleware(['web', 'auth'])->group(function () {
         Route::get('/forms/files/{answer}', [FormController::class, 'file'])->name('forms.files.show');
         Route::get('/forms/{form}', [FormController::class, 'show'])->whereNumber('form')->name('forms.show');
         Route::post('/forms/{form}', [FormController::class, 'submit'])->whereNumber('form')->name('forms.submit');
+
+        Route::get('/checklists', [ChecklistController::class, 'index'])->name('checklists.index');
+        Route::get('/checklists/templates', [ChecklistController::class, 'templates'])->name('checklists.templates.index');
+        Route::post('/checklists/templates', [ChecklistController::class, 'storeTemplate'])->name('checklists.templates.store');
+        Route::delete('/checklists/templates/{template}', [ChecklistController::class, 'retireTemplate'])->name('checklists.templates.destroy');
+        Route::get('/checklists/runs/{run}', [ChecklistController::class, 'show'])->name('checklists.runs.show');
+        Route::put('/checklists/runs/{run}', [ChecklistController::class, 'update'])->name('checklists.runs.update');
+        Route::get('/checklists/photos/{item}', [ChecklistController::class, 'photo'])->name('checklists.photos.show');
 
         Route::get('/rota/availability', [AvailabilityController::class, 'index'])->name('rota.availability.index');
         Route::post('/rota/availability', [AvailabilityController::class, 'store'])->name('rota.availability.store');

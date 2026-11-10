@@ -10,7 +10,10 @@ use Modules\Operations\Support\Notifier;
 
 final class RotaPublisher
 {
-    public function __construct(private readonly AuditLogger $audit) {}
+    public function __construct(
+        private readonly AuditLogger $audit,
+        private readonly Checklists $checklists,
+    ) {}
 
     public function publish(RotaWeek $week, User $actor): void
     {
@@ -22,6 +25,7 @@ final class RotaPublisher
 
         $week->loadMissing('site');
         $shifts = $week->shifts()->with('member')->get();
+        $this->checklists->scheduleWeek($week);
 
         $this->audit->record('operations.rota_published', $week, [
             'site_id' => $week->site_id,

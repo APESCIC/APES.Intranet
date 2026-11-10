@@ -44,6 +44,7 @@ final class Menu
                 NavItem::route('team-clock', 'Team clock', 'users', AccessMatrix::TEAM_SUPERVISE, 'operations.clock.team'),
                 NavItem::route('timesheets', 'Timesheets', 'timer', AccessMatrix::INTRANET_ACCESS, 'operations.timesheets.index', 'operations.timesheets.*'),
                 NavItem::route('tasks', 'Tasks', 'list-checks', AccessMatrix::INTRANET_ACCESS, 'operations.tasks.index', 'operations.tasks.*'),
+                NavItem::route('checklists', 'Checklists', 'clipboard-check', AccessMatrix::INTRANET_ACCESS, 'operations.checklists.index', 'operations.checklists.*'),
                 NavItem::route('forms', 'Forms', 'clipboard-list', AccessMatrix::INTRANET_ACCESS, 'operations.forms.index', 'operations.forms.*'),
             ]),
             new NavGroup('support', 'Support', [

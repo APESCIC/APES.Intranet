@@ -30,7 +30,7 @@ class RotaController
         return view('operations::rota.index', [
             'myShifts' => Shift::query()
                 ->published()
-                ->with('site')
+                ->with(['site', 'checklistRuns.template'])
                 ->where('user_id', $user->getKey())
                 ->where('ends_at', '>=', now()->startOfDay())
                 ->orderBy('starts_at')

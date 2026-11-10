@@ -4,6 +4,7 @@ namespace Modules\Operations\Dashboard;
 
 use App\Core\Dashboard\DashboardCardContributor;
 use App\Models\User;
+use Modules\Operations\Models\ChecklistRun;
 use Modules\Operations\Models\Shift;
 use Modules\Operations\Models\Task;
 
@@ -27,6 +28,20 @@ final class OperationsDashboardCards implements DashboardCardContributor
                 'title' => 'Your next shift',
                 'body' => $next->label().' at '.$next->site->name.'.',
                 'href' => route('operations.rota.index'),
+            ];
+        }
+
+        $checklists = ChecklistRun::query()
+            ->whereNull('completed_at')
+            ->whereHas('shift', fn ($q) => $q->published()->where('user_id', $user->getKey()))
+            ->where('due_at', '<=', now()->endOfDay())
+            ->count();
+        if ($checklists > 0) {
+            $cards[] = [
+                'key' => 'checklists-due',
+                'title' => 'Checklists to do',
+                'body' => $checklists === 1 ? '1 checklist is due on your shifts today.' : "{$checklists} checklists are due on your shifts today.",
+                'href' => route('operations.checklists.index'),
             ];
         }
 

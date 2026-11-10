@@ -10,7 +10,7 @@
             <div class="overflow-x-auto">
                 <table class="sg-table">
                     <thead>
-                        <tr><th scope="col">When</th><th scope="col">Role</th><th scope="col">Site</th><th scope="col"><span class="sr-only">Actions</span></th></tr>
+                        <tr><th scope="col">When</th><th scope="col">Role</th><th scope="col">Site</th><th scope="col">Checklists</th><th scope="col"><span class="sr-only">Actions</span></th></tr>
                     </thead>
                     <tbody>
                         @foreach ($myShifts as $shift)
@@ -18,6 +18,11 @@
                                 <td>{{ $shift->starts_at->format('D j M H:i') }}–{{ $shift->ends_at->format('H:i') }}</td>
                                 <td>{{ $shift->role }}</td>
                                 <td>{{ $shift->site->name }}</td>
+                                <td>
+                                    @foreach ($shift->checklistRuns as $run)
+                                        <a href="{{ route('operations.checklists.runs.show', $run) }}" data-shift-checklist="{{ $run->id }}">{{ $run->template->name }}</a>@if ($run->isComplete()) <span class="sg-badge sg-badge--ok">Done</span>@endif<br>
+                                    @endforeach
+                                </td>
                                 <td><a class="sg-btn sg-btn-ghost sg-btn-sm" href="{{ route('operations.rota.swap.create', $shift) }}">Ask to swap<span class="sr-only"> {{ $shift->label() }}</span></a></td>
                             </tr>
                         @endforeach
