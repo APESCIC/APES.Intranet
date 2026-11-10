@@ -42,6 +42,7 @@ import {
     Users,
     X,
 } from 'lucide';
+import { initClockForm } from './operations/clock.js';
 import { initDrawer } from './shell/drawer.js';
 
 const icons = {
@@ -97,6 +98,7 @@ function init() {
         },
     });
     initDrawer();
+    initClockForm();
 }
 
 if (document.readyState === 'loading') {

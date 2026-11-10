@@ -4,6 +4,7 @@ use App\Core\Access\AccessMatrix;
 use Illuminate\Support\Facades\Route;
 use Modules\Operations\Http\Controllers\Admin\SiteController;
 use Modules\Operations\Http\Controllers\AvailabilityController;
+use Modules\Operations\Http\Controllers\ClockController;
 use Modules\Operations\Http\Controllers\RotaController;
 use Modules\Operations\Http\Controllers\ShiftRequestController;
 use Modules\Operations\Http\Controllers\ShiftTemplateController;
@@ -30,6 +31,14 @@ Route::middleware(['web', 'auth'])->group(function () {
         Route::get('/rota/templates', [ShiftTemplateController::class, 'index'])->name('rota.templates.index');
         Route::post('/rota/templates', [ShiftTemplateController::class, 'store'])->name('rota.templates.store');
         Route::delete('/rota/templates/{template}', [ShiftTemplateController::class, 'destroy'])->name('rota.templates.destroy');
+
+        Route::get('/clock', [ClockController::class, 'index'])->name('clock.index');
+        Route::post('/clock/in', [ClockController::class, 'clockIn'])->name('clock.in');
+        Route::post('/clock/out', [ClockController::class, 'clockOut'])->name('clock.out');
+        Route::post('/clock/break/start', [ClockController::class, 'startBreak'])->name('clock.break.start');
+        Route::post('/clock/break/end', [ClockController::class, 'endBreak'])->name('clock.break.end');
+        Route::get('/clock/team', [ClockController::class, 'team'])->name('clock.team');
+        Route::post('/clock/records/{record}/correct', [ClockController::class, 'correct'])->name('clock.correct');
 
         Route::get('/rota/availability', [AvailabilityController::class, 'index'])->name('rota.availability.index');
         Route::post('/rota/availability', [AvailabilityController::class, 'store'])->name('rota.availability.store');

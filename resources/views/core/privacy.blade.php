@@ -22,6 +22,16 @@
                 authentication turned on. Passkeys and secrets are never stored here.
             </li>
             <li>
+                Operations records: your rota shifts, times you say you cannot work, claims and swaps, clock-in,
+                break and clock-out times, timesheets, tasks, form submissions and checklists, including any photos or
+                signatures you add to them.
+            </li>
+            <li>
+                Only if APES CIC has approved and switched on the clock-in location check for a site: whether your
+                device was near that site when you tapped Clock in (near or not near). Your location itself is never
+                saved, and nothing is checked at any other time.
+            </li>
+            <li>
                 An audit log of sign-ins, sign-outs, role changes and admin actions, with the time, your account, your
                 IP address and your browser.
             </li>

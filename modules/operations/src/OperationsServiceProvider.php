@@ -3,6 +3,7 @@
 namespace Modules\Operations;
 
 use Illuminate\Support\ServiceProvider;
+use Modules\Operations\Console\FlagMissedClockOuts;
 use Modules\Operations\Dashboard\OperationsDashboardCards;
 use Modules\Operations\Navigation\OperationsMenuContributor;
 
@@ -22,5 +23,6 @@ class OperationsServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'operations');
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        $this->commands([FlagMissedClockOuts::class]);
     }
 }

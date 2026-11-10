@@ -10,6 +10,7 @@ Schedule::command('access-review:remind')->quarterlyOn(1, '09:00');
 Schedule::command('people:sync-directory')->dailyAt('02:15')->withoutOverlapping();
 Schedule::command('people:refresh-totp-status')->dailyAt('02:30')->withoutOverlapping();
 Schedule::command('comms:send-event-reminders')->everyFiveMinutes()->withoutOverlapping();
+Schedule::command('operations:flag-missed-clock-outs')->everyFifteenMinutes()->withoutOverlapping();
 
 Artisan::command('demo:seed', function () {
     if (! app()->environment('local')) {
