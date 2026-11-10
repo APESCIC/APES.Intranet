@@ -28,5 +28,5 @@
     "The geofence needs both the DPIA approval date (approved 10 November 2026) and the switch set in the app's environment, plus a geofence area on each site. Neither is set by this release.",
     "Developer changes in this release: AGENTS.md uses full milestone versions, Operations permissions are re-seeded on every deploy, Larastan reads the module migrations and model casts, and the accessibility check covers the Operations pages."
   ],
-  "published": false
+  "published": true
 }
