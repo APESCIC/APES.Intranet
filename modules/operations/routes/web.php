@@ -2,9 +2,11 @@
 
 use App\Core\Access\AccessMatrix;
 use Illuminate\Support\Facades\Route;
+use Modules\Operations\Http\Controllers\Admin\FormBuilderController;
 use Modules\Operations\Http\Controllers\Admin\SiteController;
 use Modules\Operations\Http\Controllers\AvailabilityController;
 use Modules\Operations\Http\Controllers\ClockController;
+use Modules\Operations\Http\Controllers\FormController;
 use Modules\Operations\Http\Controllers\RotaController;
 use Modules\Operations\Http\Controllers\ShiftRequestController;
 use Modules\Operations\Http\Controllers\ShiftTemplateController;
@@ -58,6 +60,13 @@ Route::middleware(['web', 'auth'])->group(function () {
         Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus'])->name('tasks.status');
         Route::post('/tasks/{task}/comments', [TaskController::class, 'comment'])->name('tasks.comment');
 
+        Route::get('/forms', [FormController::class, 'index'])->name('forms.index');
+        Route::get('/forms/inbox', [FormController::class, 'inbox'])->name('forms.inbox');
+        Route::get('/forms/submissions/{submission}', [FormController::class, 'submission'])->name('forms.submissions.show');
+        Route::get('/forms/files/{answer}', [FormController::class, 'file'])->name('forms.files.show');
+        Route::get('/forms/{form}', [FormController::class, 'show'])->whereNumber('form')->name('forms.show');
+        Route::post('/forms/{form}', [FormController::class, 'submit'])->whereNumber('form')->name('forms.submit');
+
         Route::get('/rota/availability', [AvailabilityController::class, 'index'])->name('rota.availability.index');
         Route::post('/rota/availability', [AvailabilityController::class, 'store'])->name('rota.availability.store');
         Route::delete('/rota/availability/{availability}', [AvailabilityController::class, 'destroy'])->name('rota.availability.destroy');
@@ -68,6 +77,17 @@ Route::middleware(['web', 'auth'])->group(function () {
             Route::get('/', [SiteController::class, 'index'])->name('index');
             Route::post('/', [SiteController::class, 'store'])->name('store');
             Route::put('/{site}', [SiteController::class, 'update'])->name('update');
+        });
+
+        Route::middleware('can:'.OperationsPermissions::FORMS_MANAGE)->prefix('forms')->name('forms.')->group(function () {
+            Route::get('/', [FormBuilderController::class, 'index'])->name('index');
+            Route::post('/', [FormBuilderController::class, 'store'])->name('store');
+            Route::get('/{form}', [FormBuilderController::class, 'show'])->name('show');
+            Route::put('/{form}', [FormBuilderController::class, 'update'])->name('update');
+            Route::post('/{form}/fields', [FormBuilderController::class, 'addField'])->name('fields.store');
+            Route::delete('/{form}/fields/{field}', [FormBuilderController::class, 'removeField'])->name('fields.destroy');
+            Route::post('/{form}/publish', [FormBuilderController::class, 'publish'])->name('publish');
+            Route::get('/{form}/export.csv', [FormBuilderController::class, 'export'])->name('export');
         });
     });
 });

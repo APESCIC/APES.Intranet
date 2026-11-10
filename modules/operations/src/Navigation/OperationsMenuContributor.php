@@ -20,6 +20,7 @@ final class OperationsMenuContributor implements MenuContributor
         return [
             new NavGroup('admin-operations', 'Operations admin', [
                 NavItem::route('operations-sites', 'Sites', 'map-pin', OperationsPermissions::SITES_MANAGE, 'admin.operations.sites.index', 'admin.operations.sites.*'),
+                NavItem::route('operations-forms', 'Form builder', 'file-pen-line', OperationsPermissions::FORMS_MANAGE, 'admin.operations.forms.index', 'admin.operations.forms.*'),
             ]),
         ];
     }

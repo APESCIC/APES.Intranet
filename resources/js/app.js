@@ -43,6 +43,7 @@ import {
     X,
 } from 'lucide';
 import { initClockForm } from './operations/clock.js';
+import { initSignaturePads } from './operations/signature.js';
 import { initDrawer } from './shell/drawer.js';
 
 const icons = {
@@ -99,6 +100,7 @@ function init() {
     });
     initDrawer();
     initClockForm();
+    initSignaturePads();
 }
 
 if (document.readyState === 'loading') {

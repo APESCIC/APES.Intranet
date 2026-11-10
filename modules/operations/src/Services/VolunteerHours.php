@@ -7,6 +7,7 @@ use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 use Modules\Operations\Models\Timesheet;
+use Modules\Operations\Support\Csv;
 
 /**
  * Approved volunteer hours per person for a date range. The screen and the
@@ -43,37 +44,20 @@ final class VolunteerHours
      */
     public function csv(Collection $rows): string
     {
-        $handle = fopen('php://temp', 'r+');
-        fputcsv($handle, ['Name', 'Email', 'Team', 'Approved timesheets', 'Minutes', 'Hours'], escape: '');
+        $lines = $rows->map(fn (array $row) => [
+            $row['user']->name,
+            $row['user']->email,
+            (string) $row['user']->team,
+            $row['timesheets'],
+            $row['minutes'],
+            self::hours($row['minutes']),
+        ])->push(['Total', '', '', $rows->sum('timesheets'), $rows->sum('minutes'), self::hours((int) $rows->sum('minutes'))]);
 
-        foreach ($rows as $row) {
-            fputcsv($handle, [
-                $this->safe($row['user']->name),
-                $this->safe($row['user']->email),
-                $this->safe((string) $row['user']->team),
-                $row['timesheets'],
-                $row['minutes'],
-                self::hours($row['minutes']),
-            ], escape: '');
-        }
-
-        fputcsv($handle, ['Total', '', '', $rows->sum('timesheets'), $rows->sum('minutes'), self::hours((int) $rows->sum('minutes'))], escape: '');
-
-        rewind($handle);
-
-        return (string) stream_get_contents($handle);
+        return Csv::build(['Name', 'Email', 'Team', 'Approved timesheets', 'Minutes', 'Hours'], $lines);
     }
 
     public static function hours(int $minutes): string
     {
         return number_format($minutes / 60, 2, '.', '');
-    }
-
-    /**
-     * Stops spreadsheet formula injection from names typed by members.
-     */
-    private function safe(string $value): string
-    {
-        return preg_match('/^[=+\-@\t\r]/', $value) ? "'".$value : $value;
     }
 }
