@@ -49,7 +49,7 @@ it('shows the dashboard to every intranet role', function (RoleName $role) {
 })->with(RoleName::cases());
 
 it('shows menu items only to roles with their permission', function (RoleName $role, array $visible, array $hidden) {
-    $keys = menuKeysFor(userWithRole($role), MenuMode::Normal);
+    $keys = menuKeysFor(userWithRole($role), MenuMode::Staff);
 
     expect($keys)->toContain('dashboard', 'teams', 'updates', 'directory', 'rota', 'help-desk');
     foreach ($visible as $key) {
@@ -69,29 +69,36 @@ it('shows menu items only to roles with their permission', function (RoleName $r
     'admin' => [RoleName::Admin, ['hr', 'agreements'], ['roles', 'audit']],
 ]);
 
-it('keeps system admin items out of the Normal menu for admins', function () {
-    $keys = menuKeysFor(userWithRole(RoleName::Admin), MenuMode::Normal);
+it('keeps system admin items out of the Staff menu for admins', function () {
+    $keys = menuKeysFor(userWithRole(RoleName::Admin), MenuMode::Staff);
 
-    expect($keys)->not->toContain('roles', 'audit', 'access-review', 'system', 'totp')
+    expect($keys)->not->toContain('admin-overview', 'roles', 'audit', 'access-review', 'system', 'totp')
         ->and($keys)->toContain('hr', 'agreements', 'updates');
 });
 
-it('shows only the Admin inventory in Admin menu mode', function () {
+it('shows only the Admin inventory in the Admin panel, starting with the overview', function () {
     $keys = menuKeysFor(userWithRole(RoleName::Admin), MenuMode::Admin);
 
-    expect($keys)->toContain('roles', 'audit', 'access-review', 'system', 'totp')
+    expect($keys)->toContain('admin-overview', 'roles', 'audit', 'access-review', 'system', 'totp')
+        ->and($keys[0])->toBe('admin-overview')
         ->and($keys)->not->toContain('dashboard', 'updates', 'directory');
 });
 
+it('gives non-admins the Staff menu even if asked for the Admin panel', function () {
+    $keys = menuKeysFor(userWithRole(RoleName::Hr), MenuMode::Admin);
+
+    expect($keys)->toContain('dashboard', 'updates')
+        ->and($keys)->not->toContain('admin-overview', 'roles');
+});
+
 it('leaves out a menu group when none of its items are allowed', function () {
-    $headings = collect(Menu::for(userWithRole(RoleName::Staff), MenuMode::Normal))->pluck('heading');
+    $headings = collect(Menu::for(userWithRole(RoleName::Staff), MenuMode::Staff))->pluck('heading');
 
     expect($headings)->not->toContain('Admin', 'HR and legal');
 });
 
 it('renders the shell with a skip link, labelled menu and the current page marked', function () {
     $response = $this->actingAs(userWithRole(RoleName::Admin))
-        ->withSession([MenuMode::SESSION_KEY => MenuMode::Admin->value])
         ->get(route('admin.roles.index'))
         ->assertOk();
 
@@ -101,7 +108,7 @@ it('renders the shell with a skip link, labelled menu and the current page marke
         ->assertSee('aria-controls="workspace-drawer"', false)
         ->assertSee('Sam Example')
         ->assertSee('SE')
-        ->assertSee('Menu mode');
+        ->assertSee('data-panel-switch', false);
 
     expect($response->getContent())->toMatch('/data-nav-key="roles"\s+aria-current="page"/');
 });
@@ -111,7 +118,7 @@ it('does not render hidden menu items or the Admin switcher for non-admins', fun
         ->assertOk()
         ->assertDontSee('data-nav-key="roles"', false)
         ->assertDontSee('data-nav-key="hr"', false)
-        ->assertDontSee('Menu mode');
+        ->assertDontSee('data-panel-switch', false);
 });
 
 it('opens Teams in a new tab and marks planned features as not available yet', function () {
@@ -121,14 +128,10 @@ it('opens Teams in a new tab and marks planned features as not available yet', f
         ->assertSee('not available yet');
 });
 
-it('auto-switches an admin into Admin mode when opening an admin route', function () {
-    $admin = userWithRole(RoleName::Admin);
-
-    $this->actingAs($admin)
-        ->withSession([MenuMode::SESSION_KEY => MenuMode::Normal->value])
+it('shows the Admin panel to an admin on an admin route', function () {
+    $this->actingAs(userWithRole(RoleName::Admin))
         ->get(route('admin.roles.index'))
         ->assertOk()
-        ->assertSee('data-nav-key="roles"', false);
-
-    expect(session(MenuMode::SESSION_KEY))->toBe(MenuMode::Admin->value);
+        ->assertSee('data-nav-key="roles"', false)
+        ->assertDontSee('data-nav-key="updates"', false);
 });

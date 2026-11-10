@@ -66,7 +66,7 @@ class CoreServiceProvider extends ServiceProvider
             $user = auth()->user();
             $user = $user instanceof User ? $user : null;
 
-            $mode = $user ? Menu::resolveMode($user) : MenuMode::Normal;
+            $mode = $user ? Menu::resolveMode($user) : MenuMode::Staff;
             $view->with([
                 'menu' => Menu::for($user, $mode),
                 'menuMode' => $mode,

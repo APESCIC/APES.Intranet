@@ -2,17 +2,19 @@
 
 namespace App\Core\Navigation;
 
+/**
+ * The sidebar panel. The route decides it: admin.* pages are the Admin panel,
+ * everything else is the Staff panel. Nothing is stored in the session.
+ */
 enum MenuMode: string
 {
-    case Normal = 'normal';
+    case Staff = 'staff';
     case Admin = 'admin';
-
-    public const SESSION_KEY = 'intranet.menu_mode';
 
     public function label(): string
     {
         return match ($this) {
-            self::Normal => 'Normal',
+            self::Staff => 'Staff',
             self::Admin => 'Admin',
         };
     }

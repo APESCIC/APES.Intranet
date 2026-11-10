@@ -3,23 +3,21 @@
 namespace Modules\Communications\Http\Controllers;
 
 use App\Core\Access\RoleName;
-use App\Core\Navigation\MenuMode;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
+/**
+ * The old Normal/Admin form posted here. Pages open in old tabs may still
+ * post to it, so it sends people to the matching panel and stores nothing.
+ */
 class MenuModeController
 {
     public function __invoke(Request $request): RedirectResponse
     {
-        abort_unless($request->user()?->hasRole(RoleName::Admin->value), 403);
+        $isAdmin = $request->user()?->hasRole(RoleName::Admin->value) ?? false;
 
-        $data = $request->validate([
-            'mode' => ['required', 'in:normal,admin'],
-        ]);
-
-        $mode = MenuMode::from($data['mode']);
-        $request->session()->put(MenuMode::SESSION_KEY, $mode->value);
-
-        return back();
+        return $isAdmin && $request->input('mode') === 'admin'
+            ? redirect()->route('admin.overview')
+            : redirect()->route('dashboard');
     }
 }

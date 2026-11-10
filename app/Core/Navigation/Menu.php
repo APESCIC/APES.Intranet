@@ -8,8 +8,8 @@ use App\Models\User;
 
 /**
  * The sidebar menu. Each item shows only to people with its permission.
- * Admins may switch between Normal (member) and Admin inventories.
- * Modules add extra groups through MenuContributor bindings.
+ * Admins see the Admin inventory on admin.* pages and the Staff inventory
+ * everywhere else. Modules add extra groups through MenuContributor bindings.
  */
 final class Menu
 {
@@ -20,7 +20,7 @@ final class Menu
      *
      * @return list<NavGroup>
      */
-    public static function normalDefinition(): array
+    public static function staffDefinition(): array
     {
         return [
             new NavGroup('home', 'Home', [
@@ -59,7 +59,7 @@ final class Menu
     }
 
     /**
-     * System administration inventory. Shown only in Admin menu mode.
+     * System administration inventory. Shown only in the Admin panel.
      *
      * @return list<NavGroup>
      */
@@ -67,6 +67,7 @@ final class Menu
     {
         return [
             new NavGroup('admin', 'Admin', [
+                NavItem::route('admin-overview', 'Overview', 'layout-grid', AccessMatrix::INTRANET_ACCESS, 'admin.overview'),
                 NavItem::route('roles', 'Roles', 'shield-check', AccessMatrix::ADMIN_ROLES_VIEW, 'admin.roles.index', 'admin.roles.*'),
                 NavItem::route('audit', 'Audit log', 'scroll-text', AccessMatrix::ADMIN_AUDIT_VIEW, 'admin.audit.index'),
                 NavItem::route('access-review', 'Access review', 'clipboard-check', AccessMatrix::ACCESS_REVIEW_VIEW, 'admin.access-review.index'),
@@ -81,7 +82,7 @@ final class Menu
      */
     public static function definition(): array
     {
-        return self::normalDefinition();
+        return self::staffDefinition();
     }
 
     /**
@@ -96,7 +97,7 @@ final class Menu
         $mode ??= self::resolveMode($user);
         $groups = $mode === MenuMode::Admin && $user->hasRole(RoleName::Admin->value)
             ? self::adminDefinition()
-            : self::normalDefinition();
+            : self::staffDefinition();
 
         $groups = self::filterGroups($user, $groups);
 
@@ -111,21 +112,9 @@ final class Menu
 
     public static function resolveMode(User $user): MenuMode
     {
-        if (! $user->hasRole(RoleName::Admin->value)) {
-            session()->forget(MenuMode::SESSION_KEY);
-
-            return MenuMode::Normal;
-        }
-
-        if (self::currentRouteIsAdmin()) {
-            session([MenuMode::SESSION_KEY => MenuMode::Admin->value]);
-
-            return MenuMode::Admin;
-        }
-
-        $raw = session(MenuMode::SESSION_KEY);
-
-        return MenuMode::tryFrom(is_string($raw) ? $raw : '') ?? MenuMode::Normal;
+        return $user->hasRole(RoleName::Admin->value) && self::currentRouteIsAdmin()
+            ? MenuMode::Admin
+            : MenuMode::Staff;
     }
 
     public static function currentRouteIsAdmin(): bool

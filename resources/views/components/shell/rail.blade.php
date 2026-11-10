@@ -13,18 +13,18 @@
         </button>
     </div>
     @if ($showMenuModeSwitcher && $menuMode)
-        <form method="post" action="{{ route('communications.menu-mode') }}" class="sg-menu-mode" aria-label="Menu mode">
+        <form method="post" action="{{ route('communications.menu-mode') }}" class="sg-menu-mode" aria-label="Menu mode" data-panel-switch>
             @csrf
             <p class="sg-nav-heading" id="menu-mode-label">Menu mode</p>
             <div class="flex gap-2 px-3 pb-3" role="group" aria-labelledby="menu-mode-label">
                 <button
                     type="submit"
                     name="mode"
-                    value="normal"
-                    class="sg-btn sg-btn-sm {{ $menuMode->value === 'normal' ? 'sg-btn-primary' : 'sg-btn-secondary' }}"
-                    aria-pressed="{{ $menuMode->value === 'normal' ? 'true' : 'false' }}"
-                    aria-label="Normal menu mode, currently {{ $menuMode->label() }}"
-                >Normal</button>
+                    value="staff"
+                    class="sg-btn sg-btn-sm {{ $menuMode->value === 'staff' ? 'sg-btn-primary' : 'sg-btn-secondary' }}"
+                    aria-pressed="{{ $menuMode->value === 'staff' ? 'true' : 'false' }}"
+                    aria-label="Staff menu mode, currently {{ $menuMode->label() }}"
+                >Staff</button>
                 <button
                     type="submit"
                     name="mode"
