@@ -113,12 +113,32 @@ it('renders the shell with a skip link, labelled menu and the current page marke
     expect($response->getContent())->toMatch('/data-nav-key="roles"\s+aria-current="page"/');
 });
 
+it('renders the Staff and Admin switch for admins, marking the active panel', function () {
+    $admin = userWithRole(RoleName::Admin);
+
+    $adminPage = $this->actingAs($admin)->get(route('admin.roles.index'))->assertOk()->getContent();
+    expect($adminPage)
+        ->toContain('aria-label="Switch panel"')
+        ->toMatch('/href="'.preg_quote(route('admin.overview'), '/').'" class="sg-switch__link"\s+aria-current="true"\s*>Admin</')
+        ->toMatch('/href="'.preg_quote(route('dashboard'), '/').'" class="sg-switch__link"\s*>Staff</')
+        ->toContain('data-brand-panel>Admin panel<');
+
+    $staffPage = $this->actingAs($admin)->get(route('dashboard'))->assertOk()->getContent();
+    expect($staffPage)
+        ->toMatch('/href="'.preg_quote(route('dashboard'), '/').'" class="sg-switch__link"\s+aria-current="true"\s*>Staff</')
+        ->toContain('data-brand-panel>Staff panel<')
+        ->not->toContain('Normal')
+        ->not->toContain('Menu mode');
+});
+
 it('does not render hidden menu items or the Admin switcher for non-admins', function () {
     $this->actingAs(userWithRole(RoleName::Volunteer))->get(route('dashboard'))
         ->assertOk()
         ->assertDontSee('data-nav-key="roles"', false)
         ->assertDontSee('data-nav-key="hr"', false)
-        ->assertDontSee('data-panel-switch', false);
+        ->assertDontSee('data-panel-switch', false)
+        ->assertSee('data-brand-panel>APES CIC<', false)
+        ->assertDontSee('Staff panel');
 });
 
 it('opens Teams in a new tab and marks planned features as not available yet', function () {

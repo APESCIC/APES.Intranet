@@ -7,7 +7,7 @@ use App\Models\User;
 interface MenuContributor
 {
     /**
-     * Extra nav groups for the given user and menu mode.
+     * Extra nav groups for the given user and panel.
      *
      * @return list<NavGroup>
      */

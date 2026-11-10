@@ -69,8 +69,7 @@ class CoreServiceProvider extends ServiceProvider
             $mode = $user ? Menu::resolveMode($user) : MenuMode::Staff;
             $view->with([
                 'menu' => Menu::for($user, $mode),
-                'menuMode' => $mode,
-                'showMenuModeSwitcher' => $user?->hasRole(RoleName::Admin->value) ?? false,
+                'shellPanel' => $user?->hasRole(RoleName::Admin->value) ? $mode : null,
                 'shellUser' => $user,
                 'qaEnabled' => QaLogin::enabled(),
                 'footerVersion' => app(FooterVersion::class)->for($user),
