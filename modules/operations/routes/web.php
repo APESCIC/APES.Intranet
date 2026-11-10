@@ -8,6 +8,7 @@ use Modules\Operations\Http\Controllers\ClockController;
 use Modules\Operations\Http\Controllers\RotaController;
 use Modules\Operations\Http\Controllers\ShiftRequestController;
 use Modules\Operations\Http\Controllers\ShiftTemplateController;
+use Modules\Operations\Http\Controllers\TaskController;
 use Modules\Operations\Http\Controllers\TimesheetController;
 use Modules\Operations\OperationsPermissions;
 
@@ -49,6 +50,13 @@ Route::middleware(['web', 'auth'])->group(function () {
         Route::get('/timesheets/{timesheet}', [TimesheetController::class, 'show'])->whereNumber('timesheet')->name('timesheets.show');
         Route::post('/timesheets/{timesheet}/submit', [TimesheetController::class, 'submit'])->name('timesheets.submit');
         Route::post('/timesheets/{timesheet}/decide', [TimesheetController::class, 'decide'])->name('timesheets.decide');
+
+        Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
+        Route::get('/tasks/create', [TaskController::class, 'create'])->name('tasks.create');
+        Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
+        Route::get('/tasks/{task}', [TaskController::class, 'show'])->whereNumber('task')->name('tasks.show');
+        Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus'])->name('tasks.status');
+        Route::post('/tasks/{task}/comments', [TaskController::class, 'comment'])->name('tasks.comment');
 
         Route::get('/rota/availability', [AvailabilityController::class, 'index'])->name('rota.availability.index');
         Route::post('/rota/availability', [AvailabilityController::class, 'store'])->name('rota.availability.store');

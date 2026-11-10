@@ -2,10 +2,13 @@
 
 namespace Modules\Operations;
 
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Modules\Operations\Console\FlagMissedClockOuts;
 use Modules\Operations\Dashboard\OperationsDashboardCards;
+use Modules\Operations\Models\Task;
 use Modules\Operations\Navigation\OperationsMenuContributor;
+use Modules\Operations\Policies\TaskPolicy;
 
 class OperationsServiceProvider extends ServiceProvider
 {
@@ -24,5 +27,7 @@ class OperationsServiceProvider extends ServiceProvider
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'operations');
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         $this->commands([FlagMissedClockOuts::class]);
+
+        Gate::policy(Task::class, TaskPolicy::class);
     }
 }
