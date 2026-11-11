@@ -26,7 +26,7 @@
   "internal_notes": [
     "Reply-by-email is not available: the Cloudron app has no recvmail addon. The decision is recorded on the email issue.",
     "The Microsoft 365 note uses the handbook's licence wording. The owner confirms which groups hold licences on the help note issue.",
-    "Developer changes in this release: a new helpdesk module with four migrations, the help desk seeder runs on every deploy, menu groups can carry a short note, the live preview gate syncs roles and permissions, and the accessibility check covers the help desk pages."
+    "Developer changes in this release: a new helpdesk module with four migrations, the help desk seeder runs on every deploy, menu groups can carry a short note, the live preview gate syncs roles and permissions, and the accessibility check covers the help desk pages, raising a ticket through the form when there is no demo data."
   ],
   "published": true
 }
