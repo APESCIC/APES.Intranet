@@ -17,6 +17,7 @@ final class Tickets
         private readonly AuditLogger $audit,
         private readonly HtmlSanitizer $sanitizer,
         private readonly Sla $sla,
+        private readonly TicketMailer $mailer,
     ) {}
 
     /**
@@ -24,7 +25,7 @@ final class Tickets
      */
     public function raise(User $requester, Category $category, string $subject, string $body, ?string $priority = null): Ticket
     {
-        return DB::transaction(function () use ($requester, $category, $subject, $body, $priority) {
+        $ticket = DB::transaction(function () use ($requester, $category, $subject, $body, $priority) {
             $ticket = Ticket::query()->create([
                 'requester_id' => $requester->getKey(),
                 'queue' => $category->queue,
@@ -46,6 +47,10 @@ final class Tickets
 
             return $ticket;
         });
+
+        $this->mailer->raised($ticket->load(['requester', 'category']));
+
+        return $ticket;
     }
 
     /**
@@ -53,7 +58,7 @@ final class Tickets
      */
     public function reply(Ticket $ticket, User $author, string $body): Message
     {
-        return DB::transaction(function () use ($ticket, $author, $body) {
+        $message = DB::transaction(function () use ($ticket, $author, $body) {
             $message = $ticket->messages()->create([
                 'author_id' => $author->getKey(),
                 'body' => $this->sanitizer->clean($body),
@@ -70,6 +75,10 @@ final class Tickets
 
             return $message;
         });
+
+        $this->mailer->replied($ticket->load(['requester', 'assignee']), $message, $author);
+
+        return $message;
     }
 
     public function note(Ticket $ticket, User $author, string $body): Message
@@ -106,28 +115,28 @@ final class Tickets
                 ? $actor->name.' assigned this ticket to '.$assignee->name.'.'
                 : $actor->name.' took this ticket off '.($before->name ?? 'its assignee').'.');
         });
+
+        if ($assignee !== null) {
+            $this->mailer->assigned($ticket, $assignee, $actor);
+        }
     }
 
+    /**
+     * The requester is emailed once when the ticket is resolved or closed,
+     * not again when a resolved ticket is closed.
+     */
     public function changeStatus(Ticket $ticket, string $status, User $actor): void
     {
         if ($ticket->status === $status) {
             return;
         }
 
-        DB::transaction(function () use ($ticket, $status, $actor) {
-            $before = $ticket->status;
-            $ticket->forceFill([
-                'status' => $status,
-                'resolved_at' => match ($status) {
-                    Ticket::STATUS_RESOLVED => now(),
-                    Ticket::STATUS_CLOSED => $ticket->resolved_at ?? now(),
-                    default => null,
-                },
-                'closed_at' => $status === Ticket::STATUS_CLOSED ? now() : null,
-            ])->save();
+        $wasFinished = in_array($ticket->status, [Ticket::STATUS_RESOLVED, Ticket::STATUS_CLOSED], true);
+        DB::transaction(fn () => $this->applyStatus($ticket, $status, $actor));
 
-            $this->audit->record('helpdesk.ticket_status_changed', $ticket, ['from' => $before, 'to' => $status], $actor);
-        });
+        if (! $wasFinished && ! $ticket->isActive()) {
+            $this->mailer->finished($ticket->load('requester'));
+        }
     }
 
     /**
@@ -172,18 +181,38 @@ final class Tickets
      */
     public function merge(Ticket $duplicate, Ticket $target, User $actor): void
     {
-        DB::transaction(function () use ($duplicate, $target, $actor) {
+        $message = DB::transaction(function () use ($duplicate, $target, $actor) {
             $duplicate->forceFill(['merged_into_id' => $target->getKey()])->save();
-            $duplicate->messages()->create([
+            $message = $duplicate->messages()->create([
                 'author_id' => $actor->getKey(),
                 'body' => $this->sanitizer->clean('<p>This request was merged with '.e($target->reference()).', which covers the same thing. The help desk carries on there.</p>'),
                 'is_private' => false,
             ]);
-            $this->changeStatus($duplicate, Ticket::STATUS_CLOSED, $actor);
+            $this->applyStatus($duplicate, Ticket::STATUS_CLOSED, $actor);
 
             $this->systemNote($target, $actor, $actor->name.' merged '.$duplicate->reference().' ('.$duplicate->subject.') into this ticket.');
             $this->audit->record('helpdesk.ticket_merged', $duplicate, ['into' => $target->getKey()], $actor);
+
+            return $message;
         });
+
+        $this->mailer->replied($duplicate->load('requester'), $message, $actor);
+    }
+
+    private function applyStatus(Ticket $ticket, string $status, User $actor): void
+    {
+        $before = $ticket->status;
+        $ticket->forceFill([
+            'status' => $status,
+            'resolved_at' => match ($status) {
+                Ticket::STATUS_RESOLVED => now(),
+                Ticket::STATUS_CLOSED => $ticket->resolved_at ?? now(),
+                default => null,
+            },
+            'closed_at' => $status === Ticket::STATUS_CLOSED ? now() : null,
+        ])->save();
+
+        $this->audit->record('helpdesk.ticket_status_changed', $ticket, ['from' => $before, 'to' => $status], $actor);
     }
 
     private function systemNote(Ticket $ticket, User $actor, string $text): void
