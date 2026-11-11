@@ -33,6 +33,14 @@
                     </li>
                 @endforeach
             </ul>
+            @if ($group->note)
+                <p class="mx-3 mt-1 mb-2 text-xs leading-snug text-sg-muted" data-nav-note="{{ $group->key }}">
+                    {{ $group->note }}
+                    @foreach ($group->noteLinks as $label => $url)
+                        <a href="{{ $url }}" class="font-semibold text-sg-teal-dark underline">{{ $label }}</a>@if (! $loop->last) · @endif
+                    @endforeach
+                </p>
+            @endif
         </div>
     @endforeach
 </nav>

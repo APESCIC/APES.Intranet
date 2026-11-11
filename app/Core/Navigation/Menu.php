@@ -140,7 +140,7 @@ final class Menu
             ));
 
             if ($items !== []) {
-                $filtered[] = new NavGroup($group->key, $group->heading, $items);
+                $filtered[] = $group->withItems($items);
             }
         }
 

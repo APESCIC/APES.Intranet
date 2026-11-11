@@ -10,6 +10,7 @@ use App\Core\Navigation\NavItem;
 use App\Models\User;
 use Modules\Communications\CommunicationsPermissions;
 use Modules\Communications\Services\MicrosoftLinkRegistry;
+use Modules\Communications\Support\MicrosoftHelp;
 
 final class CommunicationsMenuContributor implements MenuContributor
 {
@@ -48,6 +49,6 @@ final class CommunicationsMenuContributor implements MenuContributor
             );
         }
 
-        return [new NavGroup('microsoft-365', 'Microsoft 365', $items)];
+        return [new NavGroup('microsoft-365', 'Microsoft 365', $items, MicrosoftHelp::note(), MicrosoftHelp::links())];
     }
 }

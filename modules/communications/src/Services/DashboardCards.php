@@ -10,6 +10,7 @@ use Modules\Communications\Models\DashboardDismissal;
 use Modules\Communications\Models\Event;
 use Modules\Communications\Models\UpdatePost;
 use Modules\Communications\Models\UpdateRead;
+use Modules\Communications\Support\MicrosoftHelp;
 
 class DashboardCards
 {
@@ -75,6 +76,8 @@ class DashboardCards
                 'body' => 'Open the apps you use at APES.',
                 'href' => null,
                 'apps' => $apps,
+                'note' => MicrosoftHelp::note(),
+                'note_links' => MicrosoftHelp::links(),
             ];
         }
 
