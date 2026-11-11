@@ -79,9 +79,9 @@ it('logs every assignment change', function () {
     $log = AuditLog::query()->where('event', 'helpdesk.ticket_assigned')->where('subject_id', $ticket->id)->orderBy('id')->get();
     expect($ticket->refresh()->assignee_id)->toBeNull()
         ->and($log)->toHaveCount(3)
-        ->and($log[0]->context)->toBe(['from' => null, 'to' => $this->admin->id])
-        ->and($log[1]->context)->toBe(['from' => $this->admin->id, 'to' => $otherAdmin->id])
-        ->and($log[2]->context)->toBe(['from' => $otherAdmin->id, 'to' => null])
+        ->and($log[0]->context)->toEqual(['from' => null, 'to' => $this->admin->id])
+        ->and($log[1]->context)->toEqual(['from' => $this->admin->id, 'to' => $otherAdmin->id])
+        ->and($log[2]->context)->toEqual(['from' => $otherAdmin->id, 'to' => null])
         ->and($ticket->messages()->where('is_private', true)->where('body', 'like', '%assigned this ticket to Robin Example%')->exists())->toBeTrue();
 });
 
