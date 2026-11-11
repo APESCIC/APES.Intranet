@@ -5,7 +5,7 @@ description: Work one GitHub issue from start to close in APES Intranet - assign
 
 # Work on one issue
 
-Follows `.cursor/rules/shipping.mdc`. One issue at a time. Comments use the templates in `templates/`; fill them in, write the result to a temporary file and post it with `gh issue comment <n> --body-file <file>`. Explain anything technical in one plain sentence. Never put a secret in a comment.
+Follows `.cursor/rules/shipping.mdc`. One issue at a time. Comments use the templates in `templates/`, never `Add-IssueUpdate.ps1` or another personal script; fill them in, write the result to a temporary file and post it with `gh issue comment <n> --body-file <file>`. Explain anything technical in one plain sentence. Never put a secret in a comment.
 
 ## 1. Start (before writing any code)
 

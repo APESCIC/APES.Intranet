@@ -43,6 +43,22 @@ above the latest tag, never GitHub's milestone number. A *hotfix* needs
 Bambie's written approval on the issue. The full flow, with a worked example,
 is in [CONTRIBUTING.md](CONTRIBUTING.md).
 
+### This repo's flow wins
+
+Where a personal Cursor rule or skill describes a different flow, follow this
+repo. In particular:
+
+- One issue branch and one PR per issue into the version branch, not one PR
+  for the whole milestone.
+- Close each issue by hand after its PR merges. The version PR says
+  `Refs #<epic>`, never `Closes`.
+- Branches are `milestone/vX-Y-Z-<slug>` and `<type>/<issue>-<slug>`, not
+  `cursor/feature/...`.
+- Issue comments use the templates in
+  [`.cursor/skills/work-on-issue/templates/`](.cursor/skills/work-on-issue/templates/),
+  not `Add-IssueUpdate.ps1`. The milestone closes with the `gh api` step in
+  the `deploy-version` skill, not `Close-Milestone.ps1`.
+
 ## Everyday commands
 
 Run them from the repo root with Laragon's PHP 8.4 and Node first on `PATH` ([how](docs/local-development.md#everyday-commands)).

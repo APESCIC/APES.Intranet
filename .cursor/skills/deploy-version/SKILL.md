@@ -5,7 +5,7 @@ description: Deploy a released version of APES Intranet to Cloudron with evidenc
 
 # Deploy a version and close it out
 
-Follows `.cursor/rules/shipping.mdc` and `docs/deploy/cloudron.md`. Needs the ship-gate answer (c or d) in the current chat. Every Cloudron app is production. Never print `.env` values, `APP_KEY` or addon credentials.
+Follows `.cursor/rules/shipping.mdc` and `docs/deploy/cloudron.md`. Use the steps below for the summary and close-out, not `Close-IssueTree.ps1` or `Close-Milestone.ps1`. Needs the ship-gate answer (c or d) in the current chat. Every Cloudron app is production. Never print `.env` values, `APP_KEY` or addon credentials.
 
 ## Steps
 
