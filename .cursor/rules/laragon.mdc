@@ -1,0 +1,30 @@
+---
+description: Laragon local set-up and the live preview gate for APES Intranet. Use before any code, test, doc, config, install or commit work, after every branch switch, and for anything about the local site, PHP, Composer, npm, Vite or the demo data.
+alwaysApply: false
+---
+
+# Laragon and the live preview gate
+
+Laragon is the only local set-up (decided 9 November 2026, #213). Never suggest containers, virtual machines or another server stack, and never run `php artisan serve` locally. The full guide is `docs/local-development.md`; the values are in `docs/laragon/profile.json`.
+
+## The gate, before any work and after every branch switch
+
+1. Put Laragon's NTS PHP 8.4, Composer and Node first on `PATH` for the session:
+   `$env:Path = 'C:\laragon\bin\php\php-8.4.27-1-nts-Win32-vs17-x64;C:\laragon\bin\composer;C:\laragon\bin\nodejs\node-v22;' + $env:Path; $env:XDEBUG_MODE = 'off'`
+2. Run `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\preview.ps1`. It loads the latest code, installs changed dependencies, reports pending migrations, checks `/healthz` shows the checked-out revision on PHP 8.4 through FastCGI, and starts Vite on port 5174.
+   - Exit 3 means a decision (uncommitted changes, a diverged branch, a merge conflict): ask with AskQuestion.
+   - Exit 1 is a blocker: report its message.
+3. Open <http://apes-intranet.test> in Cursor's browser, confirm it loaded, report the URL, the Vite port and a screenshot, then say "Preview ready, starting work".
+4. If it won't load after two attempts, stop and ask how to proceed.
+
+## Ask first
+
+- Running migrations, `php artisan demo:reset` (it empties the local database), or installing any system tool.
+- Starting Laragon, clicking Reload, or switching its profile or PHP version (Bambie has to click in Laragon).
+- `composer install` and `npm ci` may run without asking when `vendor/` or `node_modules/` is missing or a lock file changed.
+
+## Keep FastCGI safe
+
+- Never switch Laragon back to the thread-safe PHP build (mod_php).
+- `public/.htaccess`: no `php_value` or `php_flag` outside `<IfModule php_module>` (local equivalents go in `public/.user.ini`), and keep the `HTTP_AUTHORIZATION` rewrite rule. A test checks both.
+- Test with the demo data, signed in through <http://apes-intranet.test/qa>. Fake data only.

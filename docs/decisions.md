@@ -97,7 +97,7 @@ virtual machines or another local server stack, and never use
 - The version branch keeps the name `milestone/vX-Y-Z-<slug>`.
 - A hotfix ships early only with Bambie's written approval on the issue.
 - The steps are in [CONTRIBUTING.md](../CONTRIBUTING.md) and the rule
-  [`.cursor/rules/version-shipping.mdc`](../.cursor/rules/version-shipping.mdc).
+  [`.cursor/rules/shipping.mdc`](../.cursor/rules/shipping.mdc).
 
 ## Dependency updates
 
