@@ -5,7 +5,7 @@ description: Start or resume the next version of APES Intranet - live preview ga
 
 # Start the next version
 
-Follows `.cursor/rules/shipping.mdc`. One Cursor plan per version: when a new chat resumes a version, carry on with its existing plan.
+Follows `.cursor/rules/shipping.mdc`. One Cursor plan per version: when a new chat resumes a version, carry on with its existing plan (the approved copy is a comment on the Epic).
 
 ## Steps
 
