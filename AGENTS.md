@@ -61,7 +61,8 @@ repo. In particular:
 
 ## Everyday commands
 
-Run them from the repo root with Laragon's PHP 8.4 and Node first on `PATH` ([how](docs/local-development.md#everyday-commands)).
+Run them from the repo root with Laragon's PHP 8.4 and Node first on `PATH`:
+run `. .\scripts\laragon-env.ps1` once per terminal ([how](docs/local-development.md#everyday-commands)).
 
 | Command | What it does | When |
 | --- | --- | --- |
@@ -72,6 +73,7 @@ Run them from the repo root with Laragon's PHP 8.4 and Node first on `PATH` ([ho
 | `/finish-version` | Cursor: release note, version PR, ship gate, merge | Every issue closed |
 | `/release` | Cursor: tag and GitHub release | After the merge |
 | `/deploy` | Cursor: Cloudron deploy, evidence, close-out | After the release |
+| `. .\scripts\laragon-env.ps1` | Puts Laragon's PHP 8.4, Composer and Node first on `PATH` | Each new terminal |
 | `scripts\preview.ps1` | Loads the latest code and checks the preview | Before any work |
 | `scripts\laragon-setup.ps1` | Sets up or repairs Laragon for this repo | First time, or when broken |
 | `npm run dev` | Starts Vite hot reload on port 5174 | While working |

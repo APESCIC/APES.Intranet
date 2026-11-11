@@ -89,12 +89,17 @@ Laragon.
 
 The setup script sets `PATH` for its own run only. For your own commands,
 start each PowerShell session from the repository root with Laragon's PHP
-8.4, Composer and Node first on `PATH`. Use your version folders from
-`C:\laragon\bin`:
+8.4, Composer and Node first on `PATH`. This script finds the newest PHP 8.4
+NTS build and Node 22 in `C:\laragon\bin`, so it keeps working when Laragon
+updates PHP:
 
 ```powershell
-$env:Path = 'C:\laragon\bin\php\php-8.4.27-1-nts-Win32-vs17-x64;C:\laragon\bin\composer;C:\laragon\bin\nodejs\node-v22;' + $env:Path; $env:XDEBUG_MODE = 'off'
+. .\scripts\laragon-env.ps1
 ```
+
+The dot and space at the start matter: they keep the settings in your
+terminal. If PowerShell refuses to run scripts, run
+`Set-ExecutionPolicy -Scope Process Bypass` first, in the same terminal.
 
 Laragon's own terminal (the **Terminal** button) puts Laragon's active PHP,
 Composer and Node on `PATH` for you.
