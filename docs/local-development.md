@@ -155,13 +155,15 @@ Each APES repository is its own Laragon project, with its own:
 - database on the shared MySQL server;
 - Vite port: this project uses 5174, the others use 5173 or their own.
 
-They all share Laragon's Apache on port 80 and MySQL on port 3306. Apache
-runs PHP inside one Windows process for every site, so `bootstrap/app.php`
-stops Laravel from using `putenv()` there. Each project then keeps its own
-`.env` values, such as `APP_KEY` and `DB_DATABASE`, even under load. Laragon
-runs one PHP version for Apache at a time, so every project you run together
-needs to work on that version. APES Intranet needs PHP 8.4. If another project
-needs a different version, switch profile when you switch project.
+They all share Laragon's Apache on port 80 and MySQL on port 3306. Apache runs
+the NTS PHP through FastCGI, which starts separate PHP processes for each site,
+so each project keeps its own `.env` values, such as `APP_KEY` and
+`DB_DATABASE`. (If Apache is ever switched back to the thread-safe PHP build,
+which shares one process across sites, `bootstrap/app.php` stops Laravel using
+`putenv()` so the values still can't leak. Don't switch it back.) Laragon runs
+one PHP version for Apache at a time, so every project you run together needs
+to work on that version. APES Intranet needs PHP 8.4. If another project needs
+a different version, switch profile when you switch project.
 
 ## Checks before a pull request
 
@@ -178,8 +180,11 @@ $env:BASE_URL = 'http://apes-intranet.test'; $env:A11Y_BROWSER_CHANNEL = 'msedge
 The last line runs the accessibility check (axe and keyboard) against the
 preview, using Microsoft Edge. See [accessibility.md](accessibility.md).
 
-Tests use an in-memory SQLite database, so they never touch
-`apes_intranet_local`. CI runs the same tests on PHP 8.3.
+Locally, tests use an in-memory SQLite database (set in `phpunit.xml`), so
+they never touch `apes_intranet_local`. CI runs the same tests on PHP 8.3
+against a MySQL 8.4 database, so a test that passes locally can still fail on a
+MySQL-only difference. What each CI check does is in
+[workflows.md](workflows.md).
 
 ## Mail
 
