@@ -9,6 +9,7 @@ parameters:
         - modules/people/database/migrations
         - modules/communications/database/migrations
         - modules/operations/database/migrations
+        - modules/helpdesk/database/migrations
     paths:
         - app/
         - bootstrap/app.php
