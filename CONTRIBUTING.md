@@ -85,7 +85,7 @@ Say the next version is `v0.6.0 HR and training`, and issue #123 is
 
    ```powershell
    git push -u origin HEAD
-   gh pr create --base milestone/v0-6-0-hr-training --title "[v0.6.0] Keep the rota filter on reload (#123)" --body-file report.md
+   gh pr create --base milestone/v0-6-0-hr-training --title "[v0.6.0] Keep the rota filter on reload (#123)" --body-file "$env:TEMP\report.md"
    ```
 
 3. **Progress.** Post a comment at each meaningful point: the PR opened, CI

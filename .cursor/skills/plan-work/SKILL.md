@@ -19,6 +19,6 @@ Read only until Bambie approves. No edits, commits or comments other than postin
    5. Risks, and how you'll avoid them.
    6. Glossary: every technical term in one plain sentence (reuse `docs/glossary.md`).
 4. **Heading.** Use the agent name as the plan's heading: `<milestone title> – APES.Intranet`, or `APES.Intranet – <short task name>` for work with no milestone. Under 60 characters, with the version and never the milestone number.
-5. **Post it** on the issue when asked: `gh issue comment <n> --body-file <plan>`, or as a checklist in the issue body.
+5. **Post it** on the issue when asked: `gh issue comment <n> --body-file "$env:TEMP\plan.md"`, or as a checklist in the issue body.
 6. **Ask for approval** with AskQuestion: "Approve the plan (Recommended)", "Revise it", "Stop here". Ask about each open decision the same way. **Wait.**
 7. **After approval:** rename this chat to the plan's heading. If you can't, put `Suggested agent name: <name>` as the first line of your reply. Then carry out the tasks (for issues, with `work-on-issue`).
