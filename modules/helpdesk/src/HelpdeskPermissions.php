@@ -4,6 +4,7 @@ namespace Modules\Helpdesk;
 
 use App\Core\Access\RoleName;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Modules\Helpdesk\Models\Ticket;
 
 final class HelpdeskPermissions
@@ -45,6 +46,16 @@ final class HelpdeskPermissions
     public static function works(User $user, string $queue): bool
     {
         return $user->can(self::forQueue($queue));
+    }
+
+    /**
+     * Active people who work the queue, for assigning tickets.
+     *
+     * @return Collection<int, User>
+     */
+    public static function agents(string $queue): Collection
+    {
+        return User::query()->active()->permission(self::forQueue($queue))->orderBy('name')->get();
     }
 
     /**

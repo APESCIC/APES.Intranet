@@ -6,6 +6,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use Modules\Helpdesk\HelpdeskPermissions;
 use Modules\Helpdesk\Models\Category;
 use Modules\Helpdesk\Models\Ticket;
 use Modules\Helpdesk\Services\Tickets;
@@ -61,13 +62,14 @@ class TicketController
         abort_unless($user->can('view', $ticket), 403);
 
         $canWork = $user->can('work', $ticket);
-        $ticket->load(['requester', 'assignee', 'category']);
+        $ticket->load(['requester', 'assignee', 'category', 'mergedInto']);
 
         return view('helpdesk::tickets.show', [
             'ticket' => $ticket,
             'messages' => ($canWork ? $ticket->messages() : $ticket->publicMessages())->with('author')->get(),
             'canWork' => $canWork,
             'canReply' => $user->can('reply', $ticket),
+            'agents' => $canWork ? HelpdeskPermissions::agents($ticket->queue) : collect(),
         ]);
     }
 

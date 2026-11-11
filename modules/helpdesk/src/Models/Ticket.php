@@ -37,7 +37,7 @@ class Ticket extends Model
 
     protected $table = 'helpdesk_tickets';
 
-    protected $fillable = ['requester_id', 'queue', 'category_id', 'priority', 'status', 'subject', 'assignee_id'];
+    protected $fillable = ['requester_id', 'queue', 'category_id', 'priority', 'status', 'subject', 'assignee_id', 'merged_into_id'];
 
     /**
      * @return BelongsTo<User, $this>
@@ -61,6 +61,14 @@ class Ticket extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * @return BelongsTo<Ticket, $this>
+     */
+    public function mergedInto(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'merged_into_id');
     }
 
     /**
@@ -121,6 +129,15 @@ class Ticket extends Model
     public function scopeRequestedBy(Builder $query, User $user): Builder
     {
         return $query->where('requester_id', $user->getKey());
+    }
+
+    /**
+     * @param  Builder<Ticket>  $query
+     * @return Builder<Ticket>
+     */
+    public function scopeInQueue(Builder $query, string $queue): Builder
+    {
+        return $query->where('queue', $queue);
     }
 
     /**
