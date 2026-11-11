@@ -31,7 +31,7 @@ Follows `.cursor/rules/shipping.mdc`. One issue at a time. Comments use the temp
 2. Post **Work complete** from `templates/work-complete.md`: what changed, how it was checked (commands and results), the PR link, and anything Bambie needs to know or do.
 3. Close it: `gh issue close <n> --reason completed`. GitHub only closes issues by itself on merges into `main`.
 4. Confirm: `gh issue view <n> --json state` must show `CLOSED`.
-5. Tick the issue in the Epic's checklist.
+5. Tick the issue in the Epic's checklist. Save the body to a file first, so its line breaks survive: `gh issue view <epic> --json body --jq .body | Out-File -Encoding utf8 epic.md`. Change `- [ ] #<n>` to `- [x] #<n>` with the file tools, then run `gh issue edit <epic> --body-file epic.md` and check the result with `gh issue view <epic>`.
 
 ## 4. Next
 
