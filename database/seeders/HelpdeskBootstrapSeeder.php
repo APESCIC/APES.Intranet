@@ -19,6 +19,7 @@ class HelpdeskBootstrapSeeder extends Seeder
 
         $defaults = [
             ['slug' => 'sign-in', 'name' => 'Sign-in or account problem', 'queue' => Ticket::QUEUE_IT, 'default_priority' => 'high', 'sort_order' => 10],
+            ['slug' => 'lost-device-or-2fa-reset', 'name' => 'Lost device or 2FA reset', 'queue' => Ticket::QUEUE_IT, 'default_priority' => 'high', 'requires_identity_check' => true, 'sort_order' => 15],
             ['slug' => 'microsoft-365', 'name' => 'Microsoft 365 apps and licences', 'queue' => Ticket::QUEUE_IT, 'default_priority' => 'normal', 'sort_order' => 20],
             ['slug' => 'devices', 'name' => 'Laptop, phone or printer', 'queue' => Ticket::QUEUE_IT, 'default_priority' => 'normal', 'sort_order' => 30],
             ['slug' => 'access-request', 'name' => 'Access to an app or shared folder', 'queue' => Ticket::QUEUE_IT, 'default_priority' => 'low', 'sort_order' => 40],

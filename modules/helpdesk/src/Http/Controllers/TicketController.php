@@ -62,7 +62,7 @@ class TicketController
         abort_unless($user->can('view', $ticket), 403);
 
         $canWork = $user->can('work', $ticket);
-        $ticket->load(['requester', 'assignee', 'category', 'mergedInto']);
+        $ticket->load(['requester', 'assignee', 'category', 'mergedInto', 'identityCheck.checker', 'twoFactorResetter']);
 
         return view('helpdesk::tickets.show', [
             'ticket' => $ticket,

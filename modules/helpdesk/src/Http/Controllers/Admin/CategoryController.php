@@ -54,7 +54,11 @@ class CategoryController
             'sort_order' => ['nullable', 'integer', 'min:0', 'max:1000'],
         ]);
 
-        return ['sort_order' => (int) ($data['sort_order'] ?? 0), 'active' => $request->boolean('active')] + $data;
+        return [
+            'sort_order' => (int) ($data['sort_order'] ?? 0),
+            'active' => $request->boolean('active'),
+            'requires_identity_check' => $request->boolean('requires_identity_check'),
+        ] + $data;
     }
 
     private function uniqueSlug(string $name): string

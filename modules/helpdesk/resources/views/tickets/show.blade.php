@@ -68,6 +68,45 @@
 
         @if ($canWork)
             <aside class="grid content-start gap-6" aria-label="Work on this ticket">
+                @if ($ticket->requiresIdentityCheck())
+                    <section class="sg-card grid gap-3 border-2 border-sg-warn p-6" aria-labelledby="identity-heading" data-identity-check>
+                        <h2 id="identity-heading" class="font-serif text-xl font-semibold">Identity check</h2>
+                        @if ($ticket->identityCheck)
+                            <p><span class="sg-badge sg-badge--ok">Checked</span> {{ $ticket->identityCheck->methodLabel() }}.</p>
+                            <p class="text-sm text-sg-muted">Recorded by {{ $ticket->identityCheck->checker?->name ?? '—' }} on {{ $ticket->identityCheck->checked_at->format('D j M H:i') }}.</p>
+                        @elseif ($ticket->queue === \Modules\Helpdesk\Models\Ticket::QUEUE_IT && ! $ticket->isClosed())
+                            <p class="text-sm">Check who the member is before you reset anything. The ticket cannot be resolved or closed until this is recorded.</p>
+                            <form method="post" action="{{ route('helpdesk.tickets.identity-check', $ticket) }}" class="grid gap-3">
+                                @csrf
+                                <fieldset class="grid gap-2">
+                                    <legend class="sg-label">How did you check?</legend>
+                                    @foreach (\Modules\Helpdesk\Models\IdentityCheck::METHODS as $value => $label)
+                                        <label class="flex items-start gap-2 text-sm"><input type="radio" name="method" value="{{ $value }}" required @checked(old('method') === $value)> {{ $label }}</label>
+                                    @endforeach
+                                </fieldset>
+                                <div>
+                                    <label class="sg-label" for="identity-note">Note (optional)</label>
+                                    <textarea id="identity-note" name="note" rows="2" maxlength="1000" class="sg-input w-full" aria-describedby="identity-note-help">{{ old('note') }}</textarea>
+                                    <p id="identity-note-help" class="mt-1 text-sm text-sg-muted">Do not write phone numbers, codes or recovery keys here.</p>
+                                </div>
+                                <div><button type="submit" class="sg-btn sg-btn-primary sg-btn-sm">Record identity check</button></div>
+                            </form>
+                        @else
+                            <p class="text-sm text-sg-muted">No identity check recorded.</p>
+                        @endif
+
+                        @if ($ticket->two_factor_reset_at)
+                            <p><span class="sg-badge sg-badge--ok">2FA reset</span> by {{ $ticket->twoFactorResetter?->name ?? '—' }} on {{ $ticket->two_factor_reset_at->format('D j M H:i') }}.</p>
+                        @elseif ($ticket->identityCheck && $ticket->queue === \Modules\Helpdesk\Models\Ticket::QUEUE_IT && ! $ticket->isClosed())
+                            <form method="post" action="{{ route('helpdesk.tickets.two-factor-reset', $ticket) }}" class="grid gap-2">
+                                @csrf
+                                <p class="text-sm">Reset 2FA on the member's Cloudron user page first, then record it here.</p>
+                                <div><button type="submit" class="sg-btn sg-btn-secondary sg-btn-sm">Record 2FA reset</button></div>
+                            </form>
+                        @endif
+                    </section>
+                @endif
+
                 <form method="post" action="{{ route('helpdesk.tickets.assign', $ticket) }}" class="sg-card grid gap-3 p-6">
                     @csrf
                     @method('patch')

@@ -6,8 +6,10 @@ use App\Core\Audit\AuditLogger;
 use App\Core\Support\HtmlSanitizer;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Modules\Helpdesk\HelpdeskPermissions;
 use Modules\Helpdesk\Models\Category;
+use Modules\Helpdesk\Models\IdentityCheck;
 use Modules\Helpdesk\Models\Message;
 use Modules\Helpdesk\Models\Ticket;
 
@@ -131,6 +133,12 @@ final class Tickets
             return;
         }
 
+        if (! in_array($status, Ticket::ACTIVE_STATUSES, true) && $ticket->requiresIdentityCheck() && ! $ticket->hasIdentityCheck()) {
+            throw ValidationException::withMessages([
+                'status' => 'Record how you checked who the member is before you resolve or close this ticket.',
+            ]);
+        }
+
         $wasFinished = in_array($ticket->status, [Ticket::STATUS_RESOLVED, Ticket::STATUS_CLOSED], true);
         DB::transaction(fn () => $this->applyStatus($ticket, $status, $actor));
 
@@ -197,6 +205,42 @@ final class Tickets
         });
 
         $this->mailer->replied($duplicate->load('requester'), $message, $actor);
+    }
+
+    public function recordIdentityCheck(Ticket $ticket, string $method, ?string $note, User $actor): IdentityCheck
+    {
+        return DB::transaction(function () use ($ticket, $method, $note, $actor) {
+            $check = IdentityCheck::query()->create([
+                'ticket_id' => $ticket->getKey(),
+                'method' => $method,
+                'note' => filled($note) ? $note : null,
+                'checked_by' => $actor->getKey(),
+                'checked_at' => now(),
+            ]);
+
+            $this->systemNote($ticket, $actor, $actor->name.' recorded the identity check: '.$check->methodLabel().'.');
+            $this->audit->record('helpdesk.identity_checked', $ticket, ['method' => $method, 'member_id' => $ticket->requester_id], $actor);
+
+            return $check;
+        });
+    }
+
+    /**
+     * The reset itself is done on the member's Cloudron user page; this
+     * records that it happened.
+     */
+    public function recordTwoFactorReset(Ticket $ticket, User $actor): void
+    {
+        if (! $ticket->hasIdentityCheck()) {
+            throw ValidationException::withMessages(['reset' => 'Record the identity check first.']);
+        }
+
+        DB::transaction(function () use ($ticket, $actor) {
+            $ticket->forceFill(['two_factor_reset_at' => now(), 'two_factor_reset_by' => $actor->getKey()])->save();
+
+            $this->systemNote($ticket, $actor, $actor->name.' reset 2FA for '.($ticket->requester->name ?? 'the member').' on Cloudron.');
+            $this->audit->record('helpdesk.two_factor_reset', $ticket, ['member_id' => $ticket->requester_id], $actor);
+        });
     }
 
     private function applyStatus(Ticket $ticket, string $status, User $actor): void

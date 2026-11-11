@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Ticket extends Model
 {
@@ -70,6 +71,32 @@ class Ticket extends Model
     public function mergedInto(): BelongsTo
     {
         return $this->belongsTo(self::class, 'merged_into_id');
+    }
+
+    /**
+     * @return HasOne<IdentityCheck, $this>
+     */
+    public function identityCheck(): HasOne
+    {
+        return $this->hasOne(IdentityCheck::class)->latestOfMany();
+    }
+
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function twoFactorResetter(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'two_factor_reset_by');
+    }
+
+    public function requiresIdentityCheck(): bool
+    {
+        return (bool) $this->category?->requires_identity_check;
+    }
+
+    public function hasIdentityCheck(): bool
+    {
+        return $this->identityCheck()->exists();
     }
 
     /**
@@ -220,6 +247,7 @@ class Ticket extends Model
             'response_due_at' => 'immutable_datetime',
             'resolve_due_at' => 'immutable_datetime',
             'first_responded_at' => 'immutable_datetime',
+            'two_factor_reset_at' => 'immutable_datetime',
         ];
     }
 }

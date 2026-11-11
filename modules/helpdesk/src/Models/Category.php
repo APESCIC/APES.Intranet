@@ -10,7 +10,7 @@ class Category extends Model
 {
     protected $table = 'helpdesk_categories';
 
-    protected $fillable = ['slug', 'name', 'queue', 'default_priority', 'active', 'sort_order'];
+    protected $fillable = ['slug', 'name', 'queue', 'default_priority', 'requires_identity_check', 'active', 'sort_order'];
 
     /**
      * @return HasMany<Ticket, $this>
@@ -50,6 +50,7 @@ class Category extends Model
     {
         return [
             'active' => 'boolean',
+            'requires_identity_check' => 'boolean',
         ];
     }
 }

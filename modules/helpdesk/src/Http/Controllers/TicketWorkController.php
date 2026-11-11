@@ -9,6 +9,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Modules\Helpdesk\HelpdeskPermissions;
 use Modules\Helpdesk\Models\Category;
+use Modules\Helpdesk\Models\IdentityCheck;
 use Modules\Helpdesk\Models\Ticket;
 use Modules\Helpdesk\Services\Tickets;
 
@@ -75,6 +76,39 @@ class TicketWorkController
         return back()->with('status', 'Topic and priority saved.');
     }
 
+    public function identityCheck(Request $request, Ticket $ticket, Tickets $tickets): RedirectResponse
+    {
+        $this->authoriseTwoFactorWork($request->user(), $ticket);
+
+        $data = $request->validate([
+            'method' => ['required', Rule::in(array_keys(IdentityCheck::METHODS))],
+            'note' => ['nullable', 'string', 'max:1000'],
+        ]);
+        $tickets->recordIdentityCheck($ticket, $data['method'], $data['note'] ?? null, $request->user());
+
+        return back()->with('status', 'Identity check recorded.');
+    }
+
+    public function twoFactorReset(Request $request, Ticket $ticket, Tickets $tickets): RedirectResponse
+    {
+        $this->authoriseTwoFactorWork($request->user(), $ticket);
+
+        $tickets->recordTwoFactorReset($ticket, $request->user());
+
+        return back()->with('status', '2FA reset recorded.');
+    }
+
+    /**
+     * Only the IT queue checks identity and resets 2FA.
+     */
+    private function authoriseTwoFactorWork(User $user, Ticket $ticket): void
+    {
+        abort_unless(
+            $ticket->queue === Ticket::QUEUE_IT && $ticket->requiresIdentityCheck() && $user->can('work', $ticket) && ! $ticket->isClosed(),
+            403,
+        );
+    }
+
     public function merge(Request $request, Ticket $ticket, Tickets $tickets): RedirectResponse
     {
         $user = $request->user();
@@ -89,6 +123,9 @@ class TicketWorkController
         }
         if ($target === null || $target->is($ticket) || $target->isClosed() || ! $user->can('work', $target)) {
             throw ValidationException::withMessages(['target' => 'Enter the reference of another open ticket in a queue you work, for example HD-0012.']);
+        }
+        if ($ticket->requiresIdentityCheck() && ! $ticket->hasIdentityCheck() && ! $target->requiresIdentityCheck()) {
+            throw ValidationException::withMessages(['target' => 'This ticket needs an identity check, so it can only be merged into another ticket that needs one.']);
         }
 
         $tickets->merge($ticket, $target, $user);

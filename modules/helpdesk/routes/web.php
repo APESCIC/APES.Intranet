@@ -23,6 +23,8 @@ Route::middleware(['web', 'auth'])->group(function () {
         Route::patch('/tickets/{ticket}/status', [TicketWorkController::class, 'status'])->whereNumber('ticket')->name('tickets.status');
         Route::post('/tickets/{ticket}/merge', [TicketWorkController::class, 'merge'])->whereNumber('ticket')->name('tickets.merge');
         Route::patch('/tickets/{ticket}/topic', [TicketWorkController::class, 'reclassify'])->whereNumber('ticket')->name('tickets.reclassify');
+        Route::post('/tickets/{ticket}/identity-check', [TicketWorkController::class, 'identityCheck'])->whereNumber('ticket')->name('tickets.identity-check');
+        Route::post('/tickets/{ticket}/two-factor-reset', [TicketWorkController::class, 'twoFactorReset'])->whereNumber('ticket')->name('tickets.two-factor-reset');
 
         Route::middleware('can:'.HelpdeskPermissions::REPORTS_VIEW)->group(function () {
             Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');

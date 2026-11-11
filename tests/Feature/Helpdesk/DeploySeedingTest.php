@@ -49,5 +49,6 @@ it('keeps the help desk grants and categories after a deploy re-runs the seeders
     expect(Role::findByName(RoleName::Management->value)->hasPermissionTo(HelpdeskPermissions::QUEUE_IT))->toBeFalse()
         ->and(Role::findByName(RoleName::Staff->value)->hasPermissionTo(HelpdeskPermissions::QUEUE_MANAGEMENT))->toBeFalse()
         ->and(Category::query()->where('slug', 'devices')->value('name'))->toBe('Renamed by an admin')
-        ->and(Category::query()->count())->toBe(8);
+        ->and(Category::query()->count())->toBe(9)
+        ->and(Category::query()->where('slug', 'lost-device-or-2fa-reset')->value('requires_identity_check'))->toBeTruthy();
 });

@@ -23,7 +23,7 @@
     <ul class="mb-6 grid gap-4">
         @foreach ($categories as $category)
             <li class="sg-card p-5" data-category="{{ $category->slug }}">
-                <form method="post" action="{{ route('admin.helpdesk.categories.update', $category) }}" class="grid gap-3 md:grid-cols-[2fr_1fr_1fr_6rem_auto_auto] md:items-end">
+                <form method="post" action="{{ route('admin.helpdesk.categories.update', $category) }}" class="grid gap-3 md:grid-cols-[2fr_1fr_1fr_6rem_auto_auto_auto] md:items-end">
                     @csrf
                     @method('put')
                     <div>
@@ -51,6 +51,7 @@
                         <input id="sort-{{ $category->id }}" type="number" name="sort_order" min="0" max="1000" class="sg-input w-full" value="{{ $category->sort_order }}">
                     </div>
                     <label class="inline-flex items-center gap-2 text-sm"><input type="checkbox" name="active" value="1" @checked($category->active)> In use</label>
+                    <label class="inline-flex items-center gap-2 text-sm"><input type="checkbox" name="requires_identity_check" value="1" @checked($category->requires_identity_check)> Identity check before closing</label>
                     <button type="submit" class="sg-btn sg-btn-secondary sg-btn-sm">Save</button>
                 </form>
                 <p class="mt-2 text-sm text-sg-muted">{{ $category->tickets_count }} {{ \Illuminate\Support\Str::plural('ticket', $category->tickets_count) }}</p>
@@ -87,6 +88,7 @@
                 <input id="new-sort" type="number" name="sort_order" min="0" max="1000" value="50" class="sg-input w-full">
             </div>
         </div>
+        <label class="inline-flex items-center gap-2 text-sm"><input type="checkbox" name="requires_identity_check" value="1"> Identity check before closing</label>
         <input type="hidden" name="active" value="1">
         <div><button type="submit" class="sg-btn sg-btn-primary sg-btn-sm">Add topic</button></div>
     </form>
