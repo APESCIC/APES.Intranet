@@ -5,14 +5,19 @@
         @foreach ($views as $key => $label)
             <a
                 href="{{ route('helpdesk.queues.'.$queue, ['view' => $key]) }}"
-                @class(['sg-btn sg-btn-sm', 'sg-btn-primary' => $view === $key, 'sg-btn-secondary' => $view !== $key])
-                @if ($view === $key) aria-current="page" @endif
+                @class(['sg-btn sg-btn-sm', 'sg-btn-primary' => $view === $key && ! $from, 'sg-btn-secondary' => $view !== $key || $from])
+                @if ($view === $key && ! $from) aria-current="page" @endif
             >{{ $label }}</a>
         @endforeach
     </nav>
 
     <section class="sg-card p-6" aria-labelledby="queue-tickets">
-        <h2 id="queue-tickets" class="mb-3 font-serif text-xl font-semibold">{{ $views[$view] }}</h2>
+        <h2 id="queue-tickets" class="mb-3 font-serif text-xl font-semibold">
+            {{ $heading }}
+            @if ($from && $to)
+                <span class="block text-base font-normal text-sg-muted" data-period>Raised {{ $from->format('j M Y') }} to {{ $to->format('j M Y') }}</span>
+            @endif
+        </h2>
         @include('helpdesk::tickets.list', [
             'tickets' => $tickets,
             'label' => $queueLabel.' queue tickets',

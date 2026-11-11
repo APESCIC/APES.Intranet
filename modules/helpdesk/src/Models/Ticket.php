@@ -3,6 +3,7 @@
 namespace Modules\Helpdesk\Models;
 
 use App\Models\User;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -122,9 +123,12 @@ class Ticket extends Model
         return (int) $this->requester_id === (int) $user->getKey();
     }
 
+    /**
+     * Resolving a ticket without a public reply also stops the reply clock.
+     */
     public function responseBreached(): bool
     {
-        return $this->response_due_at !== null && ($this->first_responded_at ?? now())->greaterThan($this->response_due_at);
+        return $this->response_due_at !== null && ($this->first_responded_at ?? $this->resolved_at ?? now())->greaterThan($this->response_due_at);
     }
 
     public function resolveBreached(): bool
@@ -151,8 +155,9 @@ class Ticket extends Model
         $now = now();
 
         return $query->where(fn (Builder $q) => $q
-            ->where(fn (Builder $r) => $r->whereNull('first_responded_at')->where('response_due_at', '<', $now))
+            ->where(fn (Builder $r) => $r->whereNull('first_responded_at')->whereNull('resolved_at')->where('response_due_at', '<', $now))
             ->orWhereColumn('first_responded_at', '>', 'response_due_at')
+            ->orWhere(fn (Builder $r) => $r->whereNull('first_responded_at')->whereColumn('resolved_at', '>', 'response_due_at'))
             ->orWhere(fn (Builder $r) => $r->whereNull('resolved_at')->where('resolve_due_at', '<', $now))
             ->orWhereColumn('resolved_at', '>', 'resolve_due_at'));
     }
@@ -173,6 +178,26 @@ class Ticket extends Model
     public function scopeInQueue(Builder $query, string $queue): Builder
     {
         return $query->where('queue', $queue);
+    }
+
+    /**
+     * Raised on or between the two dates, whole days.
+     *
+     * @param  Builder<Ticket>  $query
+     * @return Builder<Ticket>
+     */
+    public function scopeRaisedBetween(Builder $query, CarbonInterface $from, CarbonInterface $to): Builder
+    {
+        return $query->whereBetween('created_at', [$from->copy()->startOfDay(), $to->copy()->endOfDay()]);
+    }
+
+    /**
+     * @param  Builder<Ticket>  $query
+     * @return Builder<Ticket>
+     */
+    public function scopeFinished(Builder $query): Builder
+    {
+        return $query->whereNotIn('status', self::ACTIVE_STATUSES);
     }
 
     /**

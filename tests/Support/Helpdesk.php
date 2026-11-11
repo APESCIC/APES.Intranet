@@ -44,7 +44,7 @@ final class Helpdesk
     {
         $category = self::category($category);
 
-        $ticket = Ticket::query()->create($attributes + [
+        $ticket = Ticket::query()->forceCreate($attributes + [
             'requester_id' => $requester->getKey(),
             'queue' => $category->queue,
             'category_id' => $category->getKey(),

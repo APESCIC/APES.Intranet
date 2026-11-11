@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Modules\Helpdesk\HelpdeskPermissions;
 use Modules\Helpdesk\Http\Controllers\Admin\CategoryController;
 use Modules\Helpdesk\Http\Controllers\QueueController;
+use Modules\Helpdesk\Http\Controllers\ReportController;
 use Modules\Helpdesk\Http\Controllers\TicketController;
 use Modules\Helpdesk\Http\Controllers\TicketWorkController;
 use Modules\Helpdesk\Models\Ticket;
@@ -22,6 +23,11 @@ Route::middleware(['web', 'auth'])->group(function () {
         Route::patch('/tickets/{ticket}/status', [TicketWorkController::class, 'status'])->whereNumber('ticket')->name('tickets.status');
         Route::post('/tickets/{ticket}/merge', [TicketWorkController::class, 'merge'])->whereNumber('ticket')->name('tickets.merge');
         Route::patch('/tickets/{ticket}/topic', [TicketWorkController::class, 'reclassify'])->whereNumber('ticket')->name('tickets.reclassify');
+
+        Route::middleware('can:'.HelpdeskPermissions::REPORTS_VIEW)->group(function () {
+            Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+            Route::get('/reports.csv', [ReportController::class, 'csv'])->name('reports.csv');
+        });
 
         foreach (array_keys(Ticket::QUEUES) as $queue) {
             Route::get('/queues/'.$queue, [QueueController::class, 'show'])->defaults('queue', $queue)->name('queues.'.$queue);

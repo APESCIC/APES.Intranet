@@ -25,6 +25,7 @@ final class HelpdeskMenuContributor implements MenuContributor
             new NavGroup('helpdesk-queues', 'Help desk queues', [
                 NavItem::route('helpdesk-it', 'IT queue', 'monitor-cog', HelpdeskPermissions::QUEUE_IT, 'helpdesk.queues.it'),
                 NavItem::route('helpdesk-management', 'Management queue', 'briefcase', HelpdeskPermissions::QUEUE_MANAGEMENT, 'helpdesk.queues.management'),
+                NavItem::route('helpdesk-reports', 'Help desk reports', 'chart-column', HelpdeskPermissions::REPORTS_VIEW, 'helpdesk.reports.index', 'helpdesk.reports.*'),
             ]),
         ];
     }

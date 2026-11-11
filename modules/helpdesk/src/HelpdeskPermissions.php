@@ -15,6 +15,8 @@ final class HelpdeskPermissions
 
     public const CATEGORIES_MANAGE = 'helpdesk.categories.manage';
 
+    public const REPORTS_VIEW = 'helpdesk.reports.view';
+
     /**
      * @return array<string, string>
      */
@@ -24,6 +26,7 @@ final class HelpdeskPermissions
             self::QUEUE_IT => 'Work the IT help desk queue: see its tickets, reply, add private notes and assign',
             self::QUEUE_MANAGEMENT => 'Work the Management help desk queue: see its tickets, reply, add private notes and assign',
             self::CATEGORIES_MANAGE => 'Set up help desk topics: which queue each goes to and its usual priority',
+            self::REPORTS_VIEW => 'See and export help desk reports for the queues they work',
         ];
     }
 
@@ -33,7 +36,7 @@ final class HelpdeskPermissions
     public static function grants(): array
     {
         return [
-            RoleName::Management->value => [self::QUEUE_MANAGEMENT],
+            RoleName::Management->value => [self::QUEUE_MANAGEMENT, self::REPORTS_VIEW],
             RoleName::Admin->value => array_keys(self::permissions()),
         ];
     }
