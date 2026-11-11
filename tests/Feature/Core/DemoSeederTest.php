@@ -12,6 +12,8 @@ use Modules\Communications\Models\PolicyDocument;
 use Modules\Communications\Models\UpdateComment;
 use Modules\Communications\Models\UpdatePost;
 use Modules\Communications\Models\UpdateRead;
+use Modules\Helpdesk\Models\Message;
+use Modules\Helpdesk\Models\Ticket;
 use Modules\Operations\Models\ChecklistRun;
 use Modules\Operations\Models\ClockRecord;
 use Modules\Operations\Models\Form;
@@ -37,7 +39,7 @@ function seedDemo(): void
  */
 function demoCounts(): array
 {
-    return collect([User::class, Placement::class, PlacementHour::class, UpdatePost::class, UpdateComment::class, UpdateRead::class, Event::class, EventRsvp::class, HandbookChapter::class, PolicyDocument::class, AuditLog::class, RotaWeek::class, Shift::class, ClockRecord::class, Timesheet::class, Task::class, Form::class, ChecklistRun::class])
+    return collect([User::class, Placement::class, PlacementHour::class, UpdatePost::class, UpdateComment::class, UpdateRead::class, Event::class, EventRsvp::class, HandbookChapter::class, PolicyDocument::class, AuditLog::class, RotaWeek::class, Shift::class, ClockRecord::class, Timesheet::class, Task::class, Form::class, ChecklistRun::class, Ticket::class, Message::class])
         ->mapWithKeys(fn (string $model) => [class_basename($model) => $model::query()->count()])
         ->all();
 }
@@ -70,7 +72,12 @@ it('fills every main list', function () {
         ->and($counts['Timesheet'])->toBeGreaterThan(0)
         ->and($counts['Task'])->toBe(5)
         ->and($counts['Form'])->toBe(2)
-        ->and($counts['ChecklistRun'])->toBe(14);
+        ->and($counts['ChecklistRun'])->toBe(14)
+        ->and($counts['Ticket'])->toBe(7)
+        ->and($counts['Message'])->toBe(13);
+
+    expect(Ticket::query()->inQueue(Ticket::QUEUE_IT)->active()->breached()->count())->toBeGreaterThan(0)
+        ->and(Ticket::query()->inQueue(Ticket::QUEUE_MANAGEMENT)->count())->toBe(2);
 });
 
 it('gives the same data, with no duplicates, when run again', function () {

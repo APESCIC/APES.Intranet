@@ -102,7 +102,8 @@ are only shown to the person who sent them, the people it was sent to and
 form admins. A typed name is the keyboard-friendly alternative to drawing a
 signature. Submissions export to CSV.
 
-Help desk queues arrive in v0.5.0; until then "queue" means a role.
+Forms go to people or roles. Requests for IT or Management go through the
+help desk instead ([docs/helpdesk/README.md](../helpdesk/README.md)).
 
 ## Checklists
 

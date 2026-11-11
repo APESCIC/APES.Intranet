@@ -2,7 +2,7 @@
     <table class="sg-table">
         <thead>
             <tr>
-                <th scope="col">Ticket</th>
+                <th scope="col" class="min-w-56">Ticket</th>
                 @if ($showRequester ?? false)<th scope="col">Raised by</th>@endif
                 <th scope="col">Queue</th>
                 <th scope="col">Priority</th>

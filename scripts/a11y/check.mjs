@@ -166,6 +166,16 @@ async function visit(page, path, label, expectedStatus = 200) {
     await audit(page, label);
 }
 
+// Opens the first ticket in a list, so the check uses whatever the demo data holds.
+async function visitFirstTicket(page, listPath, label) {
+    await page.goto(baseUrl + listPath, { waitUntil: 'networkidle' });
+    const href = await page.locator('[data-ticket] a').first().getAttribute('href');
+    if (!href) {
+        throw new Error(`${listPath} has no tickets. Load the demo data first (php artisan demo:seed).`);
+    }
+    await visit(page, new URL(href).pathname, label);
+}
+
 async function signInAs(page, role) {
     await page.goto(`${baseUrl}/qa`, { waitUntil: 'networkidle' });
     await page.getByRole('button', { name: role, exact: true }).click();
@@ -192,6 +202,11 @@ try {
     await visit(desktop, '/change-log?type=fixed', 'Change log filtered (desktop)');
     await visit(desktop, '/admin/operations/sites', 'Operations sites');
     await visit(desktop, '/admin/operations/forms', 'Form builder');
+    await visit(desktop, '/admin/help-desk/topics', 'Help desk topics');
+    await visit(desktop, '/help-desk/queues/it', 'IT queue');
+    await visit(desktop, '/help-desk/queues/management?view=all', 'Management queue');
+    await visit(desktop, '/help-desk/reports', 'Help desk reports');
+    await visitFirstTicket(desktop, '/help-desk/queues/it', 'Ticket (queue member)');
 
     const operations = await (await browser.newContext({ viewport: { width: 1440, height: 900 } })).newPage();
     await signInAs(operations, 'Supervisor');
@@ -219,6 +234,9 @@ try {
     await visit(mobile, '/dashboard', 'Dashboard (mobile)');
     await visit(mobile, '/operations/clock', 'Clock in and out (mobile)');
     await visit(mobile, '/operations/rota', 'Rota (mobile)');
+    await visit(mobile, '/help-desk', 'My tickets (mobile)');
+    await visit(mobile, '/help-desk/tickets/create', 'Raise a ticket (mobile)');
+    await visitFirstTicket(mobile, '/help-desk', 'Ticket (requester, mobile)');
     await mobile.getByRole('button', { name: 'Open menu' }).click();
     await mobile.getByRole('dialog', { name: 'Main menu' }).waitFor();
     await mobile.waitForTimeout(300);

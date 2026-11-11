@@ -20,8 +20,8 @@ php artisan demo:reset   # empty the local database, migrate, load it again (com
   (`database/seeders/DemoSeeder.php`) refuses too, so
   `php artisan db:seed --class=...DemoSeeder` cannot load it anywhere else.
 - Nothing calls it on Cloudron. Deploys only run the deploy-safe seeders
-  (`RolesAndPermissionsSeeder`, `CommunicationsBootstrapSeeder` and
-  `OperationsBootstrapSeeder`).
+  (`RolesAndPermissionsSeeder`, `CommunicationsBootstrapSeeder`,
+  `OperationsBootstrapSeeder` and `HelpdeskBootstrapSeeder`).
 - Everything is made up:
   - names come from Faker's `en_GB` lists;
   - email addresses use `example.test`, and links use `example.org`;
@@ -62,11 +62,13 @@ data. Dates are set relative to today, so "upcoming" events stay upcoming.
 | Tasks | 5 tasks for a person or the Animal care team: one overdue, one weekly, one monthly and one done |
 | Forms | Incident report (to HR, with photo and signature fields) and Maintenance request (to `person04`, with one submission) |
 | Checklists | Reptile house checks on every published shift; earlier ones completed, today's still to do or missed |
+| Help desk | The 9 deploy-safe topics and 7 tickets from `qa-staff`, `qa-volunteer` and `qa-student`: 5 in the IT queue (one past SLA, one 2FA reset waiting for its identity check), 2 in the Management queue, open, waiting, resolved and closed, with replies and a private note |
 | Audit log | 40 entries over the last 8 days, for the admin audit page |
 
 The QA accounts are put in the Animal care team, so `qa-supervisor` looks
 after the Reptile house rota, and `qa-staff`, `qa-volunteer` and `qa-student`
-have shifts, tasks and checklists.
+have shifts, tasks and checklists. `qa-admin` works the IT help desk queue and
+`qa-management` the Management queue.
 
 ## Test logins
 
