@@ -1,27 +1,30 @@
 # Pull request
 
-One pull request per milestone, from `milestone/vX-Y-Z-<slug>` into `main`,
-titled `vX.Y.Z: <milestone name>` (`composer milestone:next` prints both).
-Open it as a draft after the first commit.
+<!--
+Issue PR: from an issue branch into the version branch, titled "[vX.Y.Z] <summary> (#<issue>)", ending "Refs #<issue>".
+Version PR: from the version branch into main, titled "vX.Y.Z: <milestone name>", listing every issue shipped, ending "Refs #<epic>".
+composer milestone:next prints both titles. Plain words; link logs instead of pasting them.
+-->
 
-## Summary
+## What changed
 
-Say what the milestone delivers and why.
+## Why
 
-- Milestone:
-- Epic: #
-- Ships as: `vX.Y.Z`
+## How it was checked
 
-## Issues
+- `php artisan test`:
+- Checked in the Laragon preview (<http://apes-intranet.test>, demo data):
 
-List every issue in the milestone, including the Epic.
+## What you need to do
 
-- [ ] Closes #
+Nothing.
+
+## Explained
 
 ## Checklist
 
-- [ ] Checked in the Laragon preview at http://apes-intranet.test, with the demo data
 - [ ] No secrets or real personal data
-- [ ] Tests pass and `ci` is green
-- [ ] Every issue is committed on the milestone branch
-- [ ] Ship-gate answer recorded on the Epic before merge (merge commit only)
+- [ ] Checks are green
+- [ ] Version PR only: every issue in the milestone is closed (`composer milestone:status -- vX.Y.Z`), the release note is published, and the ship-gate answer is on the Epic
+
+Refs #

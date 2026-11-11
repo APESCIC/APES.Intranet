@@ -1,5 +1,14 @@
+name: ci
+
+# The main check: Markdown, workflows, Pint, Larastan, the build, release notes, tests and the accessibility check.
+# Runs on PRs into main, version branches and dependencies, and on main and vX.Y.Z tags. It never releases or deploys.
+
 on:
   pull_request:
+    branches:
+      - main
+      - 'milestone/**'
+      - dependencies
   push:
     branches:
       - main
@@ -47,13 +56,8 @@ jobs:
       - name: Check out
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Configure markdownlint
-        shell: bash
-        run: |
-          printf '%s\n' 'MD013: false' 'MD034: false' > .markdownlint.yaml
-
       - name: Check Markdown
-        uses: DavidAnson/markdownlint-cli2-action@v25
+        uses: DavidAnson/markdownlint-cli2-action@696eb3f2509270d7b882d2aa68347bc676e7af34 # v25.0.0
         with:
           config: .markdownlint.yaml
           globs: |
@@ -67,6 +71,7 @@ jobs:
           set -eu
           curl -sSfL --retry 5 --retry-all-errors --retry-delay 15 -o /tmp/actionlint.tar.gz \
             "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz"
+          echo "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8  /tmp/actionlint.tar.gz" | sha256sum --check
           tar -xzf /tmp/actionlint.tar.gz -C /tmp actionlint
           sudo mv /tmp/actionlint /usr/local/bin/actionlint
           actionlint -version
@@ -172,6 +177,7 @@ jobs:
       - name: Tests
         run: php artisan test --compact
 
+      # php artisan serve is for this CI runner only. Locally, use the Laragon preview.
       - name: Start app for the accessibility check
         shell: bash
         run: |
@@ -194,6 +200,12 @@ jobs:
           done
           cat /tmp/serve.log
           exit 1
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium

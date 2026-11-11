@@ -1,5 +1,5 @@
 name: Bug report
-description: Report a reproducible problem with APES Intranet
+description: Something in APES Intranet doesn't work as it should
 title: "[Bug] "
 labels:
   - bug
@@ -10,19 +10,16 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thank you for reporting a problem. Remove credentials, personal data,
-        and real HR, student, volunteer or agreement details from every field
-        and attachment.
-        Do not use this form for a suspected security vulnerability. Follow
-        SECURITY.md and open a private advisory.
-        After opening, set the area label and the milestone to match the
-        answers below. The form does not apply them itself.
+        Thank you. No passwords, personal data or real HR, student, volunteer
+        or agreement details, including in screenshots. A security problem
+        goes to SECURITY.md and a private advisory, not here.
+        After opening, set the area label and the version milestone.
 
   - type: dropdown
     id: area
     attributes:
       label: Area
-      description: Matches an area label. Set that label after opening.
+      description: Set the matching area label after opening.
       options:
         - "area:cloudron"
         - "area:local-dev"
@@ -39,91 +36,45 @@ body:
     validations:
       required: true
 
-  - type: dropdown
-    id: milestone
-    attributes:
-      label: Milestone
-      description: Work one milestone at a time, in order. Set it after opening.
-      options:
-        - "v0.1.x Foundations"
-        - "v0.2.x People"
-        - "v0.3.x Communications"
-        - "v0.4.x Operations"
-        - "v0.5.x Help desk"
-        - "v0.6.x HR and training"
-        - "v0.7.x Agreements and legal"
-        - "v0.8.x Hiring and integrations"
-        - "v1.0.0 Launch"
-    validations:
-      required: true
-
   - type: textarea
-    id: summary
+    id: steps
     attributes:
-      label: Summary
-      description: What went wrong?
-    validations:
-      required: true
-
-  - type: textarea
-    id: impact
-    attributes:
-      label: Impact
-      description: Who is affected, and how does this interfere with their work?
-    validations:
-      required: true
-
-  - type: input
-    id: version
-    attributes:
-      label: Affected version or environment
-      description: Version, environment, browser or device, where relevant.
-      placeholder: main, Laragon preview with demo data, Firefox on Windows 11
-    validations:
-      required: true
-
-  - type: textarea
-    id: reproduction
-    attributes:
-      label: Reproduction steps
-      description: The smallest repeatable sequence that shows the problem.
+      label: How to make it happen
       placeholder: |
         1. Open ...
         2. Select ...
-        3. Observe ...
+        3. See ...
     validations:
       required: true
 
   - type: textarea
     id: expected
     attributes:
-      label: Expected behaviour
+      label: What should happen, and what happens instead
     validations:
       required: true
 
-  - type: textarea
-    id: actual
+  - type: input
+    id: where
     attributes:
-      label: Actual behaviour
+      label: Where
+      description: Version (the pill in the footer), browser or device.
+      placeholder: v0.5.0, Edge on Windows 11
     validations:
       required: true
 
   - type: textarea
     id: evidence
     attributes:
-      label: Supporting logs or screenshots
-      description: >-
-        Sanitised evidence only. No credentials, cookies, tokens or
-        personal data.
+      label: Screenshots or logs
+      description: Remove anything personal first.
 
   - type: checkboxes
     id: privacy
     attributes:
-      label: Data-safety confirmation
+      label: Data safety
       options:
-        - label: >-
-            I removed credentials, personal data, and real HR, student,
-            volunteer or agreement details.
+        - label: I removed passwords, personal data and real HR, student, volunteer or agreement details.
           required: true
-        - label: This report is not a suspected security vulnerability.
+        - label: This is not a security problem.
           required: true

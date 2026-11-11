@@ -1,0 +1,3 @@
+# Markdown checks used by CI (ci workflow) and editors. Long lines and bare URLs are allowed.
+MD013: false
+MD034: false
