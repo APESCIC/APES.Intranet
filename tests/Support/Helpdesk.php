@@ -9,6 +9,7 @@ use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Facades\Artisan;
 use Modules\Helpdesk\Models\Category;
 use Modules\Helpdesk\Models\Ticket;
+use Modules\Helpdesk\Services\Sla;
 
 /**
  * Fixtures for the help desk feature tests. Fake data only.
@@ -51,6 +52,8 @@ final class Helpdesk
             'status' => Ticket::STATUS_OPEN,
             'subject' => 'The printer is jammed',
         ]);
+        app(Sla::class)->apply($ticket);
+        $ticket->save();
         $ticket->messages()->create(['author_id' => $requester->getKey(), 'body' => '<p>It jams on every page.</p>', 'is_private' => false]);
 
         return $ticket;

@@ -18,6 +18,7 @@
             'label' => $queueLabel.' queue tickets',
             'empty' => 'No tickets here.',
             'showRequester' => true,
+            'showSla' => true,
         ])
     </section>
 </x-layouts.app>

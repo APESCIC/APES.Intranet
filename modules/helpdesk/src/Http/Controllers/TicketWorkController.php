@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Modules\Helpdesk\HelpdeskPermissions;
+use Modules\Helpdesk\Models\Category;
 use Modules\Helpdesk\Models\Ticket;
 use Modules\Helpdesk\Services\Tickets;
 
@@ -49,6 +50,29 @@ class TicketWorkController
         $tickets->changeStatus($ticket, $data['status'], $request->user());
 
         return back()->with('status', 'Status saved: '.Ticket::STATUSES[$data['status']].'.');
+    }
+
+    public function reclassify(Request $request, Ticket $ticket, Tickets $tickets): RedirectResponse
+    {
+        $user = $request->user();
+        abort_unless($user->can('work', $ticket), 403);
+
+        $data = $request->validate([
+            'category_id' => ['required', 'integer'],
+            'priority' => ['required', Rule::in(array_keys(Ticket::PRIORITIES))],
+        ]);
+        $category = Category::query()->find($data['category_id']);
+        if ($category === null || (! $category->active && ! $category->is($ticket->category))) {
+            throw ValidationException::withMessages(['category_id' => 'Choose a topic that is in use.']);
+        }
+        $tickets->reclassify($ticket, $category, $data['priority'], $user);
+
+        if (! $user->can('view', $ticket->refresh())) {
+            return redirect()->route('helpdesk.queues.'.HelpdeskPermissions::queuesFor($user)[0])
+                ->with('status', $ticket->reference().' moved to the '.$ticket->queueLabel().' queue.');
+        }
+
+        return back()->with('status', 'Topic and priority saved.');
     }
 
     public function merge(Request $request, Ticket $ticket, Tickets $tickets): RedirectResponse

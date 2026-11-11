@@ -21,7 +21,10 @@
                     @if ($showRequester ?? false)<td>{{ $ticket->requester?->name ?? '—' }}</td>@endif
                     <td>{{ $ticket->queueLabel() }}</td>
                     <td>{{ $ticket->priorityLabel() }}</td>
-                    <td><span @class(['sg-badge', 'sg-badge--ok' => ! $ticket->isActive()])>{{ $ticket->statusLabel() }}</span></td>
+                    <td>
+                        <span @class(['sg-badge', 'sg-badge--ok' => ! $ticket->isActive()])>{{ $ticket->statusLabel() }}</span>
+                        @if (($showSla ?? false) && $ticket->isBreached())<span class="sg-badge sg-badge--error" data-breached>Past SLA</span>@endif
+                    </td>
                     <td>{{ $ticket->assignee?->name ?? 'Nobody yet' }}</td>
                     <td>{{ $ticket->updated_at->format('D j M H:i') }}</td>
                 </tr>

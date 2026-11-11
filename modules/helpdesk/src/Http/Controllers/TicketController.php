@@ -70,6 +70,9 @@ class TicketController
             'canWork' => $canWork,
             'canReply' => $user->can('reply', $ticket),
             'agents' => $canWork ? HelpdeskPermissions::agents($ticket->queue) : collect(),
+            'categories' => $canWork
+                ? Category::query()->where(fn ($q) => $q->active()->orWhere('id', $ticket->category_id))->ordered()->get()->groupBy('queue')
+                : collect(),
         ]);
     }
 

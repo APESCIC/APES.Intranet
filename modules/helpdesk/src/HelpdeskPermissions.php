@@ -13,6 +13,8 @@ final class HelpdeskPermissions
 
     public const QUEUE_MANAGEMENT = 'helpdesk.queue.management';
 
+    public const CATEGORIES_MANAGE = 'helpdesk.categories.manage';
+
     /**
      * @return array<string, string>
      */
@@ -21,6 +23,7 @@ final class HelpdeskPermissions
         return [
             self::QUEUE_IT => 'Work the IT help desk queue: see its tickets, reply, add private notes and assign',
             self::QUEUE_MANAGEMENT => 'Work the Management help desk queue: see its tickets, reply, add private notes and assign',
+            self::CATEGORIES_MANAGE => 'Set up help desk topics: which queue each goes to and its usual priority',
         ];
     }
 

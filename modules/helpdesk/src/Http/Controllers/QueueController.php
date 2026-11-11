@@ -14,6 +14,7 @@ class QueueController
         'active' => 'Open and waiting',
         'mine' => 'Assigned to me',
         'unassigned' => 'Not assigned',
+        'breached' => 'Past SLA',
         'done' => 'Resolved and closed',
         'all' => 'Everything',
     ];
@@ -34,6 +35,7 @@ class QueueController
             ->when($view === 'active', fn ($q) => $q->active())
             ->when($view === 'mine', fn ($q) => $q->active()->where('assignee_id', $user->getKey()))
             ->when($view === 'unassigned', fn ($q) => $q->active()->whereNull('assignee_id'))
+            ->when($view === 'breached', fn ($q) => $q->active()->breached())
             ->when($view === 'done', fn ($q) => $q->whereNotIn('status', Ticket::ACTIVE_STATUSES))
             ->latest('updated_at')
             ->limit((int) config('helpdesk.list_limit'))

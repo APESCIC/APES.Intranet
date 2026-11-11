@@ -14,6 +14,17 @@
                 @if ($ticket->mergedInto && $canWork)
                     <p><span class="text-sg-muted">Merged into:</span> <a href="{{ route('helpdesk.tickets.show', $ticket->mergedInto) }}">{{ $ticket->mergedInto->reference() }}</a></p>
                 @endif
+                @if ($canWork && $ticket->response_due_at)
+                    <p data-sla="response">
+                        <span class="text-sg-muted">First reply due:</span> {{ $ticket->response_due_at->format('D j M H:i') }}
+                        @if ($ticket->first_responded_at) · replied {{ $ticket->first_responded_at->format('D j M H:i') }}@endif
+                        @if ($ticket->responseBreached())<span class="sg-badge sg-badge--error">Missed</span>@endif
+                    </p>
+                    <p data-sla="resolve">
+                        <span class="text-sg-muted">Resolve by:</span> {{ $ticket->resolve_due_at->format('D j M H:i') }}
+                        @if ($ticket->resolveBreached())<span class="sg-badge sg-badge--error">Missed</span>@endif
+                    </p>
+                @endif
             </article>
 
             <section class="sg-card p-6" aria-labelledby="conversation-heading">
@@ -80,6 +91,33 @@
                         @endforeach
                     </select>
                     <div><button type="submit" class="sg-btn sg-btn-secondary sg-btn-sm">Save status</button></div>
+                </form>
+
+                <form method="post" action="{{ route('helpdesk.tickets.reclassify', $ticket) }}" class="sg-card grid gap-3 p-6">
+                    @csrf
+                    @method('patch')
+                    <div>
+                        <label class="sg-label" for="category_id">Topic</label>
+                        <select id="category_id" name="category_id" class="sg-input w-full" aria-describedby="topic-help">
+                            @foreach ($categories as $queue => $group)
+                                <optgroup label="{{ \Modules\Helpdesk\Models\Ticket::QUEUES[$queue] ?? $queue }}">
+                                    @foreach ($group as $category)
+                                        <option value="{{ $category->id }}" @selected((int) $ticket->category_id === $category->id)>{{ $category->name }}</option>
+                                    @endforeach
+                                </optgroup>
+                            @endforeach
+                        </select>
+                        <p id="topic-help" class="mt-1 text-sm text-sg-muted">A topic in another queue moves the ticket there.</p>
+                    </div>
+                    <div>
+                        <label class="sg-label" for="priority">Priority</label>
+                        <select id="priority" name="priority" class="sg-input w-full">
+                            @foreach (\Modules\Helpdesk\Models\Ticket::PRIORITIES as $value => $label)
+                                <option value="{{ $value }}" @selected($ticket->priority === $value)>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div><button type="submit" class="sg-btn sg-btn-secondary sg-btn-sm">Save topic and priority</button></div>
                 </form>
 
                 @unless ($ticket->isClosed())

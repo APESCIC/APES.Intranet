@@ -14,7 +14,11 @@ final class HelpdeskMenuContributor implements MenuContributor
     public function groups(User $user, MenuMode $mode): array
     {
         if ($mode === MenuMode::Admin) {
-            return [];
+            return [
+                new NavGroup('admin-helpdesk', 'Help desk admin', [
+                    NavItem::route('helpdesk-topics', 'Topics and routing', 'tags', HelpdeskPermissions::CATEGORIES_MANAGE, 'admin.helpdesk.categories.index'),
+                ]),
+            ];
         }
 
         return [

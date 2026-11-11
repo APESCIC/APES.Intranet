@@ -5,6 +5,7 @@ namespace Modules\Helpdesk;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use Modules\Helpdesk\Dashboard\HelpdeskDashboardCards;
 use Modules\Helpdesk\Models\Ticket;
 use Modules\Helpdesk\Navigation\HelpdeskMenuContributor;
 use Modules\Helpdesk\Policies\TicketPolicy;
@@ -16,6 +17,8 @@ class HelpdeskServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/../config/helpdesk.php', 'helpdesk');
         $this->app->singleton(HelpdeskMenuContributor::class);
         $this->app->tag([HelpdeskMenuContributor::class], 'intranet.menu');
+        $this->app->singleton(HelpdeskDashboardCards::class);
+        $this->app->tag([HelpdeskDashboardCards::class], 'intranet.dashboard');
     }
 
     public function boot(): void

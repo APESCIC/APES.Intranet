@@ -6,6 +6,7 @@ use App\Core\Audit\AuditLogger;
 use App\Core\Support\HtmlSanitizer;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Modules\Helpdesk\HelpdeskPermissions;
 use Modules\Helpdesk\Models\Category;
 use Modules\Helpdesk\Models\Message;
 use Modules\Helpdesk\Models\Ticket;
@@ -15,6 +16,7 @@ final class Tickets
     public function __construct(
         private readonly AuditLogger $audit,
         private readonly HtmlSanitizer $sanitizer,
+        private readonly Sla $sla,
     ) {}
 
     /**
@@ -31,6 +33,8 @@ final class Tickets
                 'status' => Ticket::STATUS_OPEN,
                 'subject' => $subject,
             ]);
+            $this->sla->apply($ticket);
+            $ticket->save();
 
             $ticket->messages()->create([
                 'author_id' => $requester->getKey(),
@@ -58,6 +62,8 @@ final class Tickets
 
             if ($ticket->isRequestedBy($author) && in_array($ticket->status, [Ticket::STATUS_WAITING, Ticket::STATUS_RESOLVED], true)) {
                 $ticket->forceFill(['status' => Ticket::STATUS_OPEN, 'resolved_at' => null])->save();
+            } elseif ($ticket->first_responded_at === null && ! $ticket->isRequestedBy($author) && HelpdeskPermissions::works($author, $ticket->queue)) {
+                $ticket->forceFill(['first_responded_at' => now()])->save();
             } else {
                 $ticket->touch();
             }
@@ -121,6 +127,43 @@ final class Tickets
             ])->save();
 
             $this->audit->record('helpdesk.ticket_status_changed', $ticket, ['from' => $before, 'to' => $status], $actor);
+        });
+    }
+
+    /**
+     * A new topic moves the ticket to that topic's queue, and a new priority
+     * resets the SLA targets from when the ticket was raised. A ticket that
+     * changes queue loses its assignee, who may not work the new queue.
+     */
+    public function reclassify(Ticket $ticket, Category $category, string $priority, User $actor): void
+    {
+        if ((int) $ticket->category_id === (int) $category->getKey() && $ticket->priority === $priority) {
+            return;
+        }
+
+        DB::transaction(function () use ($ticket, $category, $priority, $actor) {
+            $before = ['queue' => $ticket->queue, 'category' => $ticket->category?->slug, 'priority' => $ticket->priority];
+            $movesQueue = $ticket->queue !== $category->queue;
+
+            $ticket->forceFill([
+                'category_id' => $category->getKey(),
+                'queue' => $category->queue,
+                'priority' => $priority,
+                'assignee_id' => $movesQueue ? null : $ticket->assignee_id,
+            ]);
+            if ($before['priority'] !== $priority) {
+                $this->sla->apply($ticket);
+            }
+            $ticket->save();
+
+            $this->audit->record('helpdesk.ticket_reclassified', $ticket, [
+                'from' => $before,
+                'to' => ['queue' => $category->queue, 'category' => $category->slug, 'priority' => $priority],
+            ], $actor);
+
+            $this->systemNote($ticket, $actor, $movesQueue
+                ? $actor->name.' moved this ticket to the '.$ticket->queueLabel().' queue ('.$category->name.', '.$ticket->priorityLabel().' priority).'
+                : $actor->name.' changed the topic or priority to '.$category->name.', '.$ticket->priorityLabel().' priority.');
         });
     }
 

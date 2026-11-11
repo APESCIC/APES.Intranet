@@ -122,6 +122,41 @@ class Ticket extends Model
         return (int) $this->requester_id === (int) $user->getKey();
     }
 
+    public function responseBreached(): bool
+    {
+        return $this->response_due_at !== null && ($this->first_responded_at ?? now())->greaterThan($this->response_due_at);
+    }
+
+    public function resolveBreached(): bool
+    {
+        return $this->resolve_due_at !== null && ($this->resolved_at ?? now())->greaterThan($this->resolve_due_at);
+    }
+
+    /**
+     * Missed either target, now or when it was met late.
+     */
+    public function isBreached(): bool
+    {
+        return $this->responseBreached() || $this->resolveBreached();
+    }
+
+    /**
+     * The same rule as isBreached(), for counting in the database.
+     *
+     * @param  Builder<Ticket>  $query
+     * @return Builder<Ticket>
+     */
+    public function scopeBreached(Builder $query): Builder
+    {
+        $now = now();
+
+        return $query->where(fn (Builder $q) => $q
+            ->where(fn (Builder $r) => $r->whereNull('first_responded_at')->where('response_due_at', '<', $now))
+            ->orWhereColumn('first_responded_at', '>', 'response_due_at')
+            ->orWhere(fn (Builder $r) => $r->whereNull('resolved_at')->where('resolve_due_at', '<', $now))
+            ->orWhereColumn('resolved_at', '>', 'resolve_due_at'));
+    }
+
     /**
      * @param  Builder<Ticket>  $query
      * @return Builder<Ticket>
@@ -157,6 +192,9 @@ class Ticket extends Model
         return [
             'resolved_at' => 'immutable_datetime',
             'closed_at' => 'immutable_datetime',
+            'response_due_at' => 'immutable_datetime',
+            'resolve_due_at' => 'immutable_datetime',
+            'first_responded_at' => 'immutable_datetime',
         ];
     }
 }
