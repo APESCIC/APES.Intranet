@@ -120,7 +120,8 @@ Say the next version is `v0.6.0 HR and training`, and issue #123 is
    Only start the next issue once this one shows `CLOSED`. GitHub only closes
    issues automatically on merges into `main`, so close it yourself.
 
-In Cursor, `/work-on-issue` does all four steps for you.
+In Cursor, `/work-on-issue` does all four steps for you, using the comment
+templates in [`.cursor/skills/work-on-issue/templates/`](.cursor/skills/work-on-issue/templates/).
 
 ## Finishing a version
 
