@@ -1,0 +1,76 @@
+<?php
+
+namespace Modules\Helpdesk;
+
+use App\Core\Access\RoleName;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
+use Modules\Helpdesk\Models\Ticket;
+
+final class HelpdeskPermissions
+{
+    public const QUEUE_IT = 'helpdesk.queue.it';
+
+    public const QUEUE_MANAGEMENT = 'helpdesk.queue.management';
+
+    public const CATEGORIES_MANAGE = 'helpdesk.categories.manage';
+
+    public const REPORTS_VIEW = 'helpdesk.reports.view';
+
+    /**
+     * @return array<string, string>
+     */
+    public static function permissions(): array
+    {
+        return [
+            self::QUEUE_IT => 'Work the IT help desk queue: see its tickets, reply, add private notes and assign',
+            self::QUEUE_MANAGEMENT => 'Work the Management help desk queue: see its tickets, reply, add private notes and assign',
+            self::CATEGORIES_MANAGE => 'Set up help desk topics: which queue each goes to and its usual priority',
+            self::REPORTS_VIEW => 'See and export help desk reports for the queues they work',
+        ];
+    }
+
+    /**
+     * @return array<string, list<string>>
+     */
+    public static function grants(): array
+    {
+        return [
+            RoleName::Management->value => [self::QUEUE_MANAGEMENT, self::REPORTS_VIEW],
+            RoleName::Admin->value => array_keys(self::permissions()),
+        ];
+    }
+
+    public static function forQueue(string $queue): string
+    {
+        return match ($queue) {
+            Ticket::QUEUE_IT => self::QUEUE_IT,
+            Ticket::QUEUE_MANAGEMENT => self::QUEUE_MANAGEMENT,
+        };
+    }
+
+    public static function works(User $user, string $queue): bool
+    {
+        return $user->can(self::forQueue($queue));
+    }
+
+    /**
+     * Active people who work the queue, for assigning tickets.
+     *
+     * @return Collection<int, User>
+     */
+    public static function agents(string $queue): Collection
+    {
+        return User::query()->active()->permission(self::forQueue($queue))->orderBy('name')->get();
+    }
+
+    /**
+     * The queues the person works, in menu order.
+     *
+     * @return list<string>
+     */
+    public static function queuesFor(User $user): array
+    {
+        return array_values(array_filter(array_keys(Ticket::QUEUES), fn (string $queue) => self::works($user, $queue)));
+    }
+}

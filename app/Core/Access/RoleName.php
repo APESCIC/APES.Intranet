@@ -51,7 +51,7 @@ enum RoleName: string
             self::Volunteer => 'Uses the intranet as a volunteer.',
             self::Student => 'Uses the intranet as a student, with the student area.',
             self::Supervisor => 'Oversees their own team: sees it, and approves its shifts, swaps, timesheets, checklists and student hours. Cannot see other teams.',
-            self::Management => 'Manages teams and rotas, oversees every team, and can see all HR records.',
+            self::Management => 'Manages teams and rotas, oversees every team, works the Management help desk queue, and can see all HR records.',
             self::Hr => 'Can see and look after HR records.',
             self::Legal => 'Can see and look after agreements and legal records.',
             self::Admin => 'Can do everything, including seeing HR and legal records and running the intranet.',

@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             FakeUserSeeder::class,
             CommunicationsSeeder::class,
             OperationsBootstrapSeeder::class,
+            HelpdeskBootstrapSeeder::class,
             QaUserSeeder::class,
             ReleaseNotesSeeder::class,
         ]);

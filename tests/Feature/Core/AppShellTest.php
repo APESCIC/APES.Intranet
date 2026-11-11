@@ -144,7 +144,9 @@ it('does not render hidden menu items or the Admin switcher for non-admins', fun
 it('opens Teams in a new tab and marks planned features as not available yet', function () {
     $this->actingAs(userWithRole(RoleName::Staff))->get(route('dashboard'))
         ->assertSee(Menu::TEAMS_URL, false)
-        ->assertSee('(opens in a new tab)')
+        ->assertSee('(opens in a new tab)');
+
+    $this->actingAs(userWithRole(RoleName::Hr))->get(route('dashboard'))
         ->assertSee('not available yet');
 });
 

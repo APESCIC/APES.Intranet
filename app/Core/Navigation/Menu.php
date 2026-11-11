@@ -48,7 +48,7 @@ final class Menu
                 NavItem::route('forms', 'Forms', 'clipboard-list', AccessMatrix::INTRANET_ACCESS, 'operations.forms.index', 'operations.forms.*'),
             ]),
             new NavGroup('support', 'Support', [
-                NavItem::soon('help-desk', 'Help desk', 'life-buoy', AccessMatrix::INTRANET_ACCESS),
+                NavItem::route('help-desk', 'Help desk', 'life-buoy', AccessMatrix::INTRANET_ACCESS, 'helpdesk.tickets.index', 'helpdesk.tickets.*'),
                 NavItem::route('handbook', 'Handbook', 'book-open', AccessMatrix::INTRANET_ACCESS, 'communications.handbook.index', 'communications.handbook.*'),
                 NavItem::route('policies', 'Policies', 'file-text', AccessMatrix::INTRANET_ACCESS, 'communications.policies.index', 'communications.policies.*'),
                 NavItem::route('access-guide', 'Who can see what', 'key-round', AccessMatrix::INTRANET_ACCESS, 'access-guide'),
@@ -140,7 +140,7 @@ final class Menu
             ));
 
             if ($items !== []) {
-                $filtered[] = new NavGroup($group->key, $group->heading, $items);
+                $filtered[] = $group->withItems($items);
             }
         }
 

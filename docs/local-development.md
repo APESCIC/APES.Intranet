@@ -110,6 +110,13 @@ Composer and Node on `PATH` for you.
 
 ## Live preview
 
+Before any work, run the live preview gate,
+`powershell -NoProfile -ExecutionPolicy Bypass -File scripts\preview.ps1`. It
+loads the latest code and dependencies and reports pending migrations (ask
+before running them). When no migrations are pending, it also syncs roles and
+permissions as a deploy does, by running the seeders in
+`deploy/cloudron/activate-release.sh`.
+
 `npm run dev` starts Vite on port 5174 and writes `public/hot`, so the pages
 at <http://apes-intranet.test> load their CSS and JavaScript from Vite. Saving
 a CSS or JavaScript file updates the browser straight away. Saving a Blade

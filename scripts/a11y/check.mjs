@@ -166,6 +166,28 @@ async function visit(page, path, label, expectedStatus = 200) {
     await audit(page, label);
 }
 
+// Opens the first ticket in a list. Without demo data (as in CI) it raises one
+// through the form first; the first topic belongs to the IT queue.
+async function visitFirstTicket(page, listPath, label) {
+    await page.goto(baseUrl + listPath, { waitUntil: 'networkidle' });
+    const link = page.locator('[data-ticket] a').first();
+    if ((await link.count()) > 0) {
+        await visit(page, new URL(await link.getAttribute('href')).pathname, label);
+        return;
+    }
+
+    await page.goto(`${baseUrl}/help-desk/tickets/create`, { waitUntil: 'networkidle' });
+    await page.locator('#category_id').selectOption({ index: 1 });
+    await page.locator('#subject').fill('Accessibility check ticket');
+    await page.locator('#body-surface [contenteditable]').fill('Raised by the accessibility check.');
+    await Promise.all([
+        page.waitForURL(/\/help-desk\/tickets\/\d+$/),
+        page.getByRole('button', { name: 'Raise ticket' }).click(),
+    ]);
+    await page.waitForLoadState('networkidle');
+    await audit(page, label);
+}
+
 async function signInAs(page, role) {
     await page.goto(`${baseUrl}/qa`, { waitUntil: 'networkidle' });
     await page.getByRole('button', { name: role, exact: true }).click();
@@ -192,6 +214,11 @@ try {
     await visit(desktop, '/change-log?type=fixed', 'Change log filtered (desktop)');
     await visit(desktop, '/admin/operations/sites', 'Operations sites');
     await visit(desktop, '/admin/operations/forms', 'Form builder');
+    await visit(desktop, '/admin/help-desk/topics', 'Help desk topics');
+    await visit(desktop, '/help-desk/queues/it', 'IT queue');
+    await visit(desktop, '/help-desk/queues/management?view=all', 'Management queue');
+    await visit(desktop, '/help-desk/reports', 'Help desk reports');
+    await visitFirstTicket(desktop, '/help-desk/queues/it', 'Ticket (queue member)');
 
     const operations = await (await browser.newContext({ viewport: { width: 1440, height: 900 } })).newPage();
     await signInAs(operations, 'Supervisor');
@@ -219,6 +246,9 @@ try {
     await visit(mobile, '/dashboard', 'Dashboard (mobile)');
     await visit(mobile, '/operations/clock', 'Clock in and out (mobile)');
     await visit(mobile, '/operations/rota', 'Rota (mobile)');
+    await visit(mobile, '/help-desk', 'My tickets (mobile)');
+    await visit(mobile, '/help-desk/tickets/create', 'Raise a ticket (mobile)');
+    await visitFirstTicket(mobile, '/help-desk', 'Ticket (requester, mobile)');
     await mobile.getByRole('button', { name: 'Open menu' }).click();
     await mobile.getByRole('dialog', { name: 'Main menu' }).waitFor();
     await mobile.waitForTimeout(300);

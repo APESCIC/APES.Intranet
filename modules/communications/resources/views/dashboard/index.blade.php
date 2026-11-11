@@ -25,6 +25,14 @@
                             </li>
                         @endforeach
                     </ul>
+                    @if (! empty($card['note']))
+                        <p class="mt-4 text-sm text-sg-muted" data-card-note>
+                            {{ $card['note'] }}
+                            @foreach ($card['note_links'] ?? [] as $label => $url)
+                                <a href="{{ $url }}" class="font-semibold text-sg-teal-dark underline">{{ $label }}</a>@if (! $loop->last) · @endif
+                            @endforeach
+                        </p>
+                    @endif
                 @elseif (! empty($card['href']))
                     <a
                         href="{{ $card['href'] }}"

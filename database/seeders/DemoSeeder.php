@@ -22,6 +22,9 @@ use Modules\Communications\Models\PolicyRead;
 use Modules\Communications\Models\UpdateComment;
 use Modules\Communications\Models\UpdatePost;
 use Modules\Communications\Models\UpdateRead;
+use Modules\Helpdesk\Models\Category as HelpdeskCategory;
+use Modules\Helpdesk\Models\Ticket as HelpdeskTicket;
+use Modules\Helpdesk\Services\Sla;
 use Modules\Operations\Models\Availability;
 use Modules\Operations\Models\ChecklistRun;
 use Modules\Operations\Models\ChecklistTemplate;
@@ -82,7 +85,7 @@ class DemoSeeder extends Seeder
         $registrar->initializeCache();
 
         try {
-            $this->call([RolesAndPermissionsSeeder::class, CommunicationsBootstrapSeeder::class, OperationsBootstrapSeeder::class, QaUserSeeder::class, ReleaseNotesSeeder::class]);
+            $this->call([RolesAndPermissionsSeeder::class, CommunicationsBootstrapSeeder::class, OperationsBootstrapSeeder::class, HelpdeskBootstrapSeeder::class, QaUserSeeder::class, ReleaseNotesSeeder::class]);
 
             $this->seedPeople();
             $this->seedPlacements();
@@ -91,6 +94,7 @@ class DemoSeeder extends Seeder
             $this->seedHandbook();
             $this->seedPolicies();
             $this->seedOperations();
+            $this->seedHelpdesk();
             $this->seedAuditLog();
         } finally {
             config(['permission.cache.store' => $store]);
@@ -533,6 +537,91 @@ class DemoSeeder extends Seeder
                 $run->items->each(fn ($item) => $item->update(['done' => true]));
                 $run->forceFill(['completed_at' => $run->due_at->subMinutes(20), 'completed_by' => $run->shift?->user_id])->save();
             });
+    }
+
+    /**
+     * Tickets in both queues from the QA accounts: on time, past SLA,
+     * waiting, resolved, closed, and a 2FA reset still needing its identity
+     * check. qa-admin works the IT queue and qa-management the Management queue.
+     */
+    private function seedHelpdesk(): void
+    {
+        $qa = fn (string $profile) => User::query()->where('email', QaLogin::emailFor($profile))->firstOrFail();
+        $admin = $qa(RoleName::Admin->value);
+        $manager = $qa(RoleName::Management->value);
+        $now = CarbonImmutable::now()->startOfHour();
+        $sanitizer = app(HtmlSanitizer::class);
+        $sla = app(Sla::class);
+
+        $tickets = [
+            ['Printer in the office keeps jamming (demo)', RoleName::Staff, 'devices', 'normal', $now->subDay(), HelpdeskTicket::STATUS_OPEN, $admin, [
+                [null, false, 0, 'It jams on every second page.'],
+                [$admin, false, 1, 'Thanks. I will bring a new drum tomorrow morning.'],
+                [$admin, true, 1, 'Warranty ends next month, worth checking before ordering.'],
+            ]],
+            ['Cannot open the rota on my phone (demo)', RoleName::Volunteer, 'sign-in', 'high', $now->subDays(4), HelpdeskTicket::STATUS_OPEN, null, [
+                [null, false, 0, 'The rota page says I need to sign in again every time.'],
+            ]],
+            ['Lost my phone with the authenticator app (demo)', RoleName::Student, 'lost-device-or-2fa-reset', 'high', $now->subHours(2), HelpdeskTicket::STATUS_OPEN, $admin, [
+                [null, false, 0, 'I lost my phone on the bus and cannot get my sign-in codes.'],
+            ]],
+            ['Planner says I have no licence (demo)', RoleName::Volunteer, 'microsoft-365', 'normal', $now->subHours(5), HelpdeskTicket::STATUS_OPEN, null, [
+                [null, false, 0, 'I clicked Planner in the menu and got a "no licence" page.'],
+            ]],
+            ['Access to the education shared folder (demo)', RoleName::Staff, 'access-request', 'low', $now->subDays(10), HelpdeskTicket::STATUS_RESOLVED, $admin, [
+                [null, false, 0, 'Please could I have access to the Education folder in SharePoint?'],
+                [$admin, false, 24, 'Done. You should see it in SharePoint now.'],
+            ]],
+            ['Shift clash next Saturday (demo)', RoleName::Volunteer, 'rota-and-shifts', 'normal', $now->subDays(2), HelpdeskTicket::STATUS_WAITING, $manager, [
+                [null, false, 0, 'I am down for two shifts at the same time on Saturday.'],
+                [$manager, false, 20, 'Which one would you like to keep?'],
+            ]],
+            ['Broken gate latch by the car park (demo)', RoleName::Staff, 'buildings-and-equipment', 'normal', $now->subDays(12), HelpdeskTicket::STATUS_CLOSED, $manager, [
+                [null, false, 0, 'The latch on the car park gate does not catch.'],
+                [$manager, false, 6, 'Thanks, the contractor is booked for Thursday.'],
+                [$manager, false, 100, 'Fixed on Thursday.'],
+            ]],
+        ];
+
+        foreach ($tickets as [$subject, $role, $slug, $priority, $raisedAt, $status, $assignee, $messages]) {
+            $requester = $qa($role->value);
+            $category = HelpdeskCategory::query()->where('slug', $slug)->firstOrFail();
+
+            $lastAt = $raisedAt->addHours((int) max(array_map(fn (array $m) => $m[2], $messages)));
+            $finished = in_array($status, [HelpdeskTicket::STATUS_RESOLVED, HelpdeskTicket::STATUS_CLOSED], true);
+
+            $ticket = HelpdeskTicket::query()->firstOrNew(['subject' => $subject]);
+            $ticket->forceFill([
+                'requester_id' => $requester->getKey(),
+                'queue' => $category->queue,
+                'category_id' => $category->getKey(),
+                'priority' => $priority,
+                'status' => $status,
+                'assignee_id' => $assignee?->getKey(),
+                'created_at' => $raisedAt,
+                'updated_at' => $lastAt,
+            ]);
+            $sla->apply($ticket);
+
+            $firstReply = collect($messages)->first(fn (array $m) => $m[0] !== null && ! $m[1]);
+            $ticket->forceFill([
+                'first_responded_at' => $firstReply ? $raisedAt->addHours($firstReply[2]) : null,
+                'resolved_at' => $finished ? $lastAt : null,
+                'closed_at' => $status === HelpdeskTicket::STATUS_CLOSED ? $lastAt : null,
+            ])->save();
+
+            if ($ticket->messages()->doesntExist()) {
+                foreach ($messages as [$author, $private, $hours, $text]) {
+                    $at = $raisedAt->addHours($hours);
+                    $message = $ticket->messages()->create([
+                        'author_id' => ($author ?? $requester)->getKey(),
+                        'body' => $sanitizer->clean('<p>'.e($text).'</p>'),
+                        'is_private' => $private,
+                    ]);
+                    $message->forceFill(['created_at' => $at, 'updated_at' => $at])->save();
+                }
+            }
+        }
     }
 
     private function seedAuditLog(): void
