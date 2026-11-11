@@ -144,8 +144,9 @@ live preview gate:
    `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\preview.ps1`
    merges `origin/main` into the milestone branch (never a rebase), runs
    `composer install` or `npm ci` when a lock file changed, reports pending
-   migrations (ask before running them), and checks that `/healthz` shows the
-   checked-out revision.
+   migrations (ask before running them), syncs roles and permissions as a
+   deploy does when no migrations are pending, and checks that `/healthz`
+   shows the checked-out revision.
 2. **Start Laragon.** The same script checks that Laragon is running, that the
    site is served through FastCGI on PHP 8.4, and starts Vite on port 5174 if
    nothing listens there. Starting Laragon, clicking Reload or switching its
