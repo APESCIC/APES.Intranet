@@ -24,10 +24,10 @@ it('refuses to deploy a tag without a published release note', function () {
 
 it('documents the publish step in the shipping rule and the rollback in the release-notes guide', function () {
     $agents = (string) file_get_contents(base_path('AGENTS.md'));
-    $rule = (string) file_get_contents(base_path('.cursor/rules/version-shipping.mdc'));
+    $rule = (string) file_get_contents(base_path('.cursor/rules/shipping.mdc'));
     $guide = (string) file_get_contents(base_path('docs/release-notes.md'));
 
-    expect($agents)->toContain('.cursor/rules/version-shipping.mdc')
+    expect($agents)->toContain('.cursor/rules/shipping.mdc')
         ->and($rule)->toContain('changelog/releases/vX.Y.Z.json')
         ->and($rule)->toContain('"published": true')
         ->and($rule)->toContain('docs/release-notes.md')

@@ -48,6 +48,18 @@ class MilestoneVersionCliTest extends TestCase
                     ? ['number' => 100, 'title' => 'Milestone 7: Fix login', 'body' => "Closes #42\n", 'milestone' => null]
                     : null;
             }
+
+            public function openIssues(int $milestone): array
+            {
+                return match ($milestone) {
+                    5 => [
+                        ['number' => 41, 'title' => '[Epic] v1.9.0 Beta: Reporting and exports'],
+                        ['number' => 42, 'title' => '[Chore] Fix login'],
+                    ],
+                    7 => [['number' => 70, 'title' => '[Epic] v1.10.0 Beta: Search']],
+                    default => [],
+                };
+            }
         };
 
         $out = fopen('php://memory', 'w+');
@@ -188,6 +200,35 @@ class MilestoneVersionCliTest extends TestCase
             rmdir($this->root.'/scripts');
             rmdir($this->root);
         }
+    }
+
+    public function test_status_refuses_while_issues_other_than_the_epic_are_open(): void
+    {
+        [$exitCode, $out, $err] = $this->cli('status', 'v1.9.0');
+
+        $this->assertSame(Cli::FAILED, $exitCode);
+        $this->assertStringContainsString('Open issues: 1', $out);
+        $this->assertStringContainsString('#42 [Chore] Fix login', $out);
+        $this->assertStringContainsString('Epic:        #41 open', $out);
+        $this->assertStringContainsString('Do not close the milestone', $err);
+    }
+
+    public function test_status_passes_when_only_the_epic_is_open(): void
+    {
+        [$exitCode, $out] = $this->cli('status', 'v1.10.0');
+
+        $this->assertSame(Cli::OK, $exitCode);
+        $this->assertStringContainsString('Open issues: none', $out);
+        $this->assertStringContainsString('Epic:        #70 open', $out);
+    }
+
+    public function test_status_fails_for_a_version_with_no_open_milestone(): void
+    {
+        [$exitCode, , $err] = $this->cli('status', 'v1.8.10');
+
+        $this->assertSame(Cli::FAILED, $exitCode);
+        $this->assertStringContainsString('No open milestone has version v1.8.10', $err);
+        $this->assertSame(Cli::USAGE, $this->cli('status')[0]);
     }
 
     public function test_unknown_command_is_a_usage_error(): void

@@ -89,7 +89,7 @@ What each automatic check does, and what to do if one fails: [docs/workflows.md]
 ## Where to find more
 
 - The flow, step by step: [CONTRIBUTING.md](CONTRIBUTING.md), and the rule
-  [`.cursor/rules/version-shipping.mdc`](.cursor/rules/version-shipping.mdc).
+  [`.cursor/rules/shipping.mdc`](.cursor/rules/shipping.mdc); the skills are in `.cursor/skills/`.
 - Decisions (stack, sign-in, features, hosting, roadmap): [docs/decisions.md](docs/decisions.md).
 - Local set-up: [docs/local-development.md](docs/local-development.md).
 - Deploying: [docs/deploy/cloudron.md](docs/deploy/cloudron.md).

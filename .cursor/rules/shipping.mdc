@@ -1,0 +1,45 @@
+---
+description: How work ships in APES Intranet - version names, issue branches, the one merge per version, release, deploy and the stop points. Read before any branch, commit, PR, issue comment, merge, tag, release or deploy.
+alwaysApply: true
+---
+
+# Shipping
+
+`AGENTS.md` explains the flow in plain words. This rule holds the exact names and the stop points. The skills in `.cursor/skills/` carry out each step.
+
+## The version
+
+- A milestone's version is the `vMAJOR.MINOR.PATCH` at the start of its title. Never use GitHub's milestone number.
+- The next version is the open milestone with the lowest version above the latest tag. `composer milestone:next` prints it with every name below.
+- Stop and ask if a milestone title has no valid version, the version is not above the latest tag, or the tag already exists.
+
+## Names
+
+| Item | Format |
+| --- | --- |
+| Version branch | `milestone/vX-Y-Z-<slug>` (`composer milestone:branch`) |
+| Issue branch | `<type>/<issue>-<slug>` from the version branch (`composer milestone:branch -- --issue <n>`) |
+| Issue PR into the version branch | `[vX.Y.Z] <summary> (#<issue>)` |
+| Commit | Conventional Commit ending `(Refs #<issue>)` |
+| Version PR into `main` | `vX.Y.Z: <milestone name>`, body `Refs #<epic>` (not `Closes`) |
+| Release note | `changelog/releases/vX.Y.Z.json`, by `docs/release-notes.md` |
+| Tag and release | `vX.Y.Z` on the merge commit; release title `vX.Y.Z <milestone name>` |
+
+## The flow
+
+1. **Start** (`start-next-version`): live preview gate, version branch from `origin/main`, merge `origin/dependencies`.
+2. **Each issue** (`work-on-issue`): one at a time. "Work started" comment, issue branch, PR into the version branch, "Progress update" comments, merge (merge commit) when checks pass, "Work complete" comment, `gh issue close <n> --reason completed`, confirm closed. Then the next issue.
+3. **Finish** (`finish-version`): `composer milestone:bump -- vX.Y.Z`, last commit `chore: release vX.Y.Z` setting `"published": true`, merge `origin/main`, version PR, `ci` green, ship gate, `gh pr merge --merge`.
+4. **Release** (`release-version`), then **deploy** (`deploy-version`): `deploy/cloudron/deploy.ps1 -Tag vX.Y.Z`, `/healthz` evidence, `composer milestone:status -- vX.Y.Z`, close the Epic and the milestone.
+
+## Stop and ask (AskQuestion)
+
+- The ship gate before any merge into `main`, release or deploy, with exactly: a. Merge, b. Release, c. Deploy, d. Merge, release and deploy, e. Stop here. Ask again after each single step.
+- A merge conflict, red checks after one fix attempt, a blocker, or new scope.
+- Moving an issue to a later version, or a hotfix (needs Bambie's written approval on the issue).
+
+## Never
+
+- Commit to `main`, force-push, `reset --hard` or rebase a shared branch, or squash into `main`.
+- Close a milestone while `composer milestone:status` fails.
+- Claim a step happened without its command output.

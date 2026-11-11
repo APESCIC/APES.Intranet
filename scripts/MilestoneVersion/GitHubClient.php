@@ -62,6 +62,19 @@ final class GitHubClient implements GitHub
         ];
     }
 
+    public function openIssues(int $milestone): array
+    {
+        $issues = array_filter(
+            $this->paginate("repos/{$this->repository}/issues?milestone={$milestone}&state=open"),
+            fn (array $i): bool => ! isset($i['pull_request']),
+        );
+
+        return array_values(array_map(
+            fn (array $i): array => ['number' => (int) $i['number'], 'title' => (string) $i['title']],
+            $issues,
+        ));
+    }
+
     /**
      * @return list<array<string, mixed>>
      */
