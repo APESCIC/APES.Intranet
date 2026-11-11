@@ -1,5 +1,5 @@
 name: Epic
-description: Track one milestone and its sub-issues
+description: The parent issue for one version milestone
 title: "[Epic] "
 assignees:
   - apescic-director
@@ -7,20 +7,16 @@ body:
   - type: markdown
     attributes:
       value: |
-        One Epic per milestone, titled `[Epic] <milestone title>`. It is the
-        milestone's ship issue: the ship-gate answer and the deploy evidence
-        are posted here. Keep a sub-issue checklist in the body
-        (`- [ ] #123 [Chore] Short title`) and link each child as a sub-issue.
-        Remove credentials, personal data, and real HR, student, volunteer
-        or agreement details.
-        After opening, set the area label and the milestone to match the
-        answers below. The form does not apply them itself.
+        One Epic per milestone, titled `[Epic] <milestone title>`, for example
+        `[Epic] v0.6.0 HR and training`. The ship-gate answer, the release
+        summary and the deploy evidence are posted here. Link each child as a
+        sub-issue. After opening, set the area label and the milestone.
 
   - type: dropdown
     id: area
     attributes:
       label: Area
-      description: Matches an area label. Set that label after opening.
+      description: Set the matching area label after opening.
       options:
         - "area:cloudron"
         - "area:local-dev"
@@ -37,56 +33,28 @@ body:
     validations:
       required: true
 
-  - type: dropdown
-    id: milestone
-    attributes:
-      label: Milestone
-      description: Work one milestone at a time, in order. Set it after opening.
-      options:
-        - "v0.1.x Foundations"
-        - "v0.2.x People"
-        - "v0.3.x Communications"
-        - "v0.4.x Operations"
-        - "v0.5.x Help desk"
-        - "v0.6.x HR and training"
-        - "v0.7.x Agreements and legal"
-        - "v0.8.x Hiring and integrations"
-        - "v1.0.0 Launch"
-    validations:
-      required: true
-
   - type: textarea
     id: goal
     attributes:
       label: Goal
-      description: What does this epic deliver when every sub-issue is done?
-    validations:
-      required: true
-
-  - type: textarea
-    id: scope
-    attributes:
-      label: Scope
-      description: What is included, and what is left out?
+      description: What this version delivers when every sub-issue is done.
     validations:
       required: true
 
   - type: textarea
     id: checklist
     attributes:
-      label: Sub-issue checklist
-      description: List the child issues. Update the numbers once they exist.
+      label: Sub-issues
+      description: One line per child issue. Tick each one when it closes.
       placeholder: |
-        - [ ] #0 Short title
+        - [ ] #123 [Story] Short title
     validations:
       required: true
 
   - type: checkboxes
     id: privacy
     attributes:
-      label: Data-safety confirmation
+      label: Data safety
       options:
-        - label: >-
-            I removed credentials, personal data, and real HR, student,
-            volunteer or agreement details.
+        - label: I removed passwords, personal data and real HR, student, volunteer or agreement details.
           required: true

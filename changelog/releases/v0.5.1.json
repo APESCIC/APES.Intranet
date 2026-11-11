@@ -1,0 +1,19 @@
+{
+  "version": "v0.5.1",
+  "released_at": "2026-11-11",
+  "title": "Simpler guides for the development team",
+  "summary": "No changes you will notice. The development team's guides and checks are now simpler, so new helpers can follow how the intranet is built and released.",
+  "audiences": ["staff"],
+  "changes": {
+    "changed": [
+      "The guides for people who work on the intranet are shorter and in plain English, with a glossary of the technical words."
+    ]
+  },
+  "internal_notes": [
+    "AGENTS.md is now a one-page start guide; the decisions moved to docs/decisions.md. CONTRIBUTING.md has a flowchart and a worked example.",
+    "Each issue now gets its own branch and pull request into the version branch, with Work started, Progress update and Work complete comments, and closes when that pull request merges. The version still merges into main once.",
+    "Two Cursor rules, seven skills and the /next-version, /work-on-issue, /plan, /status, /finish-version, /release and /deploy commands replace the old rules and skills. composer milestone:status refuses while a version has open issues.",
+    "The automatic checks are named and documented in docs/workflows.md, run only on pull requests into main, version branches and dependencies, and use pinned actions and read-only permissions. The issue forms and pull request template are shorter."
+  ],
+  "published": true
+}

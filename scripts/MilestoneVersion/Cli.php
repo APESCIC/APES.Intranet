@@ -27,9 +27,10 @@ Usage: php scripts/milestone-version <command> [arguments]
   bump <vX.Y.Z>                  Set every version field in scripts/MilestoneVersion/fields.json, once per
       [--dry-run | --check]      milestone; the version must be the next milestone's (--offline skips that lookup)
       [--offline]
+  status <vX.Y.Z>                List the milestone's open issues; fails while any issue other than the Epic is open
 
-Composer: composer milestone:next, composer milestone:bump -- v1.3.0, composer milestone:check-title -- "[v1.3.0] Fix login (#42)"
-Rule: .cursor/rules/version-shipping.mdc
+Composer: composer milestone:next, composer milestone:status -- v1.3.0, composer milestone:check-title -- "[v1.3.0] Fix login (#42)"
+Rule: .cursor/rules/shipping.mdc
 TXT;
 
     /** @var resource */
@@ -68,6 +69,7 @@ TXT;
                 'check-branch' => $this->checkBranch($positional),
                 'check-release' => $this->checkRelease($positional, $options),
                 'bump' => $this->bump($positional, $options),
+                'status' => $this->status($positional),
                 null, 'help', '--help', '-h' => $this->usage($command === null ? self::USAGE : self::OK),
                 default => $this->usage(self::USAGE, sprintf('Unknown command "%s".', $command)),
             };
@@ -305,6 +307,55 @@ TXT;
         }
         foreach ($fields->notes() as $note) {
             $this->line('Next: '.$note);
+        }
+
+        return self::OK;
+    }
+
+    /**
+     * @param  list<string>  $positional
+     */
+    private function status(array $positional): int
+    {
+        if (! isset($positional[0])) {
+            return $this->usage(self::USAGE, 'status needs a version, for example v1.3.0.');
+        }
+        $version = $this->parseVersionOption($positional[0]);
+
+        $milestone = null;
+        foreach ($this->github()->openMilestones() as $open) {
+            if (SemVer::fromMilestoneTitle($open['title'])?->equals($version)) {
+                $milestone = $open;
+                break;
+            }
+        }
+        if ($milestone === null) {
+            $this->error(sprintf('No open milestone has version %s. It may already be closed.', $version));
+
+            return self::FAILED;
+        }
+
+        $epics = [];
+        $work = [];
+        foreach ($this->github()->openIssues($milestone['number']) as $issue) {
+            if (preg_match('/^\[Epic\]/i', $issue['title']) === 1) {
+                $epics[] = $issue;
+            } else {
+                $work[] = $issue;
+            }
+        }
+
+        $this->line(sprintf('Milestone:   %s', $milestone['title']));
+        $this->line(sprintf('Open issues: %s', $work === [] ? 'none' : count($work)));
+        foreach ($work as $issue) {
+            $this->line(sprintf('  #%d %s', $issue['number'], $issue['title']));
+        }
+        $this->line(sprintf('Epic:        %s', $epics === [] ? 'closed' : implode(', ', array_map(fn (array $e): string => sprintf('#%d open', $e['number']), $epics))));
+
+        if ($work !== []) {
+            $this->error(sprintf('status: FAIL %s still has %d open issue(s). Do not close the milestone.', $version, count($work)));
+
+            return self::FAILED;
         }
 
         return self::OK;

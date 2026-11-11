@@ -1,33 +1,23 @@
 ---
 name: release-version
-description: Ship a completed version - set the version once with composer milestone:bump, publish the release note, mark the milestone PR ready, get CI green, ask the ship-gate question, then merge once (merge commit), tag and release vX.Y.Z, deploy that tag to Cloudron with evidence and close out. Use when every issue in the milestone is committed, or when the user asks to merge, release, tag or deploy the milestone.
+description: Release a merged version of APES Intranet - one annotated tag vX.Y.Z on the merge commit in main and one GitHub release with notes in the report template. Use after finish-version has merged the version PR and the ship-gate answer includes release, or when the user says "release" or /release.
 ---
 
 # Release a version
 
-Follows `.cursor/rules/version-shipping.mdc` and the `ship-gate` and `cloudron-deploy` skills.
+Follows `.cursor/rules/shipping.mdc`. Needs the ship-gate answer (b or d) in the current chat.
 
 ## Steps
 
-1. **Sync.** Run `scripts\preview.ps1` (it merges `origin/main` into the milestone branch).
-2. **Set the version once.** `composer milestone:bump -- vX.Y.Z`. It refuses a version that is not the next milestone's. Fill in the release note by `docs/release-notes.md`.
-3. **Last commit.** `chore: release vX.Y.Z` setting `"published": true` in `changelog/releases/vX.Y.Z.json`. Push.
-4. **Ready.** `gh pr ready <pr>`, then `gh pr checks <pr> --watch --fail-fast`. Fix failures on the same branch.
-5. **Check the names.** `composer milestone:check-release -- vX.Y.Z "<release title>"`, using the "Release title" from `composer milestone:next`.
-6. **Ship gate.** Summarise the milestone, PR, checks, merge method, tag and deploy target, then ask with exactly: a. Merge, b. Release, c. Deploy, d. Merge, release and deploy, e. Stop here. Post the answer on the Epic. Run only what was chosen; after each single step ask again with what remains.
-7. **Merge.** `gh pr merge <pr> --merge --delete-branch`.
-8. **Release.** Tag the merge commit and publish the Release:
-
-   ```powershell
-   git fetch origin; git tag -a vX.Y.Z -m "vX.Y.Z" <merge-sha>; git push origin vX.Y.Z
-   gh release create vX.Y.Z --title "<release title>" --notes-file <notes>
-   ```
-
-9. **Deploy.** `deploy/cloudron/deploy.ps1 -Tag vX.Y.Z` (backup, build, upload, migrate, verify, roll back on failure). Evidence: its output and `/healthz` showing `version` = the tag and `revision` = the tag's commit.
-10. **Close out.** `Close-IssueTree.ps1` per issue and `Close-Milestone.ps1`, then merge `origin/main` into `dependencies`. Post the completion message with the PR, merge commit, issues, release and deploy evidence.
+1. **Find the merge commit.** `gh pr view <version pr> --json mergeCommit` and `git fetch origin --tags`.
+2. **Wait for `ci` on `main`.** `gh run list --branch main --limit 3`. **Stop and ask** if `ci` failed on the merge commit.
+3. **Check the names.** `composer milestone:check-release -- vX.Y.Z "<release title>"`.
+4. **Tag.** `git tag -a vX.Y.Z -m "vX.Y.Z" <merge sha>`, then `git push origin vX.Y.Z`. CI runs again on the tag and fails if the release note isn't published.
+5. **Release.** Write notes in the shape of `docs/templates/report.md` (What changed, Why, How it was checked, What you need to do, Explained), then
+   `gh release create vX.Y.Z --title "vX.Y.Z <milestone name>" --notes-file <notes> --verify-tag`.
+6. **Confirm.** `gh release view vX.Y.Z` and `gh run list --branch vX.Y.Z --limit 1` (CI on the tag must go green before the deploy).
+7. If the ship-gate answer was b, ask the ship gate again with the remaining step (deploy).
 
 ## Never
 
-- Squash or rebase the milestone PR, tag anything but the merge commit, or deploy a branch.
-- Rewrite a past tag, Release or published release note.
-- Report a step without its command output.
+- Tag anything but the merge commit, or move or rewrite an existing tag or release.

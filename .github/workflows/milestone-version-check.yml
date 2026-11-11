@@ -1,11 +1,15 @@
 name: milestone-version-check
 
-# PR titles and branch names must carry their milestone's version, never GitHub's milestone number.
-# See .cursor/rules/version-shipping.mdc.
+# Checks that each PR's title and branch name carry the right milestone version, never GitHub's milestone number.
+# Runs on PRs into main, version branches and dependencies (skipped for Dependabot). See .cursor/rules/shipping.mdc.
 
 on:
   pull_request:
     types: [opened, edited, synchronize, reopened]
+    branches:
+      - main
+      - 'milestone/**'
+      - dependencies
 
 permissions:
   contents: read

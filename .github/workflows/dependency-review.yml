@@ -1,14 +1,17 @@
 name: dependency-review
 
-# Free for public repositories: fails a pull request that adds a dependency
-# with a known high or critical vulnerability.
+# Fails a PR that adds a Composer, npm or Actions dependency with a known high or critical vulnerability.
+# Free for public repositories. Runs on PRs into main, version branches and dependencies.
 
 on:
   pull_request:
+    branches:
+      - main
+      - 'milestone/**'
+      - dependencies
 
 permissions:
   contents: read
-  pull-requests: write
 
 concurrency:
   group: dependency-review-${{ github.event.pull_request.number }}
@@ -29,4 +32,3 @@ jobs:
         uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
         with:
           fail-on-severity: high
-          comment-summary-in-pr: on-failure

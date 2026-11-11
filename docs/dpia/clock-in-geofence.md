@@ -23,7 +23,7 @@ only, that the member's device is near the site they are clocking in to.
 Location data about identifiable people is personal data. The ICO lists location tracking and the
 monitoring of employees among the kinds of processing that are likely to need a DPIA, and the
 people concerned include volunteers and students, some of whom may be young. APES CIC has therefore
-decided (AGENTS.md, decided features) that a DPIA is required before the check is switched on.
+decided ([decisions](../decisions.md#features)) that a DPIA is required before the check is switched on.
 
 ## Step 2: The processing
 
