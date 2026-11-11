@@ -166,14 +166,26 @@ async function visit(page, path, label, expectedStatus = 200) {
     await audit(page, label);
 }
 
-// Opens the first ticket in a list, so the check uses whatever the demo data holds.
+// Opens the first ticket in a list. Without demo data (as in CI) it raises one
+// through the form first; the first topic belongs to the IT queue.
 async function visitFirstTicket(page, listPath, label) {
     await page.goto(baseUrl + listPath, { waitUntil: 'networkidle' });
-    const href = await page.locator('[data-ticket] a').first().getAttribute('href');
-    if (!href) {
-        throw new Error(`${listPath} has no tickets. Load the demo data first (php artisan demo:seed).`);
+    const link = page.locator('[data-ticket] a').first();
+    if ((await link.count()) > 0) {
+        await visit(page, new URL(await link.getAttribute('href')).pathname, label);
+        return;
     }
-    await visit(page, new URL(href).pathname, label);
+
+    await page.goto(`${baseUrl}/help-desk/tickets/create`, { waitUntil: 'networkidle' });
+    await page.locator('#category_id').selectOption({ index: 1 });
+    await page.locator('#subject').fill('Accessibility check ticket');
+    await page.locator('#body-surface [contenteditable]').fill('Raised by the accessibility check.');
+    await Promise.all([
+        page.waitForURL(/\/help-desk\/tickets\/\d+$/),
+        page.getByRole('button', { name: 'Raise ticket' }).click(),
+    ]);
+    await page.waitForLoadState('networkidle');
+    await audit(page, label);
 }
 
 async function signInAs(page, role) {
