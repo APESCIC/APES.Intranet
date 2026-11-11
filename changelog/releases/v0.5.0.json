@@ -1,0 +1,32 @@
+{
+  "version": "v0.5.0",
+  "released_at": "2026-11-11",
+  "title": "Help desk: ask IT or Management for help in the intranet",
+  "summary": "You can now raise a ticket with IT or Management, follow it and reply in the intranet, and get an email when someone answers. The IT and Management teams work their own queues, with targets for how quickly they reply.",
+  "audiences": ["staff", "volunteers", "students"],
+  "changes": {
+    "added": [
+      "Help desk: raise a ticket by choosing what it is about, and it goes to the right team, IT or Management. Follow your tickets under Help desk and reply there. You only ever see your own tickets.",
+      "Emails when your ticket is raised, when the help desk replies, and when it is resolved or closed. Reply on the intranet: replies to the emails are not read.",
+      "A Lost device or 2FA reset topic. IT checks who you are, by calling you back on a number we already hold or through your manager, before resetting anything.",
+      "A short note with the Microsoft 365 apps in the menu and on the dashboard explains what to do if you see a Microsoft sign-in or no licence page, with links to the handbook and to IT.",
+      "For the IT and Management teams: a queue for each team, with assignment, private notes the requester never sees, merging duplicates, and service level targets that flag tickets past their reply or resolve time.",
+      "For the IT and Management teams: reports of tickets raised, still open, closed and past their targets for any period, with a CSV download. Admins choose the topics and which queue each goes to."
+    ],
+    "changed": [
+      "Help desk in the menu now opens the help desk, and your dashboard shows how many of your tickets are open."
+    ],
+    "security": [
+      "Private notes are only shown to the team that works the ticket and are never put in an email. Assignment changes, identity checks and 2FA resets are recorded in the audit log."
+    ],
+    "accessibility": [
+      "Every help desk page passes the automated accessibility checks, and the report figures are read out with what they count."
+    ]
+  },
+  "internal_notes": [
+    "Reply-by-email is not available: the Cloudron app has no recvmail addon. The decision is recorded on the email issue.",
+    "The Microsoft 365 note uses the handbook's licence wording. The owner confirms which groups hold licences on the help note issue.",
+    "Developer changes in this release: a new helpdesk module with four migrations, the help desk seeder runs on every deploy, menu groups can carry a short note, the live preview gate syncs roles and permissions, and the accessibility check covers the help desk pages."
+  ],
+  "published": true
+}
