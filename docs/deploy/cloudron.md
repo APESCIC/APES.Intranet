@@ -324,8 +324,11 @@ Use this only if `deploy.ps1` cannot run. It does the same steps.
 Before the Laravel app went live, the LAMP app's default web root,
 `/app/data/public`, held the APES "coming soon" holding page. The switch to
 the app was made with v0.0.1 on 5 November 2026, with the owner's approval on
-issue #13. The holding page files are still in `/app/data/public` as a
-fallback; removing them needs the owner's agreement and a backup first.
+issue #13. The holding page files (`index.php` and an empty `.htaccess`)
+stayed in `/app/data/public` as a fallback until 12 November 2026, when they
+were removed with the owner's agreement, after backup
+`app_8bd0acdc-ca6d-467e-aa1e-5c9eb52e3264_v5.3.1_872bd76f` (#267). The empty
+folder is still there.
 
 `/app/data/apache/app.conf` decides what Apache serves. To serve the app (as
 now), install the repository's config and restart:
@@ -338,14 +341,19 @@ cloudron restart --app $app
 Then check that `/healthz` returns 200 with `"status":"ok"`, the home page
 shows the APES sign-in page, and `/no-such-page` shows the APES 404 page.
 
-To go back to the holding page in an emergency (take a backup first), remove
-the config and restart. Nothing in `/app/data/current`, `/app/data/shared` or
-the database is lost:
+Removing `/app/data/apache/app.conf` now makes Apache serve the empty
+`/app/data/public`, so the site shows nothing useful. Don't do it to take the
+site offline: use Laravel's maintenance mode instead, which shows the APES
+maintenance page:
 
 ```powershell
-cloudron exec --app $app '--' rm /app/data/apache/app.conf
-cloudron restart --app $app
+cloudron exec --app $app '--' gosu www-data php8.4 /app/data/current/artisan down --retry=15
+cloudron exec --app $app '--' gosu www-data php8.4 /app/data/current/artisan up
 ```
+
+If the old holding page is ever needed again, its two files are in the backup
+named above. Restore them from the Cloudron backup's files rather than
+restoring the whole app.
 
 ## Troubleshooting
 
