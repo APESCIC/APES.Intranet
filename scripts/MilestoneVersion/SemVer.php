@@ -26,7 +26,7 @@ final class SemVer
             return null;
         }
 
-        $preRelease = isset($m[4]) && $m[4] !== '' ? explode('.', $m[4]) : [];
+        $preRelease = isset($m[4]) ? explode('.', $m[4]) : [];
 
         return new self((int) $m[1], (int) $m[2], (int) $m[3], $preRelease);
     }

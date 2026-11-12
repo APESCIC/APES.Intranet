@@ -31,7 +31,7 @@ class HandbookController
 
         if ($q !== '') {
             $chapters = $chapters->filter(function (HandbookChapter $chapter) use ($q) {
-                $hay = strtolower($chapter->title.' '.($chapter->currentVersion?->body ?? ''));
+                $hay = strtolower($chapter->title.' '.($chapter->currentVersion->body ?? ''));
 
                 return str_contains($hay, strtolower($q));
             })->values();
@@ -54,7 +54,7 @@ class HandbookController
             ? $chapter->versions()->where('version_number', $versionNumber)->firstOrFail()
             : $chapter->currentVersion;
 
-        abort_unless($version, 404);
+        abort_if($version === null, 404);
 
         $acked = HandbookAcknowledgement::query()
             ->where('handbook_version_id', $version->id)
@@ -131,7 +131,7 @@ class HandbookController
     {
         abort_unless($request->user()?->can(AccessMatrix::INTRANET_ACCESS), 403);
         $version = $chapter->currentVersion;
-        abort_unless($version, 404);
+        abort_if($version === null, 404);
 
         HandbookAcknowledgement::query()->firstOrCreate(
             ['handbook_version_id' => $version->id, 'user_id' => $request->user()->id],
@@ -150,7 +150,7 @@ class HandbookController
         );
 
         $version = $chapter->currentVersion;
-        abort_unless($version, 404);
+        abort_if($version === null, 404);
 
         $ackedIds = HandbookAcknowledgement::query()
             ->where('handbook_version_id', $version->id)

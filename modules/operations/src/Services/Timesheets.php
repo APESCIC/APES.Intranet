@@ -58,7 +58,7 @@ final class Timesheets
                     'clock_record_id' => $record->id,
                     'worked_on' => $record->clock_in_at->toDateString(),
                     'minutes' => $record->workedMinutes(),
-                    'description' => $record->shift?->role ?? $record->site?->name,
+                    'description' => $record->shift->role ?? $record->site?->name,
                 ]);
             }
 
@@ -113,10 +113,10 @@ final class Timesheets
         Notifier::send(
             [$timesheet->member],
             'Timesheet '.$timesheet->status.': week of '.$timesheet->period_start->format('j F Y'),
-            array_values(array_filter([
+            array_filter([
                 'Your timesheet for the week of '.$timesheet->period_start->format('j F Y').' was '.$timesheet->status.' by '.$manager->name.'.',
                 $note ? 'Note: '.$note : null,
-            ])),
+            ]),
             route('operations.timesheets.show', $timesheet),
         );
     }

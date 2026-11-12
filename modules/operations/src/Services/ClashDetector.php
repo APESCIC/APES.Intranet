@@ -52,7 +52,7 @@ final class ClashDetector
     }
 
     /**
-     * @return Collection<int, list<string>> Shift id => clashes, only shifts that clash.
+     * @return Collection<int, non-empty-list<string>> Shift id => clashes, only shifts that clash.
      */
     public function forWeek(RotaWeek $week): Collection
     {
