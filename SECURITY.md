@@ -35,8 +35,10 @@ report. Do not include real HR, student, volunteer or agreement data.
 
 ## Supported versions
 
-Nothing is released yet. Security reports are accepted for the current
-`main` branch. Older unreleased work may not receive a separate patch.
+Only the latest release is supported: the newest `vX.Y.Z` tag on `main`,
+which is the version live at <https://intranet.apes.org.uk> (its footer shows
+the version). Fixes ship in the next release, or sooner as a hotfix. Older
+releases do not get separate patches.
 
 ## Issues and discussions
 

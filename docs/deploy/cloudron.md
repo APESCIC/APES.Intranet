@@ -175,8 +175,8 @@ which follows [holding-page.md](holding-page.md).
 
 ## Each deploy
 
-A deploy ships a release that already exists: the milestone pull request is
-merged, and the release `vX.Y.Z` is published from the merge commit.
+A deploy ships a release that already exists: the version PR is merged, and
+the release `vX.Y.Z` is published from the merge commit.
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File deploy\cloudron\deploy.ps1 -Tag vX.Y.Z
@@ -207,7 +207,7 @@ Composer.
 9. On any failure from step 7 on, rolls back to the earlier release, restarts,
    verifies again, and exits 1.
 10. Prints a summary (release id, revision, backup id, `/healthz` output). Paste
-    it on the milestone's Epic, which is its ship issue.
+    it on the version's Epic.
 
 Exit code 0 means the release is live and verified. Exit code 1 means nothing
 changed, or the app was rolled back. The summary says which.
@@ -316,7 +316,7 @@ Use this only if `deploy.ps1` cannot run. It does the same steps.
     ```
 
 11. **Record** the release id, revision, backup id and `/healthz` output on the
-    milestone's Epic.
+    version's Epic.
 
 ## Troubleshooting
 

@@ -164,13 +164,15 @@ v0.3.12 platform releases). Open, in this order:
    and the other APES systems.
 5. **v1.0.0 Launch.** Go-live checks (below) and owner sign-off.
 
-## Before going public
+## Go-live checks
+
+The repository is already public. Check these again before v1.0.0:
 
 - Secret scan of the git history is clean.
 - No `.env` file is committed, other than `.env.example` and
   `.env.laragon.example`.
 - No real HR, student, volunteer or agreement data is in the repository.
-- A licence has been chosen.
+- Done: a licence has been chosen (proprietary, see [LICENSE](../LICENSE)).
 
 ## Data
 
