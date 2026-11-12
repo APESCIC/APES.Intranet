@@ -1,6 +1,8 @@
 name: Chore
 description: Maintenance or set-up work that people won't notice directly
 title: "[Chore] "
+labels:
+  - chore
 assignees:
   - apescic-director
 type: Task
@@ -10,13 +12,13 @@ body:
       value: |
         Say what needs doing and why. No passwords, personal data or real HR,
         student, volunteer or agreement details.
-        After opening, set the area label and the version milestone.
+        After opening, set the version milestone. The area label is added for you.
 
   - type: dropdown
     id: area
     attributes:
       label: Area
-      description: Set the matching area label after opening.
+      description: The matching area label is added when the issue opens.
       options:
         - "area:cloudron"
         - "area:local-dev"
