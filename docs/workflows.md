@@ -8,7 +8,8 @@ by hand after Bambie's ship-gate answer (see [CONTRIBUTING.md](../CONTRIBUTING.m
 
 | Workflow | When it runs | What it checks | If it fails |
 | --- | --- | --- | --- |
-| `ci` | PRs into `main`, a version branch or `dependencies`; pushes to `main`; `vX.Y.Z` tags | Markdown style, workflow files, YAML, no stray `.env` files, Pint, Larastan, the asset build, release notes (and on a tag, that its note is published), the tests on PHP 8.3 with MySQL, and the accessibility check | Open the failed step in the run. Run the same command locally (see the table below), fix it on the same branch and push |
+| `ci` | PRs into `main`, a version branch or `dependencies`; pushes to `main`; `vX.Y.Z` tags | Markdown style, workflow files, YAML, no stray `.env` files, Pint, Larastan, the asset build, release notes (and on a tag, that its note is published), the tests on PHP 8.3 with MySQL, and the accessibility check. Its `tests-php84` job repeats the tests on PHP 8.4 | Open the failed step in the run. Run the same command locally (see the table below), fix it on the same branch and push |
+| `tests-php84` (in `ci.yml`) | Same triggers as `ci` | The tests on PHP 8.4, the version Cloudron runs, with MySQL | Run `php artisan test` with Laragon's PHP 8.4. Not a required check, but fix it before the version PR |
 | `milestone-version-check` | PRs into `main`, a version branch or `dependencies` (not Dependabot) | The PR title and branch name carry the right version, never a milestone number | The log says what's wrong and suggests the right title. Fix the title with `gh pr edit <pr> --title "..."`, or rename the branch |
 | `dependency-review` | PRs into `main`, a version branch or `dependencies` | No new package with a known high or critical vulnerability | Read the log for the package. Use a fixed version, or ask Bambie before adding it |
 

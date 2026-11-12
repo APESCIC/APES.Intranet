@@ -20,7 +20,7 @@ Do not change any of them without her approval. Terms are explained in the
 - Responsive on desktop, tablet and mobile, and installable as a PWA.
 - PHP versions: Cloudron runs PHP 8.4, chosen by `/app/data/PHP_VERSION`.
   Local development and the release build use Laragon's PHP 8.4 too, and CI
-  tests on 8.3. All meet the PHP 8.3 floor. Do not pin Cloudron back to 8.3.
+  tests on 8.3 and 8.4. All meet the PHP 8.3 floor. Do not pin Cloudron back to 8.3.
 
 ## Sign-in
 

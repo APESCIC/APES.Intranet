@@ -27,7 +27,7 @@ a local database, a fixture or this repository.
 
 The full profile is in [laragon/profile.md](laragon/profile.md). PHP 8.4
 matches Cloudron. PHP 8.3 is still the floor (`composer.json` pins the
-platform to 8.3, and CI runs 8.3). Locally, sessions and the cache use files
+platform to 8.3, and CI tests on both 8.3 and 8.4). Locally, sessions and the cache use files
 and the queue runs straight away (`sync`), so Redis is not needed.
 
 ## First run
@@ -186,7 +186,7 @@ The last line runs the accessibility check (axe and keyboard) against the
 preview, using Microsoft Edge. See [accessibility.md](accessibility.md).
 
 Locally, tests use an in-memory SQLite database (set in `phpunit.xml`), so
-they never touch `apes_intranet_local`. CI runs the same tests on PHP 8.3
+they never touch `apes_intranet_local`. CI runs the same tests on PHP 8.3 and 8.4
 against a MySQL 8.4 database, so a test that passes locally can still fail on a
 MySQL-only difference. What each CI check does is in
 [workflows.md](workflows.md).
