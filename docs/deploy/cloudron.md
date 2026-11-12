@@ -170,13 +170,14 @@ Do this once, before the first deploy. It was done for v0.0.1 on 5 November
 6. **Check.** Run the [preflight](#preflight). Before the first deploy, expect
    `WARN` lines for `app.conf` and for "no current release yet".
 
-Then deploy, below. The holding page stays up until Apache is switched over,
-which follows [holding-page.md](holding-page.md).
+Then deploy, below. Apache keeps serving `/app/data/public` until
+`/app/data/apache/app.conf` points it at the release, as in
+[Serving the app, or the holding page](#serving-the-app-or-the-holding-page).
 
 ## Each deploy
 
-A deploy ships a release that already exists: the milestone pull request is
-merged, and the release `vX.Y.Z` is published from the merge commit.
+A deploy ships a release that already exists: the version PR is merged, and
+the release `vX.Y.Z` is published from the merge commit.
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File deploy\cloudron\deploy.ps1 -Tag vX.Y.Z
@@ -207,7 +208,7 @@ Composer.
 9. On any failure from step 7 on, rolls back to the earlier release, restarts,
    verifies again, and exits 1.
 10. Prints a summary (release id, revision, backup id, `/healthz` output). Paste
-    it on the milestone's Epic, which is its ship issue.
+    it on the version's Epic.
 
 Exit code 0 means the release is live and verified. Exit code 1 means nothing
 changed, or the app was rolled back. The summary says which.
@@ -316,13 +317,41 @@ Use this only if `deploy.ps1` cannot run. It does the same steps.
     ```
 
 11. **Record** the release id, revision, backup id and `/healthz` output on the
-    milestone's Epic.
+    version's Epic.
+
+## Serving the app, or the holding page
+
+Before the Laravel app went live, the LAMP app's default web root,
+`/app/data/public`, held the APES "coming soon" holding page. The switch to
+the app was made with v0.0.1 on 5 November 2026, with the owner's approval on
+issue #13. The holding page files are still in `/app/data/public` as a
+fallback; removing them needs the owner's agreement and a backup first.
+
+`/app/data/apache/app.conf` decides what Apache serves. To serve the app (as
+now), install the repository's config and restart:
+
+```powershell
+cloudron push --app $app .\deploy\cloudron\apache-app.conf /app/data/apache/app.conf
+cloudron restart --app $app
+```
+
+Then check that `/healthz` returns 200 with `"status":"ok"`, the home page
+shows the APES sign-in page, and `/no-such-page` shows the APES 404 page.
+
+To go back to the holding page in an emergency (take a backup first), remove
+the config and restart. Nothing in `/app/data/current`, `/app/data/shared` or
+the database is lost:
+
+```powershell
+cloudron exec --app $app '--' rm /app/data/apache/app.conf
+cloudron restart --app $app
+```
 
 ## Troubleshooting
 
 | Symptom | Cause | Fix |
 | --- | --- | --- |
-| The holding page still shows, and `/robots.txt` returns 404 | `/app/data/apache/app.conf` was not switched, or the app was not restarted after it was | Follow [holding-page.md](holding-page.md): push `apache-app.conf`, then `cloudron restart --app $app` |
+| The holding page still shows, and `/robots.txt` returns 404 | `/app/data/apache/app.conf` was not switched, or the app was not restarted after it was | Push `apache-app.conf` and restart, as in [Serving the app, or the holding page](#serving-the-app-or-the-holding-page) |
 | `/healthz` returns 404 | Apache is not serving `/app/data/current/public` | Run the preflight. Check the `app.conf` line, and that `current` points at a release with `artisan` |
 | A release folder inside a release folder, such as `releases/<id>/apes-intranet-release-<id>/` | The upload had a trailing `\` on the source, or used an older `build-release.ps1` | Delete the outer folder with `cloudron exec --app $app '--' rm -rf /app/data/releases/<id>`. Then upload again with no trailing `\`. The preflight warns about any release with no `artisan` |
 | `Create /app/data/shared/.env first.` | First-time set-up step 2 was not done | Do [first-time set-up](#first-time-set-up) steps 2 and 3 |

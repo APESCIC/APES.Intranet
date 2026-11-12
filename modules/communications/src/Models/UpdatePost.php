@@ -43,7 +43,7 @@ class UpdatePost extends Model
     public function isVisibleTo(User $user): bool
     {
         $audiences = $this->audiences ?? [];
-        if ($audiences === [] || $audiences === null) {
+        if ($audiences === []) {
             return true;
         }
 

@@ -1,0 +1,45 @@
+name: issue-area-label
+
+# Adds the area label chosen in an issue form (### Area) when the issue opens.
+# Only adds a label that already exists, so it never creates or renames labels.
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+
+jobs:
+  label:
+    name: issue-area-label
+    if: contains(github.event.issue.body, '### Area')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Add the chosen area label
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const body = context.payload.issue.body || '';
+            const match = body.match(/^### Area\s*\n+\s*(area:[a-z-]+)\s*$/m);
+            if (!match) {
+              core.info('No area answer in the issue body.');
+              return;
+            }
+            const name = match[1];
+            try {
+              await github.rest.issues.getLabel({ ...context.repo, name });
+            } catch (error) {
+              if (error.status === 404) {
+                core.warning(`Label ${name} does not exist, so it was not added.`);
+                return;
+              }
+              throw error;
+            }
+            await github.rest.issues.addLabels({
+              ...context.repo,
+              issue_number: context.payload.issue.number,
+              labels: [name],
+            });
+            core.info(`Added ${name}.`);

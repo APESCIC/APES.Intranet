@@ -40,4 +40,6 @@ This code is proprietary to Association of Protecting Exotic Species CIC
 (APES CIC). It is published for transparency only. No licence is granted to
 use, copy, modify, distribute or deploy it, in whole or in part, without prior
 written permission from APES CIC. See [LICENSE](LICENSE). For permission or
-questions, use the contact details in [SECURITY.md](SECURITY.md).
+questions, use the contact details on <https://github.com/APESCIC> or the APES
+CIC website. Report security problems privately, as in
+[SECURITY.md](SECURITY.md).

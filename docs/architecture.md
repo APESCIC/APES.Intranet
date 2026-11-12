@@ -7,7 +7,7 @@ The intranet follows the same three layers as MyAPES Account (its ADR 0001,
 | --- | --- | --- | --- |
 | Core | `app/Core/` | `App\Core\` | Sign-in, accounts, roles and permissions, the app shell, settings, audit, health |
 | Modules | `modules/<slug>/` | `Modules\<Studly>\` | Areas of the intranet, each with its own navigation and route prefix |
-| Plugins | `plugins/<slug>/` | `Plugins\<Studly>\` | Reusable features, enabled per module |
+| Plugins | `plugins/<slug>/` | `Plugins\<Studly>\` | Reserved for a later, approved mechanism. Empty for now |
 
 Terminology (Modules, Integrations, reserved Plugins and Cloudron addons) and
 the proposed enable and disable registry are in
@@ -26,17 +26,24 @@ contracts.
 
 ## Package layout
 
-Each module or plugin has one service provider and this layout:
+Each module has one service provider and this layout:
 
 ```text
 modules/<slug>/src/...
-modules/<slug>/{routes,resources/views,lang,config,database/migrations,tests}
-plugins/<slug>/src/...
-plugins/<slug>/{routes,resources/views,lang,config,database/migrations,database/factories,tests}
+modules/<slug>/{routes,resources/views,lang,config,database/migrations}
 ```
 
-Add the PSR-4 entry to `composer.json` when the first module or plugin is
-created, for example `"Modules\\People\\": "modules/people/src/"`.
+The four modules are `people`, `communications`, `operations` and `helpdesk`.
+A new module needs:
+
+- a PSR-4 entry in `composer.json`, for example
+  `"Modules\\Training\\": "modules/training/src/"`;
+- its service provider in `bootstrap/providers.php`;
+- its migrations folder in `databaseMigrationsPath` in `phpstan.neon`;
+- its tests in `tests/Feature/<Area>/` (and `tests/Unit/` where useful), not
+  inside the module.
+
+`plugins/` stays empty and reserved (see [ADR 0001](adr/0001-modules-and-integrations.md)).
 
 ## Roles and permissions
 

@@ -15,4 +15,16 @@ parameters:
         - bootstrap/app.php
         - config/
         - database/
+        - modules/
         - routes/
+        - scripts/MilestoneVersion/
+    ignoreErrors:
+        # Module config files are merged with mergeConfigFrom, so they are cached with the rest of the config.
+        -
+            identifier: larastan.noEnvCallsOutsideOfConfig
+            paths:
+                - modules/*/config/*
+        # file_get_contents() leaves $http_response_header undefined when the connection fails.
+        -
+            identifier: nullCoalesce.variable
+            path: scripts/MilestoneVersion/GitHubClient.php

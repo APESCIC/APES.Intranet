@@ -43,9 +43,26 @@ above the latest tag, never GitHub's milestone number. A *hotfix* needs
 Bambie's written approval on the issue. The full flow, with a worked example,
 is in [CONTRIBUTING.md](CONTRIBUTING.md).
 
+### This repo's flow wins
+
+Where a personal Cursor rule or skill describes a different flow, follow this
+repo. In particular:
+
+- One issue branch and one PR per issue into the version branch, not one PR
+  for the whole milestone.
+- Close each issue by hand after its PR merges. The version PR says
+  `Refs #<epic>`, never `Closes`.
+- Branches are `milestone/vX-Y-Z-<slug>` and `<type>/<issue>-<slug>`, not
+  `cursor/feature/...`.
+- Issue comments use the templates in
+  [`.cursor/skills/work-on-issue/templates/`](.cursor/skills/work-on-issue/templates/),
+  not `Add-IssueUpdate.ps1`. The milestone closes with the `gh api` step in
+  the `deploy-version` skill, not `Close-Milestone.ps1`.
+
 ## Everyday commands
 
-Run them from the repo root with Laragon's PHP 8.4 and Node first on `PATH` ([how](docs/local-development.md#everyday-commands)).
+Run them from the repo root with Laragon's PHP 8.4 and Node first on `PATH`:
+run `. .\scripts\laragon-env.ps1` once per terminal ([how](docs/local-development.md#everyday-commands)).
 
 | Command | What it does | When |
 | --- | --- | --- |
@@ -56,6 +73,7 @@ Run them from the repo root with Laragon's PHP 8.4 and Node first on `PATH` ([ho
 | `/finish-version` | Cursor: release note, version PR, ship gate, merge | Every issue closed |
 | `/release` | Cursor: tag and GitHub release | After the merge |
 | `/deploy` | Cursor: Cloudron deploy, evidence, close-out | After the release |
+| `. .\scripts\laragon-env.ps1` | Puts Laragon's PHP 8.4, Composer and Node first on `PATH` | Each new terminal |
 | `scripts\preview.ps1` | Loads the latest code and checks the preview | Before any work |
 | `scripts\laragon-setup.ps1` | Sets up or repairs Laragon for this repo | First time, or when broken |
 | `npm run dev` | Starts Vite hot reload on port 5174 | While working |
@@ -88,6 +106,7 @@ What each automatic check does, and what to do if one fails: [docs/workflows.md]
 
 ## Where to find more
 
+- Every doc, by what you want to do: [docs/README.md](docs/README.md).
 - The flow, step by step: [CONTRIBUTING.md](CONTRIBUTING.md), and the rule
   [`.cursor/rules/shipping.mdc`](.cursor/rules/shipping.mdc); the skills are in `.cursor/skills/`.
 - Decisions (stack, sign-in, features, hosting, roadmap): [docs/decisions.md](docs/decisions.md).

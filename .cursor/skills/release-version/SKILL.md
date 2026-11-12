@@ -14,7 +14,7 @@ Follows `.cursor/rules/shipping.mdc`. Needs the ship-gate answer (b or d) in the
 3. **Check the names.** `composer milestone:check-release -- vX.Y.Z "<release title>"`.
 4. **Tag.** `git tag -a vX.Y.Z -m "vX.Y.Z" <merge sha>`, then `git push origin vX.Y.Z`. CI runs again on the tag and fails if the release note isn't published.
 5. **Release.** Write notes in the shape of `docs/templates/report.md` (What changed, Why, How it was checked, What you need to do, Explained), then
-   `gh release create vX.Y.Z --title "vX.Y.Z <milestone name>" --notes-file <notes> --verify-tag`.
+   `gh release create vX.Y.Z --title "vX.Y.Z <milestone name>" --notes-file "$env:TEMP\release-notes.md" --verify-tag`.
 6. **Confirm.** `gh release view vX.Y.Z` and `gh run list --branch vX.Y.Z --limit 1` (CI on the tag must go green before the deploy).
 7. If the ship-gate answer was b, ask the ship gate again with the remaining step (deploy).
 

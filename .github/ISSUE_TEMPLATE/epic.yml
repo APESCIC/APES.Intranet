@@ -1,6 +1,8 @@
 name: Epic
 description: The parent issue for one version milestone
 title: "[Epic] "
+labels:
+  - epic
 assignees:
   - apescic-director
 body:
@@ -10,13 +12,13 @@ body:
         One Epic per milestone, titled `[Epic] <milestone title>`, for example
         `[Epic] v0.6.0 HR and training`. The ship-gate answer, the release
         summary and the deploy evidence are posted here. Link each child as a
-        sub-issue. After opening, set the area label and the milestone.
+        sub-issue. After opening, set the milestone. The area label is added for you.
 
   - type: dropdown
     id: area
     attributes:
       label: Area
-      description: Set the matching area label after opening.
+      description: The matching area label is added when the issue opens.
       options:
         - "area:cloudron"
         - "area:local-dev"

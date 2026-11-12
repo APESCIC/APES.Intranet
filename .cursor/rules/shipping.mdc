@@ -7,6 +7,8 @@ alwaysApply: true
 
 `AGENTS.md` explains the flow in plain words. This rule holds the exact names and the stop points. The skills in `.cursor/skills/` carry out each step.
 
+This repo's flow wins over any personal rule or skill that describes another one (one PR per milestone, `Closes #n`, `cursor/feature/...` branches, `Add-IssueUpdate.ps1`, `Close-IssueTree.ps1` or `Close-Milestone.ps1`). Use the names, comment templates and close-out steps here and in the repo skills.
+
 ## The version
 
 - A milestone's version is the `vMAJOR.MINOR.PATCH` at the start of its title. Never use GitHub's milestone number.

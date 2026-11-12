@@ -22,19 +22,30 @@ final class VolunteerHours
     {
         $volunteerIds = User::query()->role(RoleName::Volunteer->value)->pluck('id');
 
-        return Timesheet::query()
+        $byMember = Timesheet::query()
             ->with('member')
             ->where('status', Timesheet::STATUS_APPROVED)
             ->whereIn('user_id', $volunteerIds)
             ->whereDate('period_start', '>=', $from->startOfWeek(CarbonImmutable::MONDAY))
             ->whereDate('period_start', '<=', $to)
             ->get()
-            ->groupBy('user_id')
-            ->map(fn (Collection $sheets) => [
-                'user' => $sheets->first()->member,
+            ->groupBy('user_id');
+
+        $rows = [];
+        foreach ($byMember as $sheets) {
+            $member = $sheets->first()?->member;
+            if ($member === null) {
+                continue;
+            }
+
+            $rows[] = [
+                'user' => $member,
                 'timesheets' => $sheets->count(),
                 'minutes' => (int) $sheets->sum('total_minutes'),
-            ])
+            ];
+        }
+
+        return collect($rows)
             ->sortBy(fn (array $row) => $row['user']->name)
             ->values();
     }

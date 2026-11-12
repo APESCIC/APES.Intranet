@@ -1,11 +1,11 @@
 ---
 name: plan-work
-description: Plan any task or a whole version in APES Intranet before changing anything - investigate the code and issues, write a plan with a summary, decisions, numbered tasks with done-when checks, files, risks and a glossary, post it on the issue when asked, wait for approval, then name the agent. Use before any large or unclear task, for a whole milestone, or when the user says "plan", "make a plan" or /plan.
+description: Plan any task or a whole version in APES Intranet before changing anything - investigate the code and issues, write a plan with a summary, decisions, numbered tasks with done-when checks, files, risks and a glossary, wait for approval, post the approved plan on the Epic or issue, then name the agent. Use before any large or unclear task, for a whole milestone, or when the user says "plan", "make a plan" or /plan.
 ---
 
 # Plan the work
 
-Read only until Bambie approves. No edits, commits or comments other than posting the plan when asked.
+Read only until Bambie approves. No edits, commits or comments other than posting the approved plan.
 
 ## Steps
 
@@ -19,6 +19,6 @@ Read only until Bambie approves. No edits, commits or comments other than postin
    5. Risks, and how you'll avoid them.
    6. Glossary: every technical term in one plain sentence (reuse `docs/glossary.md`).
 4. **Heading.** Use the agent name as the plan's heading: `<milestone title> – APES.Intranet`, or `APES.Intranet – <short task name>` for work with no milestone. Under 60 characters, with the version and never the milestone number.
-5. **Post it** on the issue when asked: `gh issue comment <n> --body-file <plan>`, or as a checklist in the issue body.
-6. **Ask for approval** with AskQuestion: "Approve the plan (Recommended)", "Revise it", "Stop here". Ask about each open decision the same way. **Wait.**
+5. **Ask for approval** with AskQuestion: "Approve the plan (Recommended)", "Revise it", "Stop here". Ask about each open decision the same way. **Wait.**
+6. **Post the approved plan, every time.** On the version's Epic, or on the issue for work with no version, starting with `**Plan approved by Bambie on <date>**`: `gh issue comment <n> --body-file "$env:TEMP\plan.md"`. A Cursor restart can lose the chat's plan; the comment keeps it. When a new chat resumes the work, read the plan from there.
 7. **After approval:** rename this chat to the plan's heading. If you can't, put `Suggested agent name: <name>` as the first line of your reply. Then carry out the tasks (for issues, with `work-on-issue`).

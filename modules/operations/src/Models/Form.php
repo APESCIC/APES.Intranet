@@ -48,7 +48,7 @@ class Form extends Model
 
     public function routingLabel(): string
     {
-        return $this->routeToUser?->name
+        return $this->routeToUser->name
             ?? ($this->route_to_role ? 'Everyone with the '.$this->route_to_role.' role' : 'Not set');
     }
 

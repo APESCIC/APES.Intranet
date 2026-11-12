@@ -13,7 +13,7 @@ Follows `.cursor/rules/shipping.mdc`. Then `release-version` and `deploy-version
 2. **Sync.** `git switch <version branch>`, `git pull --ff-only`, run the live preview gate (it merges `origin/main` in).
 3. **Release note.** `composer milestone:bump -- vX.Y.Z` creates `changelog/releases/vX.Y.Z.json` from its template. Write it by `docs/release-notes.md`, for the people who use the intranet. Developer-only releases are for `staff`, summary "No changes you will notice", detail in `internal_notes`.
 4. **Last commit.** `chore: release vX.Y.Z (Refs #<epic>)`, setting `"published": true`. Run `php artisan changelog:validate`. Push.
-5. **Version PR.** `gh pr create --base main --title "<Milestone PR title from composer milestone:next>" --body-file <report>`. The body follows `docs/templates/report.md`, lists every issue shipped, and says `Refs #<epic>` (never `Closes`, so the Epic stays open until the deploy).
+5. **Version PR.** `gh pr create --base main --title "<Milestone PR title from composer milestone:next>" --body-file "$env:TEMP\report.md"`. The body follows `docs/templates/report.md`, lists every issue shipped, and says `Refs #<epic>` (never `Closes`, so the Epic stays open until the deploy).
 6. **Checks.** `gh pr checks <pr> --watch`. Fix failures on the version branch. **Stop and ask** if still red after one fix attempt.
 7. **Check the names.** `composer milestone:check-release -- vX.Y.Z "<Release title from composer milestone:next>"`.
 8. **Ship gate.** Summarise: milestone and issues, PR, checks, target `main`, merge method (merge commit), tag, deploy target (Cloudron, `intranet.apes.org.uk`), and that nothing auto-deploys. Then ask with AskQuestion using exactly:

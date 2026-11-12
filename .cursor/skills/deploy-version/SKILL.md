@@ -5,7 +5,7 @@ description: Deploy a released version of APES Intranet to Cloudron with evidenc
 
 # Deploy a version and close it out
 
-Follows `.cursor/rules/shipping.mdc` and `docs/deploy/cloudron.md`. Needs the ship-gate answer (c or d) in the current chat. Every Cloudron app is production. Never print `.env` values, `APP_KEY` or addon credentials.
+Follows `.cursor/rules/shipping.mdc` and `docs/deploy/cloudron.md`. Use the steps below for the summary and close-out, not `Close-IssueTree.ps1` or `Close-Milestone.ps1`. Needs the ship-gate answer (c or d) in the current chat. Every Cloudron app is production. Never print `.env` values, `APP_KEY` or addon credentials.
 
 ## Steps
 
@@ -15,7 +15,7 @@ Follows `.cursor/rules/shipping.mdc` and `docs/deploy/cloudron.md`. Needs the sh
    - Exit 1 means nothing changed or it rolled back. **Stop**: nothing closes, and reopen any issue that needs the fix. Ask how to proceed.
 4. **Evidence.** `curl.exe -s https://intranet.apes.org.uk/healthz` must show `"version":"vX.Y.Z"` and `revision` = the first 12 characters of the tag's commit (`git rev-parse vX.Y.Z^{commit}`).
 5. **Check the milestone.** `composer milestone:status -- vX.Y.Z` must pass (only the Epic may be open). If not, list the open issues and **stop**. Never close a milestone with open issues.
-6. **Release summary.** Fill in `templates/release-summary.md` and post it on the Epic (`gh issue comment <epic> --body-file <file>`).
+6. **Release summary.** Fill in `templates/release-summary.md` and post it on the Epic (`gh issue comment <epic> --body-file "$env:TEMP\release-summary.md"`).
 7. **Close the Epic.** `gh issue close <epic> --reason completed`. Run `composer milestone:status -- vX.Y.Z` again: it must say `Epic: closed`.
 8. **Close the milestone.** Add the summary to the milestone description, then close it:
    `gh api -X PATCH repos/APESCIC/APES.Intranet/milestones/<number> -f state=closed -f description=<summary>`. Look up its number with `gh api repos/APESCIC/APES.Intranet/milestones`; never write that number in a name or title.

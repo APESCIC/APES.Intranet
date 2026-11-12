@@ -20,7 +20,7 @@ Do not change any of them without her approval. Terms are explained in the
 - Responsive on desktop, tablet and mobile, and installable as a PWA.
 - PHP versions: Cloudron runs PHP 8.4, chosen by `/app/data/PHP_VERSION`.
   Local development and the release build use Laragon's PHP 8.4 too, and CI
-  tests on 8.3. All meet the PHP 8.3 floor. Do not pin Cloudron back to 8.3.
+  tests on 8.3 and 8.4. All meet the PHP 8.3 floor. Do not pin Cloudron back to 8.3.
 
 ## Sign-in
 
@@ -65,7 +65,7 @@ Do not change any of them without her approval. Terms are explained in the
   SharePoint redirect has been removed.
 - The Laravel app has been live since v0.0.1 (5 November 2026). The old
   "coming soon" holding page stays in `/app/data/public` as a fallback
-  ([holding-page.md](deploy/holding-page.md)).
+  ([serving the app, or the holding page](deploy/cloudron.md#serving-the-app-or-the-holding-page)).
 - Agents do not change DNS or Cloudflare. Any DNS change is made by the APES
   IT Administrator with Bambie's approval.
 - Agents may change Cloudron: deploys, first-time set-up, rollbacks and app
@@ -111,7 +111,15 @@ week per ecosystem (Composer, npm and GitHub Actions) into the long-lived
    version branch with a merge commit, then push.
 3. After each version ships, merge `origin/main` into `dependencies`.
 
-A security update that cannot wait follows the hotfix route.
+Dependabot security updates are switched on (checked 11 November 2026, #245).
+GitHub always opens them against `main`, because `target-branch` only applies
+to the weekly updates. When one arrives:
+
+- Retarget it to `dependencies` with `gh pr edit <pr> --base dependencies`,
+  then treat it like any other Dependabot PR. It ships inside the next version.
+- If it cannot wait for the next version, it follows the hotfix route instead,
+  with Bambie's written approval on an issue.
+- Never merge a Dependabot PR straight into `main`.
 
 ## Security tools
 
@@ -156,13 +164,15 @@ v0.3.12 platform releases). Open, in this order:
    and the other APES systems.
 5. **v1.0.0 Launch.** Go-live checks (below) and owner sign-off.
 
-## Before going public
+## Go-live checks
+
+The repository is already public. Check these again before v1.0.0:
 
 - Secret scan of the git history is clean.
 - No `.env` file is committed, other than `.env.example` and
   `.env.laragon.example`.
 - No real HR, student, volunteer or agreement data is in the repository.
-- A licence has been chosen.
+- Done: a licence has been chosen (proprietary, see [LICENSE](../LICENSE)).
 
 ## Data
 

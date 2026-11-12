@@ -8,7 +8,8 @@ by hand after Bambie's ship-gate answer (see [CONTRIBUTING.md](../CONTRIBUTING.m
 
 | Workflow | When it runs | What it checks | If it fails |
 | --- | --- | --- | --- |
-| `ci` | PRs into `main`, a version branch or `dependencies`; pushes to `main`; `vX.Y.Z` tags | Markdown style, workflow files, YAML, no stray `.env` files, Pint, Larastan, the asset build, release notes (and on a tag, that its note is published), the tests on PHP 8.3 with MySQL, and the accessibility check | Open the failed step in the run. Run the same command locally (see the table below), fix it on the same branch and push |
+| `ci` | PRs into `main`, a version branch or `dependencies`; pushes to `main`; `vX.Y.Z` tags | Markdown style, workflow files, YAML, no stray `.env` files, Pint, Larastan, the asset build, release notes (and on a tag, that its note is published), the tests on PHP 8.3 with MySQL, and the accessibility check. Its `tests-php84` job repeats the tests on PHP 8.4 | Open the failed step in the run. Run the same command locally (see the table below), fix it on the same branch and push |
+| `tests-php84` (in `ci.yml`) | Same triggers as `ci` | The tests on PHP 8.4, the version Cloudron runs, with MySQL | Run `php artisan test` with Laragon's PHP 8.4. Not a required check, but fix it before the version PR |
 | `milestone-version-check` | PRs into `main`, a version branch or `dependencies` (not Dependabot) | The PR title and branch name carry the right version, never a milestone number | The log says what's wrong and suggests the right title. Fix the title with `gh pr edit <pr> --title "..."`, or rename the branch |
 | `dependency-review` | PRs into `main`, a version branch or `dependencies` | No new package with a known high or critical vulnerability | Read the log for the package. Use a fixed version, or ask Bambie before adding it |
 
@@ -34,10 +35,11 @@ fails in CI, look for a MySQL-only difference.
 
 | What | What it does | Kept because |
 | --- | --- | --- |
-| Dependabot (`.github/dependabot.yml`) | Opens one grouped PR a week each for Composer, npm and Actions updates, into `dependencies` | Updates reach `main` only inside a version |
+| Dependabot (`.github/dependabot.yml`) | Opens one grouped PR a week each for Composer, npm and Actions updates, into `dependencies`. Security updates open against `main`: retarget them to `dependencies` ([decisions](decisions.md#dependency-updates)) | Updates reach `main` only inside a version |
 | CodeQL default set-up (repository settings) | Scans JavaScript, TypeScript and the workflows each week | Free security scanning; no file in the repo |
 | `CODEOWNERS` | Asks `apescic-director` to review every PR | One owner reviews everything |
-| Issue forms (`.github/ISSUE_TEMPLATE/`) | Feature, Chore, Bug and Epic forms; blank issues are off | Every issue starts with its type and an area |
+| Issue forms (`.github/ISSUE_TEMPLATE/`) | Story, Chore, Bug and Epic forms, each adding its type label; blank issues are off | Every issue starts with its type and an area |
+| `issue-area-label` (`.github/workflows/issue-area-label.yml`) | When an issue opens, adds the area label chosen in its form. Only adds labels that already exist | Nobody has to set the area label by hand. If it is missing, add it with `gh issue edit <n> --add-label area:...` |
 | PR template (`.github/pull_request_template.md`) | The report shape for every PR | Same shape as task reports and releases ([report template](templates/report.md)) |
 | Discussion forms (`.github/DISCUSSION_TEMPLATE/`) | Questions, ideas and notes on guides | Keeps questions out of issues |
 | Pre-push hook (`.githooks/pre-push`) | Optional: checks the branch name before a push. Turn it on once with `git config core.hooksPath .githooks` | Catches a wrong branch name before CI does |

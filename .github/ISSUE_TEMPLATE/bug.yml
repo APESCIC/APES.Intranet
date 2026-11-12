@@ -13,13 +13,13 @@ body:
         Thank you. No passwords, personal data or real HR, student, volunteer
         or agreement details, including in screenshots. A security problem
         goes to SECURITY.md and a private advisory, not here.
-        After opening, set the area label and the version milestone.
+        After opening, set the version milestone. The area label is added for you.
 
   - type: dropdown
     id: area
     attributes:
       label: Area
-      description: Set the matching area label after opening.
+      description: The matching area label is added when the issue opens.
       options:
         - "area:cloudron"
         - "area:local-dev"
