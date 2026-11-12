@@ -10,8 +10,10 @@ cutover or a decommission each needs Bambie's separate approval of a build
 milestone.
 
 This repository is public, so this copy leaves out app IDs, software and
-plugin versions and account details. The full inventory belongs in
-SharePoint, filed by Bambie (#250).
+plugin versions and account details (#250). The full inventory is in the
+private
+[APESCIC/.github-private](https://github.com/APESCIC/.github-private/blob/main/docs/apes-intranet/discovery/lms-inventory.md)
+repository, for organisation members.
 
 ## How it was checked
 

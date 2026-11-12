@@ -64,7 +64,8 @@ Do not change any of them without her approval. Terms are explained in the
   unproxied, and the certificate is a valid Let's Encrypt certificate. The
   SharePoint redirect has been removed.
 - The Laravel app has been live since v0.0.1 (5 November 2026). The old
-  "coming soon" holding page stays in `/app/data/public` as a fallback
+  "coming soon" holding page was kept in `/app/data/public` as a fallback
+  until it was removed on 12 November 2026, after a backup
   ([serving the app, or the holding page](deploy/cloudron.md#serving-the-app-or-the-holding-page)).
 - Agents do not change DNS or Cloudflare. Any DNS change is made by the APES
   IT Administrator with Bambie's approval.
@@ -173,6 +174,23 @@ The repository is already public. Check these again before v1.0.0:
   `.env.laragon.example`.
 - No real HR, student, volunteer or agreement data is in the repository.
 - Done: a licence has been chosen (proprietary, see [LICENSE](../LICENSE)).
+
+## Where documents live
+
+Decided on 12 November 2026 (#271).
+
+- Repository and development docs (guides, decisions, ADRs, DPIAs,
+  discovery notes, release notes) live in this repository, beside the code.
+- This repository is public. Internal-only detail that should not be public,
+  such as Cloudron app IDs, software and plugin versions and inventories,
+  lives in the private organisation repository
+  [APESCIC/.github-private](https://github.com/APESCIC/.github-private) under
+  `docs/apes-intranet/`, with a trimmed copy here where useful.
+- Agents never hand a document off to SharePoint, and never ask anyone to
+  file one there.
+- Neither repository ever holds secrets or personal data.
+- The intranet's own content files (policy files, signed agreements) still
+  live in SharePoint, as in [Features](#features).
 
 ## Data
 
