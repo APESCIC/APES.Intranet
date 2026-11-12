@@ -22,7 +22,7 @@ APES Intranet is its own Laragon project. These are the values it needs.
 | Laragon profile | `apes-intranet` |
 
 PHP 8.3 is still the floor (`composer.json` pins the platform to 8.3, and CI
-runs 8.3). Use 8.4 locally so it matches Cloudron.
+tests on 8.3 and 8.4). Use 8.4 locally so it matches Cloudron.
 
 ## The Laragon profile
 
