@@ -5,6 +5,7 @@ namespace Modules\Helpdesk;
 use App\Core\Access\RoleName;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
+use InvalidArgumentException;
 use Modules\Helpdesk\Models\Ticket;
 
 final class HelpdeskPermissions
@@ -46,6 +47,7 @@ final class HelpdeskPermissions
         return match ($queue) {
             Ticket::QUEUE_IT => self::QUEUE_IT,
             Ticket::QUEUE_MANAGEMENT => self::QUEUE_MANAGEMENT,
+            default => throw new InvalidArgumentException("Unknown help desk queue: {$queue}"),
         };
     }
 

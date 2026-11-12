@@ -29,6 +29,9 @@ class Event extends Model
         return $this->belongsTo(User::class, 'author_id');
     }
 
+    /**
+     * @return HasMany<EventRsvp, $this>
+     */
     public function rsvps(): HasMany
     {
         return $this->hasMany(EventRsvp::class);

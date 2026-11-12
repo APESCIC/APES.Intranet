@@ -15,11 +15,17 @@ class HandbookChapter extends Model
         return ['published' => 'boolean'];
     }
 
+    /**
+     * @return HasMany<HandbookVersion, $this>
+     */
     public function versions(): HasMany
     {
         return $this->hasMany(HandbookVersion::class);
     }
 
+    /**
+     * @return HasOne<HandbookVersion, $this>
+     */
     public function currentVersion(): HasOne
     {
         return $this->hasOne(HandbookVersion::class)->latestOfMany('version_number');
