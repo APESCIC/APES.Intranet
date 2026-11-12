@@ -1,0 +1,24 @@
+﻿{
+  "version": "v0.5.2",
+  "released_at": "2026-11-12",
+  "title": "Behind-the-scenes tidy-up",
+  "summary": "No changes you will notice. The checks that catch mistakes before a release are stronger, and the guides for people who work on the intranet are up to date.",
+  "audiences": ["staff"],
+  "changes": {
+    "changed": [
+      "The guides for people who work on the intranet are up to date, with an index and new guides to the People and Communications areas."
+    ],
+    "fixed": [
+      "Approved volunteer hours no longer fail when a timesheet's member no longer exists."
+    ]
+  },
+  "internal_notes": [
+    "Larastan now type-checks the four modules and the milestone scripts; 18 problems were fixed and none are in a baseline.",
+    "CI also runs the tests on PHP 8.4, the version Cloudron runs, and the Composer cache works (it never saved before).",
+    "Removed unused packages: concurrently, @laravel/multiplex and laravel/pail.",
+    "New scripts/laragon-env.ps1 sets Laragon's PHP and Node for a terminal. The short Cursor commands moved up one folder, skills write temporary files outside the repo, and the approved plan is always posted on the Epic.",
+    "Issue forms add their type label, and a new workflow adds the chosen area label. Dependabot security PRs are retargeted to the dependencies branch.",
+    "The holding page doc is folded into the Cloudron guide, and the public LMS inventory no longer lists app IDs or software versions."
+  ],
+  "published": true
+}
