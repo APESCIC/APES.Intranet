@@ -52,11 +52,13 @@ as "No changes you will notice", and put the detail in `internal_notes`.
 
 ## Publishing a release note
 
-The note is part of the milestone's work, so it ships in the milestone pull
-request:
+The note is part of the version's work, so it ships in the version PR:
 
-1. Add `changelog/releases/vX.Y.Z.json` on the milestone branch with
-   `"published": false`, and keep it up to date as issues are committed.
+1. When every issue in the version is closed, run
+   `composer milestone:bump -- vX.Y.Z` on the version branch. It creates
+   `changelog/releases/vX.Y.Z.json` from `_template.json`, with
+   `"published": false`. Write it by the rules above, covering every issue
+   that shipped.
 2. As the last commit before the ship gate (`chore: release vX.Y.Z`), review
    the note and set `"published": true`.
 3. Tag and release as usual. CI runs again on the `vX.Y.Z` tag and fails if
@@ -68,7 +70,7 @@ request:
 
 ## Unpublishing or correcting a note
 
-- To fix wording, edit the file on the next milestone branch (or a hotfix
+- To fix wording, edit the file on the next version branch (or a hotfix
   branch). The next deploy's sync updates the row.
 - To hide a note, set `"published": false` and deploy. The row stays, but only
   admins can see it.
