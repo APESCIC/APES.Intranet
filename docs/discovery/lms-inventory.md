@@ -9,14 +9,17 @@ This inventory does **not** authorise any build work. A Training Module, a
 cutover or a decommission each needs Bambie's separate approval of a build
 milestone.
 
+This repository is public, so this copy leaves out app IDs, software and
+plugin versions and account details. The full inventory belongs in
+SharePoint, filed by Bambie (#250).
+
 ## How it was checked
 
 - Read-only `cloudron exec` commands on the two LMS apps: plugin and theme
   lists, and aggregate counts from the databases. Each script was pushed to
   `/tmp`, run once and deleted.
-- Moodle was read through its own API (`core_plugin_manager` and `$DB`
-  counts), run as `www-data`, so nothing was written apart from Moodle's
-  normal cache.
+- Moodle was read through its own API, so nothing was written apart from
+  Moodle's normal cache.
 - No names, email addresses, grades, enrolment rows or configuration secrets
   were read into this document, the issue or the chat. Counts only.
 - Packagist metadata and the Packagist security advisories API for package
@@ -27,7 +30,7 @@ milestone.
 - APES has **two** LMS apps on Cloudron, not one. The separate Moodle is
   **confirmed**.
 - The TutorLMS host that the README links to has **no courses**. The only
-  course content is on the Moodle at `upskilling.intranet.apes.org.uk`.
+  course content is on the Moodle ("Upskilling").
 - Both are small: Moodle has 2 courses, 19 pages, 2 quizzes and 32
   multiple-choice questions, with 2 enrolments and no completions.
 - **None** of SCORM, H5P, xAPI or LTI is in use on either app.
@@ -35,32 +38,9 @@ milestone.
 
 ## App 1: TutorLMS on WordPress
 
-| Fact | Value |
-| --- | --- |
-| Location | <https://lms.intranet.apes.org.uk/> |
-| Cloudron app | `5f6f9dc8-1bd6-4cdb-a988-a6c7dcfbdf93`, package `org.wordpress.cloudronapp` 3.21.1 |
-| WordPress | 7.1.4 |
-| TutorLMS | 4.2.0 (free edition, GPLv3) |
-| Theme | Twenty Twenty-Five 1.5 (active); Twenty Twenty-Four and Twenty Twenty-Three inactive |
-| Sign-in | `cloudron-sso` 1.0.0 and `daggerhart-openid-connect-generic` 3.11.3, both active (Cloudron OIDC) |
-| Accounts | 1 (administrator and Tutor instructor) |
-
-Plugins:
-
-| Plugin | Version | Status |
-| --- | --- | --- |
-| `tutor` (TutorLMS) | 4.2.0 | Active |
-| `certificate-customizer-for-tutor-lms` | 1.0.1 | Active |
-| `cloudron-sso` | 1.0.0 | Active |
-| `daggerhart-openid-connect-generic` | 3.11.3 | Active |
-| `smtp-mailer` | 1.1.28 | Active |
-| `tutor-lms-divi-modules` | 4.0.0 | Inactive |
-| `tutor-lms-elementor-addons` | 4.0.2 | Inactive |
-| `wp-megamenu` | 1.4.2 | Inactive |
-| `akismet` | 5.7.2 | Inactive |
-| `hello` | 1.7.2 | Inactive |
-
-Content (counts):
+<https://lms.intranet.apes.org.uk/>: the free edition of TutorLMS on
+WordPress, signing in through Cloudron. There is no TutorLMS Pro, and no
+SCORM, H5P, xAPI or LTI plugin.
 
 | Item | Count |
 | --- | --- |
@@ -71,26 +51,11 @@ Content (counts):
 | Posts | 2, both in the bin |
 | Media library items | 0 |
 
-There is no TutorLMS Pro, and no SCORM, H5P, xAPI or LTI plugin installed.
-
 ## App 2: Moodle ("Upskilling")
 
-| Fact | Value |
-| --- | --- |
-| Location | <https://upskilling.intranet.apes.org.uk/> |
-| Cloudron app | `d35884ef-02e2-4ce6-a975-cacc8aee9069`, package `org.moodle.cloudronapp` 4.4.0 |
-| Moodle | 5.3 (Build: 20261005). The package number is not the Moodle release. |
-| Theme | Boost |
-| Sign-in | OAuth 2 only (`auth_enabled=oauth2`), with one issuer, "Cloudron" (`my.cloudron.apes.org.uk`), shown on the login page |
-| Accounts | 2, not counting guest (1 OAuth 2 account and the local admin). Both active in the last 90 days. |
-| Enrolment methods enabled | Manual, guest, self, cohort |
-| Completion tracking | Enabled |
-| Competencies | Enabled, 0 frameworks |
-| Badges | 0 |
-| Web services | Enabled |
-| Additional plugins | Only `theme_classic` (disabled). It is listed as additional because Moodle 5 removed it from core. |
-
-Content (counts):
+Moodle 5, signing in through Cloudron with OAuth 2 only. Completion tracking
+and competencies are on (with no competency frameworks), and there are no
+badges.
 
 | Item | Count |
 | --- | --- |
@@ -111,7 +76,7 @@ approves the minimum standards later.
 | Standard | TutorLMS host | Moodle | Status |
 | --- | --- | --- | --- |
 | SCORM 1.2 / 2004 | No plugin | 0 SCORM packages | **Not used** |
-| H5P | No plugin | 0 H5P activities and 0 deployed H5P items. The 146 H5P libraries are Moodle's bundled core set, not content. | **Not used** |
+| H5P | No plugin | 0 H5P activities and 0 deployed H5P items (only Moodle's bundled core libraries) | **Not used** |
 | xAPI / cmi5 | No plugin | 0 xAPI states | **Not used** |
 | LTI (as a consumer of external tools) | No plugin | 0 tool types, 0 LTI activities | **Not used** |
 | LTI (publishing courses to others) | No plugin | 0 published tools | **Not used** |
@@ -142,7 +107,7 @@ security advisories. No code was reviewed or installed.
 | `escolalms/courses` | 0.4.45 (Aug 2025) | MIT | PHP >=7.4; `laravel/framework` >=8 (no upper bound): **unknown** | **Unknown.** It is part of the EscolaLMS headless suite, with its own API and auth assumptions. Pre-1.0, and not tested against Laravel 13. |
 | `escolalms/api` | 1.0.55 (Oct 2026) | MIT | `laravel/framework` ^9: **fail** | **Fail.** Laravel 9 only. |
 | `lms-laravel/course` | dev-master only (2016) | MIT | No release: **fail** | **Fail.** Abandoned. |
-| `cms-orbit/lms` | 4.6.1 (Sep 2026) | MIT | PHP ^8.4, Laravel ^13, `cms-orbit/core` ^4.6 | **Rejected.** Coupled to the Orbit CMS. Its PHP ^8.4 floor would also break local Laragon (PHP 8.3). |
+| `cms-orbit/lms` | 4.6.1 (Sep 2026) | MIT | PHP ^8.4, Laravel ^13, `cms-orbit/core` ^4.6 | **Rejected.** Coupled to the Orbit CMS, and its PHP ^8.4 floor is above the repo's PHP 8.3 floor. |
 | `daniel-jorg-schuppelius/php-elearning-toolkit` | v0.1.3 (Sep 2026) | Apache-2.0 | PHP >=8.2 <8.6, framework-free: **pass** | **Not needed now.** Pre-1.0 SCORM and xAPI helpers. Only worth a look if a standard is approved later. |
 
 ## Notes for later decisions
@@ -163,11 +128,9 @@ These are observations, not decisions:
 
 ## Sources
 
-- `wp plugin list`, `wp theme list`, `wp core version` and aggregate
-  `wp db query` counts on `lms.intranet.apes.org.uk`, 8 November 2026.
-- A Moodle CLI script on `upskilling.intranet.apes.org.uk` (counts, enabled
-  settings, `core_plugin_manager` additional plugins, OAuth 2 issuer name and
-  host), 8 November 2026.
-- Public TutorLMS readme: <https://lms.intranet.apes.org.uk/wp-content/plugins/tutor/readme.txt>.
+- WP-CLI plugin, theme and core lists, and aggregate database counts, on the
+  TutorLMS host, 8 November 2026.
+- A Moodle CLI script on the Moodle app (counts, enabled settings and
+  additional plugins), 8 November 2026.
 - Packagist: `https://repo.packagist.org/p2/<package>.json` and
   `https://packagist.org/api/security-advisories/`.
