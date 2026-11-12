@@ -202,7 +202,7 @@ Mail is never sent locally. `MAIL_MAILER=log` writes each message to
 | --- | --- |
 | The setup script says PHP 8.4 is not installed | Add it with Menu, then **Tools**, then **Quick add**, then run the script again |
 | The script warns that Apache runs another PHP version | Choose Menu, then **Profile**, then **apes-intranet**, or Menu, then **PHP**, then **Version**, then 8.4 |
-| `php -v` is not 8.4 in your own terminal | Put Laragon's PHP 8.4 first on `PATH`, as in [Everyday commands](#everyday-commands) |
+| `php -v` is not 8.4 in your own terminal | Run `. .\scripts\laragon-env.ps1`, as in [Everyday commands](#everyday-commands) |
 | `apes-intranet.test` does not resolve | Laragon adds it to the Windows hosts file on **Reload**. Run Laragon as administrator once, or add `127.0.0.1 apes-intranet.test` to `C:\Windows\System32\drivers\etc\hosts` |
 | Laragon's own page opens instead of the app | Click **Reload** in Laragon, so Apache loads `auto.apes-intranet.test.conf`. [laragon/apes-intranet.test.conf](laragon/apes-intranet.test.conf) shows what it should contain |
 | Port 80 or 3306 is in use, and Apache or MySQL will not start | Another web server or MySQL is running. Find it with `Get-NetTCPConnection -State Listen -LocalPort 80,3306`, stop it, then click **Start All** |
@@ -213,3 +213,5 @@ Mail is never sent locally. `MAIL_MAILER=log` writes each message to
 | Database errors | Check MySQL is running in Laragon, and that `.env` has `DB_HOST=127.0.0.1` and `DB_DATABASE=apes_intranet_local` |
 | `Permission denied` writing to `storage` or `bootstrap/cache` | Close anything holding the file open (another `artisan` run, an editor or an antivirus scan), then try again. If it keeps happening, give your Windows user full control of the clone folder |
 | The demo commands refuse to run | Set `APP_ENV=local` in `.env`. They never run anywhere else |
+| `git push` or `gh` hangs, or asks for credentials in a strange window | Another local server stack (for example ServBay) put its own `git` first on `PATH`. Check with `(Get-Command git).Source`: it should be `C:\Program Files\Git\...` or Laragon's Git. Remove the other stack's folder from `PATH`, or uninstall the stack, since Laragon is the only supported set-up |
+| An old database such as `apes_intranet` sits next to `apes_intranet_local` | It is left from an earlier set-up. This project only uses `apes_intranet_local` (see `.env`). Ask Bambie before dropping anything, then drop the old one in Laragon's database tool. Never drop another project's database |
