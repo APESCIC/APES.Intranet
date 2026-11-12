@@ -1,0 +1,17 @@
+{
+  "version": "v0.5.3",
+  "released_at": "2026-11-12",
+  "title": "Where our documents live",
+  "summary": "No changes you will notice. The guides for people who work on the intranet now say where documents are kept.",
+  "audiences": ["staff"],
+  "changes": {
+    "changed": [
+      "The guides for people who work on the intranet now keep every development document beside the code, instead of in SharePoint."
+    ]
+  },
+  "internal_notes": [
+    "Repo and development docs live in the repo. Internal-only detail such as the full LMS inventory lives in the private organisation GitHub repository, and agents never hand documents off to SharePoint.",
+    "The Cloudron guide records that the old holding page files were removed after a backup, and uses maintenance mode for taking the site offline."
+  ],
+  "published": true
+}
