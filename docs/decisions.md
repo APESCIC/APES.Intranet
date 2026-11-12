@@ -111,7 +111,15 @@ week per ecosystem (Composer, npm and GitHub Actions) into the long-lived
    version branch with a merge commit, then push.
 3. After each version ships, merge `origin/main` into `dependencies`.
 
-A security update that cannot wait follows the hotfix route.
+Dependabot security updates are switched on (checked 11 November 2026, #245).
+GitHub always opens them against `main`, because `target-branch` only applies
+to the weekly updates. When one arrives:
+
+- Retarget it to `dependencies` with `gh pr edit <pr> --base dependencies`,
+  then treat it like any other Dependabot PR. It ships inside the next version.
+- If it cannot wait for the next version, it follows the hotfix route instead,
+  with Bambie's written approval on an issue.
+- Never merge a Dependabot PR straight into `main`.
 
 ## Security tools
 
