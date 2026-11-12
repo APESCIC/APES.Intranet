@@ -106,6 +106,7 @@ What each automatic check does, and what to do if one fails: [docs/workflows.md]
 
 ## Where to find more
 
+- Every doc, by what you want to do: [docs/README.md](docs/README.md).
 - The flow, step by step: [CONTRIBUTING.md](CONTRIBUTING.md), and the rule
   [`.cursor/rules/shipping.mdc`](.cursor/rules/shipping.mdc); the skills are in `.cursor/skills/`.
 - Decisions (stack, sign-in, features, hosting, roadmap): [docs/decisions.md](docs/decisions.md).
