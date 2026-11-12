@@ -52,7 +52,7 @@ for organisation members ([where documents live](decisions.md#where-documents-li
 
 | Doc | What it covers |
 | --- | --- |
-| [deploy/cloudron.md](deploy/cloudron.md) | First-time set-up, each deploy, rollback, the holding page fallback and troubleshooting |
+| [deploy/cloudron.md](deploy/cloudron.md) | First-time set-up, each deploy, rollback, what Apache serves and troubleshooting |
 | [cloudron-sign-in.md](cloudron-sign-in.md) | OIDC sign-in, the 8 approved groups and how roles are set |
 
 ## Screenshots
