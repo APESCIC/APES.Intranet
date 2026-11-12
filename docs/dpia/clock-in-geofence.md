@@ -10,8 +10,10 @@
 | Drafted | 10 November 2026 |
 | Review | Before the geofence is switched on, after any change to how it works, and once a year while it is on |
 
-This assessment is kept in the repository so it can be reviewed with the code. The approved
-copy is filed in SharePoint. The geofence stays off until the approval date is also set in the
+This assessment is kept in the repository so it can be reviewed with the code, and this file is
+the record of the approved assessment
+([where documents live](../decisions.md#where-documents-live)). A copy was also filed in SharePoint
+when it was approved. The geofence stays off until the approval date is also set in the
 Cloudron app's environment (see [Step 7](#step-7-sign-off-and-outcomes)).
 
 ## Step 1: Why a DPIA is needed

@@ -19,6 +19,11 @@ Every guide in this folder, by what you want to do. Start with
 
 How work ships is in [CONTRIBUTING.md](../CONTRIBUTING.md).
 
+Docs live here, never in SharePoint. Internal-only detail that this public
+repository leaves out is in
+[APESCIC/.github-private `docs/apes-intranet/`](https://github.com/APESCIC/.github-private/blob/main/docs/apes-intranet/README.md),
+for organisation members ([where documents live](decisions.md#where-documents-live)).
+
 ## Decisions and design
 
 | Doc | What it covers |
@@ -28,7 +33,7 @@ How work ships is in [CONTRIBUTING.md](../CONTRIBUTING.md).
 | [adr/0001-modules-and-integrations.md](adr/0001-modules-and-integrations.md) | Modules, Integrations and the proposed module registry |
 | [accessibility.md](accessibility.md) | The WCAG 2.2 AA baseline, the automated check and rules for new pages |
 | [dpia/clock-in-geofence.md](dpia/clock-in-geofence.md) | The approved data protection impact assessment for the clock-in geofence |
-| [discovery/lms-inventory.md](discovery/lms-inventory.md) | What the two LMS apps hold, for the Learning versions |
+| [discovery/lms-inventory.md](discovery/lms-inventory.md) | What the two LMS apps hold, for the Learning versions (full copy in `.github-private`) |
 
 ## Modules
 

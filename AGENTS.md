@@ -97,8 +97,12 @@ What each automatic check does, and what to do if one fails: [docs/workflows.md]
 - No merge into `main`, release or deploy without her ship-gate answer in the
   current chat.
 - Ask before running migrations, `demo:reset`, or installing any tool.
-- Work only in `APESCIC/APES.Intranet`. Don't rename or delete milestones or
-  labels, and don't change DNS or Cloudflare.
+- Work only in `APESCIC/APES.Intranet`, plus `docs/apes-intranet/` in the
+  private `APESCIC/.github-private` for internal-only docs. Don't rename or
+  delete milestones or labels, and don't change DNS or Cloudflare.
+- Docs live in this repo; anything that must not be public goes in
+  `APESCIC/.github-private` `docs/apes-intranet/`. Never hand a document off
+  to SharePoint ([where documents live](docs/decisions.md#where-documents-live)).
 - Laragon only for local work: no containers, virtual machines or
   `php artisan serve`.
 - Free GitHub features only. Security reviews use tests and the

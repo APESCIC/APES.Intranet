@@ -174,6 +174,23 @@ The repository is already public. Check these again before v1.0.0:
 - No real HR, student, volunteer or agreement data is in the repository.
 - Done: a licence has been chosen (proprietary, see [LICENSE](../LICENSE)).
 
+## Where documents live
+
+Decided on 12 November 2026 (#271).
+
+- Repository and development docs (guides, decisions, ADRs, DPIAs,
+  discovery notes, release notes) live in this repository, beside the code.
+- This repository is public. Internal-only detail that should not be public,
+  such as Cloudron app IDs, software and plugin versions and inventories,
+  lives in the private organisation repository
+  [APESCIC/.github-private](https://github.com/APESCIC/.github-private) under
+  `docs/apes-intranet/`, with a trimmed copy here where useful.
+- Agents never hand a document off to SharePoint, and never ask anyone to
+  file one there.
+- Neither repository ever holds secrets or personal data.
+- The intranet's own content files (policy files, signed agreements) still
+  live in SharePoint, as in [Features](#features).
+
 ## Data
 
 Seeders create fake data only. Never put real HR, student, volunteer or
