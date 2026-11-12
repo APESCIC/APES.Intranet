@@ -35,7 +35,7 @@ fails in CI, look for a MySQL-only difference.
 
 | What | What it does | Kept because |
 | --- | --- | --- |
-| Dependabot (`.github/dependabot.yml`) | Opens one grouped PR a week each for Composer, npm and Actions updates, into `dependencies` | Updates reach `main` only inside a version |
+| Dependabot (`.github/dependabot.yml`) | Opens one grouped PR a week each for Composer, npm and Actions updates, into `dependencies`. Security updates open against `main`: retarget them to `dependencies` ([decisions](decisions.md#dependency-updates)) | Updates reach `main` only inside a version |
 | CodeQL default set-up (repository settings) | Scans JavaScript, TypeScript and the workflows each week | Free security scanning; no file in the repo |
 | `CODEOWNERS` | Asks `apescic-director` to review every PR | One owner reviews everything |
 | Issue forms (`.github/ISSUE_TEMPLATE/`) | Feature, Chore, Bug and Epic forms; blank issues are off | Every issue starts with its type and an area |
