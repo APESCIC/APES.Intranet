@@ -47,8 +47,7 @@ How work ships is in [CONTRIBUTING.md](../CONTRIBUTING.md).
 
 | Doc | What it covers |
 | --- | --- |
-| [deploy/cloudron.md](deploy/cloudron.md) | First-time set-up, each deploy, rollback and troubleshooting |
-| [deploy/holding-page.md](deploy/holding-page.md) | The record of the switch from the holding page |
+| [deploy/cloudron.md](deploy/cloudron.md) | First-time set-up, each deploy, rollback, the holding page fallback and troubleshooting |
 | [cloudron-sign-in.md](cloudron-sign-in.md) | OIDC sign-in, the 8 approved groups and how roles are set |
 
 ## Screenshots
