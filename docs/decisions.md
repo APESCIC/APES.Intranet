@@ -65,7 +65,7 @@ Do not change any of them without her approval. Terms are explained in the
   SharePoint redirect has been removed.
 - The Laravel app has been live since v0.0.1 (5 November 2026). The old
   "coming soon" holding page stays in `/app/data/public` as a fallback
-  ([holding-page.md](deploy/holding-page.md)).
+  ([serving the app, or the holding page](deploy/cloudron.md#serving-the-app-or-the-holding-page)).
 - Agents do not change DNS or Cloudflare. Any DNS change is made by the APES
   IT Administrator with Bambie's approval.
 - Agents may change Cloudron: deploys, first-time set-up, rollbacks and app
