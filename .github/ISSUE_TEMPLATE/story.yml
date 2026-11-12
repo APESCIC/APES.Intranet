@@ -1,8 +1,8 @@
-name: Feature
-description: Ask for something new or better in APES Intranet
+name: Story
+description: Ask for something new or better in APES Intranet (a user-facing story)
 title: "[Story] "
 labels:
-  - enhancement
+  - story
 assignees:
   - apescic-director
 type: Feature
@@ -12,13 +12,13 @@ body:
       value: |
         Say what people need and what they should be able to do. No passwords,
         personal data or real HR, student, volunteer or agreement details.
-        After opening, set the area label and the version milestone.
+        After opening, set the version milestone. The area label is added for you.
 
   - type: dropdown
     id: area
     attributes:
       label: Area
-      description: Set the matching area label after opening.
+      description: The matching area label is added when the issue opens.
       options:
         - "area:cloudron"
         - "area:local-dev"

@@ -38,7 +38,8 @@ fails in CI, look for a MySQL-only difference.
 | Dependabot (`.github/dependabot.yml`) | Opens one grouped PR a week each for Composer, npm and Actions updates, into `dependencies`. Security updates open against `main`: retarget them to `dependencies` ([decisions](decisions.md#dependency-updates)) | Updates reach `main` only inside a version |
 | CodeQL default set-up (repository settings) | Scans JavaScript, TypeScript and the workflows each week | Free security scanning; no file in the repo |
 | `CODEOWNERS` | Asks `apescic-director` to review every PR | One owner reviews everything |
-| Issue forms (`.github/ISSUE_TEMPLATE/`) | Feature, Chore, Bug and Epic forms; blank issues are off | Every issue starts with its type and an area |
+| Issue forms (`.github/ISSUE_TEMPLATE/`) | Story, Chore, Bug and Epic forms, each adding its type label; blank issues are off | Every issue starts with its type and an area |
+| `issue-area-label` (`.github/workflows/issue-area-label.yml`) | When an issue opens, adds the area label chosen in its form. Only adds labels that already exist | Nobody has to set the area label by hand. If it is missing, add it with `gh issue edit <n> --add-label area:...` |
 | PR template (`.github/pull_request_template.md`) | The report shape for every PR | Same shape as task reports and releases ([report template](templates/report.md)) |
 | Discussion forms (`.github/DISCUSSION_TEMPLATE/`) | Questions, ideas and notes on guides | Keeps questions out of issues |
 | Pre-push hook (`.githooks/pre-push`) | Optional: checks the branch name before a push. Turn it on once with `git config core.hooksPath .githooks` | Catches a wrong branch name before CI does |
