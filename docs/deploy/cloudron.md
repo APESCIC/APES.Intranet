@@ -63,9 +63,31 @@ cache on every start, which picks up any changed value.
 | Sendmail | `CLOUDRON_MAIL_SMTP_SERVER`, `CLOUDRON_MAIL_SMTP_PORT`, `CLOUDRON_MAIL_SMTP_USERNAME`, `CLOUDRON_MAIL_SMTP_PASSWORD`, `CLOUDRON_MAIL_FROM`, `CLOUDRON_MAIL_DOMAIN` | `CLOUDRON_MAIL_SMTP_PASSWORD` |
 | LDAP | `CLOUDRON_LDAP_HOST`, `CLOUDRON_LDAP_PORT`, `CLOUDRON_LDAP_USERS_BASE_DN`, `CLOUDRON_LDAP_GROUPS_BASE_DN`, `CLOUDRON_LDAP_BIND_DN`, `CLOUDRON_LDAP_BIND_PASSWORD` | `CLOUDRON_LDAP_BIND_PASSWORD` |
 | OIDC client (no addon, set by hand) | `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `OIDC_REDIRECT_URI` in `shared/.env` | `OIDC_CLIENT_SECRET` |
+| Web Push VAPID (no addon, set by hand) | `VAPID_SUBJECT`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` in `shared/.env` | `VAPID_PRIVATE_KEY` |
 
 `CLOUDRON_APP_ORIGIN` sets the app URL. When Redis is present it is used for
 the cache, sessions and queues. Without it they use the database.
+
+### Web Push (VAPID) keys
+
+Browser push needs a VAPID key pair. Generate once, store the values only in
+the APES Vault, and set them in Cloudron `shared/.env` (private ops issue in
+`.github-private`). Never commit key values to this repository. Treat the
+private key like `APP_KEY`: do not rotate it casually, or every subscribed
+device must opt in again.
+
+```dotenv
+VAPID_SUBJECT=mailto:intranet@apes.org.uk
+VAPID_PUBLIC_KEY=
+VAPID_PRIVATE_KEY=
+```
+
+Push notifications are queued (`ShouldQueue`). The Cloudron `run.sh` queue
+worker must be running so alerts leave the queue. Confirm in the app logs
+("Starting queue worker") after a restart. Admins can open **Admin > Push
+delivery** for subscription and opt-in counts only — never payloads or full
+endpoints. iPhone and iPad users must add the intranet to the Home Screen
+before Safari can subscribe (see Notification preferences).
 
 Rules:
 

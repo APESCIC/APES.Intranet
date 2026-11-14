@@ -2,7 +2,7 @@
 
 Laravel Herd Pro on Windows is the only supported local set-up for APES
 Intranet (it replaced Laragon in November 2026). The app is its own Herd site
-at <http://apes-intranet.test>, with its own database and Vite port, so it runs
+at <https://apes-intranet.test>, with its own database and Vite port, so it runs
 side by side with the other APES projects. Check every change there, with the
 demo data loaded, before any Cloudron deploy.
 
@@ -26,7 +26,7 @@ a local database, a fixture or this repository.
 
 | Part | What runs it | Address |
 | --- | --- | --- |
-| Web server | Herd's nginx, serving `public/` | <http://apes-intranet.test> |
+| Web server | Herd's nginx, serving `public/` | <https://apes-intranet.test> |
 | PHP | Herd's PHP 8.4, for nginx and the command line | |
 | Database | Herd's MySQL 8.4, database `apes_intranet_local`, user `root`, no password | `127.0.0.1:3306` |
 | Front end | Vite (`npm run dev`) | Port 5174 |
@@ -58,10 +58,12 @@ files and the queue runs straight away (`sync`), so Redis is not needed.
    - checks Herd is running and has PHP 8.4 (with the extensions the app
      needs), Composer, Node 22 and a running MySQL 8.4 service on port 3306,
      and uses them for this session;
-   - links the clone as the `apes-intranet` site (`herd link`) and pins it to
-     PHP 8.4 (`herd isolate`), so Herd serves <http://apes-intranet.test>;
+   - links the clone as the `apes-intranet` site (`herd link`), pins it to
+     PHP 8.4 (`herd isolate`), and secures it (`herd secure`) so Herd serves
+     <https://apes-intranet.test>;
    - copies `.env.herd.example` to `.env` if you have no `.env`, and warns
-     if your `.env` does not match the profile;
+     if your `.env` does not match the profile (including `APP_URL` and the
+     Vite TLS certificate keys needed so icons load on HTTPS);
    - runs `composer install`, and `npm ci` if `node_modules` is missing;
    - generates `APP_KEY` if it is blank;
    - creates the `apes_intranet_local` database if it is missing, and runs the
@@ -79,7 +81,7 @@ files and the queue runs straight away (`sync`), so Redis is not needed.
    npm run dev
    ```
 
-5. Open <http://apes-intranet.test/login> and use the **Developer sign-in**
+5. Open <https://apes-intranet.test/login> and use the **Developer sign-in**
    panel to sign in as a fake account for any role (see
    [Test logins](#test-logins)).
 
@@ -122,13 +124,23 @@ service are running, and that `/healthz` serves the checked-out revision on
 PHP 8.4 through FastCGI, and starts Vite.
 
 `npm run dev` starts Vite on port 5174 and writes `public/hot`, so the pages
-at <http://apes-intranet.test> load their CSS and JavaScript from Vite. Saving
+at <https://apes-intranet.test> load their CSS and JavaScript from Vite. Saving
 a CSS or JavaScript file updates the browser straight away. Saving a Blade
 template (in `resources/views` or a module's `resources/views`) or a routes
 file reloads the page. You never need to rebuild by hand.
 
 `npm run build` writes `public/build` for production. Stop and start
 `npm run dev` afterwards, so the preview uses Vite again.
+
+Do **not** use Herd's own "dev" stack for this site (the Herd badge or app
+control that runs `php artisan dev`). It starts `php artisan serve` on Herd's
+global PHP and a second Vite that clashes with port 5174, and stopping it
+removes `public/hot`. Use `scripts\preview.ps1` and `npm run dev` instead.
+
+When the site is HTTPS, set `VITE_DEV_SERVER_KEY` and `VITE_DEV_SERVER_CERT`
+in `.env` to Herd's certificate files for `apes-intranet.test` (see
+`.env.herd.example`). Without them Vite serves plain HTTP and the HTTPS page
+loses its icons.
 
 ## Demo data
 
@@ -145,7 +157,7 @@ What it contains, and the test logins, are in
 ## Test logins
 
 Sign-in is through Cloudron only, so there are no passwords. Locally, the
-amber **Developer sign-in** panel on <http://apes-intranet.test/login>, marked
+amber **Developer sign-in** panel on <https://apes-intranet.test/login>, marked
 Local only, signs you in with one click as a fake account for any role or
 common stack of roles, such as `qa-admin@example.test` or
 `qa-staff-hr@example.test`.
@@ -157,7 +169,7 @@ open the page, otherwise you go to the dashboard. **Sign out of QA** at the
 bottom of the list takes you back to the login page. When a page needs a
 fresh sign-in, confirm your current role in the prompt instead.
 
-<http://apes-intranet.test/qa> still works as a fallback, with the same panel.
+<https://apes-intranet.test/qa> still works as a fallback, with the same panel.
 
 All of this only appears when `QA_LOGIN_ENABLED=true` and `APP_ENV=local`, as
 in `.env.herd.example`. Anywhere else, the panel and pill are hidden and every
@@ -167,7 +179,7 @@ in `.env.herd.example`. Anywhere else, the panel and pill are hidden and every
 
 Each APES repository is its own Herd site, with its own:
 
-- `http://<site>.test` address, from `herd link <site>`;
+- `https://<site>.test` address once secured (`herd link` then `herd secure`), or `http://` until then;
 - database on the shared MySQL service;
 - Vite port: this project uses 5174, the others use 5173 or their own;
 - PHP version, pinned with `herd isolate`, so projects on different PHP
@@ -186,7 +198,7 @@ php vendor/bin/pint --test
 php vendor/bin/phpstan analyse --memory-limit=1G
 php artisan test
 npm run build
-$env:BASE_URL = 'http://apes-intranet.test'; $env:A11Y_BROWSER_CHANNEL = 'msedge'; npm run test:a11y
+$env:BASE_URL = 'https://apes-intranet.test'; $env:A11Y_BROWSER_CHANNEL = 'msedge'; npm run test:a11y
 ```
 
 The last line runs the accessibility check (axe and keyboard) against the

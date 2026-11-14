@@ -3,6 +3,8 @@
 namespace Modules\Communications\Http\Controllers;
 
 use App\Core\Access\AccessMatrix;
+use App\Core\Notifications\AlertDispatcher;
+use App\Core\Notifications\NotificationCategory;
 use App\Core\Support\HtmlSanitizer;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -132,12 +134,23 @@ class EventController
             ->get();
 
         foreach ($due as $event) {
+            $recipients = [];
+
             foreach ($event->rsvps()->where('status', 'going')->get() as $rsvp) {
                 $user = User::query()->find($rsvp->user_id);
                 if ($user?->email) {
                     Mail::to($user->email)->send(new EventReminderMail($event));
+                    $recipients[] = $user;
                 }
             }
+
+            AlertDispatcher::send(
+                $recipients,
+                NotificationCategory::Announcements,
+                'You have a new intranet announcement.',
+                'Open the intranet to view it.',
+                route('communications.events.show', $event),
+            );
 
             $event->forceFill(['reminder_sent_at' => now()])->save();
         }

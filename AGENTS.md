@@ -20,10 +20,12 @@ Director. Her decisions are in [docs/decisions.md](docs/decisions.md).
    `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\herd-setup.ps1 -SeedDemo`.
 3. Before any work, run the live preview gate:
    `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\preview.ps1`.
-4. Open <http://apes-intranet.test/login> and use the amber **Developer
+4. Open <https://apes-intranet.test/login> and use the amber **Developer
    sign-in** panel (local only) to sign in as a fake account for any role.
    Once signed in, the amber **QA** pill in the menu switches role in place.
-   <http://apes-intranet.test/qa> still works as a fallback.
+   <https://apes-intranet.test/qa> still works as a fallback. The local site
+   is HTTPS (`herd secure apes-intranet`); do not use Herd's badge "dev"
+   stack — use `scripts\preview.ps1` and `npm run dev`.
 5. Stuck? See [docs/local-development.md](docs/local-development.md).
 
 ## How we work

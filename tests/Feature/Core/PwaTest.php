@@ -46,10 +46,16 @@ it('links the manifest, theme colour and touch icon from every page', function (
         ->assertSee('rel="apple-touch-icon"', false);
 });
 
-it('has no service worker or offline cache', function () {
-    expect(public_path('sw.js'))->not->toBeFile()
-        ->and(public_path('service-worker.js'))->not->toBeFile()
-        ->and(file_get_contents(resource_path('js/app.js')))->not->toContain('serviceWorker');
+it('ships a push-only service worker that does not cache personal data', function () {
+    $script = file_get_contents(public_path('sw.js'));
+
+    expect(public_path('sw.js'))->toBeFile()
+        ->and(file_get_contents(resource_path('js/app.js')))->toContain('registerPushServiceWorker')
+        ->and(file_get_contents(resource_path('js/push.js')))->toContain('serviceWorker')
+        ->and($script)->toContain("addEventListener('push'")
+        ->and($script)->not->toContain('caches.open')
+        ->and($script)->not->toContain('cache.put')
+        ->and($script)->not->toContain('CacheStorage');
 });
 
 it('tells browsers not to store pages for signed-in people', function () {

@@ -9,7 +9,8 @@ step with `.env.herd.example` and `vite.config.js`.
 | --- | --- |
 | Herd | Laravel Herd Pro 2.1 or newer, for Windows |
 | Site | `apes-intranet`, linked to your clone with `herd link apes-intranet` |
-| Hostname | `http://apes-intranet.test` (plain HTTP, as in `APP_URL`) |
+| Hostname | `apes-intranet.test` |
+| App URL | `https://apes-intranet.test` (secured with `herd secure apes-intranet`) |
 | Document root | `public/` (Herd's Laravel driver finds it) |
 | Web server | Herd's nginx |
 | PHP | 8.4, as on Cloudron. The site is pinned to it (`herd isolate 8.4`), whatever Herd's global PHP is |
@@ -67,7 +68,8 @@ checked-out git revision. `scripts/preview.ps1` reads it.
 
 ## Running several APES projects side by side
 
-Each APES repository is its own Herd site, with its own `http://<site>.test`
-address, its own database on the shared MySQL service, and its own Vite port.
+Each APES repository is its own Herd site, with its own `https://<site>.test`
+(or `http://` until secured) address, its own database on the shared MySQL
+service, and its own Vite port.
 Each site can be pinned to its own PHP version, so projects on different PHP
 versions run at the same time.
