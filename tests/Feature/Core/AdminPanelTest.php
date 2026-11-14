@@ -62,6 +62,7 @@ dataset('admin menu pages', [
     'audit log' => 'admin.audit.index',
     'access review' => 'admin.access-review.index',
     'system status' => 'admin.system.index',
+    'push delivery' => 'admin.push-delivery.index',
     '2FA status' => 'admin.totp.index',
     'Microsoft 365 links' => 'admin.m365-links.index',
 ]);

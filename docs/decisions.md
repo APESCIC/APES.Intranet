@@ -41,6 +41,12 @@ Do not change any of them without her approval. Terms are explained in the
   runs at clock-in only. No continuous tracking. A DPIA is required before
   the geofence check is switched on ([DPIA](dpia/clock-in-geofence.md)).
 - Help desk, built in Laravel, with IT and Management queues.
+- Browser Web Push (opt-in per category) plus an in-app notification bell.
+  Lock-screen wording stays generic. Push is off until the person opts in.
+  VAPID keys live only in the APES Vault and Cloudron shared env; treat them
+  like `APP_KEY` and do not rotate them casually. iPhone and iPad need the
+  intranet on the Home Screen before Safari can subscribe. Draft DPIA:
+  [web-push-notifications.md](dpia/web-push-notifications.md) (not complete).
 - Chat stays in Teams. The intranet only links to it.
 - HR at full scope, including appraisals and recognition.
 - Agreements: register, templates, versions, renewals, and e-signing via

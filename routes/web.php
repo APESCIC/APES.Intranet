@@ -10,6 +10,7 @@ use App\Core\Changelog\Http\Controllers\ChangeLogController;
 use App\Core\Navigation\Http\Controllers\AdminOverviewController;
 use App\Core\Notifications\Http\Controllers\NotificationInboxController;
 use App\Core\Notifications\Http\Controllers\NotificationPreferencesController;
+use App\Core\Notifications\Http\Controllers\PushDeliveryStatsController;
 use App\Core\Notifications\Http\Controllers\PushSubscriptionController;
 use App\Core\Notifications\Http\Controllers\TestPushNotificationController;
 use App\Core\Notifications\Http\Controllers\VapidPublicKeyController;
@@ -76,6 +77,7 @@ Route::middleware('auth')->group(function () {
         Route::middleware(['can:'.AccessMatrix::ADMIN_SYSTEM_VIEW, 'fresh-signin'])->group(function () {
             Route::get('/system', SystemStatusController::class)->name('system.index');
             Route::post('/system/test-email', SendTestEmailController::class)->name('system.test-email');
+            Route::get('/push-delivery', PushDeliveryStatsController::class)->name('push-delivery.index');
         });
     });
 });
