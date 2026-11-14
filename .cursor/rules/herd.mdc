@@ -5,7 +5,7 @@ alwaysApply: false
 
 # Herd and the live preview gate
 
-Laravel Herd Pro is the only local set-up (decided 14 November 2026, #282, replacing Laragon from #213). Never suggest containers, virtual machines or another server stack, and never run `php artisan serve` locally. The full guide is `docs/local-development.md`; the values are in `docs/herd/profile.json`.
+Laravel Herd Pro is the only local set-up (decided 14 November 2026, #282). Never suggest containers, virtual machines or another server stack, and never run `php artisan serve` locally. The full guide is `docs/local-development.md`; the values are in `docs/herd/profile.json`.
 
 ## The gate, before any work and after every branch switch
 
