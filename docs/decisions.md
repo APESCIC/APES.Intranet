@@ -41,6 +41,12 @@ Do not change any of them without her approval. Terms are explained in the
   runs at clock-in only. No continuous tracking. A DPIA is required before
   the geofence check is switched on ([DPIA](dpia/clock-in-geofence.md)).
 - Help desk, built in Laravel, with IT and Management queues.
+- Browser Web Push (opt-in per category) plus an in-app notification bell.
+  Lock-screen wording stays generic. Push is off until the person opts in.
+  VAPID keys live only in the APES Vault and Cloudron shared env; treat them
+  like `APP_KEY` and do not rotate them casually. iPhone and iPad need the
+  intranet on the Home Screen before Safari can subscribe. Draft DPIA:
+  [web-push-notifications.md](dpia/web-push-notifications.md) (not complete).
 - Chat stays in Teams. The intranet only links to it.
 - HR at full scope, including appraisals and recognition.
 - Agreements: register, templates, versions, renewals, and e-signing via
@@ -80,7 +86,7 @@ Do not change any of them without her approval. Terms are explained in the
 
 Decided by Bambie on 14 November 2026 (#282): Laravel Herd Pro is the only
 supported local set-up, replacing Laragon (decided 9 November 2026, #213). The
-repository is its own Herd site at <http://apes-intranet.test>: Herd's nginx
+repository is its own Herd site at <https://apes-intranet.test>: Herd's nginx
 running PHP 8.4 through FastCGI (the site is pinned to 8.4), Herd's MySQL 8.4
 service on port 3306, Node 22 through Herd's nvm, and Herd's mail catcher on
 port 2525. Never suggest containers, virtual machines or another local server

@@ -35,6 +35,13 @@
                 An audit log of sign-ins, sign-outs, role changes and admin actions, with the time, your account, your
                 IP address and your browser.
             </li>
+            <li>
+                If you opt in to browser notifications: a push subscription endpoint and encryption keys for each
+                device you allow. Those endpoints go to the browser's push service (for example Google, Mozilla or
+                Apple). Lock-screen wording stays generic and never includes ticket or message content. We delete a
+                subscription when you remove the device, when the push service says it has expired, when the account
+                is deactivated, or after twelve months with no successful use.
+            </li>
         </ul>
 
         <h2 class="font-serif text-xl font-semibold">Why</h2>

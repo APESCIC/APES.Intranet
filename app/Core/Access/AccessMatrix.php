@@ -45,7 +45,7 @@ final class AccessMatrix
             self::STUDENT_AREA => 'Use the student area',
             self::ADMIN_ROLES_VIEW => 'View roles and permissions',
             self::ADMIN_AUDIT_VIEW => 'View the audit log',
-            self::ADMIN_SYSTEM_VIEW => 'View system status and send a test email',
+            self::ADMIN_SYSTEM_VIEW => 'View system status, push delivery counts and send a test email',
             self::ACCESS_REVIEW_VIEW => 'Run the quarterly group membership and access review',
         ];
     }

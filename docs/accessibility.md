@@ -24,7 +24,7 @@ must be running, with `QA_LOGIN_ENABLED=true` in `.env` and the demo data
 loaded (`php artisan demo:seed`):
 
 ```powershell
-$env:BASE_URL = 'http://apes-intranet.test'; $env:A11Y_BROWSER_CHANNEL = 'msedge'; npm run test:a11y
+$env:BASE_URL = 'https://apes-intranet.test'; $env:A11Y_BROWSER_CHANNEL = 'msedge'; npm run test:a11y
 ```
 
 If the Herd site is secured (`herd secured` lists it), `http://` redirects to

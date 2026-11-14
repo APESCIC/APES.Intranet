@@ -2,7 +2,7 @@
     "project": "apes-intranet",
     "herdSite": "apes-intranet",
     "hostname": "apes-intranet.test",
-    "appUrl": "http://apes-intranet.test",
+    "appUrl": "https://apes-intranet.test",
     "documentRoot": "public",
     "webServer": "nginx",
     "php": "8.4",

@@ -510,6 +510,88 @@ a.sg-nav-link:hover {
     padding: 0.5rem 0.75rem;
 }
 
+.sg-topbar__actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.sg-notification-bell {
+    position: relative;
+}
+
+.sg-notification-bell__badge {
+    position: absolute;
+    top: 0.15rem;
+    right: 0.15rem;
+    min-width: 1.1rem;
+    height: 1.1rem;
+    padding: 0 0.25rem;
+    border-radius: 999px;
+    background: var(--color-sg-teal);
+    color: var(--color-sg-white);
+    font-size: 0.65rem;
+    line-height: 1.1rem;
+    text-align: center;
+}
+
+.sg-notification-bell__panel {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.35rem);
+    z-index: 40;
+    width: min(22rem, 90vw);
+    border-radius: var(--radius-sg-field);
+    border: 1px solid var(--sg-edge);
+    background: var(--sg-surface-strong);
+    box-shadow: 0 0.75rem 1.5rem rgba(18, 38, 44, 0.12);
+    padding: 0.75rem;
+}
+
+.sg-notification-bell__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.sg-notification-bell__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 18rem;
+    overflow: auto;
+}
+
+.sg-notification-bell__item {
+    border-top: 1px solid var(--sg-edge);
+}
+
+.sg-notification-bell__item--unread {
+    background: rgba(210, 244, 250, 0.45);
+}
+
+.sg-notification-bell__link {
+    display: block;
+    width: 100%;
+    padding: 0.65rem 0.25rem;
+    text-align: left;
+}
+
+.sg-notification-bell__empty,
+.sg-notification-bell__footer {
+    display: block;
+    margin-top: 0.75rem;
+    font-size: 0.85rem;
+}
+
+.sg-notification-bell__footer {
+    text-align: center;
+    color: var(--color-sg-teal);
+}
+
 @media (min-width: 64rem) {
     .sg-main-column--rail .sg-topbar {
         display: none;
@@ -857,3 +939,6 @@ a.sg-nav-link:hover {
         padding-left: 0 !important;
     }
 }
+
+.sg-rail__top-actions { display: flex; align-items: center; gap: 0.35rem; margin-left: auto; }
+

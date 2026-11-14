@@ -32,5 +32,9 @@
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <!-- Published Minishlink example pair for tests only — not production keys. -->
+        <env name="VAPID_SUBJECT" value="mailto:intranet-tests@example.test"/>
+        <env name="VAPID_PUBLIC_KEY" value="BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U"/>
+        <env name="VAPID_PRIVATE_KEY" value="UUxI4O8-FbGemm28gXv72qzIcSx5EaWxyff4QgWYsXE"/>
     </php>
 </phpunit>

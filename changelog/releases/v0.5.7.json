@@ -1,0 +1,30 @@
+{
+  "version": "v0.5.7",
+  "released_at": "2026-11-14",
+  "title": "Web Push notifications",
+  "summary": "You can opt in to browser notifications for tickets, account alerts, announcements and rota notices, with quiet hours and an in-app bell. Lock-screen wording stays generic.",
+  "audiences": ["staff", "volunteers", "students"],
+  "changes": {
+    "added": [
+      "Notification preferences to choose browser push, email and the in-app bell per category, with quiet hours in UK time.",
+      "An in-app notification bell in the top bar, with an unread count and links to related pages.",
+      "Browser push for tickets, account and security alerts, announcements and rota or operations notices, when you have opted in and allowed notifications on the device.",
+      "A short guide on Notification preferences for iPhone and iPad (add the intranet to the Home Screen first).",
+      "An Admin Push delivery page with counts only, so admins can see delivery health without seeing message content."
+    ],
+    "changed": [
+      "The local development site is documented and previewed over HTTPS, which browsers need for push."
+    ],
+    "security": [
+      "Push payloads never include ticket subjects, replies, names or student or safeguarding detail.",
+      "Push starts off until you opt in; the browser only asks for permission after you press the button on Notification preferences."
+    ],
+    "accessibility": [
+      "Notification preferences, the in-app bell and inbox, and the Admin Push delivery page are included in the accessibility check."
+    ]
+  },
+  "internal_notes": [
+    "VAPID keys live only in the APES Vault and Cloudron shared env (private ops). Do not rotate casually. Queue worker must be running. Web Push DPIA is still a draft."
+  ],
+  "published": true
+}

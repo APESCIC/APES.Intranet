@@ -8,6 +8,12 @@ use App\Core\Audit\Http\Controllers\AuditLogIndexController;
 use App\Core\Auth\Http\Controllers\OidcController;
 use App\Core\Changelog\Http\Controllers\ChangeLogController;
 use App\Core\Navigation\Http\Controllers\AdminOverviewController;
+use App\Core\Notifications\Http\Controllers\NotificationInboxController;
+use App\Core\Notifications\Http\Controllers\NotificationPreferencesController;
+use App\Core\Notifications\Http\Controllers\PushDeliveryStatsController;
+use App\Core\Notifications\Http\Controllers\PushSubscriptionController;
+use App\Core\Notifications\Http\Controllers\TestPushNotificationController;
+use App\Core\Notifications\Http\Controllers\VapidPublicKeyController;
 use App\Core\Qa\Http\Controllers\QaLoginController;
 use App\Core\Qa\Http\Middleware\EnsureQaLoginEnabled;
 use App\Core\System\Http\Controllers\SendTestEmailController;
@@ -36,6 +42,27 @@ Route::middleware('auth')->group(function () {
         Route::get('/change-log/{version}', [ChangeLogController::class, 'show'])
             ->where('version', 'v[0-9]+\.[0-9]+\.[0-9]+')
             ->name('change-log.show');
+
+        Route::get('/push/vapid-public-key', VapidPublicKeyController::class)
+            ->name('push.vapid-public-key');
+        Route::post('/push-subscriptions', [PushSubscriptionController::class, 'store'])
+            ->name('push-subscriptions.store');
+        Route::delete('/push-subscriptions', [PushSubscriptionController::class, 'destroy'])
+            ->name('push-subscriptions.destroy');
+
+        Route::get('/notifications/preferences', [NotificationPreferencesController::class, 'edit'])
+            ->name('notifications.preferences.edit');
+        Route::put('/notifications/preferences', [NotificationPreferencesController::class, 'update'])
+            ->name('notifications.preferences.update');
+        Route::post('/notifications/preferences/test', TestPushNotificationController::class)
+            ->name('notifications.preferences.test');
+
+        Route::get('/notifications', [NotificationInboxController::class, 'index'])
+            ->name('notifications.inbox');
+        Route::post('/notifications/read-all', [NotificationInboxController::class, 'markAllRead'])
+            ->name('notifications.mark-all-read');
+        Route::post('/notifications/{notification}/read', [NotificationInboxController::class, 'markRead'])
+            ->name('notifications.read');
     });
 
     Route::prefix('admin')->name('admin.')->group(function () {
@@ -50,6 +77,7 @@ Route::middleware('auth')->group(function () {
         Route::middleware(['can:'.AccessMatrix::ADMIN_SYSTEM_VIEW, 'fresh-signin'])->group(function () {
             Route::get('/system', SystemStatusController::class)->name('system.index');
             Route::post('/system/test-email', SendTestEmailController::class)->name('system.test-email');
+            Route::get('/push-delivery', PushDeliveryStatsController::class)->name('push-delivery.index');
         });
     });
 });

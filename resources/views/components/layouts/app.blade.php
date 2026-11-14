@@ -26,13 +26,20 @@
                         :qa-picker="$qaPicker"
                         :qa-return-to="$qaReturnTo"
                         :qa-confirm="$qaConfirm"
+                        :unread-notifications="$unreadNotifications ?? 0"
+                        :recent-notifications="$recentNotifications ?? collect()"
                     />
                 </aside>
             @endif
 
             <div @class(['sg-main-column', 'sg-main-column--rail' => $shellUser])>
                 <div class="sg-content">
-                    <x-shell.topbar :has-menu="(bool) $shellUser" :panel="$shellPanel ?? null" />
+                    <x-shell.topbar
+                        :has-menu="(bool) $shellUser"
+                        :panel="$shellPanel ?? null"
+                        :unread-notifications="$unreadNotifications ?? 0"
+                        :recent-notifications="$recentNotifications ?? collect()"
+                    />
 
                     @if ($title)
                         <header class="sg-page-header">
