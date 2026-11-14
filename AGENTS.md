@@ -122,8 +122,8 @@ What each automatic check does, and what to do if one fails: [docs/workflows.md]
 - Herd injects an "Edit with Herd" badge (`#herd-ai-host`) into local pages;
   the accessibility check excludes it.
 - Herd's nvm needs `C:\Program Files\nodejs` free: no standalone Node.js.
-- Old Laragon folders (`C:\laragon\bin\...`) can still be on the system
-  `PATH` ahead of Herd. After `. .\scripts\herd-env.ps1`,
+- Leftover `C:\laragon\bin\...` folders on the system `PATH` must not win over
+  Herd, but they can sit ahead of it. After `. .\scripts\herd-env.ps1`,
   `(Get-Command php).Source` must show `.config\herd\bin\php84`; agent shells
   may need it in the same command, as `PATH` changes don't always carry over.
 - If the Herd site is secured (`herd secured` lists it), `http://` redirects
