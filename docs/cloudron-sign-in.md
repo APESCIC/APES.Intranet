@@ -120,7 +120,7 @@ Cloudron's `auth_time` claim. Details are in
 
 ## Locally
 
-The local Laragon preview has no Cloudron. Use the QA role switcher at
+The local Herd preview has no Cloudron. Use the QA role switcher at
 <http://apes-intranet.test/qa> instead. "Sign in with Cloudron" shows a
 "temporarily unavailable" page locally, because the OIDC values are blank.
 

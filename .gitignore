@@ -3,7 +3,7 @@
 .env
 .env.*
 !.env.example
-!.env.laragon.example
+!.env.herd.example
 .phpactor.json
 .phpunit.result.cache
 /.codex

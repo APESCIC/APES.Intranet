@@ -13,7 +13,7 @@ composer milestone:next prints both titles. Plain words; link logs instead of pa
 ## How it was checked
 
 - `php artisan test`:
-- Checked in the Laragon preview (<http://apes-intranet.test>, demo data):
+- Checked in the Herd preview (<http://apes-intranet.test>, demo data):
 
 ## What you need to do
 

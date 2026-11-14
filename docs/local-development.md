@@ -1,38 +1,45 @@
-# Local development with Laragon
+# Local development with Laravel Herd
 
-Laragon on Windows is the only supported local set-up for APES Intranet. The
-app is its own Laragon project at <http://apes-intranet.test>, with its own
-folder, database and Vite port, so it runs side by side with the other APES
-projects. Check every change there, with the demo data loaded, before any
-Cloudron deploy.
+Laravel Herd Pro on Windows is the only supported local set-up for APES
+Intranet (it replaced Laragon in November 2026). The app is its own Herd site
+at <http://apes-intranet.test>, with its own database and Vite port, so it runs
+side by side with the other APES projects. Check every change there, with the
+demo data loaded, before any Cloudron deploy.
 
 Use fake data only. Never put real HR, student, volunteer or agreement data in
 a local database, a fixture or this repository.
 
 ## What you need
 
-- [Laragon](https://laragon.org/) (Full) 8 or newer, installed in
-  `C:\laragon`. It brings Apache 2.4, PHP, MySQL 8.4, Node, Composer and Git.
-- PHP 8.4 in Laragon. If Menu, then **PHP**, then **Version** has no 8.4,
-  add it with Menu, then **Tools**, then **Quick add**.
-- Node 22 in Laragon (Menu, then **Node.js**, then **Version**).
+- [Laravel Herd](https://herd.laravel.com/windows) for Windows, with a Pro
+  licence (MySQL and the mail catcher are Pro features).
+- PHP 8.4 in Herd (**Settings**, then **PHP**). If it is missing, run
+  `herd php:install 8.4`. Herd's global PHP can be newer: the site is pinned
+  to 8.4.
+- The `ldap` extension on in Herd's PHP 8.4. Run `herd ini 8.4`, change
+  `;extension=ldap` to `extension=ldap`, save, then run `herd restart php`.
+- A MySQL 8.4 service on port 3306 (**Services** in Herd, or
+  `herd services:create mysql --service-version=8.4.13 --port=3306`).
+- Node 22 through Herd's nvm. Turn on Node.js in **Settings**, then run
+  `herd node:install 22`. Herd's nvm takes over `C:\Program Files\nodejs`, so
+  uninstall any standalone Node.js first.
 
 | Part | What runs it | Address |
 | --- | --- | --- |
-| Web server | Laragon's Apache, serving `public/` | <http://apes-intranet.test> |
-| PHP | Laragon's PHP 8.4, for Apache and the command line | |
-| Database | Laragon's MySQL 8.4, database `apes_intranet_local`, user `root`, no password | `127.0.0.1:3306` |
+| Web server | Herd's nginx, serving `public/` | <http://apes-intranet.test> |
+| PHP | Herd's PHP 8.4, for nginx and the command line | |
+| Database | Herd's MySQL 8.4, database `apes_intranet_local`, user `root`, no password | `127.0.0.1:3306` |
 | Front end | Vite (`npm run dev`) | Port 5174 |
-| Mail | Written to `storage/logs/laravel.log` | |
+| Mail | Herd's mail catcher, shown in Herd's Mail window, never sent | `127.0.0.1:2525` |
 
-The full profile is in [laragon/profile.md](laragon/profile.md). PHP 8.4
-matches Cloudron. PHP 8.3 is still the floor (`composer.json` pins the
-platform to 8.3, and CI tests on both 8.3 and 8.4). Locally, sessions and the cache use files
-and the queue runs straight away (`sync`), so Redis is not needed.
+The full profile is in [herd/profile.md](herd/profile.md). PHP 8.4 matches
+Cloudron. PHP 8.3 is still the floor (`composer.json` pins the platform to
+8.3, and CI tests on both 8.3 and 8.4). Locally, sessions and the cache use
+files and the queue runs straight away (`sync`), so Redis is not needed.
 
 ## First run
 
-1. Start Laragon and click **Start All**.
+1. Open Herd, and check its MySQL service is running.
 2. Clone the repository wherever you keep your code, for example:
 
    ```powershell
@@ -41,23 +48,19 @@ and the queue runs straight away (`sync`), so Redis is not needed.
    cd APES.Intranet
    ```
 
-   You can also clone it straight into `C:\laragon\www\apes-intranet`. The
-   setup script accepts either.
-
 3. Run the setup script from the repository root:
 
    ```powershell
-   powershell -NoProfile -ExecutionPolicy Bypass -File scripts\laragon-setup.ps1
+   powershell -NoProfile -ExecutionPolicy Bypass -File scripts\herd-setup.ps1
    ```
 
    It:
-   - checks that Laragon has PHP 8.4 (with the extensions the app needs),
-     Composer, Node 22 and MySQL 8.4, and uses them for this session;
-   - warns if Laragon's Apache runs a different PHP version;
-   - links `C:\laragon\www\apes-intranet` to your clone, and reloads Laragon
-     so it creates `http://apes-intranet.test`;
-   - writes the `apes-intranet` Laragon profile;
-   - copies `.env.laragon.example` to `.env` if you have no `.env`, and warns
+   - checks Herd is running and has PHP 8.4 (with the extensions the app
+     needs), Composer, Node 22 and a running MySQL 8.4 service on port 3306,
+     and uses them for this session;
+   - links the clone as the `apes-intranet` site (`herd link`) and pins it to
+     PHP 8.4 (`herd isolate`), so Herd serves <http://apes-intranet.test>;
+   - copies `.env.herd.example` to `.env` if you have no `.env`, and warns
      if your `.env` does not match the profile;
    - runs `composer install`, and `npm ci` if `node_modules` is missing;
    - generates `APP_KEY` if it is blank;
@@ -67,42 +70,34 @@ and the queue runs straight away (`sync`), so Redis is not needed.
      the question.
 
    It is safe to run again at any time. It never touches another project's
-   folder, database, profile or site. `composer setup` runs it too. `.env`
-   stays on your machine: Git ignores it, so never commit it.
+   site or database. `composer setup` runs it too. `.env` stays on your
+   machine: Git ignores it, so never commit it.
 
-4. Apply the Laragon profile: Menu, then **Profile**, then **apes-intranet**.
-   This sets Laragon to the versions in the profile. If you only ever run
-   projects on the same versions, Laragon's default profile works as well.
-5. Start Vite, and leave it running:
+4. Start Vite, and leave it running:
 
    ```powershell
    npm run dev
    ```
 
-6. Open <http://apes-intranet.test/qa> and sign in as a fake account for any
+5. Open <http://apes-intranet.test/qa> and sign in as a fake account for any
    role.
-
-If <http://apes-intranet.test> shows Laragon's own page, click **Reload** in
-Laragon.
 
 ## Everyday commands
 
 The setup script sets `PATH` for its own run only. For your own commands,
-start each PowerShell session from the repository root with Laragon's PHP
-8.4, Composer and Node first on `PATH`. This script finds the newest PHP 8.4
-NTS build and Node 22 in `C:\laragon\bin`, so it keeps working when Laragon
-updates PHP:
+start each PowerShell session from the repository root with Herd's PHP 8.4,
+Composer and Node 22 first on `PATH`. Herd's own `php` command runs Herd's
+global PHP, which may be newer than 8.4, so use this script:
 
 ```powershell
-. .\scripts\laragon-env.ps1
+. .\scripts\herd-env.ps1
 ```
 
 The dot and space at the start matter: they keep the settings in your
 terminal. If PowerShell refuses to run scripts, run
 `Set-ExecutionPolicy -Scope Process Bypass` first, in the same terminal.
-
-Laragon's own terminal (the **Terminal** button) puts Laragon's active PHP,
-Composer and Node on `PATH` for you.
+`herd php` and `herd composer` also use the site's PHP 8.4 from inside the
+repository folder.
 
 | Task | Command |
 | --- | --- |
@@ -112,6 +107,7 @@ Composer and Node on `PATH` for you.
 | Set up or repair | `composer setup` |
 | Production build of the assets | `npm run build` (or `composer build`) |
 | Artisan | `php artisan <command>` |
+| Site details, PHP version and services | `herd site:info` |
 
 ## Live preview
 
@@ -120,7 +116,9 @@ Before any work, run the live preview gate,
 loads the latest code and dependencies and reports pending migrations (ask
 before running them). When no migrations are pending, it also syncs roles and
 permissions as a deploy does, by running the seeders in
-`deploy/cloudron/activate-release.sh`.
+`deploy/cloudron/activate-release.sh`. Then it checks Herd and its MySQL
+service are running, and that `/healthz` serves the checked-out revision on
+PHP 8.4 through FastCGI, and starts Vite.
 
 `npm run dev` starts Vite on port 5174 and writes `public/hot`, so the pages
 at <http://apes-intranet.test> load their CSS and JavaScript from Vite. Saving
@@ -141,7 +139,7 @@ migrates it and loads the demo data again. Both refuse to run unless
 `APP_ENV=local`.
 
 What it contains, and the test logins, are in
-[laragon/demo-data.md](laragon/demo-data.md).
+[herd/demo-data.md](herd/demo-data.md).
 
 ## Test logins
 
@@ -149,26 +147,22 @@ Sign-in is through Cloudron only, so there are no passwords. Locally, the QA
 role switcher at <http://apes-intranet.test/qa> signs you in as a fake account
 for any role or common stack of roles, such as `qa-admin@example.test` or
 `qa-staff-hr@example.test`. It only works when `QA_LOGIN_ENABLED=true` and
-`APP_ENV=local`, as in `.env.laragon.example`. Anywhere else, every `/qa`
+`APP_ENV=local`, as in `.env.herd.example`. Anywhere else, every `/qa`
 route returns 404. Leave the flag off on Cloudron.
 
 ## Running several APES projects side by side
 
-Each APES repository is its own Laragon project, with its own:
+Each APES repository is its own Herd site, with its own:
 
-- folder in `C:\laragon\www`, and so its own `http://<folder>.test` address;
-- database on the shared MySQL server;
-- Vite port: this project uses 5174, the others use 5173 or their own.
+- `http://<site>.test` address, from `herd link <site>`;
+- database on the shared MySQL service;
+- Vite port: this project uses 5174, the others use 5173 or their own;
+- PHP version, pinned with `herd isolate`, so projects on different PHP
+  versions run at the same time.
 
-They all share Laragon's Apache on port 80 and MySQL on port 3306. Apache runs
-the NTS PHP through FastCGI, which starts separate PHP processes for each site,
-so each project keeps its own `.env` values, such as `APP_KEY` and
-`DB_DATABASE`. (If Apache is ever switched back to the thread-safe PHP build,
-which shares one process across sites, `bootstrap/app.php` stops Laravel using
-`putenv()` so the values still can't leak. Don't switch it back.) Laragon runs
-one PHP version for Apache at a time, so every project you run together needs
-to work on that version. APES Intranet needs PHP 8.4. If another project needs
-a different version, switch profile when you switch project.
+They all share Herd's nginx on port 80 and MySQL on port 3306. PHP undoes
+`putenv()` at the end of each request, so one project's `.env` values, such
+as `APP_KEY` and `DB_DATABASE`, do not carry over into another.
 
 ## Checks before a pull request
 
@@ -193,25 +187,47 @@ MySQL-only difference. What each CI check does is in
 
 ## Mail
 
-Mail is never sent locally. `MAIL_MAILER=log` writes each message to
-`storage/logs/laravel.log`.
+Mail is never sent locally. `MAIL_MAILER=smtp` with `MAIL_HOST=127.0.0.1` and
+`MAIL_PORT=2525` hands every message to Herd's mail catcher. Open Herd's
+**Mail** window to read it, or ask an agent to use the Herd MCP `mail` tool
+(for example to find a link in a message). Tests use the `array` mailer, so
+they never send anything either.
+
+## Debugging
+
+- The last exception the site threw, with its stack trace: the Herd MCP
+  `site` tool's `error` action, or `storage/logs/laravel.log`.
+- `dump()` output, queries, logs and slow requests: Herd's **Dumps** window,
+  or the Herd MCP `insights` tool.
+- Herd's own health: `herd status`.
 
 ## Common problems
 
 | Problem | Fix |
 | --- | --- |
-| The setup script says PHP 8.4 is not installed | Add it with Menu, then **Tools**, then **Quick add**, then run the script again |
-| The script warns that Apache runs another PHP version | Choose Menu, then **Profile**, then **apes-intranet**, or Menu, then **PHP**, then **Version**, then 8.4 |
-| `php -v` is not 8.4 in your own terminal | Run `. .\scripts\laragon-env.ps1`, as in [Everyday commands](#everyday-commands) |
-| `apes-intranet.test` does not resolve | Laragon adds it to the Windows hosts file on **Reload**. Run Laragon as administrator once, or add `127.0.0.1 apes-intranet.test` to `C:\Windows\System32\drivers\etc\hosts` |
-| Laragon's own page opens instead of the app | Click **Reload** in Laragon, so Apache loads `auto.apes-intranet.test.conf`. [laragon/apes-intranet.test.conf](laragon/apes-intranet.test.conf) shows what it should contain |
-| Port 80 or 3306 is in use, and Apache or MySQL will not start | Another web server or MySQL is running. Find it with `Get-NetTCPConnection -State Listen -LocalPort 80,3306`, stop it, then click **Start All** |
+| The setup script says PHP 8.4 is not installed | Run `herd php:install 8.4`, then run the script again |
+| The setup script says `ldap` is missing | Run `herd ini 8.4`, change `;extension=ldap` to `extension=ldap`, then `herd restart php` |
+| The setup script says Herd's nvm has no Node 22 | Turn on Node.js in Herd's **Settings**, then run `herd node:install 22` |
+| `php -v` is not 8.4 in your own terminal | Run `. .\scripts\herd-env.ps1`, as in [Everyday commands](#everyday-commands) |
+| `/healthz` or `preview.ps1` reports another PHP version | Run `herd isolate 8.4 --site=apes-intranet` |
+| `apes-intranet.test` does not resolve, or shows a 404 from Herd | Check `herd links` lists `apes-intranet` pointing at your clone. If not, run `scripts\herd-setup.ps1` again |
+| Port 80 or 3306 is in use, and Herd or MySQL will not start | Another web server or MySQL is running (for example Laragon). Find it with `Get-NetTCPConnection -State Listen -LocalPort 80,3306`, stop it, then restart Herd |
 | Port 5174 is in use | Another Vite server is running, usually this project in another terminal. Stop it. Vite will not move to another port, because the preview expects 5174 |
-| `500` error | Read `storage/logs/laravel.log`. Check `.env` exists and has an `APP_KEY` |
-| `/healthz` says `"redis": "fail"` | Expected locally. The health check always tries Redis, which Cloudron provides, but the Laragon set-up does not use it. `app` and `database` should say `ok` |
+| `500` error | Use the Herd MCP `site` `error` action, or read `storage/logs/laravel.log`. Check `.env` exists and has an `APP_KEY` |
+| `/healthz` says `"redis": "fail"` | Expected locally. The health check always tries Redis, which Cloudron provides, but the Herd set-up does not use it. `app` and `database` should say `ok` |
 | Unstyled page or "Vite manifest not found" | Start `npm run dev`. Vite writes `public/hot` once it is ready |
-| Database errors | Check MySQL is running in Laragon, and that `.env` has `DB_HOST=127.0.0.1` and `DB_DATABASE=apes_intranet_local` |
+| `herd services:list` says MySQL is stopped, but the site works | Herd loses track of its services after Herd itself restarts. If the database misbehaves, stop and start the service in Herd's **Services** |
+| Herd's Node.js settings say you don't use the nvm that ships with Herd | A standalone Node.js, or old `NVM_HOME` and `NVM_SYMLINK` variables, are in the way. Uninstall the standalone Node.js, remove both variables, restart Herd, then click **Install NVM** |
+| Database errors | Check Herd's MySQL service is running (`herd services:list`), and that `.env` has `DB_HOST=127.0.0.1` and `DB_DATABASE=apes_intranet_local` |
 | `Permission denied` writing to `storage` or `bootstrap/cache` | Close anything holding the file open (another `artisan` run, an editor or an antivirus scan), then try again. If it keeps happening, give your Windows user full control of the clone folder |
 | The demo commands refuse to run | Set `APP_ENV=local` in `.env`. They never run anywhere else |
-| `git push` or `gh` hangs, or asks for credentials in a strange window | Another local server stack (for example ServBay) put its own `git` first on `PATH`. Check with `(Get-Command git).Source`: it should be `C:\Program Files\Git\...` or Laragon's Git. Remove the other stack's folder from `PATH`, or uninstall the stack, since Laragon is the only supported set-up |
-| An old database such as `apes_intranet` sits next to `apes_intranet_local` | It is left from an earlier set-up. This project only uses `apes_intranet_local` (see `.env`). Ask Bambie before dropping anything, then drop the old one in Laragon's database tool. Never drop another project's database |
+| `git push` or `gh` hangs, or asks for credentials in a strange window | Another local server stack put its own `git` first on `PATH`. Check with `(Get-Command git).Source`: it should be `C:\Program Files\Git\...`. Remove the other stack's folder from `PATH`, or uninstall the stack, since Herd is the only supported set-up |
+| An old database such as `apes_intranet` sits next to `apes_intranet_local` | It is left from an earlier set-up. This project only uses `apes_intranet_local` (see `.env`). Ask Bambie before dropping anything, then drop the old one with `herd db:drop`. Never drop another project's database |
+
+## Moving from Laragon
+
+If you used Laragon before November 2026: stop Laragon (it uses the same
+ports 80 and 3306), then follow [First run](#first-run). The demo data loads
+the same on every run, so nothing is lost by starting with a fresh Herd
+database. The old `C:\laragon\www\apes-intranet` junction does no harm, and
+you can delete it once Herd works.

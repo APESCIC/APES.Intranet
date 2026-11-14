@@ -11,7 +11,7 @@
       2. Runs preflight.ps1 and stops on any FAIL.
       3. Takes a Cloudron backup and notes its id.
       4. Notes the live release, for a rollback.
-      5. Builds the tag with build-release.ps1 (Laragon's PHP 8.4, Composer
+      5. Builds the tag with build-release.ps1 (Herd's PHP 8.4, Composer
          and npm, reusing dependency caches when the lock files are unchanged),
          packs it into one .tar.gz, uploads it with cloudron push and unpacks
          it to /app/data/releases/<ReleaseId>. -SyncPush uploads file by file
@@ -33,11 +33,11 @@
     release is activated and then rolled back. Proves the rollback works.
 
 .PARAMETER Php
-    PHP 8.4 for the build. Defaults to Laragon's newest PHP 8.4.
+    PHP 8.4 for the build. Defaults to Herd's PHP 8.4.
 
 .PARAMETER Composer
-    Path to composer.phar. Defaults to the one next to composer on PATH, or
-    Laragon's.
+    Path to composer.phar. Defaults to Herd's, or the one next to composer
+    on PATH.
 
 .PARAMETER SyncPush
     Upload the release folder file by file with cloudron sync push (the old,

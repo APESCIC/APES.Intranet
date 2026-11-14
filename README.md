@@ -10,12 +10,12 @@ Sign-in is through Cloudron.
 
 ## Quick start
 
-Laragon on Windows is the only supported local set-up.
+Laravel Herd Pro on Windows is the only supported local set-up.
 
 ```powershell
 git clone https://github.com/APESCIC/APES.Intranet.git
 cd APES.Intranet
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\laragon-setup.ps1 -SeedDemo
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\herd-setup.ps1 -SeedDemo
 npm run dev
 ```
 

@@ -1,7 +1,7 @@
 <#
 .SYNOPSIS
     Live preview gate, steps 1 and 2: load the latest code, then check the
-    Laragon preview serves it through FastCGI. Run before any development work.
+    Herd preview serves it through FastCGI. Run before any development work.
 
 .DESCRIPTION
     1. Stops if tracked files have uncommitted changes. Fetches origin, fast-
@@ -13,7 +13,7 @@
        safe seeders that deploy/cloudron/activate-release.sh runs (roles,
        permissions and module defaults, no personal data), so local grants
        match Cloudron.
-    3. Checks Laragon is running, the site answers, and /healthz shows the
+    3. Checks Herd and its MySQL service are running, the site answers, and /healthz shows the
        expected PHP version through FastCGI and the checked-out revision.
        Clears Laravel's caches once if the revision is stale.
     4. Starts Vite in its own window if nothing listens on the profile's port.
@@ -30,7 +30,7 @@ param(
     [switch]$NoSync,
     [switch]$NoMergeMain,
     [switch]$NoVite,
-    [string]$LaragonRoot = 'C:\laragon'
+    [string]$HerdRoot = (Join-Path $env:USERPROFILE '.config\herd')
 )
 
 $ErrorActionPreference = 'Stop'
@@ -59,12 +59,17 @@ function Get-Health([string]$Url) {
 }
 
 $repo = Split-Path $PSScriptRoot -Parent
-$p = Get-Content (Join-Path $repo 'docs\laragon\profile.json') -Raw | ConvertFrom-Json
-$phpPattern = "^php-$([regex]::Escape($p.php))\.\d+(-\d+)?-" + $(if ($p.phpThreadSafe) { '' } else { 'nts-' }) + 'Win32'
-$phpDir = Get-ChildItem "$LaragonRoot\bin\php" -Directory | Where-Object { $_.Name -match $phpPattern } | Sort-Object Name -Descending | Select-Object -First 1
-if (-not $phpDir) { Stop-Preview 1 "Laragon has no PHP $($p.php) build matching $phpPattern. Run scripts\laragon-setup.ps1." }
-$nodeDir = Get-ChildItem "$LaragonRoot\bin\nodejs" -Directory | Where-Object { $_.Name -match "^node-v?$($p.node)(\D|$)" } | Select-Object -First 1
-$env:Path = "$($phpDir.FullName);$LaragonRoot\bin\composer;$(if ($nodeDir) { $nodeDir.FullName });" + $env:Path
+$p = Get-Content (Join-Path $repo 'docs\herd\profile.json') -Raw | ConvertFrom-Json
+$herdBin = Join-Path $HerdRoot 'bin'
+$phpDir = Join-Path $herdBin "php$($p.php -replace '\.', '')"
+if (-not (Test-Path (Join-Path $phpDir 'php.exe'))) { Stop-Preview 1 "Herd has no PHP $($p.php) in $phpDir. Run scripts\herd-setup.ps1." }
+$composerPhar = Join-Path $herdBin 'composer.phar'
+$nodeDir = Get-ChildItem (Join-Path $herdBin 'nvm') -Directory -ErrorAction SilentlyContinue |
+    Where-Object { $_.Name -match "^v$($p.node)\.\d+\.\d+$" } |
+    Sort-Object { [version]($_.Name.TrimStart('v')) } -Descending |
+    Select-Object -First 1
+if (-not $nodeDir) { Stop-Preview 1 "Herd's nvm has no Node $($p.node). Turn on Node.js in Herd > Settings, then run: herd node:install $($p.node)" }
+$env:Path = "$phpDir;$herdBin;$($nodeDir.FullName);" + $env:Path
 if (-not $env:XDEBUG_MODE) { $env:XDEBUG_MODE = 'off' }
 
 Push-Location $repo
@@ -104,7 +109,7 @@ try {
     Write-Step 'Dependencies'
     $installed = Join-Path $repo 'vendor\composer\installed.json'
     if (-not (Test-Path $installed) -or (Get-Item 'composer.lock').LastWriteTime -gt (Get-Item $installed).LastWriteTime) {
-        $run = Invoke-Native { php "$LaragonRoot\bin\composer\composer.phar" install --no-interaction --no-progress }
+        $run = Invoke-Native { php $composerPhar install --no-interaction --no-progress }
         if ($run.Code -ne 0) { Stop-Preview 1 "composer install failed: $($run.Output)" }
         Write-Ok 'Ran composer install'
     } else { Write-Ok 'Composer dependencies are current' }
@@ -130,23 +135,24 @@ try {
         Write-Ok "Synced roles and permissions ($($seeders.Count) deploy seeders, as on Cloudron)"
     }
 
-    # 3. Laragon and the preview -------------------------------------------------
-    Write-Step "Laragon preview $($p.appUrl)"
-    $missing = @('laragon', 'httpd', 'mysqld' | Where-Object { -not (Get-Process $_ -ErrorAction SilentlyContinue) })
-    if ($missing.Count -gt 0) { Stop-Preview 1 "Not running: $($missing -join ', '). Click Start All in Laragon." }
+    # 3. Herd and the preview ----------------------------------------------------
+    Write-Step "Herd preview $($p.appUrl)"
+    $missing = @('Herd', 'nginx' | Where-Object { -not (Get-Process $_ -ErrorAction SilentlyContinue) })
+    if ($missing.Count -gt 0) { Stop-Preview 1 "Not running: $($missing -join ', '). Open Herd." }
+    if (-not (Get-NetTCPConnection -State Listen -LocalPort $p.database.port -ErrorAction SilentlyContinue)) { Stop-Preview 1 "Nothing listens on MySQL's port $($p.database.port). Start Herd's MySQL service (Herd > Services)." }
     $health = Get-Health $p.appUrl
-    if ($null -eq $health -or $null -eq $health.local) { Stop-Preview 1 "$($p.appUrl)/healthz did not answer with the local block. Is APP_ENV=local in .env, and has Laragon been reloaded?" }
+    if ($null -eq $health -or $null -eq $health.local) { Stop-Preview 1 "$($p.appUrl)/healthz did not answer with the local block. Is APP_ENV=local in .env, and is the site linked (herd links)?" }
     if ($health.local.git_revision -ne $head.Substring(0, 12)) {
         Invoke-Native { php artisan optimize:clear } | Out-Null
         $health = Get-Health $p.appUrl
     }
-    if ($health.local.git_revision -ne $head.Substring(0, 12)) { Stop-Preview 1 "The preview serves $($health.local.git_revision), not $($head.Substring(0, 12)). Check the junction $($p.folder) points at this clone." }
-    if ($health.local.php_sapi -ne 'cgi-fcgi') { Stop-Preview 1 "The preview runs PHP as $($health.local.php_sapi), not FastCGI (cgi-fcgi). Switch Laragon to the NTS PHP $($p.php) build." }
-    if ($health.local.php -notlike "$($p.php).*") { Stop-Preview 1 "The preview runs PHP $($health.local.php), not $($p.php)." }
+    if ($health.local.git_revision -ne $head.Substring(0, 12)) { Stop-Preview 1 "The preview serves $($health.local.git_revision), not $($head.Substring(0, 12)). Check 'herd links' shows $($p.herdSite) pointing at this clone." }
+    if ($health.local.php_sapi -ne 'cgi-fcgi') { Stop-Preview 1 "The preview runs PHP as $($health.local.php_sapi), not FastCGI (cgi-fcgi)." }
+    if ($health.local.php -notlike "$($p.php).*") { Stop-Preview 1 "The preview runs PHP $($health.local.php), not $($p.php). Pin the site with: herd isolate $($p.php) --site=$($p.herdSite)" }
     Write-Ok "Serves $($head.Substring(0, 12)) on PHP $($health.local.php) through FastCGI"
     if ($health.status -ne 'ok') {
         $failed = ($health.checks.PSObject.Properties | Where-Object { $_.Value -ne 'ok' } | ForEach-Object { $_.Name }) -join ', '
-        Write-Warn "/healthz reports $($health.status) ($failed). The preview still works; start that Laragon service if the task needs it."
+        Write-Warn "/healthz reports $($health.status) ($failed). The preview still works; add that Herd service if the task needs it."
     }
 
     # 4. Vite ------------------------------------------------------------------

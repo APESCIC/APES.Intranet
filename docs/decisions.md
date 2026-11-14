@@ -19,7 +19,7 @@ Do not change any of them without her approval. Terms are explained in the
   output.
 - Responsive on desktop, tablet and mobile, and installable as a PWA.
 - PHP versions: Cloudron runs PHP 8.4, chosen by `/app/data/PHP_VERSION`.
-  Local development and the release build use Laragon's PHP 8.4 too, and CI
+  Local development and the release build use Herd's PHP 8.4 too, and CI
   tests on 8.3 and 8.4. All meet the PHP 8.3 floor. Do not pin Cloudron back to 8.3.
 
 ## Sign-in
@@ -78,12 +78,13 @@ Do not change any of them without her approval. Terms are explained in the
 
 ## Local development
 
-Decided on 9 November 2026 (#213): Laragon is the only supported local
-set-up, replacing the earlier set-ups from #209 and before. The repository is
-its own Laragon project at <http://apes-intranet.test>: Apache running Laragon's
-NTS PHP 8.4 through FastCGI, MySQL 8.4 and Node 22. Never suggest containers,
-virtual machines or another local server stack, and never use
-`php artisan serve` locally. The full guide is
+Decided by Bambie on 14 November 2026 (#282): Laravel Herd Pro is the only
+supported local set-up, replacing Laragon (decided 9 November 2026, #213). The
+repository is its own Herd site at <http://apes-intranet.test>: Herd's nginx
+running PHP 8.4 through FastCGI (the site is pinned to 8.4), Herd's MySQL 8.4
+service on port 3306, Node 22 through Herd's nvm, and Herd's mail catcher on
+port 2525. Never suggest containers, virtual machines or another local server
+stack, and never use `php artisan serve` locally. The full guide is
 [local-development.md](local-development.md).
 
 ## Shipping
@@ -171,7 +172,7 @@ The repository is already public. Check these again before v1.0.0:
 
 - Secret scan of the git history is clean.
 - No `.env` file is committed, other than `.env.example` and
-  `.env.laragon.example`.
+  `.env.herd.example`.
 - No real HR, student, volunteer or agreement data is in the repository.
 - Done: a licence has been chosen (proprietary, see [LICENSE](../LICENSE)).
 
