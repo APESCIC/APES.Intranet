@@ -145,7 +145,10 @@ if (-not $mysqlRow) {
     throw "Herd has no MySQL service on port $($p.database.port). Create one with: herd services:create mysql --service-version=$($p.database.version).<latest patch> --port=$($p.database.port)"
 }
 if ($mysqlRow -notmatch "\|\s*$([regex]::Escape($p.database.version))\.\d+\s*\|") { Write-Warn "The MySQL service on port $($p.database.port) is not version $($p.database.version): $($mysqlRow.Trim())" }
-if ($mysqlRow -notmatch '\|\s*running\s*\|') { throw "Herd's MySQL service on port $($p.database.port) is not running. Start it in Herd > Services, then run this again." }
+if ($mysqlRow -notmatch '\|\s*running\s*\|') {
+    if (-not (Get-NetTCPConnection -State Listen -LocalPort $p.database.port -ErrorAction SilentlyContinue)) { throw "Herd's MySQL service on port $($p.database.port) is not running. Start it in Herd > Services, then run this again." }
+    Write-Warn "Herd lists its MySQL service as not running, but something answers on port $($p.database.port). This happens after Herd restarts; restart the service in Herd > Services if the database misbehaves."
+}
 $mysqlBin = Get-ChildItem (Join-Path $herdBin 'services\mysql') -Directory -ErrorAction SilentlyContinue |
     Where-Object { $_.Name -like "$($p.database.version).*" } |
     Sort-Object { [version]$_.Name } -Descending |
