@@ -10,6 +10,47 @@ export function pushSupported() {
     return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
 }
 
+export function initPushPreferences() {
+    const enable = document.querySelector('[data-push-enable]');
+    const disable = document.querySelector('[data-push-disable]');
+    const status = document.getElementById('push-status');
+    if (!enable && !disable) {
+        return;
+    }
+
+    enable?.addEventListener('click', async () => {
+        if (status) {
+            status.textContent = 'Asking the browser for permission…';
+        }
+        try {
+            await subscribeToPush();
+            if (status) {
+                status.textContent = 'Browser notifications are on for this device. Save your category preferences below.';
+            }
+        } catch (error) {
+            if (status) {
+                status.textContent = error instanceof Error ? error.message : 'Could not turn on browser notifications.';
+            }
+        }
+    });
+
+    disable?.addEventListener('click', async () => {
+        if (status) {
+            status.textContent = 'Turning off on this device…';
+        }
+        try {
+            await unsubscribeFromPush();
+            if (status) {
+                status.textContent = 'Browser notifications are off on this device.';
+            }
+        } catch (error) {
+            if (status) {
+                status.textContent = error instanceof Error ? error.message : 'Could not turn off browser notifications.';
+            }
+        }
+    });
+}
+
 export async function registerPushServiceWorker() {
     if (!('serviceWorker' in navigator)) {
         return null;
