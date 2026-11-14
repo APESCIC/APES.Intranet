@@ -19,7 +19,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts\herd-setup.ps1 -Seed
 npm run dev
 ```
 
-Then open <http://apes-intranet.test/login> and use the **Developer sign-in**
+Then open <https://apes-intranet.test/login> and use the **Developer sign-in**
 panel (local only) to sign in as a fake account for any role. The amber
 **QA** pill in the menu switches role without leaving the page.
 

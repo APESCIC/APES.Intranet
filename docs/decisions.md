@@ -80,7 +80,7 @@ Do not change any of them without her approval. Terms are explained in the
 
 Decided by Bambie on 14 November 2026 (#282): Laravel Herd Pro is the only
 supported local set-up, replacing Laragon (decided 9 November 2026, #213). The
-repository is its own Herd site at <http://apes-intranet.test>: Herd's nginx
+repository is its own Herd site at <https://apes-intranet.test>: Herd's nginx
 running PHP 8.4 through FastCGI (the site is pinned to 8.4), Herd's MySQL 8.4
 service on port 3306, Node 22 through Herd's nvm, and Herd's mail catcher on
 port 2525. Never suggest containers, virtual machines or another local server

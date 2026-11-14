@@ -23,7 +23,7 @@ it('keeps the Herd env example in step with the profile', function () {
 
     expect($env['APP_ENV'])->toBe('local')
         ->and($env['APP_URL'])->toBe($profile['appUrl'])
-        ->and($env['APP_URL'])->toBe('http://'.$profile['hostname'])
+        ->and($env['APP_URL'])->toBe('https://'.$profile['hostname'])
         ->and($env['DB_CONNECTION'])->toBe($profile['database']['engine'])
         ->and($env['DB_HOST'])->toBe($profile['database']['host'])
         ->and((int) $env['DB_PORT'])->toBe($profile['database']['port'])
@@ -39,7 +39,15 @@ it('names the Herd site after the hostname', function () {
     $profile = herdProfile();
 
     expect($profile['hostname'])->toBe($profile['herdSite'].'.test')
-        ->and($profile['herdSite'])->toBe($profile['project']);
+        ->and($profile['herdSite'])->toBe($profile['project'])
+        ->and($profile['appUrl'])->toBe('https://'.$profile['hostname']);
+});
+
+it('documents that the local site is secured for HTTPS', function () {
+    $doc = file_get_contents(base_path('docs/herd/profile.md'));
+
+    expect($doc)->toContain('herd secure '.herdProfile()['herdSite'])
+        ->and($doc)->toContain(herdProfile()['appUrl']);
 });
 
 it('keeps the Vite port in step with the profile', function () {

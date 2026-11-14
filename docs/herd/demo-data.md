@@ -76,12 +76,12 @@ The intranet signs in through Cloudron only, so there are no passwords. In
 the local environment, the Developer sign-in panel signs you in as a fake
 account for any role, with one click:
 
-1. Open <http://apes-intranet.test/login>.
+1. Open <https://apes-intranet.test/login>.
 2. Choose the account in the amber **Developer sign-in** panel.
 
 To change account later, open the amber **QA** pill at the bottom of the menu
 and choose another; it keeps you on the same page when the new role may open
-it. <http://apes-intranet.test/qa> still works as a fallback.
+it. <https://apes-intranet.test/qa> still works as a fallback.
 
 | Account | Roles |
 | --- | --- |
