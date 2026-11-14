@@ -16,6 +16,8 @@ use App\Core\Changelog\Console\ValidateChangelog;
 use App\Core\Changelog\FooterVersion;
 use App\Core\Changelog\Release;
 use App\Core\Changelog\ReleasePolicy;
+use App\Core\Communications\Contracts\PublishIntranetUpdate;
+use App\Core\Communications\NullPublishIntranetUpdate;
 use App\Core\Helpdesk\Contracts\RaiseItTicket;
 use App\Core\Helpdesk\NullRaiseItTicket;
 use App\Core\Hr\Contracts\ApprovedLeaveLookup;
@@ -45,6 +47,7 @@ class CoreServiceProvider extends ServiceProvider
         $this->app->bind(DirectoryGroups::class, LdapDirectoryGroups::class);
         $this->app->bind(ApprovedLeaveLookup::class, NullApprovedLeaveLookup::class);
         $this->app->bind(RaiseItTicket::class, NullRaiseItTicket::class);
+        $this->app->bind(PublishIntranetUpdate::class, NullPublishIntranetUpdate::class);
         $this->app->bind(SystemStatus::class, fn ($app) => new SystemStatus([
             $app->make(MysqlCheck::class),
             $app->make(RedisCheck::class),

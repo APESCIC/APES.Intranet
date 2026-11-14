@@ -3,8 +3,10 @@
 namespace Modules\Hr;
 
 use App\Core\Hr\Contracts\ApprovedLeaveLookup;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Modules\Hr\Console\RemindIdentityCheckExpiry;
+use Modules\Hr\Models\Recognition;
 use Modules\Hr\Navigation\HrMenuContributor;
 use Modules\Hr\Services\LeaveRequestApprovedLeaveLookup;
 
@@ -24,5 +26,22 @@ class HrServiceProvider extends ServiceProvider
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'hr');
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         $this->commands([RemindIdentityCheckExpiry::class]);
+
+        // Keep People free of HR imports: inject recognitions onto the profile view.
+        View::composer('people::profile.show', function ($view): void {
+            $person = $view->getData()['person'] ?? null;
+            if ($person === null) {
+                $view->with('recognitions', collect());
+
+                return;
+            }
+
+            $view->with('recognitions', Recognition::query()
+                ->with('giver')
+                ->where('recipient_id', $person->id)
+                ->latest()
+                ->limit(20)
+                ->get());
+        });
     }
 }

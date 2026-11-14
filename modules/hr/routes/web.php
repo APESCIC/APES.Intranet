@@ -7,6 +7,7 @@ use Modules\Hr\Http\Controllers\ChecklistController;
 use Modules\Hr\Http\Controllers\HrRecordController;
 use Modules\Hr\Http\Controllers\IdentityCheckController;
 use Modules\Hr\Http\Controllers\LeaveController;
+use Modules\Hr\Http\Controllers\RecognitionController;
 use Modules\Hr\Http\Controllers\TrainingController;
 
 Route::middleware(['web', 'auth', 'can:'.AccessMatrix::INTRANET_ACCESS])->prefix('hr')->name('hr.')->group(function () {
@@ -17,6 +18,9 @@ Route::middleware(['web', 'auth', 'can:'.AccessMatrix::INTRANET_ACCESS])->prefix
     Route::post('/leave/absence', [LeaveController::class, 'storeAbsence'])->name('leave.absence');
 
     Route::get('/training', [TrainingController::class, 'mine'])->name('training.mine');
+
+    Route::get('/recognition', [RecognitionController::class, 'create'])->name('recognition.create');
+    Route::post('/recognition', [RecognitionController::class, 'store'])->name('recognition.store');
 
     Route::get('/appraisals', [AppraisalController::class, 'index'])->name('appraisals.index');
     Route::get('/appraisals/{appraisal}', [AppraisalController::class, 'show'])->whereNumber('appraisal')->name('appraisals.show');
