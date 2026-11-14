@@ -349,8 +349,16 @@ the app was made with v0.0.1 on 5 November 2026, with the owner's approval on
 issue #13. The holding page files (`index.php` and an empty `.htaccess`)
 stayed in `/app/data/public` as a fallback until 12 November 2026, when they
 were removed with the owner's agreement, after backup
-`app_8bd0acdc-ca6d-467e-aa1e-5c9eb52e3264_v5.3.1_872bd76f` (#267). The empty
-folder is still there.
+`app_8bd0acdc-ca6d-467e-aa1e-5c9eb52e3264_v5.3.1_872bd76f` (#267).
+
+**Never empty `/app/data/public`.** The LAMP image's `/app/code/start.sh`
+treats an empty `/app/data/public` as a first install: on the next restart it
+copies its default `index.php` back **and overwrites `/app/data/run.sh`** with
+a blank placeholder, which stops the queue worker and scheduler (#276). After
+the holding page was removed, leave the image's default `index.php` (or any
+other non-empty content) in that folder. `deploy/cloudron/preflight.sh` fails
+when the folder is empty. The v0.5.3 deploy hit this and rolled back; do not
+treat an empty folder as a tidy end state.
 
 `/app/data/apache/app.conf` decides what Apache serves. To serve the app (as
 now), install the repository's config and restart:
@@ -363,10 +371,10 @@ cloudron restart --app $app
 Then check that `/healthz` returns 200 with `"status":"ok"`, the home page
 shows the APES sign-in page, and `/no-such-page` shows the APES 404 page.
 
-Removing `/app/data/apache/app.conf` now makes Apache serve the empty
-`/app/data/public`, so the site shows nothing useful. Don't do it to take the
-site offline: use Laravel's maintenance mode instead, which shows the APES
-maintenance page:
+Removing `/app/data/apache/app.conf` makes Apache serve `/app/data/public`
+(the image default `index.php`, not the Laravel app), so the site is not the
+intranet. Don't do it to take the site offline: use Laravel's maintenance mode
+instead, which shows the APES maintenance page:
 
 ```powershell
 cloudron exec --app $app '--' gosu www-data php8.4 /app/data/current/artisan down --retry=15
