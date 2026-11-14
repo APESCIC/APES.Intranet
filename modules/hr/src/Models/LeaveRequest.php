@@ -3,10 +3,10 @@
 namespace Modules\Hr\Models;
 
 use App\Models\User;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Carbon;
 
 class LeaveRequest extends Model
 {
@@ -67,7 +67,7 @@ class LeaveRequest extends Model
      * @param  Builder<LeaveRequest>  $query
      * @return Builder<LeaveRequest>
      */
-    public function scopeApprovedCovering(Builder $query, int $userId, Carbon $starts, Carbon $ends): Builder
+    public function scopeApprovedCovering(Builder $query, int $userId, CarbonInterface $starts, CarbonInterface $ends): Builder
     {
         return $query->where('user_id', $userId)
             ->where('status', self::STATUS_APPROVED)
