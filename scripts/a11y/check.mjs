@@ -285,6 +285,7 @@ try {
     await signInAs(desktop, 'Admin');
     await visit(desktop, '/dashboard', 'Dashboard (desktop)');
     await visit(desktop, '/notifications/preferences', 'Notification preferences');
+    await visit(desktop, '/notifications', 'Notification inbox');
     await visit(desktop, '/admin', 'Admin overview');
     await visit(desktop, '/admin/roles', 'Roles');
     await visit(desktop, '/admin/audit', 'Audit log');

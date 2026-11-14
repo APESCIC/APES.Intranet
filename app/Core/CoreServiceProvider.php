@@ -78,6 +78,10 @@ class CoreServiceProvider extends ServiceProvider
                 'qaConfirm' => $qaProfile !== null && session(QaLogin::CONFIRM) === true,
                 'qaNotice' => $qaProfile !== null ? session('qa.notice') : null,
                 'footerVersion' => app(FooterVersion::class)->for($user),
+                'unreadNotifications' => $user?->unreadNotifications()->count() ?? 0,
+                'recentNotifications' => $user
+                    ? $user->notifications()->latest()->limit(8)->get()
+                    : collect(),
             ]);
         });
     }
