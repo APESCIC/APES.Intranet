@@ -1,0 +1,18 @@
+{
+  "version": "v0.5.5",
+  "released_at": "2026-11-14",
+  "title": "Quicker test sign-in for developers",
+  "summary": "No changes you will notice. The people who work on the intranet can now sign in as test accounts and switch between them more quickly on their own computers.",
+  "audiences": ["staff"],
+  "changes": {
+    "changed": [
+      "Developers testing the intranet on their own computers can sign in as a test account straight from the sign-in page, and switch to another test account without leaving the page they are on."
+    ]
+  },
+  "internal_notes": [
+    "Local only: the sign-in page has an amber Developer sign-in panel, marked Local only, with one-click buttons for the 8 approved groups and 4 common stacks. The old role switcher page stays as a fallback with the same panel.",
+    "Signed-in test accounts see an amber QA pill in the menu that shows the current test role and opens a switcher. A switch keeps you on the same page when the new role may open it, otherwise you go to the dashboard. Pages that need a fresh sign-in ask a test account to confirm its current role. Signing out of QA now works from the menu and returns to the sign-in page.",
+    "None of this appears unless QA sign-in is switched on in a local environment. It is off on Cloudron, and the tests prove it stays hidden in production, staging and testing even if the flag is on. Roles, permissions and Cloudron sign-in are unchanged."
+  ],
+  "published": true
+}

@@ -15,7 +15,7 @@ export const cloneRail = (rail) => {
         element.id = `${DRAWER_ID_PREFIX}${element.id}`;
     }
 
-    for (const attribute of ['aria-labelledby', 'aria-controls', 'aria-describedby', 'for']) {
+    for (const attribute of ['aria-labelledby', 'aria-controls', 'aria-describedby', 'for', 'popovertarget']) {
         for (const element of copy.querySelectorAll(`[${attribute}]`)) {
             element.setAttribute(attribute, prefixIds(element.getAttribute(attribute)));
         }

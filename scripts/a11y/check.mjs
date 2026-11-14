@@ -1,10 +1,11 @@
 // Accessibility check: axe-core (WCAG 2.2 A and AA) on the main pages, plus real
 // keyboard checks. Fails on any serious or critical axe issue or keyboard
-// failure. Needs a running app with the QA role switcher on.
+// failure. Needs a running app with QA sign-in on (QA_LOGIN_ENABLED=true).
 //
 //   A11Y_BROWSER_CHANNEL=msedge npm run test:a11y
 //
-// BASE_URL defaults to the Herd preview, http://apes-intranet.test.
+// BASE_URL defaults to the Herd preview, http://apes-intranet.test. If the site
+// redirects to https, the check follows it.
 //
 // A11Y_BROWSER_CHANNEL uses an installed browser (msedge, chrome) instead of
 // Playwright's own Chromium.
@@ -12,7 +13,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { chromium } from 'playwright';
 
-const baseUrl = (process.env.BASE_URL ?? 'http://apes-intranet.test').replace(/\/$/, '');
+let baseUrl = (process.env.BASE_URL ?? 'http://apes-intranet.test').replace(/\/$/, '');
 const channel = process.env.A11Y_BROWSER_CHANNEL || undefined;
 const blocking = new Set(['serious', 'critical']);
 const tags = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
@@ -121,6 +122,73 @@ async function keyboardChecks(desktop, mobile) {
     expectKeyboard(current === 'page', 'change log filter works from the keyboard and marks the chosen type');
 }
 
+// The switcher moves focus to the current role on its toggle event, a moment
+// after it becomes visible, so wait for that before reading or moving focus.
+async function waitForFocusInSwitcher(page) {
+    await page.waitForFunction(() => Boolean(document.activeElement?.closest('[data-qa-flyout]')), null, { timeout: 5000 })
+        .catch(() => {});
+}
+
+async function qaSwitcherChecks(desktop, narrow) {
+    await signInAs(desktop, 'Staff');
+    await desktop.goto(`${baseUrl}/dashboard`, { waitUntil: 'networkidle' });
+    const pill = desktop.locator('[data-workspace-rail-dock] [data-qa-pill]');
+    const pillBox = await pill.boundingBox();
+    expectKeyboard((await pill.textContent()).trim() === 'QA: Staff' && pillBox !== null && pillBox.height >= 44, 'the amber QA pill shows the current profile with a 44px target', 'layout');
+
+    await pill.focus();
+    await desktop.keyboard.press('Enter');
+    const flyout = desktop.locator('[data-workspace-rail-dock] [data-qa-flyout]');
+    await flyout.waitFor();
+    await waitForFocusInSwitcher(desktop);
+    let state = await focused(desktop);
+    expectKeyboard(state.label === 'Staff (current)' && (await pill.getAttribute('aria-expanded')) === 'true', 'Enter on the QA pill opens the switcher on the current profile');
+    await audit(desktop, 'QA switcher (desktop)');
+
+    await desktop.keyboard.press('Escape');
+    state = await focused(desktop);
+    expectKeyboard(!(await flyout.isVisible()) && state.label === 'QA: Staff', 'Escape closes the QA switcher and returns focus to the pill');
+
+    await pill.focus();
+    await desktop.keyboard.press('Enter');
+    await waitForFocusInSwitcher(desktop);
+    await flyout.getByRole('button', { name: 'Admin', exact: true }).focus();
+    await Promise.all([desktop.waitForResponse((response) => response.url().endsWith('/qa/login')), desktop.keyboard.press('Enter')]);
+    await desktop.waitForLoadState('networkidle');
+    expectKeyboard(desktop.url() === `${baseUrl}/dashboard` && (await pill.textContent()).trim() === 'QA: Admin', 'switching role from the keyboard stays on a page the new role may open');
+
+    await desktop.goto(`${baseUrl}/admin/roles`, { waitUntil: 'networkidle' });
+    await pill.click();
+    await Promise.all([
+        desktop.waitForResponse((response) => response.url().endsWith('/qa/login')),
+        flyout.getByRole('button', { name: 'Staff', exact: true }).click(),
+    ]);
+    await desktop.waitForURL(`${baseUrl}/dashboard`);
+    await desktop.waitForLoadState('networkidle');
+    expectKeyboard((await pill.textContent()).trim() === 'QA: Staff', 'switching to a role that may not open the page lands on the dashboard');
+
+    await narrow.goto(`${baseUrl}/dashboard`, { waitUntil: 'networkidle' });
+    await narrow.getByRole('button', { name: 'Open menu' }).click();
+    const drawer = narrow.getByRole('dialog', { name: 'Main menu' });
+    await drawer.waitFor();
+    await narrow.waitForTimeout(300);
+    await drawer.locator('[data-qa-pill]').focus();
+    await narrow.keyboard.press('Enter');
+    const drawerFlyout = drawer.locator('[data-qa-flyout]');
+    await drawerFlyout.waitFor();
+    await waitForFocusInSwitcher(narrow);
+    const fits = await drawerFlyout.evaluate((element) => element.getBoundingClientRect().right <= window.innerWidth
+        && [...element.querySelectorAll('button')].every((button) => button.getBoundingClientRect().height >= 44));
+    expectKeyboard(fits && (await focused(narrow)).insideDrawer, 'the QA switcher fits the 320px menu with 44px targets', 'layout');
+
+    await narrow.keyboard.press('Escape');
+    state = await focused(narrow);
+    expectKeyboard(!(await drawerFlyout.isVisible()) && state.insideDrawer && state.label.startsWith('QA: '), 'Escape closes the QA switcher but leaves the 320px menu open');
+
+    await narrow.keyboard.press('Escape');
+    expectKeyboard((await focused(narrow)).label === 'Open menu', 'a second Escape closes the 320px menu');
+}
+
 async function narrowScreenChecks(narrow) {
     await signInAs(narrow, 'Staff');
     for (const path of ['/dashboard', '/change-log']) {
@@ -190,9 +258,14 @@ async function visitFirstTicket(page, listPath, label) {
     await audit(page, label);
 }
 
+// Uses the Developer sign-in panel on /login, or the /qa fallback when already
+// signed in (signed-in visits to /login go to the dashboard).
 async function signInAs(page, role) {
-    await page.goto(`${baseUrl}/qa`, { waitUntil: 'networkidle' });
-    await page.getByRole('button', { name: role, exact: true }).click();
+    await page.goto(`${baseUrl}/login`, { waitUntil: 'networkidle' });
+    if (!page.url().endsWith('/login')) {
+        await page.goto(`${baseUrl}/qa`, { waitUntil: 'networkidle' });
+    }
+    await page.locator('#developer-signin').getByRole('button', { name: role, exact: true }).click();
     await page.waitForURL(`${baseUrl}/dashboard`);
 }
 
@@ -201,6 +274,8 @@ const browser = await chromium.launch({ channel });
 try {
     const desktop = await (await browser.newContext({ viewport: { width: 1440, height: 900 } })).newPage();
     await visit(desktop, '/login', 'Sign in');
+    // A secured Herd site redirects http to https; carry on at the address it chose.
+    baseUrl = new URL(desktop.url()).origin;
     await visit(desktop, '/privacy', 'Privacy notice');
     await visit(desktop, '/no-such-page', 'Error 404', 404);
 
@@ -260,6 +335,7 @@ try {
 
     const narrow = await (await browser.newContext({ viewport: { width: 320, height: 640 }, isMobile: true, hasTouch: true })).newPage();
     await narrowScreenChecks(narrow);
+    await qaSwitcherChecks(desktop, narrow);
 } finally {
     await browser.close();
 }

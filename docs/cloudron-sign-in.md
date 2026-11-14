@@ -120,9 +120,13 @@ Cloudron's `auth_time` claim. Details are in
 
 ## Locally
 
-The local Herd preview has no Cloudron. Use the QA role switcher at
-<http://apes-intranet.test/qa> instead. "Sign in with Cloudron" shows a
-"temporarily unavailable" page locally, because the OIDC values are blank.
+The local Herd preview has no Cloudron. Use the amber **Developer sign-in**
+panel under "Sign in with Cloudron" on <http://apes-intranet.test/login>
+instead, then the amber **QA** pill in the menu to switch role
+(<http://apes-intranet.test/qa> is the fallback). "Sign in with Cloudron"
+shows a "temporarily unavailable" page locally, because the OIDC values are
+blank. Pages that need a fresh sign-in ask a QA account to confirm its current
+role instead of going through Cloudron.
 
 ## Signing out
 

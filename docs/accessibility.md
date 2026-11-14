@@ -11,9 +11,11 @@ pull request. It:
 - runs axe-core with the WCAG 2.0, 2.1 and 2.2 A and AA rules on the sign-in
   page, privacy notice, 404 and 403 error pages, dashboard (desktop and
   mobile), roles screen, audit log and the open mobile menu
-- signs in through the QA role switcher as Staff, Admin and Volunteer
-- presses real keys to check the skip link, focus order, focus rings and the
-  mobile menu's focus trap
+- signs in as Staff, Admin and Volunteer through the Developer sign-in panel
+  on `/login`, or the `/qa` fallback when already signed in
+- presses real keys to check the skip link, focus order, focus rings, the
+  mobile menu's focus trap and the QA pill's role switcher (desktop and the
+  320px menu), and runs axe on the open switcher
 - fails on any serious or critical axe issue, or any keyboard failure
 
 Run it locally against the Herd preview, using the installed Microsoft
@@ -24,6 +26,9 @@ loaded (`php artisan demo:seed`):
 ```powershell
 $env:BASE_URL = 'http://apes-intranet.test'; $env:A11Y_BROWSER_CHANNEL = 'msedge'; npm run test:a11y
 ```
+
+If the Herd site is secured (`herd secured` lists it), `http://` redirects to
+`https://apes-intranet.test` and the check carries on there.
 
 Herd adds an "Edit with Herd" badge (`#herd-ai-host`) to every local page.
 It is not part of the app, so the check leaves it out.
@@ -58,6 +63,8 @@ Measured from the theme colours (WCAG relative luminance). Body text needs
 | Teal links `#107481` | White | 5.5:1 |
 | White on teal buttons | Teal `#107481` | 5.5:1 |
 | Warning `#8a4b0b` | Warning mist `#fdefd3` | 6.0:1 |
+| Warning `#8a4b0b` | White | 6.8:1 |
+| White on warning (QA tag, current role) | Warning `#8a4b0b` | 6.8:1 |
 
 `--color-sg-accent` (`#67c3ce`) fails contrast as text. Use it for decoration
 only.
@@ -75,6 +82,10 @@ local preview:
 - On tablet and mobile, "Open menu" opens the menu as a dialog and moves focus
   to "Close menu". Tab stays inside the menu. Escape or the backdrop closes it
   and returns focus to "Open menu".
+- Locally, the amber QA pill opens the role switcher with focus on the
+  current role. Escape closes only the switcher, even inside the mobile menu,
+  and returns focus to the pill. Every role button is at least 44px tall, and
+  amber text is 6.8:1 on white and 6.0:1 on the warning mist.
 - Planned features ("Soon") are not focusable and are announced as "not
   available yet".
 - "Chat in Teams" says that it opens in a new tab.

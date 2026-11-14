@@ -658,6 +658,174 @@ a.sg-nav-link:hover {
     height: 1.25rem;
 }
 
+/* Local QA sign-in (amber: warn on white is 6.8:1, warn on warn-mist is 6.0:1) */
+.sg-qa-panel {
+    max-width: 36rem;
+    border: 2px solid var(--color-sg-warn);
+    border-radius: var(--radius-sg-card);
+    background: var(--color-sg-warn-mist);
+    padding: 1.25rem;
+    color: var(--color-sg-ink);
+    scroll-margin-top: 6rem;
+}
+
+.sg-qa-panel__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.sg-qa-panel__title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-sg-warn);
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.sg-qa-panel__title svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.sg-qa-panel__intro {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.sg-qa-tag {
+    display: inline-block;
+    border-radius: 999px;
+    background: var(--color-sg-warn);
+    padding: 0.125rem 0.625rem;
+    color: var(--color-sg-white);
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.sg-qa-picker__group {
+    margin-top: 1rem;
+}
+
+.sg-qa-picker__heading {
+    color: var(--color-sg-warn);
+    font-size: 0.8125rem;
+    font-weight: 700;
+}
+
+.sg-qa-picker__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.sg-qa-btn {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    gap: 0.25rem;
+    border: 1px solid var(--color-sg-warn);
+    border-radius: 999px;
+    background: var(--color-sg-white);
+    padding: 0.5rem 1rem;
+    color: var(--color-sg-warn);
+    font-size: 0.875rem;
+    font-weight: 650;
+    line-height: 1.2;
+    text-align: left;
+    cursor: pointer;
+}
+
+.sg-qa-btn:hover,
+.sg-qa-btn[aria-current='true'] {
+    background: var(--color-sg-warn);
+    color: var(--color-sg-white);
+}
+
+.sg-qa-btn__current {
+    font-weight: 500;
+}
+
+.sg-qa-pill {
+    display: flex;
+    width: 100%;
+    min-height: 2.75rem;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    border: 2px solid var(--color-sg-warn);
+    border-radius: 999px;
+    background: var(--color-sg-warn-mist);
+    padding: 0.5rem 1rem;
+    color: var(--color-sg-warn);
+    font-size: 0.875rem;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: left;
+    cursor: pointer;
+}
+
+.sg-qa-pill:hover,
+.sg-qa-pill[aria-expanded='true'] {
+    background: var(--color-sg-warn);
+    color: var(--color-sg-white);
+}
+
+.sg-qa-pill svg {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+}
+
+.sg-qa-pill__label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* A popover, so it sits in the top layer beside the rail instead of being clipped by it. */
+.sg-qa-flyout {
+    position: fixed;
+    inset: auto auto var(--sg-rail-inset) calc(var(--sg-rail-inset) + var(--sg-rail-width) + 0.75rem);
+    width: min(24rem, calc(100vw - 2rem));
+    max-height: calc(100vh - 2 * var(--sg-rail-inset));
+    overflow-y: auto;
+    margin: 0;
+    border: 2px solid var(--color-sg-warn);
+    border-radius: var(--radius-sg-card);
+    background: var(--color-sg-warn-mist);
+    padding: 1.25rem;
+    color: var(--color-sg-ink);
+    box-shadow: var(--shadow-sg-rail);
+}
+
+.sg-drawer .sg-qa-flyout {
+    inset: auto auto 1.5rem 1.5rem;
+    width: calc(min(20rem, 88vw) - 1.5rem);
+    max-height: calc(100vh - 3rem);
+}
+
+.sg-qa-flyout__signout {
+    margin-top: 1.25rem;
+    border-top: 1px solid var(--color-sg-warn);
+    padding-top: 1rem;
+}
+
+.sg-qa-notice {
+    margin-bottom: 1rem;
+    border: 2px solid var(--color-sg-warn);
+    border-radius: var(--radius-sg-field);
+    background: var(--color-sg-warn-mist);
+    padding: 0.75rem 1rem;
+    color: var(--color-sg-ink);
+}
+
 @media (prefers-reduced-motion: reduce) {
     .workspace-shell *,
     .workspace-shell *::before,

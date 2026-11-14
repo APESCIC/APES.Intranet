@@ -28,7 +28,7 @@ class OidcController
             return redirect()->route('dashboard');
         }
 
-        return view('core.auth.login', ['qaEnabled' => QaLogin::enabled()]);
+        return view('core.auth.login', ['qaProfiles' => QaLogin::enabled() ? QaLogin::picker() : null]);
     }
 
     public function redirect(IdentityProvider $identityProvider): RedirectResponse
@@ -51,7 +51,11 @@ class OidcController
     public function reauthenticate(Request $request, IdentityProvider $identityProvider): RedirectResponse
     {
         if (QaLogin::enabled()) {
-            return redirect()->route('qa.index')->with('status', 'Sign in again to open that page.');
+            if (QaLogin::profileFor($request->user()) === null) {
+                return redirect()->route('qa.index')->with('status', 'Sign in again to open that page.');
+            }
+
+            return redirect()->to($this->pageBeforeReauth($request))->with(QaLogin::CONFIRM, true);
         }
 
         (new FreshSignIn($request->session()))->markRequested();
@@ -159,6 +163,29 @@ class OidcController
         $request->session()->regenerateToken();
 
         return redirect()->route('login')->with('status', 'You have signed out of the intranet.');
+    }
+
+    /**
+     * The page the person was on before following a link to a page that needs
+     * a fresh sign-in, or the dashboard.
+     */
+    private function pageBeforeReauth(Request $request): string
+    {
+        $referer = (string) $request->headers->get('referer', '');
+        $intended = (string) $request->session()->get('url.intended', '');
+
+        if ($referer === '' || parse_url($referer, PHP_URL_HOST) !== $request->getHost()) {
+            return route('dashboard');
+        }
+
+        $path = QaLogin::safeReturnPath(parse_url($referer, PHP_URL_PATH));
+        if ($path === null || $path === parse_url($intended, PHP_URL_PATH) || $path === parse_url(route('auth.reauth'), PHP_URL_PATH)) {
+            return route('dashboard');
+        }
+
+        $query = parse_url($referer, PHP_URL_QUERY);
+
+        return url($path.(is_string($query) && $query !== '' ? '?'.$query : ''));
     }
 
     private function denied(?User $user, string $reason, ?string $message = null): Response
