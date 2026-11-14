@@ -21,8 +21,11 @@
                     <x-shell.rail
                         :menu="$menu"
                         :user="$shellUser"
-                        :qa-enabled="$qaEnabled"
                         :panel="$shellPanel ?? null"
+                        :qa-profile="$qaProfile"
+                        :qa-picker="$qaPicker"
+                        :qa-return-to="$qaReturnTo"
+                        :qa-confirm="$qaConfirm"
                     />
                 </aside>
             @endif
@@ -41,6 +44,9 @@
                     @endif
 
                     <main id="main-content" class="app-main" tabindex="-1">
+                        @if ($qaProfile)
+                            <x-qa.notices :profile="$qaProfile" :confirm="$qaConfirm" :notice="$qaNotice" />
+                        @endif
                         {{ $slot }}
                     </main>
 

@@ -12,11 +12,9 @@
             <i data-lucide="log-in"></i>
             Sign in with Cloudron
         </a>
-
-        @if ($qaEnabled)
-            <p class="mt-6 text-sm text-sg-muted">
-                Local preview: <a href="{{ route('qa.index') }}">use the QA role switcher</a>.
-            </p>
-        @endif
     </section>
+
+    @if ($qaProfiles)
+        <x-qa.signin-panel :profiles="$qaProfiles" class="mt-6" />
+    @endif
 </x-layouts.app>
