@@ -1,0 +1,37 @@
+<?php
+
+namespace Modules\Hr\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class TrainingCourse extends Model
+{
+    protected $table = 'hr_training_courses';
+
+    protected $fillable = ['code', 'title', 'lms_url', 'active'];
+
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return ['active' => 'boolean'];
+    }
+
+    /**
+     * @return HasMany<TrainingRequirement, $this>
+     */
+    public function requirements(): HasMany
+    {
+        return $this->hasMany(TrainingRequirement::class, 'course_id');
+    }
+
+    /**
+     * @return HasMany<TrainingCompletion, $this>
+     */
+    public function completions(): HasMany
+    {
+        return $this->hasMany(TrainingCompletion::class, 'course_id');
+    }
+}

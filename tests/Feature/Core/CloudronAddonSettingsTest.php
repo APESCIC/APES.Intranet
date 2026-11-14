@@ -61,6 +61,19 @@ it('has the preflight fail when shared/.env copies an addon password', function 
     expect($preflight)->toContain('shared/.env holds no addon passwords');
 });
 
+it('has the preflight fail when /app/data/public is empty so run.sh is not overwritten', function () {
+    $preflight = file_get_contents(base_path('deploy/cloudron/preflight.sh'));
+    $docs = file_get_contents(base_path('docs/deploy/cloudron.md'));
+    $decisions = file_get_contents(base_path('docs/decisions.md'));
+
+    expect($preflight)->toContain('is empty; the LAMP image would overwrite run.sh')
+        ->and($preflight)->toContain('/app/data/public is not empty')
+        ->and($preflight)->toContain('public_dir="$DATA/public"')
+        ->and($docs)->toContain('Never empty `/app/data/public`')
+        ->and($docs)->toContain('overwrites `/app/data/run.sh`')
+        ->and($decisions)->toContain('Never empty `/app/data/public`');
+});
+
 it('reads the live MySQL addon values before anything in .env', function () {
     $config = configWithEnv('database', [
         'CLOUDRON_MYSQL_HOST' => 'mysql.addon', 'DB_HOST' => 'stale-host',

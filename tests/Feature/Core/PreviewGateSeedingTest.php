@@ -20,3 +20,14 @@ it('finds the deploy seeders the live preview gate runs', function () {
         expect(class_exists($seeder))->toBeTrue();
     }
 });
+
+it('compares package-lock by content hash and stops this site Vite before npm ci', function () {
+    $gate = file_get_contents(base_path('scripts/preview.ps1'));
+
+    expect($gate)->toContain('Get-FileHash -Algorithm SHA256')
+        ->and($gate)->toContain('.apes-package-lock.sha256')
+        ->and($gate)->not->toContain('LastWriteTime -gt (Get-Item $npmMarker).LastWriteTime')
+        ->and($gate)->toContain('function Stop-SiteVite')
+        ->and($gate)->toContain('before npm ci')
+        ->and($gate)->toContain('Restarted npm run dev on port');
+});

@@ -37,7 +37,8 @@
             "Modules\\People\\": "modules/people/src/",
             "Modules\\Communications\\": "modules/communications/src/",
             "Modules\\Operations\\": "modules/operations/src/",
-            "Modules\\Helpdesk\\": "modules/helpdesk/src/"
+            "Modules\\Helpdesk\\": "modules/helpdesk/src/",
+            "Modules\\Hr\\": "modules/hr/src/"
         }
     },
     "autoload-dev": {

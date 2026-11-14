@@ -61,4 +61,20 @@
             <a href="{{ route('people.profile.edit') }}" class="sg-btn sg-btn-secondary sg-btn-sm">Edit profile</a>
         @endif
     </article>
+
+    @isset($recognitions)
+        @if ($recognitions->isNotEmpty())
+            <section class="sg-card mt-6 max-w-3xl space-y-3 p-6" aria-labelledby="recognition-heading">
+                <h2 id="recognition-heading" class="font-serif text-xl font-semibold">Recognition</h2>
+                <ul class="space-y-3">
+                    @foreach ($recognitions as $recognition)
+                        <li class="border-t border-sg-border pt-3 first:border-t-0 first:pt-0">
+                            <p class="text-sm text-sg-muted">From {{ $recognition->giver?->name ?? 'A colleague' }} · {{ $recognition->created_at?->timezone(config('app.timezone'))->format('d M Y') }}</p>
+                            <p>{{ $recognition->message }}</p>
+                        </li>
+                    @endforeach
+                </ul>
+            </section>
+        @endif
+    @endisset
 </x-layouts.app>

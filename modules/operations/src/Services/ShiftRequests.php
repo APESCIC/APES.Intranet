@@ -3,6 +3,7 @@
 namespace Modules\Operations\Services;
 
 use App\Core\Audit\AuditLogger;
+use App\Core\Hr\Contracts\ApprovedLeaveLookup;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Modules\Operations\Models\Shift;
@@ -17,7 +18,10 @@ use RuntimeException;
  */
 final class ShiftRequests
 {
-    public function __construct(private readonly AuditLogger $audit) {}
+    public function __construct(
+        private readonly AuditLogger $audit,
+        private readonly ApprovedLeaveLookup $leave,
+    ) {}
 
     public function claim(Shift $shift, User $member, ?string $note = null): ShiftRequest
     {
@@ -25,6 +29,10 @@ final class ShiftRequests
 
         if (! $shift->isOpen() || ! $shift->rotaWeek->isPublished() || $shift->starts_at->isPast()) {
             throw new RuntimeException('This shift is not open to claim.');
+        }
+
+        if ($this->leave->overlaps((int) $member->getKey(), $shift->starts_at, $shift->ends_at)) {
+            throw new RuntimeException('You have approved leave covering this shift.');
         }
 
         if ($this->hasPending($shift, $member)) {
@@ -101,11 +109,18 @@ final class ShiftRequests
                     if (! $shift->isOpen()) {
                         throw new RuntimeException('This shift has already been filled.');
                     }
+                    if ($this->leave->overlaps((int) $request->requester_id, $shift->starts_at, $shift->ends_at)) {
+                        throw new RuntimeException('That person has approved leave covering this shift.');
+                    }
                     $shift->update(['user_id' => $request->requester_id]);
                     $this->closeOtherClaims($request);
                 } else {
                     if ($target === null || (int) $shift->user_id !== (int) $request->requester_id || $target->user_id === null) {
                         throw new RuntimeException('One of these shifts has changed since the swap was asked for.');
+                    }
+                    if ($this->leave->overlaps((int) $target->user_id, $shift->starts_at, $shift->ends_at)
+                        || $this->leave->overlaps((int) $shift->user_id, $target->starts_at, $target->ends_at)) {
+                        throw new RuntimeException('Approved leave covers one of these shifts.');
                     }
                     $targetMember = $target->user_id;
                     $target->update(['user_id' => $shift->user_id]);
