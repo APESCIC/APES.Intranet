@@ -4,6 +4,7 @@ namespace Modules\Operations\Http\Controllers;
 
 use App\Core\Access\AccessMatrix;
 use App\Core\Audit\AuditLogger;
+use App\Core\Hr\Contracts\ApprovedLeaveLookup;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\RedirectResponse;
@@ -79,7 +80,7 @@ class RotaController
         ]);
     }
 
-    public function storeShift(Request $request, RotaWeek $week, AuditLogger $audit): RedirectResponse
+    public function storeShift(Request $request, RotaWeek $week, AuditLogger $audit, ApprovedLeaveLookup $leave): RedirectResponse
     {
         $this->authoriseManage($request, $week);
 
@@ -90,13 +91,23 @@ class RotaController
             'user_id' => ['nullable', 'integer', Rule::exists('users', 'id')],
         ]);
 
+        if ($data['user_id'] !== null && $leave->overlaps(
+            (int) $data['user_id'],
+            CarbonImmutable::parse($data['starts_at']),
+            CarbonImmutable::parse($data['ends_at']),
+        )) {
+            return back()->withErrors([
+                'user_id' => 'That person has approved leave covering this shift.',
+            ])->withInput();
+        }
+
         $shift = $week->shifts()->create($data + ['site_id' => $week->site_id]);
         $audit->record('operations.shift_added', $shift, ['rota_week_id' => $week->id, 'user_id' => $shift->user_id]);
 
         return back()->with('status', 'Shift added.');
     }
 
-    public function updateShift(Request $request, Shift $shift, AuditLogger $audit, ClashDetector $clashes): RedirectResponse
+    public function updateShift(Request $request, Shift $shift, AuditLogger $audit, ClashDetector $clashes, ApprovedLeaveLookup $leave): RedirectResponse
     {
         $week = $shift->rotaWeek;
         $this->authoriseManage($request, $week);
@@ -105,8 +116,15 @@ class RotaController
             'user_id' => ['nullable', 'integer', Rule::exists('users', 'id')],
         ]);
 
+        $userId = $data['user_id'] ?? null;
+        if ($userId !== null && $leave->overlaps((int) $userId, $shift->starts_at, $shift->ends_at)) {
+            return back()->withErrors([
+                'user_id' => 'That person has approved leave covering this shift.',
+            ])->withInput();
+        }
+
         $before = $shift->user_id;
-        $shift->update(['user_id' => $data['user_id'] ?? null]);
+        $shift->update(['user_id' => $userId]);
         $audit->record('operations.shift_assigned', $shift, ['from_user_id' => $before, 'to_user_id' => $shift->user_id]);
 
         $found = $clashes->forShift($shift);

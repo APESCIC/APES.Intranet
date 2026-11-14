@@ -2,17 +2,20 @@
 
 namespace Modules\Operations\Services;
 
+use App\Core\Hr\Contracts\ApprovedLeaveLookup;
 use Illuminate\Support\Collection;
 use Modules\Operations\Models\Availability;
 use Modules\Operations\Models\RotaWeek;
 use Modules\Operations\Models\Shift;
 
 /**
- * Flags a shift whose member is unavailable or already on another shift at
- * the same time. A flag is a warning for the rota builder, not a block.
+ * Flags a shift whose member is unavailable, on approved leave, or already on
+ * another shift at the same time. Leave is also a hard block on assignment.
  */
 final class ClashDetector
 {
+    public function __construct(private readonly ApprovedLeaveLookup $leave) {}
+
     /**
      * @return list<string>
      */
@@ -23,6 +26,10 @@ final class ClashDetector
         }
 
         $clashes = [];
+
+        foreach ($this->leave->overlappingSummaries((int) $shift->user_id, $shift->starts_at, $shift->ends_at) as $summary) {
+            $clashes[] = $summary;
+        }
 
         $unavailable = Availability::query()
             ->where('user_id', $shift->user_id)
