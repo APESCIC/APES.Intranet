@@ -66,8 +66,9 @@ it('has the preflight fail when /app/data/public is empty so run.sh is not overw
     $docs = file_get_contents(base_path('docs/deploy/cloudron.md'));
     $decisions = file_get_contents(base_path('docs/decisions.md'));
 
-    expect($preflight)->toContain('/app/data/public is empty')
+    expect($preflight)->toContain('is empty; the LAMP image would overwrite run.sh')
         ->and($preflight)->toContain('/app/data/public is not empty')
+        ->and($preflight)->toContain('public_dir="$DATA/public"')
         ->and($docs)->toContain('Never empty `/app/data/public`')
         ->and($docs)->toContain('overwrites `/app/data/run.sh`')
         ->and($decisions)->toContain('Never empty `/app/data/public`');
