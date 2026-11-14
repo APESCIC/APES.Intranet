@@ -6,6 +6,7 @@ use Modules\Hr\Http\Controllers\ChecklistController;
 use Modules\Hr\Http\Controllers\HrRecordController;
 use Modules\Hr\Http\Controllers\IdentityCheckController;
 use Modules\Hr\Http\Controllers\LeaveController;
+use Modules\Hr\Http\Controllers\TrainingController;
 
 Route::middleware(['web', 'auth', 'can:'.AccessMatrix::INTRANET_ACCESS])->prefix('hr')->name('hr.')->group(function () {
     Route::get('/leave', [LeaveController::class, 'index'])->name('leave.index');
@@ -13,6 +14,8 @@ Route::middleware(['web', 'auth', 'can:'.AccessMatrix::INTRANET_ACCESS])->prefix
     Route::post('/leave/{leaveRequest}/approve', [LeaveController::class, 'approve'])->whereNumber('leaveRequest')->name('leave.approve');
     Route::post('/leave/{leaveRequest}/decline', [LeaveController::class, 'decline'])->whereNumber('leaveRequest')->name('leave.decline');
     Route::post('/leave/absence', [LeaveController::class, 'storeAbsence'])->name('leave.absence');
+
+    Route::get('/training', [TrainingController::class, 'mine'])->name('training.mine');
 });
 
 Route::middleware(['web', 'auth', 'can:'.AccessMatrix::HR_ACCESS])->prefix('hr')->name('hr.')->group(function () {
@@ -29,4 +32,7 @@ Route::middleware(['web', 'auth', 'can:'.AccessMatrix::HR_ACCESS])->prefix('hr')
     Route::post('/checklists', [ChecklistController::class, 'store'])->name('checklists.store');
     Route::get('/checklists/{checklist}', [ChecklistController::class, 'show'])->whereNumber('checklist')->name('checklists.show');
     Route::post('/checklists/items/{item}/complete', [ChecklistController::class, 'completeItem'])->whereNumber('item')->name('checklists.items.complete');
+
+    Route::get('/training/overdue', [TrainingController::class, 'overdue'])->name('training.overdue');
+    Route::post('/training/completions', [TrainingController::class, 'storeCompletion'])->name('training.completions.store');
 });
