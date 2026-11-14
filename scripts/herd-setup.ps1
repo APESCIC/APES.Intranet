@@ -9,9 +9,10 @@
       2. checks the PHP extensions, OPcache and that public/.htaccess stays safe
          for Cloudron's Apache;
       3. checks Herd's MySQL service runs the profile's version on its port;
-      4. links the site (herd link) and pins it to the profile's PHP version
-         (herd isolate), unless that is already done;
-      5. copies .env.herd.example to .env if .env is missing;
+      4. links the site (herd link), pins it to the profile's PHP version
+         (herd isolate), and secures it for HTTPS (herd secure) when needed;
+      5. copies .env.herd.example to .env if .env is missing, and checks
+         APP_URL plus the Vite TLS certificate keys for HTTPS;
       6. installs Composer and npm dependencies, and generates APP_KEY if blank;
       7. creates this project's database if missing, and runs the migrations;
       8. offers to load the fake demo data (php artisan demo:seed).
@@ -183,6 +184,17 @@ try {
         }
     }
 
+    $certDir = Join-Path $HerdRoot 'config\valet\Certificates'
+    $siteCert = Join-Path $certDir "$($p.hostname).crt"
+    $siteKey = Join-Path $certDir "$($p.hostname).key"
+    if (Test-Path $siteCert) {
+        Write-Ok "HTTPS is on ($($p.appUrl))"
+    } else {
+        Invoke-Checked 'herd secure' { herd secure $p.herdSite }
+        if (-not (Test-Path $siteCert)) { throw "herd secure $($p.herdSite) finished, but $siteCert is still missing." }
+        Write-Ok "Secured $($p.hostname) with herd secure (open $($p.appUrl))"
+    }
+
     # 5. .env --------------------------------------------------------------------
     Write-Step '.env'
     $envFile = Join-Path $repo '.env'
@@ -195,6 +207,19 @@ try {
     foreach ($check in @(@('APP_ENV', 'local'), @('APP_URL', $p.appUrl), @('DB_DATABASE', $p.database.name), @('DB_HOST', $p.database.host), @('DB_PORT', "$($p.database.port)"), @('MAIL_HOST', $p.mail.host), @('MAIL_PORT', "$($p.mail.port)"))) {
         $value = Get-EnvValue $envFile $check[0]
         if ($value -ne $check[1]) { Write-Warn "$($check[0]) in .env is '$value'. The Herd profile expects '$($check[1])'." }
+    }
+    foreach ($viteKey in @('VITE_DEV_SERVER_KEY', 'VITE_DEV_SERVER_CERT')) {
+        $value = Get-EnvValue $envFile $viteKey
+        if (-not $value) {
+            Write-Warn "$viteKey is missing in .env. Without it Vite serves plain HTTP and the HTTPS page loses its icons. Set it to Herd's certificate under $certDir (see .env.herd.example)."
+        } elseif (-not (Test-Path $value)) {
+            Write-Warn "$viteKey in .env points at '$value', which was not found."
+        } else {
+            Write-Ok "$viteKey points at a certificate file"
+        }
+    }
+    if ((Test-Path $siteKey) -and (Test-Path $siteCert)) {
+        Write-Ok "Herd certificate files: $siteKey and $siteCert"
     }
 
     # 6. Dependencies ------------------------------------------------------------

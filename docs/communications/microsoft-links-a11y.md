@@ -10,7 +10,7 @@
 
 ## Manual viewport notes (local preview / Cloudron)
 
-Verify in the Herd preview at <http://apes-intranet.test> at 390, 820
+Verify in the Herd preview at <https://apes-intranet.test> at 390, 820
 and 1440 px before ship.
 
 | Width | Expected |

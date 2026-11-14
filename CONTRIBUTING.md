@@ -2,7 +2,7 @@
 
 APES Intranet is maintained by APES CIC. Set up Laravel Herd first
 ([docs/local-development.md](docs/local-development.md)), and check every
-change at <http://apes-intranet.test> with the demo data loaded. Terms are
+change at <https://apes-intranet.test> with the demo data loaded. Terms are
 explained in the [glossary](docs/glossary.md).
 
 ## How work ships

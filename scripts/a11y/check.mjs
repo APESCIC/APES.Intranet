@@ -4,7 +4,7 @@
 //
 //   A11Y_BROWSER_CHANNEL=msedge npm run test:a11y
 //
-// BASE_URL defaults to the Herd preview, http://apes-intranet.test. If the site
+// BASE_URL defaults to the Herd preview, https://apes-intranet.test. If the site
 // redirects to https, the check follows it.
 //
 // A11Y_BROWSER_CHANNEL uses an installed browser (msedge, chrome) instead of
@@ -13,7 +13,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { chromium } from 'playwright';
 
-let baseUrl = (process.env.BASE_URL ?? 'http://apes-intranet.test').replace(/\/$/, '');
+let baseUrl = (process.env.BASE_URL ?? 'https://apes-intranet.test').replace(/\/$/, '');
 const channel = process.env.A11Y_BROWSER_CHANNEL || undefined;
 const blocking = new Set(['serious', 'critical']);
 const tags = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
