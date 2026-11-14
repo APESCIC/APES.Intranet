@@ -16,7 +16,7 @@ pull request. It:
   mobile menu's focus trap
 - fails on any serious or critical axe issue, or any keyboard failure
 
-Run it locally against the Laragon preview, using the installed Microsoft
+Run it locally against the Herd preview, using the installed Microsoft
 Edge, so Playwright does not need to download its own Chromium. The preview
 must be running, with `QA_LOGIN_ENABLED=true` in `.env` and the demo data
 loaded (`php artisan demo:seed`):
