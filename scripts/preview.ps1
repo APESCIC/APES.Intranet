@@ -7,12 +7,14 @@
     1. Stops if tracked files have uncommitted changes. Fetches origin, fast-
        forwards the branch, and merges origin/main into it (a merge commit, never
        a rebase; a conflict is aborted and reported). Nothing is pushed.
-    2. Runs composer install or npm ci when a lock file is newer than the
-       installed dependencies, and reports migrations that have not run (it
-       never runs them). When no migrations are pending, it runs the deploy-
-       safe seeders that deploy/cloudron/activate-release.sh runs (roles,
-       permissions and module defaults, no personal data), so local grants
-       match Cloudron.
+    2. Runs composer install when composer.lock is newer than the installed
+       packages, and npm ci when package-lock.json's content hash differs from
+       the hash stored after the last install (not the lock file's date). Before
+       npm ci it stops this site's Vite on the profile port, then starts it
+       again afterwards. Reports migrations that have not run (it never runs
+       them). When no migrations are pending, it runs the deploy-safe seeders
+       that deploy/cloudron/activate-release.sh runs (roles, permissions and
+       module defaults, no personal data), so local grants match Cloudron.
     3. Checks Herd and its MySQL service are running, the site answers, and /healthz shows the
        expected PHP version through FastCGI and the checked-out revision.
        Clears Laravel's caches once if the revision is stale.
@@ -45,6 +47,33 @@ function Invoke-Native([scriptblock]$Command) {
     $ErrorActionPreference = 'Continue'
     try { $output = & $Command 2>&1 } finally { $ErrorActionPreference = $previous }
     return [pscustomobject]@{ Code = $LASTEXITCODE; Output = ($output | Out-String).Trim() }
+}
+
+function Stop-SiteVite([string]$Repo, [int]$Port) {
+    # This profile's Vite port is reserved for apes-intranet. Stop listeners on
+    # that port when they are node/cmd (Vite), preferring processes whose
+    # command line names this repo so another project's accidental bind is not
+    # killed unless it is the only listener on our dedicated port.
+    $stopped = $false
+    $listeners = @(Get-NetTCPConnection -State Listen -LocalPort $Port -ErrorAction SilentlyContinue)
+    foreach ($listener in $listeners) {
+        $proc = Get-Process -Id $listener.OwningProcess -ErrorAction SilentlyContinue
+        if ($null -eq $proc) { continue }
+        if ($proc.ProcessName -notmatch '^(node|cmd)$') { continue }
+        $cmd = $null
+        try {
+            $cmd = (Get-CimInstance Win32_Process -Filter "ProcessId = $($proc.Id)").CommandLine
+        } catch { }
+        $namesThisRepo = $cmd -and ($cmd -like "*$Repo*")
+        $looksLikeVite = $cmd -and ($cmd -match 'vite|npm run dev')
+        if ($namesThisRepo -or $looksLikeVite -or $listeners.Count -eq 1) {
+            Write-Ok "Stopping this site's Vite on port $Port (PID $($proc.Id)) before npm ci"
+            Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
+            $stopped = $true
+        }
+    }
+    if ($stopped) { Start-Sleep -Seconds 1 }
+    return $stopped
 }
 
 function Get-Health([string]$Url) {
@@ -113,11 +142,28 @@ try {
         if ($run.Code -ne 0) { Stop-Preview 1 "composer install failed: $($run.Output)" }
         Write-Ok 'Ran composer install'
     } else { Write-Ok 'Composer dependencies are current' }
+    # Compare package-lock by content hash, not LastWriteTime: switching branches
+    # rewrites the lock file's date and used to force npm ci while Vite still held
+    # native modules open on Windows (EPERM / half-deleted node_modules). See #270.
+    $lockHashPath = Join-Path $repo 'node_modules\.apes-package-lock.sha256'
+    $lockHash = (Get-FileHash -Algorithm SHA256 -Path (Join-Path $repo 'package-lock.json')).Hash.ToLowerInvariant()
+    $storedHash = if (Test-Path $lockHashPath) { (Get-Content $lockHashPath -Raw).Trim().ToLowerInvariant() } else { '' }
     $npmMarker = Join-Path $repo 'node_modules\.package-lock.json'
-    if (-not (Test-Path $npmMarker) -or (Get-Item 'package-lock.json').LastWriteTime -gt (Get-Item $npmMarker).LastWriteTime) {
+    $needsNpmCi = (-not (Test-Path $npmMarker)) -or ($storedHash -ne $lockHash)
+    if ($needsNpmCi) {
+        $vitePort = [int]$p.viteDevServerPort
+        $stoppedVite = Stop-SiteVite -Repo $repo -Port $vitePort
         $run = Invoke-Native { npm ci --no-audit --no-fund }
         if ($run.Code -ne 0) { Stop-Preview 1 "npm ci failed: $($run.Output)" }
-        Write-Ok 'Ran npm ci (restart Vite if it was running)'
+        if (-not (Test-Path (Join-Path $repo 'node_modules'))) {
+            Stop-Preview 1 'npm ci finished but node_modules is missing.'
+        }
+        Set-Content -Path $lockHashPath -Value $lockHash -Encoding ascii -NoNewline
+        Write-Ok 'Ran npm ci (lockfile content changed)'
+        if ($stoppedVite -and -not $NoVite) {
+            Start-Process -FilePath 'cmd.exe' -ArgumentList '/c', 'npm run dev' -WorkingDirectory $repo -WindowStyle Minimized
+            Write-Ok "Restarted npm run dev on port $vitePort"
+        }
     } else { Write-Ok 'npm dependencies are current' }
     $pending = Invoke-Native { php artisan migrate:status --pending --no-ansi }
     if ($pending.Code -eq 0 -and $pending.Output -match '\bPending\b' -and $pending.Output -notmatch 'No pending migrations') {
