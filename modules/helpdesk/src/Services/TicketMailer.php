@@ -2,6 +2,8 @@
 
 namespace Modules\Helpdesk\Services;
 
+use App\Core\Notifications\AlertDispatcher;
+use App\Core\Notifications\NotificationCategory;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -74,6 +76,7 @@ final class TicketMailer
     private function send(iterable $people, Ticket $ticket, string $what, array $lines): void
     {
         $subject = $ticket->reference().' · '.$what.': '.Str::limit($ticket->subject, 80);
+        $url = route('helpdesk.tickets.show', $ticket);
         $sent = [];
 
         foreach ($people as $person) {
@@ -83,11 +86,46 @@ final class TicketMailer
             $sent[$person->getKey()] = true;
 
             try {
-                Mail::to($person->email)->send(new HelpdeskMail($subject, $lines, route('helpdesk.tickets.show', $ticket)));
+                Mail::to($person->email)->send(new HelpdeskMail($subject, $lines, $url));
             } catch (Throwable $e) {
                 report($e);
             }
         }
+
+        [$title, $body] = $this->genericAlert($what);
+        AlertDispatcher::send(
+            $people,
+            NotificationCategory::Tickets,
+            $title,
+            $body,
+            $url,
+            $ticket->reference(),
+        );
+    }
+
+    /**
+     * @return array{0: string, 1: string}
+     */
+    private function genericAlert(string $what): array
+    {
+        return match ($what) {
+            'Assigned to you' => [
+                'A ticket has been assigned to you.',
+                'Open the intranet to view it.',
+            ],
+            'New reply', 'Reply from the requester' => [
+                'You have a new ticket reply.',
+                'Open the intranet to read it.',
+            ],
+            'Resolved', 'Closed' => [
+                'A ticket has been updated.',
+                'Open the intranet to view it.',
+            ],
+            default => [
+                'You have a new ticket notice.',
+                'Open the intranet to view it.',
+            ],
+        };
     }
 
     /**
