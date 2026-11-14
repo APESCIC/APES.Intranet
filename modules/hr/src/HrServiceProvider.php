@@ -3,6 +3,7 @@
 namespace Modules\Hr;
 
 use Illuminate\Support\ServiceProvider;
+use Modules\Hr\Console\RemindIdentityCheckExpiry;
 use Modules\Hr\Navigation\HrMenuContributor;
 
 class HrServiceProvider extends ServiceProvider
@@ -19,5 +20,6 @@ class HrServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'hr');
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        $this->commands([RemindIdentityCheckExpiry::class]);
     }
 }

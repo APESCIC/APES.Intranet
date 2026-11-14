@@ -11,6 +11,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Modules\Hr\Models\HrRecord;
+use Modules\Hr\Models\IdentityCheck;
 
 class HrRecordController
 {
@@ -45,10 +46,22 @@ class HrRecordController
         $record = HrRecord::query()->firstOrCreate(['user_id' => $user->id]);
         $sensitive->openHrRecord($record);
 
+        $checks = $user->identityChecks()->orderByDesc('expires_on')->get();
+        foreach ($checks as $check) {
+            if ($request->user()?->can(AccessMatrix::HR_SPECIAL_CATEGORY_VIEW)) {
+                $sensitive->openSpecialCategory(
+                    $check,
+                    $check->check_type === IdentityCheck::TYPE_DBS ? SensitiveData::DBS : 'right_to_work'
+                );
+            }
+        }
+
         return view('hr::records.show', [
             'person' => $user->load('roles'),
             'record' => $record,
+            'checks' => $checks,
             'canEdit' => $this->canEdit($request->user()),
+            'canEditChecks' => $this->canEdit($request->user()) && $request->user()?->can(AccessMatrix::HR_SPECIAL_CATEGORY_VIEW),
             'fields' => config('hr.editable_fields'),
         ]);
     }

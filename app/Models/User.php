@@ -17,6 +17,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
 use Modules\Hr\Models\HrRecord;
+use Modules\Hr\Models\IdentityCheck;
 use NotificationChannels\WebPush\HasPushSubscriptions;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -116,6 +117,14 @@ class User extends Authenticatable
     public function hrRecord(): HasOne
     {
         return $this->hasOne(HrRecord::class);
+    }
+
+    /**
+     * @return HasMany<IdentityCheck, $this>
+     */
+    public function identityChecks(): HasMany
+    {
+        return $this->hasMany(IdentityCheck::class);
     }
 
     /**

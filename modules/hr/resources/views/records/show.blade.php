@@ -79,4 +79,60 @@
             <p class="text-sm text-sg-muted">Management can view this record. Only HR or admin can edit it.</p>
         @endif
     </article>
+
+    @can(\App\Core\Access\AccessMatrix::HR_SPECIAL_CATEGORY_VIEW)
+        <section class="sg-card mt-6 max-w-3xl space-y-4 p-6" aria-labelledby="checks-heading">
+            <h2 id="checks-heading" class="font-serif text-xl font-semibold">DBS and right to work</h2>
+            <p class="text-sm text-sg-muted">Metadata and a SharePoint link only. Opening these rows is audited as special category data.</p>
+
+            @if ($checks->isEmpty())
+                <p class="text-sg-muted">No checks recorded yet.</p>
+            @else
+                <ul class="space-y-2">
+                    @foreach ($checks as $check)
+                        <li data-check="{{ $check->id }}">
+                            <strong>{{ $check->typeLabel() }}</strong>
+                            — ref {{ $check->reference ?: '—' }},
+                            expires {{ optional($check->expires_on)->format('d M Y') ?: '—' }}
+                            @if ($check->document_url)
+                                — <a class="underline" href="{{ $check->document_url }}" target="_blank" rel="noopener">evidence link</a>
+                            @endif
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
+
+            @if ($canEditChecks)
+                <form method="post" action="{{ route('hr.checks.store', $person) }}" class="grid gap-3 sm:grid-cols-2">
+                    @csrf
+                    <div>
+                        <label class="mb-1 block text-sm font-medium" for="check_type">Check type</label>
+                        <select id="check_type" class="sg-input" name="check_type" required>
+                            <option value="dbs">DBS</option>
+                            <option value="right_to_work">Right to work</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="mb-1 block text-sm font-medium" for="reference">Reference</label>
+                        <input id="reference" class="sg-input" name="reference">
+                    </div>
+                    <div>
+                        <label class="mb-1 block text-sm font-medium" for="checked_on">Checked on</label>
+                        <input id="checked_on" class="sg-input" type="date" name="checked_on">
+                    </div>
+                    <div>
+                        <label class="mb-1 block text-sm font-medium" for="expires_on">Expires on</label>
+                        <input id="expires_on" class="sg-input" type="date" name="expires_on">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="mb-1 block text-sm font-medium" for="document_url">SharePoint link (optional)</label>
+                        <input id="document_url" class="sg-input" type="url" name="document_url" placeholder="https://...">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <button class="sg-btn sg-btn-secondary" type="submit">Add check</button>
+                    </div>
+                </form>
+            @endif
+        </section>
+    @endcan
 </x-layouts.app>
