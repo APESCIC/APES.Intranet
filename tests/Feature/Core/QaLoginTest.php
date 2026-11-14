@@ -30,6 +30,7 @@ it('is not found when the flag is off', function () {
     $this->get(route('qa.index'))->assertNotFound();
     $this->post(route('qa.login'), ['profile' => 'admin'])->assertNotFound();
     $this->post(route('qa.login'), ['profile' => 'staff-admin'])->assertNotFound();
+    $this->post(route('qa.logout'))->assertNotFound();
     $this->assertGuest();
 });
 
@@ -39,6 +40,7 @@ it('cannot be enabled outside local, even with the flag on', function (string $e
     expect(QaLogin::enabled())->toBeFalse();
     $this->get(route('qa.index'))->assertNotFound();
     $this->post(route('qa.login'), ['profile' => 'admin'])->assertNotFound();
+    $this->post(route('qa.logout'))->assertNotFound();
     $this->assertGuest();
 })->with(['production', 'staging', 'testing']);
 
@@ -161,6 +163,18 @@ it('asks a stale QA session to confirm its role on the page it came from, then o
         ->assertSee('Confirm QA Admin')
         ->assertSee('data-qa-autoopen', false);
     $this->post(route('qa.login'), ['profile' => 'admin'])->assertRedirect(route('admin.system.index'));
+    $this->get(route('admin.system.index'))->assertOk();
+});
+
+it('satisfies a fresh sign-in by confirming the current role in the QA fly-out', function () {
+    enableQa();
+    $this->post(route('qa.login'), ['profile' => 'admin']);
+    $this->travel(16)->minutes();
+
+    $this->get(route('admin.system.index'));
+    $this->get(route('auth.reauth'), ['referer' => route('admin.overview')]);
+    $this->post(route('qa.login'), ['profile' => 'admin', 'return_to' => '/admin'])
+        ->assertRedirect(route('admin.system.index'));
     $this->get(route('admin.system.index'))->assertOk();
 });
 

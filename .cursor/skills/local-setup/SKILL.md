@@ -13,5 +13,5 @@ Follows `.cursor/rules/herd.mdc`. The full guide, with fixes for common problems
 2. **Set up or repair.** `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\herd-setup.ps1 -NoDemo`. It only touches this project and is safe to run twice.
 3. **Demo data.** If the database is empty, `php artisan demo:seed`. **Stop and ask** before `php artisan demo:reset`, because it empties the local database.
 4. **Preview.** Run the live preview gate (`scripts\preview.ps1`), open <http://apes-intranet.test> in Cursor's browser and take a screenshot.
-5. **Sign in** at <http://apes-intranet.test/qa> as a fake account for the role you need.
+5. **Sign in** with the amber Developer sign-in panel on <http://apes-intranet.test/login> as a fake account for the role you need. Switch role later with the amber QA pill at the bottom of the menu (`/qa` is the fallback).
 6. If it still won't load after two attempts, **stop**, report what you saw (the Herd MCP `site` `error` action shows the last exception), and ask how to proceed.

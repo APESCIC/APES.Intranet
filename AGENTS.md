@@ -20,7 +20,10 @@ Director. Her decisions are in [docs/decisions.md](docs/decisions.md).
    `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\herd-setup.ps1 -SeedDemo`.
 3. Before any work, run the live preview gate:
    `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\preview.ps1`.
-4. Open <http://apes-intranet.test/qa> to sign in as a fake account for any role.
+4. Open <http://apes-intranet.test/login> and use the amber **Developer
+   sign-in** panel (local only) to sign in as a fake account for any role.
+   Once signed in, the amber **QA** pill in the menu switches role in place.
+   <http://apes-intranet.test/qa> still works as a fallback.
 5. Stuck? See [docs/local-development.md](docs/local-development.md).
 
 ## How we work
@@ -119,6 +122,15 @@ What each automatic check does, and what to do if one fails: [docs/workflows.md]
 - Herd injects an "Edit with Herd" badge (`#herd-ai-host`) into local pages;
   the accessibility check excludes it.
 - Herd's nvm needs `C:\Program Files\nodejs` free: no standalone Node.js.
+- Old Laragon folders (`C:\laragon\bin\...`) can still be on the system
+  `PATH` ahead of Herd. After `. .\scripts\herd-env.ps1`,
+  `(Get-Command php).Source` must show `.config\herd\bin\php84`; agent shells
+  may need it in the same command, as `PATH` changes don't always carry over.
+- If the Herd site is secured (`herd secured` lists it), `http://` redirects
+  to `https://apes-intranet.test`. The accessibility check follows that.
+- `php artisan test --parallel` fails a few footer, change log and `/healthz`
+  tests at random, because they all write the `VERSION` file. Run
+  `php artisan test` (as CI does) before trusting a failure there.
 
 ## Where to find more
 
