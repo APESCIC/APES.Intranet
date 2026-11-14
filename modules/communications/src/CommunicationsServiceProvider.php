@@ -2,6 +2,7 @@
 
 namespace Modules\Communications;
 
+use App\Core\Communications\Contracts\PublishIntranetUpdate;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Modules\Communications\Console\SendEventReminders;
@@ -16,6 +17,7 @@ use Modules\Communications\Policies\HandbookChapterPolicy;
 use Modules\Communications\Policies\MicrosoftLinkPolicy;
 use Modules\Communications\Policies\PolicyDocumentPolicy;
 use Modules\Communications\Policies\UpdatePostPolicy;
+use Modules\Communications\Services\CommunicationsPublishIntranetUpdate;
 
 class CommunicationsServiceProvider extends ServiceProvider
 {
@@ -24,6 +26,7 @@ class CommunicationsServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/../config/communications.php', 'communications');
         $this->app->singleton(CommunicationsMenuContributor::class);
         $this->app->tag([CommunicationsMenuContributor::class], 'intranet.menu');
+        $this->app->bind(PublishIntranetUpdate::class, CommunicationsPublishIntranetUpdate::class);
     }
 
     public function boot(): void
