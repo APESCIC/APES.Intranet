@@ -84,7 +84,7 @@ class AppraisalController
 
     public function show(Request $request, Appraisal $appraisal, SensitiveData $sensitive, AuditLogger $audit): View
     {
-        $appraisal->load(['cycle', 'user', 'manager']);
+        $appraisal->load(['cycle', 'user', 'manager', 'objectives']);
         abort_unless($appraisal->canBeViewedBy($request->user()), 403);
 
         // HR opens through SensitiveData; member and manager get a plain audit entry.
@@ -134,6 +134,43 @@ class AppraisalController
         $audit->record('hr.appraisal.manager_review', $appraisal, [], $request->user());
 
         return back()->with('status', 'Manager review saved.');
+    }
+
+    public function storeObjective(Request $request, Appraisal $appraisal, AppraisalService $appraisals, AuditLogger $audit): RedirectResponse
+    {
+        abort_unless($appraisal->canBeViewedBy($request->user()), 403);
+        $data = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'notes' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        try {
+            $objective = $appraisals->addObjective($appraisal, $data['title'], $data['notes'] ?? null, $request->user());
+        } catch (RuntimeException $e) {
+            return back()->withErrors(['title' => $e->getMessage()]);
+        }
+
+        $audit->record('hr.appraisal.objective_added', $objective, ['appraisal_id' => $appraisal->id], $request->user());
+
+        return back()->with('status', 'Objective saved.');
+    }
+
+    public function signOff(Request $request, Appraisal $appraisal, AppraisalService $appraisals, AuditLogger $audit): RedirectResponse
+    {
+        abort_unless($appraisal->canBeViewedBy($request->user()), 403);
+        $data = $request->validate([
+            'as' => ['required', Rule::in(['member', 'manager'])],
+        ]);
+
+        try {
+            $appraisals->signOff($appraisal, $request->user(), $data['as']);
+        } catch (RuntimeException $e) {
+            return back()->withErrors(['as' => $e->getMessage()]);
+        }
+
+        $audit->record('hr.appraisal.signed', $appraisal, ['as' => $data['as']], $request->user());
+
+        return back()->with('status', 'Sign-off recorded.');
     }
 
     public function lock(Request $request, Appraisal $appraisal, AppraisalService $appraisals, AuditLogger $audit): RedirectResponse

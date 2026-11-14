@@ -6,6 +6,7 @@ use App\Core\Access\AccessMatrix;
 use App\Models\User;
 use Modules\Hr\Models\Appraisal;
 use Modules\Hr\Models\AppraisalCycle;
+use Modules\Hr\Models\AppraisalObjective;
 use RuntimeException;
 
 final class AppraisalService
@@ -68,6 +69,49 @@ final class AppraisalService
         return $appraisal->refresh();
     }
 
+    public function addObjective(Appraisal $appraisal, string $title, ?string $notes, User $actor): AppraisalObjective
+    {
+        $this->assertEditable($appraisal, $actor);
+
+        $order = (int) $appraisal->objectives()->max('sort_order') + 10;
+
+        return AppraisalObjective::query()->create([
+            'appraisal_id' => $appraisal->id,
+            'title' => $title,
+            'notes' => $notes,
+            'sort_order' => $order,
+        ]);
+    }
+
+    public function signOff(Appraisal $appraisal, User $actor, string $as): Appraisal
+    {
+        $this->assertEditable($appraisal, $actor);
+
+        if ($as === 'member') {
+            if ((int) $actor->id !== (int) $appraisal->user_id && ! $actor->can(AccessMatrix::HR_ACCESS)) {
+                throw new RuntimeException('Only the member can sign as the member.');
+            }
+            $appraisal->fill([
+                'member_signed_at' => now(),
+                'member_signed_by' => $actor->id,
+            ])->save();
+        } elseif ($as === 'manager') {
+            $isManager = (int) $actor->id === (int) $appraisal->manager_id
+                || (int) $actor->id === (int) $appraisal->user?->manager_id;
+            if (! $isManager && ! $actor->can(AccessMatrix::HR_ACCESS)) {
+                throw new RuntimeException('Only the manager can sign as the manager.');
+            }
+            $appraisal->fill([
+                'manager_signed_at' => now(),
+                'manager_signed_by' => $actor->id,
+            ])->save();
+        } else {
+            throw new RuntimeException('Unknown sign-off role.');
+        }
+
+        return $appraisal->refresh();
+    }
+
     public function completeAndLock(Appraisal $appraisal, User $actor): Appraisal
     {
         $this->assertEditable($appraisal, $actor);
@@ -75,6 +119,10 @@ final class AppraisalService
         if ($appraisal->self_review === null || $appraisal->self_review === ''
             || $appraisal->manager_review === null || $appraisal->manager_review === '') {
             throw new RuntimeException('Both self and manager reviews are needed before locking.');
+        }
+
+        if (! $appraisal->bothSigned()) {
+            throw new RuntimeException('Both the member and the manager must sign off before locking.');
         }
 
         $appraisal->fill([

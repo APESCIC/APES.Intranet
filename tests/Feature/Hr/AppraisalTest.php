@@ -71,6 +71,11 @@ it('locks a completed appraisal so it cannot be edited', function () {
 
     appraisalActor($this, [RoleName::Supervisor], $manager);
     $this->post(route('hr.appraisals.manager', $appraisal), ['manager_review' => 'Agreed.'])->assertRedirect();
+
+    appraisalActor($this, [RoleName::Staff], $member);
+    $this->post(route('hr.appraisals.sign', $appraisal), ['as' => 'member'])->assertRedirect();
+    appraisalActor($this, [RoleName::Supervisor], $manager);
+    $this->post(route('hr.appraisals.sign', $appraisal), ['as' => 'manager'])->assertRedirect();
     $this->post(route('hr.appraisals.lock', $appraisal))->assertRedirect();
 
     expect($appraisal->refresh()->isLocked())->toBeTrue()
