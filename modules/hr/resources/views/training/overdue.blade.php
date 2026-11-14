@@ -5,7 +5,7 @@
 
     <section class="sg-card mb-6 p-6" aria-labelledby="report-heading">
         <h2 id="report-heading" class="mb-3 font-serif text-xl font-semibold">Overdue report</h2>
-        @if ($rows->isEmpty())
+        @if ($rows === [])
             <p class="text-sg-muted">Nobody is overdue.</p>
         @else
             <ul class="space-y-4">

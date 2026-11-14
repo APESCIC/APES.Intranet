@@ -76,28 +76,26 @@ final class TrainingService
     /**
      * Members with at least one overdue required course.
      *
-     * @return Collection<int, array{user: User, overdue: list<TrainingCourse>}>
+     * @return list<array{user: User, overdue: list<TrainingCourse>}>
      */
-    public function overdueReport(): Collection
+    public function overdueReport(): array
     {
         $this->ensureDefaults();
 
-        return User::query()
-            ->active()
-            ->with('roles')
-            ->orderBy('name')
-            ->get()
-            ->map(function (User $user) {
-                $overdue = $this->forMember($user)
-                    ->filter(fn (array $row) => $row['overdue'])
-                    ->pluck('course')
-                    ->values()
-                    ->all();
+        $rows = [];
+        foreach (User::query()->active()->with('roles')->orderBy('name')->get() as $user) {
+            $overdue = [];
+            foreach ($this->forMember($user) as $row) {
+                if ($row['overdue']) {
+                    $overdue[] = $row['course'];
+                }
+            }
+            if ($overdue !== []) {
+                $rows[] = ['user' => $user, 'overdue' => $overdue];
+            }
+        }
 
-                return ['user' => $user, 'overdue' => $overdue];
-            })
-            ->filter(fn (array $row) => $row['overdue'] !== [])
-            ->values();
+        return $rows;
     }
 
     public function recordCompletion(User $member, TrainingCourse $course, Carbon $completedOn, User $recorder, ?string $notes = null): TrainingCompletion
