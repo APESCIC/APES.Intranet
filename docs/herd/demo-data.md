@@ -73,11 +73,15 @@ have shifts, tasks and checklists. `qa-admin` works the IT help desk queue and
 ## Test logins
 
 The intranet signs in through Cloudron only, so there are no passwords. In
-the local environment, the QA role switcher signs you in as a fake account for
-any role, with one click:
+the local environment, the Developer sign-in panel signs you in as a fake
+account for any role, with one click:
 
-1. Open <http://apes-intranet.test/qa>.
-2. Choose the account.
+1. Open <http://apes-intranet.test/login>.
+2. Choose the account in the amber **Developer sign-in** panel.
+
+To change account later, open the amber **QA** pill at the bottom of the menu
+and choose another; it keeps you on the same page when the new role may open
+it. <http://apes-intranet.test/qa> still works as a fallback.
 
 | Account | Roles |
 | --- | --- |
@@ -94,9 +98,9 @@ any role, with one click:
 | `qa-volunteer-supervisor@example.test` | Volunteer and Supervisor |
 | `qa-staff-admin@example.test` | Staff and Admin |
 
-The switcher only works when `QA_LOGIN_ENABLED=true` and `APP_ENV=local`, as
-in `.env.herd.example`. Anywhere else, every `/qa` route returns 404. It is
-off on Cloudron.
+The panel and pill only appear when `QA_LOGIN_ENABLED=true` and
+`APP_ENV=local`, as in `.env.herd.example`. Anywhere else they are hidden and
+every `/qa` route returns 404. They are off on Cloudron.
 
 The 50 demo people appear in the directory, the organisation chart, comments,
 RSVPs and placements, but you cannot sign in as them.

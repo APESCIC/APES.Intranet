@@ -69,7 +69,9 @@ Plain-English meanings of the terms used in this repository's docs.
 | Live preview | Your local copy of the site at <http://apes-intranet.test>. |
 | Vite | The tool that rebuilds styles and scripts as you save, on port 5174. |
 | Demo data | Fake people and records for testing, loaded with `php artisan demo:seed`. |
-| QA role switcher | The local page at <http://apes-intranet.test/qa> that signs you in as a fake account for any role. |
+| Developer sign-in | The amber panel on the local login page, marked Local only, that signs you in as a fake account for any role with one click. |
+| QA pill | The amber "QA: role" button in the local menu. It shows the fake account you are using and opens the list to switch role, or sign out of QA, without leaving the page. |
+| QA role switcher | The local fallback page at <http://apes-intranet.test/qa>, with the same panel as Developer sign-in. |
 | Migration | A script that changes the database structure. Ask before running one. |
 | Composer and npm | The tools that install PHP and JavaScript packages. |
 | Artisan | Laravel's command-line tool, run as `php artisan <command>`. |

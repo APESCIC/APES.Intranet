@@ -79,8 +79,9 @@ files and the queue runs straight away (`sync`), so Redis is not needed.
    npm run dev
    ```
 
-5. Open <http://apes-intranet.test/qa> and sign in as a fake account for any
-   role.
+5. Open <http://apes-intranet.test/login> and use the **Developer sign-in**
+   panel to sign in as a fake account for any role (see
+   [Test logins](#test-logins)).
 
 ## Everyday commands
 
@@ -143,12 +144,24 @@ What it contains, and the test logins, are in
 
 ## Test logins
 
-Sign-in is through Cloudron only, so there are no passwords. Locally, the QA
-role switcher at <http://apes-intranet.test/qa> signs you in as a fake account
-for any role or common stack of roles, such as `qa-admin@example.test` or
-`qa-staff-hr@example.test`. It only works when `QA_LOGIN_ENABLED=true` and
-`APP_ENV=local`, as in `.env.herd.example`. Anywhere else, every `/qa`
-route returns 404. Leave the flag off on Cloudron.
+Sign-in is through Cloudron only, so there are no passwords. Locally, the
+amber **Developer sign-in** panel on <http://apes-intranet.test/login>, marked
+Local only, signs you in with one click as a fake account for any role or
+common stack of roles, such as `qa-admin@example.test` or
+`qa-staff-hr@example.test`.
+
+Once you are signed in as one of those accounts, the amber **QA** pill at the
+bottom of the menu (for example "QA: Staff + HR") shows who you are. Open it to switch to another
+role without leaving the page: you stay where you are if the new role may
+open the page, otherwise you go to the dashboard. **Sign out of QA** at the
+bottom of the list takes you back to the login page. When a page needs a
+fresh sign-in, confirm your current role in the prompt instead.
+
+<http://apes-intranet.test/qa> still works as a fallback, with the same panel.
+
+All of this only appears when `QA_LOGIN_ENABLED=true` and `APP_ENV=local`, as
+in `.env.herd.example`. Anywhere else, the panel and pill are hidden and every
+`/qa` route returns 404. Leave the flag off on Cloudron.
 
 ## Running several APES projects side by side
 
@@ -177,7 +190,11 @@ $env:BASE_URL = 'http://apes-intranet.test'; $env:A11Y_BROWSER_CHANNEL = 'msedge
 ```
 
 The last line runs the accessibility check (axe and keyboard) against the
-preview, using Microsoft Edge. See [accessibility.md](accessibility.md).
+preview, using Microsoft Edge. If the Herd site is secured, it follows the
+redirect to `https://`. See [accessibility.md](accessibility.md).
+
+Run `php artisan test` without `--parallel`: some tests write the `VERSION`
+file and race each other in parallel runs.
 
 Locally, tests use an in-memory SQLite database (set in `phpunit.xml`), so
 they never touch `apes_intranet_local`. CI runs the same tests on PHP 8.3 and 8.4

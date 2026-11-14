@@ -1,10 +1,11 @@
 // Accessibility check: axe-core (WCAG 2.2 A and AA) on the main pages, plus real
 // keyboard checks. Fails on any serious or critical axe issue or keyboard
-// failure. Needs a running app with the QA role switcher on.
+// failure. Needs a running app with QA sign-in on (QA_LOGIN_ENABLED=true).
 //
 //   A11Y_BROWSER_CHANNEL=msedge npm run test:a11y
 //
-// BASE_URL defaults to the Herd preview, http://apes-intranet.test.
+// BASE_URL defaults to the Herd preview, http://apes-intranet.test. If the site
+// redirects to https, the check follows it.
 //
 // A11Y_BROWSER_CHANNEL uses an installed browser (msedge, chrome) instead of
 // Playwright's own Chromium.
@@ -12,7 +13,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { chromium } from 'playwright';
 
-const baseUrl = (process.env.BASE_URL ?? 'http://apes-intranet.test').replace(/\/$/, '');
+let baseUrl = (process.env.BASE_URL ?? 'http://apes-intranet.test').replace(/\/$/, '');
 const channel = process.env.A11Y_BROWSER_CHANNEL || undefined;
 const blocking = new Set(['serious', 'critical']);
 const tags = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
@@ -247,9 +248,14 @@ async function visitFirstTicket(page, listPath, label) {
     await audit(page, label);
 }
 
+// Uses the Developer sign-in panel on /login, or the /qa fallback when already
+// signed in (signed-in visits to /login go to the dashboard).
 async function signInAs(page, role) {
-    await page.goto(`${baseUrl}/qa`, { waitUntil: 'networkidle' });
-    await page.getByRole('button', { name: role, exact: true }).click();
+    await page.goto(`${baseUrl}/login`, { waitUntil: 'networkidle' });
+    if (!page.url().endsWith('/login')) {
+        await page.goto(`${baseUrl}/qa`, { waitUntil: 'networkidle' });
+    }
+    await page.locator('#developer-signin').getByRole('button', { name: role, exact: true }).click();
     await page.waitForURL(`${baseUrl}/dashboard`);
 }
 
@@ -258,6 +264,8 @@ const browser = await chromium.launch({ channel });
 try {
     const desktop = await (await browser.newContext({ viewport: { width: 1440, height: 900 } })).newPage();
     await visit(desktop, '/login', 'Sign in');
+    // A secured Herd site redirects http to https; carry on at the address it chose.
+    baseUrl = new URL(desktop.url()).origin;
     await visit(desktop, '/privacy', 'Privacy notice');
     await visit(desktop, '/no-such-page', 'Error 404', 404);
 

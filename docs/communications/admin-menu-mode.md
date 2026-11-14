@@ -34,4 +34,5 @@ The old `POST /menu-mode` form address stays only so that pages left open
 from earlier releases keep working: it sends admins who chose Admin to the
 overview and everyone else to the dashboard, and stores nothing.
 
-This is separate from the local QA “Switch role” control.
+This is separate from the local amber QA pill, which switches between fake
+accounts and only appears when QA sign-in is on in a local environment.
