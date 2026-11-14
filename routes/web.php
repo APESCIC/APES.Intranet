@@ -8,6 +8,8 @@ use App\Core\Audit\Http\Controllers\AuditLogIndexController;
 use App\Core\Auth\Http\Controllers\OidcController;
 use App\Core\Changelog\Http\Controllers\ChangeLogController;
 use App\Core\Navigation\Http\Controllers\AdminOverviewController;
+use App\Core\Notifications\Http\Controllers\PushSubscriptionController;
+use App\Core\Notifications\Http\Controllers\VapidPublicKeyController;
 use App\Core\Qa\Http\Controllers\QaLoginController;
 use App\Core\Qa\Http\Middleware\EnsureQaLoginEnabled;
 use App\Core\System\Http\Controllers\SendTestEmailController;
@@ -36,6 +38,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/change-log/{version}', [ChangeLogController::class, 'show'])
             ->where('version', 'v[0-9]+\.[0-9]+\.[0-9]+')
             ->name('change-log.show');
+
+        Route::get('/push/vapid-public-key', VapidPublicKeyController::class)
+            ->name('push.vapid-public-key');
+        Route::post('/push-subscriptions', [PushSubscriptionController::class, 'store'])
+            ->name('push-subscriptions.store');
+        Route::delete('/push-subscriptions', [PushSubscriptionController::class, 'destroy'])
+            ->name('push-subscriptions.destroy');
     });
 
     Route::prefix('admin')->name('admin.')->group(function () {
