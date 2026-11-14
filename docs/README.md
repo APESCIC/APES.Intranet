@@ -8,10 +8,9 @@ Every guide in this folder, by what you want to do. Start with
 
 | Doc | What it covers |
 | --- | --- |
-| [local-development.md](local-development.md) | Laragon set-up, everyday commands, checks before a PR and common problems |
-| [laragon/profile.md](laragon/profile.md) | The Laragon profile, why the NTS build and FastCGI, and [profile.json](laragon/profile.json) |
-| [laragon/demo-data.md](laragon/demo-data.md) | What the fake demo data contains and the test logins |
-| [laragon/apes-intranet.test.conf](laragon/apes-intranet.test.conf) | A reference copy of the virtual host Laragon writes |
+| [local-development.md](local-development.md) | Laravel Herd set-up, everyday commands, checks before a PR and common problems |
+| [herd/profile.md](herd/profile.md) | The Herd profile, where Herd keeps things, PHP extensions and FastCGI, and [profile.json](herd/profile.json) |
+| [herd/demo-data.md](herd/demo-data.md) | What the fake demo data contains and the test logins |
 | [workflows.md](workflows.md) | Every automatic check on GitHub, and what to do when one fails |
 | [templates/report.md](templates/report.md) | The report shape for tasks, PRs and GitHub releases |
 | [release-notes.md](release-notes.md) | How to write and publish a release note for the change log |

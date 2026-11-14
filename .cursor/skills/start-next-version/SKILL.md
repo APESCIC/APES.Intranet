@@ -9,7 +9,7 @@ Follows `.cursor/rules/shipping.mdc`. One Cursor plan per version: when a new ch
 
 ## Steps
 
-1. **Live preview gate.** Follow `.cursor/rules/laragon.mdc`. Stop if it fails twice.
+1. **Live preview gate.** Follow `.cursor/rules/herd.mdc`. Stop if it fails twice.
 2. **Find the version.** Run `composer milestone:next` and show its output.
    - **Stop and ask** if it fails, prints a warning about the milestone, or names a different milestone than the user asked for.
 3. **Name the agent.** Rename this chat to `<milestone title> – APES.Intranet`, under 60 characters, with the version and never the milestone number (for example `v0.6.0 HR and training – APES.Intranet`). If you can't rename it, put `Suggested agent name: <name>` as the first line of your reply.

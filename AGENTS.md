@@ -13,10 +13,11 @@ Director. Her decisions are in [docs/decisions.md](docs/decisions.md).
 
 ## Start here
 
-1. Install *Laragon* with PHP 8.4, MySQL 8.4 and Node 22 (the only supported
-   local set-up).
+1. Install *Laravel Herd* Pro with PHP 8.4 (`ldap` on), a MySQL 8.4 service
+   on port 3306 and Node 22 through Herd's nvm (the only supported local
+   set-up).
 2. Clone the repo, then run
-   `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\laragon-setup.ps1 -SeedDemo`.
+   `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\herd-setup.ps1 -SeedDemo`.
 3. Before any work, run the live preview gate:
    `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\preview.ps1`.
 4. Open <http://apes-intranet.test/qa> to sign in as a fake account for any role.
@@ -61,8 +62,8 @@ repo. In particular:
 
 ## Everyday commands
 
-Run them from the repo root with Laragon's PHP 8.4 and Node first on `PATH`:
-run `. .\scripts\laragon-env.ps1` once per terminal ([how](docs/local-development.md#everyday-commands)).
+Run them from the repo root with Herd's PHP 8.4 and Node 22 first on `PATH`
+(Herd's global PHP may be newer): run `. .\scripts\herd-env.ps1` once per terminal ([how](docs/local-development.md#everyday-commands)).
 
 | Command | What it does | When |
 | --- | --- | --- |
@@ -73,9 +74,9 @@ run `. .\scripts\laragon-env.ps1` once per terminal ([how](docs/local-developmen
 | `/finish-version` | Cursor: release note, version PR, ship gate, merge | Every issue closed |
 | `/release` | Cursor: tag and GitHub release | After the merge |
 | `/deploy` | Cursor: Cloudron deploy, evidence, close-out | After the release |
-| `. .\scripts\laragon-env.ps1` | Puts Laragon's PHP 8.4, Composer and Node first on `PATH` | Each new terminal |
+| `. .\scripts\herd-env.ps1` | Puts Herd's PHP 8.4, Composer and Node 22 first on `PATH` | Each new terminal |
 | `scripts\preview.ps1` | Loads the latest code and checks the preview | Before any work |
-| `scripts\laragon-setup.ps1` | Sets up or repairs Laragon for this repo | First time, or when broken |
+| `scripts\herd-setup.ps1` | Sets up or repairs the Herd site for this repo | First time, or when broken |
 | `npm run dev` | Starts Vite hot reload on port 5174 | While working |
 | `php artisan demo:seed` | Loads fake demo data | Once, or after a reset |
 | `php artisan test` | Runs the tests | Before each PR |
@@ -103,10 +104,21 @@ What each automatic check does, and what to do if one fails: [docs/workflows.md]
 - Docs live in this repo; anything that must not be public goes in
   `APESCIC/.github-private` `docs/apes-intranet/`. Never hand a document off
   to SharePoint ([where documents live](docs/decisions.md#where-documents-live)).
-- Laragon only for local work: no containers, virtual machines or
-  `php artisan serve`.
+- Laravel Herd only for local work: no containers, virtual machines or
+  `php artisan serve`. The Herd MCP server (`user-herd`) shows the site's
+  last error, logs and caught mail.
 - Free GitHub features only. Security reviews use tests and the
   `review-security` skill, never Aikido.
+
+## Herd notes
+
+- Herd's own `php` runs its global PHP (8.5 or newer), so dot-source
+  `scripts\herd-env.ps1` before any `php`, `composer` or `npm` command.
+- After Herd restarts, `herd services:list` can show MySQL as stopped while
+  it still answers on port 3306. Trust `scripts\preview.ps1`.
+- Herd injects an "Edit with Herd" badge (`#herd-ai-host`) into local pages;
+  the accessibility check excludes it.
+- Herd's nvm needs `C:\Program Files\nodejs` free: no standalone Node.js.
 
 ## Where to find more
 

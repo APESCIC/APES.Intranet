@@ -4,7 +4,7 @@
 //
 //   A11Y_BROWSER_CHANNEL=msedge npm run test:a11y
 //
-// BASE_URL defaults to the Laragon preview, http://apes-intranet.test.
+// BASE_URL defaults to the Herd preview, http://apes-intranet.test.
 //
 // A11Y_BROWSER_CHANNEL uses an installed browser (msedge, chrome) instead of
 // Playwright's own Chromium.
@@ -16,6 +16,8 @@ const baseUrl = (process.env.BASE_URL ?? 'http://apes-intranet.test').replace(/\
 const channel = process.env.A11Y_BROWSER_CHANNEL || undefined;
 const blocking = new Set(['serious', 'critical']);
 const tags = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
+// Herd injects its "Edit with Herd" badge into every local page; it is not part of the app.
+const excluded = ['#herd-ai-host'];
 
 const results = [];
 const keyboardFailures = [];
@@ -154,7 +156,7 @@ async function narrowScreenChecks(narrow) {
 }
 
 async function audit(page, label) {
-    const { violations, passes, incomplete } = await new AxeBuilder({ page }).withTags(tags).analyze();
+    const { violations, passes, incomplete } = await new AxeBuilder({ page }).withTags(tags).exclude(excluded).analyze();
     results.push({ label, url: page.url(), violations, passes, incomplete });
 }
 

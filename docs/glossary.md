@@ -65,7 +65,7 @@ Plain-English meanings of the terms used in this repository's docs.
 
 | Term | Meaning |
 | --- | --- |
-| Laragon | The Windows app that runs the website on your own computer. |
+| Laravel Herd | The Windows app that runs the website, its database and a mail catcher on your own computer. It replaced Laragon in November 2026. |
 | Live preview | Your local copy of the site at <http://apes-intranet.test>. |
 | Vite | The tool that rebuilds styles and scripts as you save, on port 5174. |
 | Demo data | Fake people and records for testing, loaded with `php artisan demo:seed`. |
@@ -73,7 +73,8 @@ Plain-English meanings of the terms used in this repository's docs.
 | Migration | A script that changes the database structure. Ask before running one. |
 | Composer and npm | The tools that install PHP and JavaScript packages. |
 | Artisan | Laravel's command-line tool, run as `php artisan <command>`. |
-| FastCGI and NTS | How Laragon runs PHP: a separate PHP process for each site (FastCGI), using the build made for that (NTS, non-thread-safe). |
+| FastCGI | How Herd runs PHP: nginx hands each request to separate `php-cgi` processes, so the website and the command line use the same PHP 8.4. |
+| Mail catcher | Herd's local mail server. It keeps every email the site sends, in Herd's Mail window, and never delivers it. |
 | `.env` | The local settings file. Never commit it. |
 
 ## Cursor

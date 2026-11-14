@@ -1,0 +1,35 @@
+---
+description: Laravel Herd local set-up and the live preview gate for APES Intranet. Use before any code, test, doc, config, install or commit work, after every branch switch, and for anything about the local site, PHP, Composer, npm, Vite, the local database, mail or the demo data.
+alwaysApply: false
+---
+
+# Herd and the live preview gate
+
+Laravel Herd Pro is the only local set-up (decided 14 November 2026, #282, replacing Laragon from #213). Never suggest containers, virtual machines or another server stack, and never run `php artisan serve` locally. The full guide is `docs/local-development.md`; the values are in `docs/herd/profile.json`.
+
+## The gate, before any work and after every branch switch
+
+1. Put Herd's PHP 8.4, Composer and Node 22 first on `PATH` for the session (Herd's global PHP may be newer, so never rely on bare `php` without this):
+   `Set-ExecutionPolicy -Scope Process Bypass; . .\scripts\herd-env.ps1`
+2. Run `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\preview.ps1`. It loads the latest code, installs changed dependencies, reports pending migrations, checks `/healthz` shows the checked-out revision on PHP 8.4 through FastCGI, and starts Vite on port 5174.
+   - Exit 3 means a decision (uncommitted changes, a diverged branch, a merge conflict): ask with AskQuestion.
+   - Exit 1 is a blocker: report its message.
+3. Open <http://apes-intranet.test> in Cursor's browser, confirm it loaded, report the URL, the Vite port and a screenshot, then say "Preview ready, starting work".
+4. If it won't load after two attempts, stop and ask how to proceed.
+
+## Herd tools
+
+- The Herd MCP server (`user-herd`) serves this site as `apes-intranet`. Use `site` `info` and `error`, `logs` `read`, `insights` and `mail` to debug, and `env` to change `.env` keys (it masks secrets).
+- Mail goes to Herd's mail catcher (SMTP `127.0.0.1:2525`) and is never sent.
+- `herd which-php apes-intranet` must print Herd's `php84` build. If not, `herd isolate 8.4 --site=apes-intranet`.
+
+## Ask first
+
+- Running migrations, `php artisan demo:reset` (it empties the local database), or installing any system tool (a PHP version or extension, a Herd service, a Node version).
+- Changing Herd's global PHP, its `php.ini`, or a service's port.
+- `composer install` and `npm ci` may run without asking when `vendor/` or `node_modules/` is missing or a lock file changed.
+
+## Keep Cloudron safe
+
+- `public/.htaccess` is for Cloudron's Apache (nginx ignores it): no `php_value` or `php_flag` outside `<IfModule php_module>` (local equivalents go in `public/.user.ini`), and keep the `HTTP_AUTHORIZATION` rewrite rule. A test checks both.
+- Test with the demo data, signed in through <http://apes-intranet.test/qa>. Fake data only.

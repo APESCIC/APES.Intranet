@@ -183,8 +183,8 @@ the release `vX.Y.Z` is published from the merge commit.
 powershell -NoProfile -ExecutionPolicy Bypass -File deploy\cloudron\deploy.ps1 -Tag vX.Y.Z
 ```
 
-The build runs Composer with Laragon's newest PHP 8.4 (as on Cloudron) and
-Vite with Laragon's Node, and stops if the PHP is not 8.4. Pass `-Php` or
+The build runs Composer with Herd's PHP 8.4 (as on Cloudron) and Vite with
+Node from `PATH`, or Herd's Node 22, and stops if the PHP is not 8.4. Pass `-Php` or
 `-Composer` (the path to `composer.phar`) to use a different PHP 8.4 or
 Composer.
 
@@ -258,7 +258,7 @@ Use this only if `deploy.ps1` cannot run. It does the same steps.
 
 5. **Build** the tag, never `main`. This uses its own git worktree in
    `%LOCALAPPDATA%\APES\apes-intranet-build\worktree`, with Composer on
-   Laragon's PHP 8.4 and Vite on Laragon's Node. The worktree keeps
+   Herd's PHP 8.4 and Vite on Herd's Node 22. The worktree keeps
    `vendor/` and `node_modules/` between builds, so when the lock files have
    not changed a build takes about 20 seconds instead of about 3 minutes
    (`-NoCache` starts from scratch):

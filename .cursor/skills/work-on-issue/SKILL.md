@@ -9,7 +9,7 @@ Follows `.cursor/rules/shipping.mdc`. One issue at a time. Comments use the temp
 
 ## 1. Start (before writing any code)
 
-1. Run the live preview gate (`.cursor/rules/laragon.mdc`) if you haven't on this branch.
+1. Run the live preview gate (`.cursor/rules/herd.mdc`) if you haven't on this branch.
 2. Read the issue: `gh issue view <n>`. Check it's in the version's milestone. **Stop and ask** if it isn't, or if it's too big for one PR (offer to split it).
 3. Assign it if nobody is assigned: `gh issue edit <n> --add-assignee apescic-director`.
 4. Create the issue branch from the version branch:

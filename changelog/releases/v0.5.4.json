@@ -1,0 +1,17 @@
+{
+  "version": "v0.5.4",
+  "released_at": "2026-11-14",
+  "title": "A new local test set-up",
+  "summary": "No changes you will notice. The people who work on the intranet now build and test it on their own computers with Laravel Herd instead of Laragon.",
+  "audiences": ["staff"],
+  "changes": {
+    "changed": [
+      "The intranet is now built and tested on developers' computers with Laravel Herd, which replaces Laragon."
+    ]
+  },
+  "internal_notes": [
+    "Laravel Herd Pro is now the only local set-up: the site is pinned to PHP 8.4 to match Cloudron, with Herd's MySQL 8.4 service, Node 22 through Herd's nvm, and Herd's mail catcher for local email.",
+    "The setup and preview scripts, the release build, the agent rule and skills, and the local development guide all use Herd. The accessibility check leaves out the badge Herd adds to local pages."
+  ],
+  "published": true
+}
