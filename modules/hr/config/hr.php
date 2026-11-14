@@ -18,4 +18,10 @@ return [
         'notes',
     ],
 
+    /*
+    | Moodle LMS base URL for required-course links. Course content is not
+    | hosted in the intranet (Learning milestones come later).
+    */
+    'lms_base_url' => env('HR_LMS_BASE_URL', 'https://lms.intranet.apes.org.uk'),
+
 ];
