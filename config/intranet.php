@@ -56,10 +56,21 @@ return [
 
     /*
     | How long records are kept. A blank or too-small value falls back to a
-    | safe minimum so a missing setting never wipes the log.
+    | safe minimum so a missing setting never wipes the log. HR periods are
+    | years (see docs/dpia/hr-records.md); audit log stays in days.
     */
     'retention' => [
         'audit_log_days' => max(30, (int) (env('AUDIT_LOG_RETENTION_DAYS') ?: 730)),
+        'hr' => [
+            'record_years_after_leave' => max(1, (int) (env('HR_RETENTION_RECORD_YEARS_AFTER_LEAVE') ?: 6)),
+            'dbs_years_after_leave' => max(1, (int) (env('HR_RETENTION_DBS_YEARS_AFTER_LEAVE') ?: 6)),
+            'right_to_work_years_after_leave' => max(1, (int) (env('HR_RETENTION_RIGHT_TO_WORK_YEARS_AFTER_LEAVE') ?: 2)),
+            'leave_years' => max(1, (int) (env('HR_RETENTION_LEAVE_YEARS') ?: 3)),
+            'appraisal_years_after_leave' => max(1, (int) (env('HR_RETENTION_APPRAISAL_YEARS_AFTER_LEAVE') ?: 6)),
+            'training_years_after_leave' => max(1, (int) (env('HR_RETENTION_TRAINING_YEARS_AFTER_LEAVE') ?: 6)),
+            'checklist_years_after_leave' => max(1, (int) (env('HR_RETENTION_CHECKLIST_YEARS_AFTER_LEAVE') ?: 2)),
+            'recognition_years_after_leave' => max(1, (int) (env('HR_RETENTION_RECOGNITION_YEARS_AFTER_LEAVE') ?: 2)),
+        ],
     ],
 
     /*
