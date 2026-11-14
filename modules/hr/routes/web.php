@@ -2,6 +2,7 @@
 
 use App\Core\Access\AccessMatrix;
 use Illuminate\Support\Facades\Route;
+use Modules\Hr\Http\Controllers\ChecklistController;
 use Modules\Hr\Http\Controllers\HrRecordController;
 use Modules\Hr\Http\Controllers\IdentityCheckController;
 use Modules\Hr\Http\Controllers\LeaveController;
@@ -23,4 +24,9 @@ Route::middleware(['web', 'auth', 'can:'.AccessMatrix::HR_ACCESS])->prefix('hr')
         Route::get('/checks/report', [IdentityCheckController::class, 'report'])->name('checks.report');
         Route::post('/records/{user}/checks', [IdentityCheckController::class, 'store'])->whereNumber('user')->name('checks.store');
     });
+
+    Route::get('/checklists', [ChecklistController::class, 'index'])->name('checklists.index');
+    Route::post('/checklists', [ChecklistController::class, 'store'])->name('checklists.store');
+    Route::get('/checklists/{checklist}', [ChecklistController::class, 'show'])->whereNumber('checklist')->name('checklists.show');
+    Route::post('/checklists/items/{item}/complete', [ChecklistController::class, 'completeItem'])->whereNumber('item')->name('checklists.items.complete');
 });

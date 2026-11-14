@@ -2,6 +2,7 @@
 
 namespace Modules\Helpdesk;
 
+use App\Core\Helpdesk\Contracts\RaiseItTicket;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -9,6 +10,7 @@ use Modules\Helpdesk\Dashboard\HelpdeskDashboardCards;
 use Modules\Helpdesk\Models\Ticket;
 use Modules\Helpdesk\Navigation\HelpdeskMenuContributor;
 use Modules\Helpdesk\Policies\TicketPolicy;
+use Modules\Helpdesk\Services\HelpdeskRaiseItTicket;
 
 class HelpdeskServiceProvider extends ServiceProvider
 {
@@ -19,6 +21,7 @@ class HelpdeskServiceProvider extends ServiceProvider
         $this->app->tag([HelpdeskMenuContributor::class], 'intranet.menu');
         $this->app->singleton(HelpdeskDashboardCards::class);
         $this->app->tag([HelpdeskDashboardCards::class], 'intranet.dashboard');
+        $this->app->bind(RaiseItTicket::class, HelpdeskRaiseItTicket::class);
     }
 
     public function boot(): void
