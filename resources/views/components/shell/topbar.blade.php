@@ -1,4 +1,4 @@
-@props(['hasMenu' => false, 'panel' => null])
+@props(['hasMenu' => false, 'panel' => null, 'unreadNotifications' => 0, 'recentNotifications' => null])
 <div class="sg-card sg-topbar">
     @if ($hasMenu)
         <button
@@ -13,4 +13,12 @@
         </button>
     @endif
     <x-shell.brand :panel="$panel" />
+    <div class="sg-topbar__actions">
+        @auth
+            <x-shell.notification-bell
+                :unread-count="$unreadNotifications"
+                :recent="$recentNotifications ?? collect()"
+            />
+        @endauth
+    </div>
 </div>

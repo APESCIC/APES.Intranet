@@ -55,12 +55,17 @@ async function keyboardChecks(desktop, mobile) {
     state = await focused(desktop);
     expectKeyboard(state.id === 'main-content', 'skip link moves focus to the main content');
 
-    // Admins reach the Staff and Admin switch straight after the brand link.
+    // Admins reach the Staff and Admin switch after the brand (and the
+    // notification bell, when it is present in the rail).
     await desktop.goto(`${baseUrl}/admin/roles`, { waitUntil: 'networkidle' });
     await desktop.keyboard.press('Tab');
     await desktop.keyboard.press('Tab');
     await desktop.keyboard.press('Tab');
     state = await focused(desktop);
+    if (state.label.startsWith('Notifications')) {
+        await desktop.keyboard.press('Tab');
+        state = await focused(desktop);
+    }
     expectKeyboard(state.label === 'Staff' && state.outline, 'admins reach the Staff switch after the brand, with a visible focus ring');
 
     await desktop.keyboard.press('Tab');
@@ -74,14 +79,18 @@ async function keyboardChecks(desktop, mobile) {
     const staffCurrent = await desktop.getByRole('navigation', { name: 'Switch panel' }).getByRole('link', { name: 'Staff' }).getAttribute('aria-current');
     expectKeyboard(staffCurrent === 'true', 'the Staff switch opens the dashboard with Staff marked current');
 
-    // Staff has no panel switch, so the first rail tab after the skip link
-    // reaches the Dashboard item.
+    // Staff has no panel switch, so after skip + brand (+ notification bell)
+    // the next rail tab reaches the Dashboard item.
     await signInAs(desktop, 'Staff');
     await desktop.goto(`${baseUrl}/dashboard`, { waitUntil: 'networkidle' });
     await desktop.keyboard.press('Tab');
     await desktop.keyboard.press('Tab');
     await desktop.keyboard.press('Tab');
     state = await focused(desktop);
+    if (state.label.startsWith('Notifications')) {
+        await desktop.keyboard.press('Tab');
+        state = await focused(desktop);
+    }
     expectKeyboard(state.label.startsWith('Dashboard') && state.outline, 'menu links are reached in order with a visible focus ring');
 
     await mobile.goto(`${baseUrl}/dashboard`, { waitUntil: 'networkidle' });
@@ -285,6 +294,7 @@ try {
     await signInAs(desktop, 'Admin');
     await visit(desktop, '/dashboard', 'Dashboard (desktop)');
     await visit(desktop, '/notifications/preferences', 'Notification preferences');
+    await visit(desktop, '/notifications', 'Notification inbox');
     await visit(desktop, '/admin', 'Admin overview');
     await visit(desktop, '/admin/roles', 'Roles');
     await visit(desktop, '/admin/audit', 'Audit log');

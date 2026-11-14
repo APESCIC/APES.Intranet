@@ -8,6 +8,7 @@ use App\Core\Audit\Http\Controllers\AuditLogIndexController;
 use App\Core\Auth\Http\Controllers\OidcController;
 use App\Core\Changelog\Http\Controllers\ChangeLogController;
 use App\Core\Navigation\Http\Controllers\AdminOverviewController;
+use App\Core\Notifications\Http\Controllers\NotificationInboxController;
 use App\Core\Notifications\Http\Controllers\NotificationPreferencesController;
 use App\Core\Notifications\Http\Controllers\PushSubscriptionController;
 use App\Core\Notifications\Http\Controllers\TestPushNotificationController;
@@ -54,6 +55,13 @@ Route::middleware('auth')->group(function () {
             ->name('notifications.preferences.update');
         Route::post('/notifications/preferences/test', TestPushNotificationController::class)
             ->name('notifications.preferences.test');
+
+        Route::get('/notifications', [NotificationInboxController::class, 'index'])
+            ->name('notifications.inbox');
+        Route::post('/notifications/read-all', [NotificationInboxController::class, 'markAllRead'])
+            ->name('notifications.mark-all-read');
+        Route::post('/notifications/{notification}/read', [NotificationInboxController::class, 'markRead'])
+            ->name('notifications.read');
     });
 
     Route::prefix('admin')->name('admin.')->group(function () {
