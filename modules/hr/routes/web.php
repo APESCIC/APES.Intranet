@@ -4,6 +4,15 @@ use App\Core\Access\AccessMatrix;
 use Illuminate\Support\Facades\Route;
 use Modules\Hr\Http\Controllers\HrRecordController;
 use Modules\Hr\Http\Controllers\IdentityCheckController;
+use Modules\Hr\Http\Controllers\LeaveController;
+
+Route::middleware(['web', 'auth', 'can:'.AccessMatrix::INTRANET_ACCESS])->prefix('hr')->name('hr.')->group(function () {
+    Route::get('/leave', [LeaveController::class, 'index'])->name('leave.index');
+    Route::post('/leave', [LeaveController::class, 'store'])->name('leave.store');
+    Route::post('/leave/{leaveRequest}/approve', [LeaveController::class, 'approve'])->whereNumber('leaveRequest')->name('leave.approve');
+    Route::post('/leave/{leaveRequest}/decline', [LeaveController::class, 'decline'])->whereNumber('leaveRequest')->name('leave.decline');
+    Route::post('/leave/absence', [LeaveController::class, 'storeAbsence'])->name('leave.absence');
+});
 
 Route::middleware(['web', 'auth', 'can:'.AccessMatrix::HR_ACCESS])->prefix('hr')->name('hr.')->group(function () {
     Route::get('/records', [HrRecordController::class, 'index'])->name('records.index');
