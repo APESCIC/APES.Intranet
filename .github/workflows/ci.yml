@@ -113,7 +113,7 @@ jobs:
           while IFS= read -r -d '' path; do
             base="${path##*/}"
             case "${base}" in
-              .env.example|.env.laragon.example)
+              .env.example|.env.herd.example)
                 ;;
               .env|.env.*)
                 printf 'Unexpected env file committed: %s\n' "${path}"
@@ -167,7 +167,7 @@ jobs:
 
       - name: Prepare environment
         run: |
-          cp .env.laragon.example .env
+          cp .env.herd.example .env
           php artisan key:generate
 
       - name: Check release notes
@@ -182,7 +182,7 @@ jobs:
       - name: Tests
         run: php artisan test --compact
 
-      # php artisan serve is for this CI runner only. Locally, use the Laragon preview.
+      # php artisan serve is for this CI runner only. Locally, use the Herd preview.
       - name: Start app for the accessibility check
         shell: bash
         run: |
@@ -287,7 +287,7 @@ jobs:
 
       - name: Prepare environment
         run: |
-          cp .env.laragon.example .env
+          cp .env.herd.example .env
           php artisan key:generate
 
       - name: Tests on PHP 8.4

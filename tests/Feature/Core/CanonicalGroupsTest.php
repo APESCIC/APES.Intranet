@@ -83,7 +83,7 @@ it('gives admin every permission, including HR and legal', function () {
 it('keeps legacy group names out of the code and docs', function () {
     $files = Finder::create()->files()
         ->in(array_map(base_path(...), ['app', 'config', 'database', 'deploy', 'docs', 'resources', 'routes']))
-        ->append([base_path('AGENTS.md'), base_path('README.md'), base_path('.env.example'), base_path('.env.laragon.example')]);
+        ->append([base_path('AGENTS.md'), base_path('README.md'), base_path('.env.example'), base_path('.env.herd.example')]);
 
     $found = [];
     foreach ($files as $file) {

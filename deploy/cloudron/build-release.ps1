@@ -8,8 +8,8 @@
     trailing slash on the source) creates /app/data/releases/<ReleaseId>.
     deploy.ps1 runs this for you.
 
-    Composer runs with Laragon's newest PHP 8.4 (as on Cloudron), and npm
-    with Node from PATH, or Laragon's Node. The build stops if the PHP is not
+    Composer runs with Herd's PHP 8.4 (as on Cloudron), and npm with Node
+    from PATH, or Herd's newest Node 22. The build stops if the PHP is not
     8.4.
 
 .EXAMPLE
@@ -54,29 +54,30 @@ if ($Version) {
     if ($tagSha -and $tagSha -ne $sha) { throw "Tag $Version is $tagSha, not the commit being built ($sha)." }
 }
 
-$laragon = 'C:\laragon\bin'
+$herd = Join-Path $env:USERPROFILE '.config\herd\bin'
 if (-not $Php) {
-    $laragonPhp = Get-ChildItem "$laragon\php" -Directory -ErrorAction SilentlyContinue |
-        Where-Object { $_.Name -match '^php-8\.4\.\d+-' } |
-        Sort-Object { [version]($_.Name -replace '^php-(\d+\.\d+\.\d+)-.*$', '$1') } -Descending |
-        Select-Object -First 1
-    $Php = if ($laragonPhp) { Join-Path $laragonPhp.FullName 'php.exe' } else { 'php' }
+    $herdPhp = Join-Path $herd 'php84\php.exe'
+    $Php = if (Test-Path $herdPhp) { $herdPhp } else { 'php' }
 }
 $phpVersion = "$(& $Php -r 'echo PHP_VERSION;')".Trim()
 if ($LASTEXITCODE -ne 0 -or $phpVersion -notlike '8.4.*') {
-    throw "PHP 8.4 is needed to match Cloudron, but $Php is '$phpVersion'. Add PHP 8.4 to Laragon (Menu > Tools > Quick add), or pass -Php."
+    throw "PHP 8.4 is needed to match Cloudron, but $Php is '$phpVersion'. Install it with 'herd php:install 8.4', or pass -Php."
 }
 
 if (-not $Composer) {
+    $herdComposer = Join-Path $herd 'composer.phar'
     $command = Get-Command composer -ErrorAction SilentlyContinue | Select-Object -First 1
-    $Composer = if ($command) { Join-Path (Split-Path $command.Source) 'composer.phar' } else { "$laragon\composer\composer.phar" }
+    $Composer = if (Test-Path $herdComposer) { $herdComposer } elseif ($command) { Join-Path (Split-Path $command.Source) 'composer.phar' } else { $herdComposer }
 }
-if (-not (Test-Path $Composer)) { throw 'composer.phar was not found. Use Laragon (Full), or pass -Composer C:\path\to\composer.phar.' }
+if (-not (Test-Path $Composer)) { throw 'composer.phar was not found. Install Laravel Herd, or pass -Composer C:\path\to\composer.phar.' }
 if (-not (Get-Command npm -ErrorAction SilentlyContinue)) {
-    $laragonNode = Get-ChildItem "$laragon\nodejs" -Directory -ErrorAction SilentlyContinue | Sort-Object Name -Descending | Select-Object -First 1
-    if ($laragonNode) { $env:Path = "$($laragonNode.FullName);$env:Path" }
+    $herdNode = Get-ChildItem (Join-Path $herd 'nvm') -Directory -ErrorAction SilentlyContinue |
+        Where-Object { $_.Name -match '^v22\.\d+\.\d+$' } |
+        Sort-Object { [version]($_.Name.TrimStart('v')) } -Descending |
+        Select-Object -First 1
+    if ($herdNode) { $env:Path = "$($herdNode.FullName);$env:Path" }
 }
-if (-not (Get-Command npm -ErrorAction SilentlyContinue)) { throw 'npm was not found. Use Laragon (Full), or put Node.js on PATH.' }
+if (-not (Get-Command npm -ErrorAction SilentlyContinue)) { throw "npm was not found. Install Node 22 with 'herd node:install 22', or put Node.js on PATH." }
 
 # Xdebug slows Composer down and is not needed for a build.
 $env:XDEBUG_MODE = 'off'

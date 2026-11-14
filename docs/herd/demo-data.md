@@ -2,14 +2,14 @@
 
 The demo data fills every main page and list of the local intranet with fake
 records, so you can click through it, test changes and write repeatable bug
-reports. It only exists in your local Laragon database.
+reports. It only exists in your local Herd database.
 
 ```powershell
 php artisan demo:seed    # load it, or bring it up to date (composer demo:seed)
 php artisan demo:reset   # empty the local database, migrate, load it again (composer demo:reset)
 ```
 
-`scripts/laragon-setup.ps1` offers to load it, or loads it straight away with
+`scripts/herd-setup.ps1` offers to load it, or loads it straight away with
 `-SeedDemo`.
 
 ## Safety
@@ -95,7 +95,7 @@ any role, with one click:
 | `qa-staff-admin@example.test` | Staff and Admin |
 
 The switcher only works when `QA_LOGIN_ENABLED=true` and `APP_ENV=local`, as
-in `.env.laragon.example`. Anywhere else, every `/qa` route returns 404. It is
+in `.env.herd.example`. Anywhere else, every `/qa` route returns 404. It is
 off on Cloudron.
 
 The 50 demo people appear in the directory, the organisation chart, comments,

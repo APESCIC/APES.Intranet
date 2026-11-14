@@ -1,14 +1,12 @@
 {
     "project": "apes-intranet",
-    "folder": "C:\\laragon\\www\\apes-intranet",
+    "herdSite": "apes-intranet",
     "hostname": "apes-intranet.test",
     "appUrl": "http://apes-intranet.test",
     "documentRoot": "public",
-    "webServer": "apache",
-    "apache": "2.4",
+    "webServer": "nginx",
     "php": "8.4",
-    "phpThreadSafe": false,
-    "apacheHandler": "fcgid",
+    "phpIsolated": true,
     "phpExtensions": [
         "ctype",
         "curl",
@@ -33,7 +31,11 @@
         "charset": "utf8mb4",
         "collation": "utf8mb4_unicode_ci"
     },
+    "mail": {
+        "mailer": "smtp",
+        "host": "127.0.0.1",
+        "port": 2525
+    },
     "node": "22",
-    "viteDevServerPort": 5174,
-    "laragonProfile": "apes-intranet"
+    "viteDevServerPort": 5174
 }

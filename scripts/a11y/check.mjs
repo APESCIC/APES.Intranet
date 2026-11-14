@@ -4,7 +4,7 @@
 //
 //   A11Y_BROWSER_CHANNEL=msedge npm run test:a11y
 //
-// BASE_URL defaults to the Laragon preview, http://apes-intranet.test.
+// BASE_URL defaults to the Herd preview, http://apes-intranet.test.
 //
 // A11Y_BROWSER_CHANNEL uses an installed browser (msedge, chrome) instead of
 // Playwright's own Chromium.

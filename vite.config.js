@@ -14,7 +14,7 @@ export default defineConfig({
     ],
     server: {
         // 5174, so it does not clash with other projects' Vite on 5173
-        // (docs/laragon/profile.json).
+        // (docs/herd/profile.json).
         port: 5174,
         strictPort: true,
         watch: {
