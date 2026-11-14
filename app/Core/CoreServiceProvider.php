@@ -67,11 +67,16 @@ class CoreServiceProvider extends ServiceProvider
             $user = $user instanceof User ? $user : null;
 
             $mode = $user ? Menu::resolveMode($user) : MenuMode::Staff;
+            $qaProfile = QaLogin::enabled() ? QaLogin::profileFor($user) : null;
             $view->with([
                 'menu' => Menu::for($user, $mode),
                 'shellPanel' => $user?->hasRole(RoleName::Admin->value) ? $mode : null,
                 'shellUser' => $user,
-                'qaEnabled' => QaLogin::enabled(),
+                'qaProfile' => $qaProfile,
+                'qaPicker' => $qaProfile !== null ? QaLogin::picker() : null,
+                'qaReturnTo' => $qaProfile !== null ? request()->getRequestUri() : null,
+                'qaConfirm' => $qaProfile !== null && session(QaLogin::CONFIRM) === true,
+                'qaNotice' => $qaProfile !== null ? session('qa.notice') : null,
                 'footerVersion' => app(FooterVersion::class)->for($user),
             ]);
         });

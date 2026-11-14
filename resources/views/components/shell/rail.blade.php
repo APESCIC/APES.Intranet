@@ -1,8 +1,11 @@
 @props([
     'menu',
     'user',
-    'qaEnabled' => false,
     'panel' => null,
+    'qaProfile' => null,
+    'qaPicker' => null,
+    'qaReturnTo' => null,
+    'qaConfirm' => false,
 ])
 <div class="sg-rail" data-workspace-rail>
     <div class="sg-rail__top">
@@ -18,5 +21,11 @@
         </nav>
     @endif
     <x-shell.nav :menu="$menu" />
-    <x-shell.user-dock :user="$user" :qa-enabled="$qaEnabled" />
+    <x-shell.user-dock
+        :user="$user"
+        :qa-profile="$qaProfile"
+        :qa-picker="$qaPicker"
+        :qa-return-to="$qaReturnTo"
+        :qa-confirm="$qaConfirm"
+    />
 </div>
