@@ -25,6 +25,9 @@ loaded (`php artisan demo:seed`):
 $env:BASE_URL = 'http://apes-intranet.test'; $env:A11Y_BROWSER_CHANNEL = 'msedge'; npm run test:a11y
 ```
 
+Herd adds an "Edit with Herd" badge (`#herd-ai-host`) to every local page.
+It is not part of the app, so the check leaves it out.
+
 ## Baseline audit, 4 November 2026
 
 Laragon preview, Edge (Chromium), axe-core 4.14 via `@axe-core/playwright`.

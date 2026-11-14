@@ -216,6 +216,8 @@ they never send anything either.
 | `500` error | Use the Herd MCP `site` `error` action, or read `storage/logs/laravel.log`. Check `.env` exists and has an `APP_KEY` |
 | `/healthz` says `"redis": "fail"` | Expected locally. The health check always tries Redis, which Cloudron provides, but the Herd set-up does not use it. `app` and `database` should say `ok` |
 | Unstyled page or "Vite manifest not found" | Start `npm run dev`. Vite writes `public/hot` once it is ready |
+| `herd services:list` says MySQL is stopped, but the site works | Herd loses track of its services after Herd itself restarts. If the database misbehaves, stop and start the service in Herd's **Services** |
+| Herd's Node.js settings say you don't use the nvm that ships with Herd | A standalone Node.js, or old `NVM_HOME` and `NVM_SYMLINK` variables, are in the way. Uninstall the standalone Node.js, remove both variables, restart Herd, then click **Install NVM** |
 | Database errors | Check Herd's MySQL service is running (`herd services:list`), and that `.env` has `DB_HOST=127.0.0.1` and `DB_DATABASE=apes_intranet_local` |
 | `Permission denied` writing to `storage` or `bootstrap/cache` | Close anything holding the file open (another `artisan` run, an editor or an antivirus scan), then try again. If it keeps happening, give your Windows user full control of the clone folder |
 | The demo commands refuse to run | Set `APP_ENV=local` in `.env`. They never run anywhere else |

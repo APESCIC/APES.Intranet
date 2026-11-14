@@ -110,6 +110,16 @@ What each automatic check does, and what to do if one fails: [docs/workflows.md]
 - Free GitHub features only. Security reviews use tests and the
   `review-security` skill, never Aikido.
 
+## Herd notes
+
+- Herd's own `php` runs its global PHP (8.5 or newer), so dot-source
+  `scripts\herd-env.ps1` before any `php`, `composer` or `npm` command.
+- After Herd restarts, `herd services:list` can show MySQL as stopped while
+  it still answers on port 3306. Trust `scripts\preview.ps1`.
+- Herd injects an "Edit with Herd" badge (`#herd-ai-host`) into local pages;
+  the accessibility check excludes it.
+- Herd's nvm needs `C:\Program Files\nodejs` free: no standalone Node.js.
+
 ## Where to find more
 
 - Every doc, by what you want to do: [docs/README.md](docs/README.md).
