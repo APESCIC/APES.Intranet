@@ -1,0 +1,26 @@
+{
+  "version": "v0.6.0",
+  "released_at": "2026-11-14",
+  "title": "HR and training",
+  "summary": "HR records, leave, checklists, training, appraisals and recognition are now in the intranet for the people who need them, with clear access controls.",
+  "audiences": ["staff", "volunteers"],
+  "changes": {
+    "added": [
+      "HR records you and your manager can open, with access limited to HR and the right roles.",
+      "DBS and right-to-work checks with expiry reminders for HR.",
+      "Leave balances and requests, with approved leave blocking rota clashes.",
+      "Onboarding and offboarding checklists for new starters and leavers.",
+      "Required training courses with LMS links, and an overdue list for HR.",
+      "Appraisal cycles, objectives and dual sign-off for member and manager.",
+      "Recognition: thank a colleague with a message on their profile, and optionally post it to the updates feed."
+    ],
+    "security": [
+      "A published DPIA covers how HR records are held and who can see them.",
+      "Sensitive HR screens are audited when opened."
+    ]
+  },
+  "internal_notes": [
+    "Also shipped preview-gate npm ci / Vite readiness (#270) and empty public/run.sh preflight (#276). Parents #51 and #54 were split into #326/#327 and #328/#329."
+  ],
+  "published": true
+}
