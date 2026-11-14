@@ -12,6 +12,7 @@ Schedule::command('people:refresh-totp-status')->dailyAt('02:30')->withoutOverla
 Schedule::command('comms:send-event-reminders')->everyFiveMinutes()->withoutOverlapping();
 Schedule::command('operations:flag-missed-clock-outs')->everyFifteenMinutes()->withoutOverlapping();
 Schedule::command('operations:alert-missed-checklists')->everyFiveMinutes()->withoutOverlapping();
+Schedule::command('hr:remind-identity-check-expiry')->dailyAt('09:15')->withoutOverlapping();
 
 Artisan::command('demo:seed', function () {
     if (! app()->environment('local')) {
