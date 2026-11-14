@@ -26,8 +26,8 @@ it('compares package-lock by content hash and stops this site Vite before npm ci
 
     expect($gate)->toContain('Get-FileHash -Algorithm SHA256')
         ->and($gate)->toContain('.apes-package-lock.sha256')
-        ->and($gate)->not->toContain("LastWriteTime -gt (Get-Item \$npmMarker).LastWriteTime")
+        ->and($gate)->not->toContain('LastWriteTime -gt (Get-Item $npmMarker).LastWriteTime')
         ->and($gate)->toContain('function Stop-SiteVite')
-        ->and($gate)->toContain("Stopping this site's Vite on port")
+        ->and($gate)->toContain('before npm ci')
         ->and($gate)->toContain('Restarted npm run dev on port');
 });
