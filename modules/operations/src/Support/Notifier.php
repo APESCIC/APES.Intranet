@@ -2,6 +2,8 @@
 
 namespace Modules\Operations\Support;
 
+use App\Core\Notifications\AlertDispatcher;
+use App\Core\Notifications\NotificationCategory;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use Modules\Operations\Mail\OperationsNoticeMail;
@@ -24,5 +26,13 @@ final class Notifier
             $sent[$person->getKey()] = true;
             Mail::to($person->email)->send(new OperationsNoticeMail($subject, $lines, $url));
         }
+
+        AlertDispatcher::send(
+            $people,
+            NotificationCategory::Operations,
+            'You have a new rota or operations notice.',
+            'Open the intranet to view it.',
+            $url,
+        );
     }
 }

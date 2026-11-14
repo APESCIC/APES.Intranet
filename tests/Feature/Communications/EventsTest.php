@@ -1,11 +1,13 @@
 <?php
 
 use App\Core\Access\RoleName;
+use App\Core\Notifications\Notifications\IntranetAlert;
 use App\Models\User;
 use Database\Seeders\CommunicationsPermissionsSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 use Modules\Communications\Http\Controllers\EventController;
 use Modules\Communications\Mail\EventReminderMail;
 use Modules\Communications\Models\Event;
@@ -34,6 +36,7 @@ it('lets a member change their RSVP', function () {
 
 it('sends reminder email for due events', function () {
     Mail::fake();
+    Notification::fake();
     $user = User::factory()->create(['email' => 'member@example.test'])->assignRole(RoleName::Staff->value);
     $event = Event::query()->create([
         'author_id' => $user->id,
@@ -45,6 +48,7 @@ it('sends reminder email for due events', function () {
 
     expect(app(EventController::class)->sendDueReminders())->toBe(1);
     Mail::assertSent(EventReminderMail::class, fn (EventReminderMail $mail) => $mail->hasTo('member@example.test'));
+    Notification::assertSentTo($user, IntranetAlert::class);
     $event->refresh();
     expect($event->reminder_sent_at)->not->toBeNull();
 });
