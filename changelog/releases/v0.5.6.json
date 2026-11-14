@@ -1,0 +1,17 @@
+{
+  "version": "v0.5.6",
+  "released_at": "2026-11-14",
+  "title": "A steadier accessibility check",
+  "summary": "No changes you will notice. This release puts the quicker developer test sign-in from v0.5.5 live, with a fix to one of the automatic checks that runs before each release.",
+  "audiences": ["staff"],
+  "changes": {
+    "fixed": [
+      "One of the automatic keyboard checks that run before each release now waits for the page to finish moving focus, so it no longer fails at random."
+    ]
+  },
+  "internal_notes": [
+    "v0.5.5 (Developer QA sign-in) was released but not deployed, because the accessibility check on its tag failed on a timing race in the QA switcher keyboard check. This release fixes the check and deploys everything in v0.5.5.",
+    "The check now waits until focus is inside the open QA switcher before reading or moving it. No app code changed."
+  ],
+  "published": true
+}
