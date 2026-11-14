@@ -122,6 +122,13 @@ async function keyboardChecks(desktop, mobile) {
     expectKeyboard(current === 'page', 'change log filter works from the keyboard and marks the chosen type');
 }
 
+// The switcher moves focus to the current role on its toggle event, a moment
+// after it becomes visible, so wait for that before reading or moving focus.
+async function waitForFocusInSwitcher(page) {
+    await page.waitForFunction(() => Boolean(document.activeElement?.closest('[data-qa-flyout]')), null, { timeout: 5000 })
+        .catch(() => {});
+}
+
 async function qaSwitcherChecks(desktop, narrow) {
     await signInAs(desktop, 'Staff');
     await desktop.goto(`${baseUrl}/dashboard`, { waitUntil: 'networkidle' });
@@ -133,6 +140,7 @@ async function qaSwitcherChecks(desktop, narrow) {
     await desktop.keyboard.press('Enter');
     const flyout = desktop.locator('[data-workspace-rail-dock] [data-qa-flyout]');
     await flyout.waitFor();
+    await waitForFocusInSwitcher(desktop);
     let state = await focused(desktop);
     expectKeyboard(state.label === 'Staff (current)' && (await pill.getAttribute('aria-expanded')) === 'true', 'Enter on the QA pill opens the switcher on the current profile');
     await audit(desktop, 'QA switcher (desktop)');
@@ -143,6 +151,7 @@ async function qaSwitcherChecks(desktop, narrow) {
 
     await pill.focus();
     await desktop.keyboard.press('Enter');
+    await waitForFocusInSwitcher(desktop);
     await flyout.getByRole('button', { name: 'Admin', exact: true }).focus();
     await Promise.all([desktop.waitForResponse((response) => response.url().endsWith('/qa/login')), desktop.keyboard.press('Enter')]);
     await desktop.waitForLoadState('networkidle');
@@ -167,6 +176,7 @@ async function qaSwitcherChecks(desktop, narrow) {
     await narrow.keyboard.press('Enter');
     const drawerFlyout = drawer.locator('[data-qa-flyout]');
     await drawerFlyout.waitFor();
+    await waitForFocusInSwitcher(narrow);
     const fits = await drawerFlyout.evaluate((element) => element.getBoundingClientRect().right <= window.innerWidth
         && [...element.querySelectorAll('button')].every((button) => button.getBoundingClientRect().height >= 44));
     expectKeyboard(fits && (await focused(narrow)).insideDrawer, 'the QA switcher fits the 320px menu with 44px targets', 'layout');
