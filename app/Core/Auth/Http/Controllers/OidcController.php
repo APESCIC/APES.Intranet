@@ -28,7 +28,7 @@ class OidcController
             return redirect()->route('dashboard');
         }
 
-        return view('core.auth.login', ['qaEnabled' => QaLogin::enabled()]);
+        return view('core.auth.login', ['qaProfiles' => QaLogin::enabled() ? QaLogin::picker() : null]);
     }
 
     public function redirect(IdentityProvider $identityProvider): RedirectResponse

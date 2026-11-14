@@ -658,6 +658,99 @@ a.sg-nav-link:hover {
     height: 1.25rem;
 }
 
+/* Local QA sign-in (amber: warn on white is 6.8:1, warn on warn-mist is 6.0:1) */
+.sg-qa-panel {
+    max-width: 36rem;
+    border: 2px solid var(--color-sg-warn);
+    border-radius: var(--radius-sg-card);
+    background: var(--color-sg-warn-mist);
+    padding: 1.25rem;
+    color: var(--color-sg-ink);
+    scroll-margin-top: 6rem;
+}
+
+.sg-qa-panel__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.sg-qa-panel__title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-sg-warn);
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.sg-qa-panel__title svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.sg-qa-panel__intro {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.sg-qa-tag {
+    display: inline-block;
+    border-radius: 999px;
+    background: var(--color-sg-warn);
+    padding: 0.125rem 0.625rem;
+    color: var(--color-sg-white);
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.sg-qa-picker__group {
+    margin-top: 1rem;
+}
+
+.sg-qa-picker__heading {
+    color: var(--color-sg-warn);
+    font-size: 0.8125rem;
+    font-weight: 700;
+}
+
+.sg-qa-picker__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.sg-qa-btn {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    gap: 0.25rem;
+    border: 1px solid var(--color-sg-warn);
+    border-radius: 999px;
+    background: var(--color-sg-white);
+    padding: 0.5rem 1rem;
+    color: var(--color-sg-warn);
+    font-size: 0.875rem;
+    font-weight: 650;
+    line-height: 1.2;
+    text-align: left;
+    cursor: pointer;
+}
+
+.sg-qa-btn:hover,
+.sg-qa-btn[aria-current='true'] {
+    background: var(--color-sg-warn);
+    color: var(--color-sg-white);
+}
+
+.sg-qa-btn__current {
+    font-weight: 500;
+}
+
 @media (prefers-reduced-motion: reduce) {
     .workspace-shell *,
     .workspace-shell *::before,

@@ -55,6 +55,57 @@ it('lists the 8 approved groups and the common stacks when enabled on local', fu
     $response->assertSee('intranet.supervisor')->assertSee('intranet.management');
 });
 
+it('shows the Developer sign-in panel on the login page when enabled on local', function () {
+    enableQa();
+
+    $response = $this->get(route('login'))->assertOk()
+        ->assertSee('id="developer-signin"', false)
+        ->assertSee('Developer sign-in')
+        ->assertSee('Local only')
+        ->assertSee('Sign in with Cloudron')
+        ->assertDontSee('use the QA role switcher');
+
+    foreach (RoleName::cases() as $role) {
+        $response->assertSee('value="'.$role->value.'"', false);
+    }
+    foreach (array_keys(RoleStacks::common()) as $stack) {
+        $response->assertSee('value="'.$stack.'"', false);
+    }
+});
+
+it('leaves the Developer sign-in panel off the login page when the flag is off', function () {
+    enableQa(flag: false);
+
+    $this->get(route('login'))->assertOk()
+        ->assertSee('Sign in with Cloudron')
+        ->assertDontSee('developer-signin')
+        ->assertDontSee(route('qa.login', absolute: false));
+});
+
+it('leaves the Developer sign-in panel off the login page outside local, even with the flag on', function (string $environment) {
+    enableQa($environment);
+
+    $this->get(route('login'))->assertOk()
+        ->assertDontSee('developer-signin')
+        ->assertDontSee('Local only');
+})->with(['production', 'staging', 'testing']);
+
+it('keeps /qa as a fallback with the same panel', function () {
+    enableQa();
+
+    $this->get(route('qa.index'))->assertOk()
+        ->assertSee('id="developer-signin"', false)
+        ->assertSee('Local only');
+});
+
+it('signs in from the login page panel and returns to the page that was asked for', function () {
+    enableQa();
+
+    $this->get(route('admin.audit.index'))->assertRedirect(route('login'));
+    $this->get(route('login'))->assertSee('developer-signin');
+    $this->post(route('qa.login'), ['profile' => 'admin'])->assertRedirect(route('admin.audit.index'));
+});
+
 it('signs in as a fake account with exactly one group role', function (RoleName $role) {
     enableQa();
 

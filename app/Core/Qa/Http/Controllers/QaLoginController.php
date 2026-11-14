@@ -2,8 +2,6 @@
 
 namespace App\Core\Qa\Http\Controllers;
 
-use App\Core\Access\RoleName;
-use App\Core\Access\RoleStacks;
 use App\Core\Audit\AuditLogger;
 use App\Core\Auth\FreshSignIn;
 use App\Core\Qa\QaLogin;
@@ -17,15 +15,8 @@ class QaLoginController
 {
     public function index(Request $request): View
     {
-        $profiles = collect(QaLogin::profiles())->map(fn (array $roles, string $key) => [
-            'key' => $key,
-            'label' => RoleStacks::label($roles),
-            'groups' => array_map(fn (RoleName $role) => self::groupFor($role), $roles),
-        ]);
-
         return view('core.qa.index', [
-            'groups' => $profiles->filter(fn (array $profile) => count($profile['groups']) === 1)->values(),
-            'stacks' => $profiles->filter(fn (array $profile) => count($profile['groups']) > 1)->values(),
+            'qaProfiles' => QaLogin::picker(),
             'current' => $request->user(),
         ]);
     }
@@ -53,10 +44,5 @@ class QaLoginController
         $request->session()->regenerateToken();
 
         return redirect()->route('qa.index');
-    }
-
-    private static function groupFor(RoleName $role): string
-    {
-        return (string) array_search($role->value, config('intranet.group_roles', []), true);
     }
 }
