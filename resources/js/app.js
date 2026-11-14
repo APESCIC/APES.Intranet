@@ -49,6 +49,7 @@ import {
 import { initClockForm } from './operations/clock.js';
 import { initSignaturePads } from './operations/signature.js';
 import { initDrawer } from './shell/drawer.js';
+import { initQaSwitcher } from './shell/qa-switcher.js';
 
 const icons = {
     Activity,
@@ -107,6 +108,7 @@ function init() {
         },
     });
     initDrawer();
+    initQaSwitcher();
     initClockForm();
     initSignaturePads();
 }

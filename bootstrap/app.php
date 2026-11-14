@@ -3,12 +3,14 @@
 use App\Core\Auth\Http\Middleware\RequireFreshSignIn;
 use App\Core\Health\HealthzController;
 use App\Core\Http\Middleware\PreventCachingSignedInPages;
+use App\Core\Qa\QaLogin;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Env;
 use Illuminate\Support\Facades\Route;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 // On Windows, Apache's mod_php serves every site from one process,
 // so putenv() would leak this app's .env values into other sites, and theirs
@@ -35,5 +37,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
+        );
+        $exceptions->render(
+            fn (HttpExceptionInterface $exception, Request $request) => QaLogin::fallbackAfterSwitch($request, $exception->getStatusCode()),
         );
     })->create();

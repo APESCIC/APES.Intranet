@@ -121,6 +121,63 @@ async function keyboardChecks(desktop, mobile) {
     expectKeyboard(current === 'page', 'change log filter works from the keyboard and marks the chosen type');
 }
 
+async function qaSwitcherChecks(desktop, narrow) {
+    await signInAs(desktop, 'Staff');
+    await desktop.goto(`${baseUrl}/dashboard`, { waitUntil: 'networkidle' });
+    const pill = desktop.locator('[data-workspace-rail-dock] [data-qa-pill]');
+    const pillBox = await pill.boundingBox();
+    expectKeyboard((await pill.textContent()).trim() === 'QA: Staff' && pillBox !== null && pillBox.height >= 44, 'the amber QA pill shows the current profile with a 44px target', 'layout');
+
+    await pill.focus();
+    await desktop.keyboard.press('Enter');
+    const flyout = desktop.locator('[data-workspace-rail-dock] [data-qa-flyout]');
+    await flyout.waitFor();
+    let state = await focused(desktop);
+    expectKeyboard(state.label === 'Staff (current)' && (await pill.getAttribute('aria-expanded')) === 'true', 'Enter on the QA pill opens the switcher on the current profile');
+    await audit(desktop, 'QA switcher (desktop)');
+
+    await desktop.keyboard.press('Escape');
+    state = await focused(desktop);
+    expectKeyboard(!(await flyout.isVisible()) && state.label === 'QA: Staff', 'Escape closes the QA switcher and returns focus to the pill');
+
+    await pill.focus();
+    await desktop.keyboard.press('Enter');
+    await flyout.getByRole('button', { name: 'Admin', exact: true }).focus();
+    await Promise.all([desktop.waitForResponse((response) => response.url().endsWith('/qa/login')), desktop.keyboard.press('Enter')]);
+    await desktop.waitForLoadState('networkidle');
+    expectKeyboard(desktop.url() === `${baseUrl}/dashboard` && (await pill.textContent()).trim() === 'QA: Admin', 'switching role from the keyboard stays on a page the new role may open');
+
+    await desktop.goto(`${baseUrl}/admin/roles`, { waitUntil: 'networkidle' });
+    await pill.click();
+    await Promise.all([
+        desktop.waitForResponse((response) => response.url().endsWith('/qa/login')),
+        flyout.getByRole('button', { name: 'Staff', exact: true }).click(),
+    ]);
+    await desktop.waitForURL(`${baseUrl}/dashboard`);
+    await desktop.waitForLoadState('networkidle');
+    expectKeyboard((await pill.textContent()).trim() === 'QA: Staff', 'switching to a role that may not open the page lands on the dashboard');
+
+    await narrow.goto(`${baseUrl}/dashboard`, { waitUntil: 'networkidle' });
+    await narrow.getByRole('button', { name: 'Open menu' }).click();
+    const drawer = narrow.getByRole('dialog', { name: 'Main menu' });
+    await drawer.waitFor();
+    await narrow.waitForTimeout(300);
+    await drawer.locator('[data-qa-pill]').focus();
+    await narrow.keyboard.press('Enter');
+    const drawerFlyout = drawer.locator('[data-qa-flyout]');
+    await drawerFlyout.waitFor();
+    const fits = await drawerFlyout.evaluate((element) => element.getBoundingClientRect().right <= window.innerWidth
+        && [...element.querySelectorAll('button')].every((button) => button.getBoundingClientRect().height >= 44));
+    expectKeyboard(fits && (await focused(narrow)).insideDrawer, 'the QA switcher fits the 320px menu with 44px targets', 'layout');
+
+    await narrow.keyboard.press('Escape');
+    state = await focused(narrow);
+    expectKeyboard(!(await drawerFlyout.isVisible()) && state.insideDrawer && state.label.startsWith('QA: '), 'Escape closes the QA switcher but leaves the 320px menu open');
+
+    await narrow.keyboard.press('Escape');
+    expectKeyboard((await focused(narrow)).label === 'Open menu', 'a second Escape closes the 320px menu');
+}
+
 async function narrowScreenChecks(narrow) {
     await signInAs(narrow, 'Staff');
     for (const path of ['/dashboard', '/change-log']) {
@@ -260,6 +317,7 @@ try {
 
     const narrow = await (await browser.newContext({ viewport: { width: 320, height: 640 }, isMobile: true, hasTouch: true })).newPage();
     await narrowScreenChecks(narrow);
+    await qaSwitcherChecks(desktop, narrow);
 } finally {
     await browser.close();
 }

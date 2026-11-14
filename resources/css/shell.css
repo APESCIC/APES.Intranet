@@ -751,6 +751,81 @@ a.sg-nav-link:hover {
     font-weight: 500;
 }
 
+.sg-qa-pill {
+    display: flex;
+    width: 100%;
+    min-height: 2.75rem;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    border: 2px solid var(--color-sg-warn);
+    border-radius: 999px;
+    background: var(--color-sg-warn-mist);
+    padding: 0.5rem 1rem;
+    color: var(--color-sg-warn);
+    font-size: 0.875rem;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: left;
+    cursor: pointer;
+}
+
+.sg-qa-pill:hover,
+.sg-qa-pill[aria-expanded='true'] {
+    background: var(--color-sg-warn);
+    color: var(--color-sg-white);
+}
+
+.sg-qa-pill svg {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+}
+
+.sg-qa-pill__label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* A popover, so it sits in the top layer beside the rail instead of being clipped by it. */
+.sg-qa-flyout {
+    position: fixed;
+    inset: auto auto var(--sg-rail-inset) calc(var(--sg-rail-inset) + var(--sg-rail-width) + 0.75rem);
+    width: min(24rem, calc(100vw - 2rem));
+    max-height: calc(100vh - 2 * var(--sg-rail-inset));
+    overflow-y: auto;
+    margin: 0;
+    border: 2px solid var(--color-sg-warn);
+    border-radius: var(--radius-sg-card);
+    background: var(--color-sg-warn-mist);
+    padding: 1.25rem;
+    color: var(--color-sg-ink);
+    box-shadow: var(--shadow-sg-rail);
+}
+
+.sg-drawer .sg-qa-flyout {
+    inset: auto auto 1.5rem 1.5rem;
+    width: calc(min(20rem, 88vw) - 1.5rem);
+    max-height: calc(100vh - 3rem);
+}
+
+.sg-qa-flyout__signout {
+    margin-top: 1.25rem;
+    border-top: 1px solid var(--color-sg-warn);
+    padding-top: 1rem;
+}
+
+.sg-qa-notice {
+    margin-bottom: 1rem;
+    border: 2px solid var(--color-sg-warn);
+    border-radius: var(--radius-sg-field);
+    background: var(--color-sg-warn-mist);
+    padding: 0.75rem 1rem;
+    color: var(--color-sg-ink);
+}
+
 @media (prefers-reduced-motion: reduce) {
     .workspace-shell *,
     .workspace-shell *::before,
