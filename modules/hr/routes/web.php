@@ -22,6 +22,8 @@ Route::middleware(['web', 'auth', 'can:'.AccessMatrix::INTRANET_ACCESS])->prefix
     Route::get('/appraisals/{appraisal}', [AppraisalController::class, 'show'])->whereNumber('appraisal')->name('appraisals.show');
     Route::post('/appraisals/{appraisal}/self', [AppraisalController::class, 'updateSelf'])->whereNumber('appraisal')->name('appraisals.self');
     Route::post('/appraisals/{appraisal}/manager', [AppraisalController::class, 'updateManager'])->whereNumber('appraisal')->name('appraisals.manager');
+    Route::post('/appraisals/{appraisal}/objectives', [AppraisalController::class, 'storeObjective'])->whereNumber('appraisal')->name('appraisals.objectives.store');
+    Route::post('/appraisals/{appraisal}/sign', [AppraisalController::class, 'signOff'])->whereNumber('appraisal')->name('appraisals.sign');
     Route::post('/appraisals/{appraisal}/lock', [AppraisalController::class, 'lock'])->whereNumber('appraisal')->name('appraisals.lock');
 });
 

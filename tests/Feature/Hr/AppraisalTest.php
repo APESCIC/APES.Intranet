@@ -30,20 +30,14 @@ it('lets only the member, manager and HR see an appraisal', function () {
     $member = User::factory()->create(['manager_id' => $manager->id])->assignRole(RoleName::Staff->value);
     $stranger = User::factory()->create()->assignRole(RoleName::Staff->value);
     $hr = appraisalActor($this, [RoleName::Staff, RoleName::Hr]);
-
-    $this->post(route('hr.appraisals.cycles.store'), [
-        'name' => '2026 annual',
-        'year' => 2026,
-        'starts_on' => '2026-01-01',
-        'ends_on' => '2026-12-31',
-    ])->assertRedirect();
+    $cycle = app(AppraisalService::class)->openCycle('2026 annual', 2026, '2026-01-01', '2026-12-31');
 
     $this->post(route('hr.appraisals.store'), [
-        'cycle_id' => 1,
+        'cycle_id' => $cycle->id,
         'user_id' => $member->id,
-    ])->assertRedirect();
+    ])->assertRedirect()->assertSessionHasNoErrors();
 
-    $appraisal = Appraisal::query()->firstOrFail();
+    $appraisal = Appraisal::query()->where('user_id', $member->id)->where('cycle_id', $cycle->id)->firstOrFail();
 
     appraisalActor($this, [RoleName::Staff], $member);
     $this->get(route('hr.appraisals.show', $appraisal))->assertOk();
@@ -71,6 +65,11 @@ it('locks a completed appraisal so it cannot be edited', function () {
 
     appraisalActor($this, [RoleName::Supervisor], $manager);
     $this->post(route('hr.appraisals.manager', $appraisal), ['manager_review' => 'Agreed.'])->assertRedirect();
+
+    appraisalActor($this, [RoleName::Staff], $member);
+    $this->post(route('hr.appraisals.sign', $appraisal), ['as' => 'member'])->assertRedirect();
+    appraisalActor($this, [RoleName::Supervisor], $manager);
+    $this->post(route('hr.appraisals.sign', $appraisal), ['as' => 'manager'])->assertRedirect();
     $this->post(route('hr.appraisals.lock', $appraisal))->assertRedirect();
 
     expect($appraisal->refresh()->isLocked())->toBeTrue()
