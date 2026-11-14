@@ -34,6 +34,33 @@ final class QaLogin
         return $profiles + RoleStacks::common();
     }
 
+    /**
+     * Profiles for the picker, split into single groups and stacks.
+     *
+     * @return array{groups: list<array{key: string, label: string, groups: list<string>}>, stacks: list<array{key: string, label: string, groups: list<string>}>}
+     */
+    public static function picker(): array
+    {
+        $groups = [];
+        $stacks = [];
+
+        foreach (self::profiles() as $key => $roles) {
+            $profile = [
+                'key' => $key,
+                'label' => RoleStacks::label($roles),
+                'groups' => array_map(fn (RoleName $role) => self::groupFor($role), $roles),
+            ];
+
+            if (count($roles) === 1) {
+                $groups[] = $profile;
+            } else {
+                $stacks[] = $profile;
+            }
+        }
+
+        return ['groups' => $groups, 'stacks' => $stacks];
+    }
+
     public static function emailFor(string $profile): string
     {
         return 'qa-'.$profile.'@example.test';
@@ -51,5 +78,10 @@ final class QaLogin
         $user->syncRoles(array_map(fn (RoleName $role) => $role->value, $roles));
 
         return $user;
+    }
+
+    private static function groupFor(RoleName $role): string
+    {
+        return (string) array_search($role->value, config('intranet.group_roles', []), true);
     }
 }
