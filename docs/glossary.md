@@ -65,7 +65,7 @@ Plain-English meanings of the terms used in this repository's docs.
 
 | Term | Meaning |
 | --- | --- |
-| Laravel Herd | The Windows app that runs the website, its database and a mail catcher on your own computer. It replaced Laragon in November 2026. |
+| Laravel Herd | The Windows app that runs the website, its database and a mail catcher on your own computer. |
 | Live preview | Your local copy of the site at <http://apes-intranet.test>. |
 | Vite | The tool that rebuilds styles and scripts as you save, on port 5174. |
 | Demo data | Fake people and records for testing, loaded with `php artisan demo:seed`. |

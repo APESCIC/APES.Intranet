@@ -30,7 +30,7 @@ It is not part of the app, so the check leaves it out.
 
 ## Baseline audit, 4 November 2026
 
-Laragon preview, Edge (Chromium), axe-core 4.14 via `@axe-core/playwright`.
+Local preview, Edge (Chromium), axe-core 4.14 via `@axe-core/playwright`.
 
 | Page | axe result |
 | --- | --- |

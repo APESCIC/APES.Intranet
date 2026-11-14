@@ -1,9 +1,9 @@
 # Local development with Laravel Herd
 
 Laravel Herd Pro on Windows is the only supported local set-up for APES
-Intranet (it replaced Laragon in November 2026). The app is its own Herd site
-at <http://apes-intranet.test>, with its own database and Vite port, so it runs
-side by side with the other APES projects. Check every change there, with the
+Intranet. The app is its own Herd site at <http://apes-intranet.test>, with its
+own database and Vite port, so it runs side by side with the other APES
+projects. Check every change there, with the
 demo data loaded, before any Cloudron deploy.
 
 Use fake data only. Never put real HR, student, volunteer or agreement data in
@@ -211,7 +211,7 @@ they never send anything either.
 | `php -v` is not 8.4 in your own terminal | Run `. .\scripts\herd-env.ps1`, as in [Everyday commands](#everyday-commands) |
 | `/healthz` or `preview.ps1` reports another PHP version | Run `herd isolate 8.4 --site=apes-intranet` |
 | `apes-intranet.test` does not resolve, or shows a 404 from Herd | Check `herd links` lists `apes-intranet` pointing at your clone. If not, run `scripts\herd-setup.ps1` again |
-| Port 80 or 3306 is in use, and Herd or MySQL will not start | Another web server or MySQL is running (for example Laragon). Find it with `Get-NetTCPConnection -State Listen -LocalPort 80,3306`, stop it, then restart Herd |
+| Port 80 or 3306 is in use, and Herd or MySQL will not start | Another web server or MySQL is running. Find it with `Get-NetTCPConnection -State Listen -LocalPort 80,3306`, stop it, then restart Herd |
 | Port 5174 is in use | Another Vite server is running, usually this project in another terminal. Stop it. Vite will not move to another port, because the preview expects 5174 |
 | `500` error | Use the Herd MCP `site` `error` action, or read `storage/logs/laravel.log`. Check `.env` exists and has an `APP_KEY` |
 | `/healthz` says `"redis": "fail"` | Expected locally. The health check always tries Redis, which Cloudron provides, but the Herd set-up does not use it. `app` and `database` should say `ok` |
@@ -223,11 +223,3 @@ they never send anything either.
 | The demo commands refuse to run | Set `APP_ENV=local` in `.env`. They never run anywhere else |
 | `git push` or `gh` hangs, or asks for credentials in a strange window | Another local server stack put its own `git` first on `PATH`. Check with `(Get-Command git).Source`: it should be `C:\Program Files\Git\...`. Remove the other stack's folder from `PATH`, or uninstall the stack, since Herd is the only supported set-up |
 | An old database such as `apes_intranet` sits next to `apes_intranet_local` | It is left from an earlier set-up. This project only uses `apes_intranet_local` (see `.env`). Ask Bambie before dropping anything, then drop the old one with `herd db:drop`. Never drop another project's database |
-
-## Moving from Laragon
-
-If you used Laragon before November 2026: stop Laragon (it uses the same
-ports 80 and 3306), then follow [First run](#first-run). The demo data loads
-the same on every run, so nothing is lost by starting with a fresh Herd
-database. The old `C:\laragon\www\apes-intranet` junction does no harm, and
-you can delete it once Herd works.
