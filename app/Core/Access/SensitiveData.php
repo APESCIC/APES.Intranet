@@ -26,10 +26,8 @@ final class SensitiveData
     public function openHrRecord(Model $record): void
     {
         $this->authorize('viewHrRecord');
-
-        if ($this->viewerIsAdminOrManagement()) {
-            $this->audit->record('hr.record.viewed', $record);
-        }
+        // Every HR record view is audited (v0.6.0 #49), whoever opens it.
+        $this->audit->record('hr.record.viewed', $record);
     }
 
     /**

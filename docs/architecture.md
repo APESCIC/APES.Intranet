@@ -33,7 +33,7 @@ modules/<slug>/src/...
 modules/<slug>/{routes,resources/views,lang,config,database/migrations}
 ```
 
-The four modules are `people`, `communications`, `operations` and `helpdesk`.
+The modules are `people`, `communications`, `operations`, `helpdesk` and `hr`.
 A new module needs:
 
 - a PSR-4 entry in `composer.json`, for example
@@ -112,10 +112,10 @@ $data->openLegalRecord($agreement);
 
 It checks the gate and a fresh sign-in for every role, admin included, even
 if a route forgot the `fresh-signin` middleware. It also writes the audit
-entries. Every view of DBS or health data is audited
-(`hr.special_category.viewed`, with the category but never the contents), and
-so is every admin or management view of an HR or legal record
-(`hr.record.viewed`, `legal.record.viewed`).
+entries. Every view of an HR record is audited (`hr.record.viewed`). Every
+view of DBS or health data is audited (`hr.special_category.viewed`, with the
+category but never the contents). Every admin or management view of a legal
+record is audited (`legal.record.viewed`).
 
 ## Fresh sign-in
 
