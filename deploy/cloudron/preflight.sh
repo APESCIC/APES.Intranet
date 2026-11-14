@@ -55,6 +55,17 @@ else
     fail "$ENV_FILE is missing (first-time set-up step 3)"
 fi
 
+# An empty /app/data/public makes the LAMP start.sh treat the app as a first
+# install and overwrite /app/data/run.sh with a blank placeholder (#276).
+public_dir="$DATA/public"
+if [[ ! -d "$public_dir" ]]; then
+    fail "$public_dir is missing; never remove it (emptying it overwrites run.sh)"
+elif [[ -z "$(find "$public_dir" -mindepth 1 -maxdepth 1 2> /dev/null | head -n1)" ]]; then
+    fail "$public_dir is empty; the LAMP image would overwrite run.sh on restart"
+else
+    pass "/app/data/public is not empty"
+fi
+
 run_sh="$DATA/run.sh"
 if [[ -f "$run_sh" ]]; then
     if [[ -x "$run_sh" ]]; then pass "run.sh is executable"; else fail "run.sh is not executable"; fi
