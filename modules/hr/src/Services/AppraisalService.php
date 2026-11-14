@@ -30,7 +30,7 @@ final class AppraisalService
         return Appraisal::query()->firstOrCreate(
             ['cycle_id' => $cycle->id, 'user_id' => $member->id],
             [
-                'manager_id' => $manager?->id ?? $member->manager_id,
+                'manager_id' => $manager !== null ? $manager->id : $member->manager_id,
                 'status' => Appraisal::STATUS_DRAFT,
             ],
         );
