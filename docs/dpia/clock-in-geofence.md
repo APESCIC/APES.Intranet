@@ -43,7 +43,8 @@ decided ([decisions](../decisions.md#features)) that a DPIA is required before t
 
 There is no check at clock-out, during breaks or at any other time. There is no background
 location, no continuous tracking, no route history and no map of where anyone has been. The
-intranet has no service worker, so nothing runs when the page is closed.
+intranet's service worker is push-only (Web Push notifications). It does not
+run geolocation, does not cache personal pages for offline use, and is not part of this geofence feature.
 
 ### Scope
 

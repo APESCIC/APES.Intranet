@@ -298,6 +298,7 @@ try {
     await visit(desktop, '/admin', 'Admin overview');
     await visit(desktop, '/admin/roles', 'Roles');
     await visit(desktop, '/admin/audit', 'Audit log');
+    await visit(desktop, '/admin/push-delivery', 'Push delivery');
     await visit(desktop, '/change-log', 'Change log (desktop)');
     await visit(desktop, '/change-log?type=fixed', 'Change log filtered (desktop)');
     await visit(desktop, '/admin/operations/sites', 'Operations sites');
