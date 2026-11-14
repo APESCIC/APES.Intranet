@@ -8,7 +8,9 @@ use App\Core\Audit\Http\Controllers\AuditLogIndexController;
 use App\Core\Auth\Http\Controllers\OidcController;
 use App\Core\Changelog\Http\Controllers\ChangeLogController;
 use App\Core\Navigation\Http\Controllers\AdminOverviewController;
+use App\Core\Notifications\Http\Controllers\NotificationPreferencesController;
 use App\Core\Notifications\Http\Controllers\PushSubscriptionController;
+use App\Core\Notifications\Http\Controllers\TestPushNotificationController;
 use App\Core\Notifications\Http\Controllers\VapidPublicKeyController;
 use App\Core\Qa\Http\Controllers\QaLoginController;
 use App\Core\Qa\Http\Middleware\EnsureQaLoginEnabled;
@@ -45,6 +47,13 @@ Route::middleware('auth')->group(function () {
             ->name('push-subscriptions.store');
         Route::delete('/push-subscriptions', [PushSubscriptionController::class, 'destroy'])
             ->name('push-subscriptions.destroy');
+
+        Route::get('/notifications/preferences', [NotificationPreferencesController::class, 'edit'])
+            ->name('notifications.preferences.edit');
+        Route::put('/notifications/preferences', [NotificationPreferencesController::class, 'update'])
+            ->name('notifications.preferences.update');
+        Route::post('/notifications/preferences/test', TestPushNotificationController::class)
+            ->name('notifications.preferences.test');
     });
 
     Route::prefix('admin')->name('admin.')->group(function () {

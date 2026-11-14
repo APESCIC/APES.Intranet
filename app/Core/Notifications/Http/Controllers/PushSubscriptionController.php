@@ -4,6 +4,7 @@ namespace App\Core\Notifications\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 /**
@@ -33,7 +34,7 @@ class PushSubscriptionController
         return response()->json(['status' => 'subscribed'], 201);
     }
 
-    public function destroy(Request $request): JsonResponse
+    public function destroy(Request $request): JsonResponse|RedirectResponse
     {
         $validated = $request->validate([
             'endpoint' => ['required', 'string', 'max:1024', 'url'],
@@ -43,6 +44,12 @@ class PushSubscriptionController
         $user = $request->user();
         $user->deletePushSubscription($validated['endpoint']);
 
-        return response()->json(['status' => 'unsubscribed']);
+        if ($request->expectsJson()) {
+            return response()->json(['status' => 'unsubscribed']);
+        }
+
+        return redirect()
+            ->route('notifications.preferences.edit')
+            ->with('status', 'That device has been removed.');
     }
 }

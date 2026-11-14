@@ -1,6 +1,7 @@
 import {
     Activity,
     AppWindow,
+    Bell,
     BookOpen,
     Boxes,
     Briefcase,
@@ -48,13 +49,14 @@ import {
 } from 'lucide';
 import { initClockForm } from './operations/clock.js';
 import { initSignaturePads } from './operations/signature.js';
-import { registerPushServiceWorker } from './push.js';
+import { initPushPreferences, registerPushServiceWorker } from './push.js';
 import { initDrawer } from './shell/drawer.js';
 import { initQaSwitcher } from './shell/qa-switcher.js';
 
 const icons = {
     Activity,
     AppWindow,
+    Bell,
     BookOpen,
     Boxes,
     Briefcase,
@@ -112,6 +114,7 @@ function init() {
     initQaSwitcher();
     initClockForm();
     initSignaturePads();
+    initPushPreferences();
     // Register only — never ask for notification permission on page load.
     registerPushServiceWorker().catch(() => {});
 }
