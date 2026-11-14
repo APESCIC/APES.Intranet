@@ -55,12 +55,17 @@ async function keyboardChecks(desktop, mobile) {
     state = await focused(desktop);
     expectKeyboard(state.id === 'main-content', 'skip link moves focus to the main content');
 
-    // Admins reach the Staff and Admin switch straight after the brand link.
+    // Admins reach the Staff and Admin switch after the brand (and the
+    // notification bell, when it is present in the rail).
     await desktop.goto(`${baseUrl}/admin/roles`, { waitUntil: 'networkidle' });
     await desktop.keyboard.press('Tab');
     await desktop.keyboard.press('Tab');
     await desktop.keyboard.press('Tab');
     state = await focused(desktop);
+    if (state.label.startsWith('Notifications')) {
+        await desktop.keyboard.press('Tab');
+        state = await focused(desktop);
+    }
     expectKeyboard(state.label === 'Staff' && state.outline, 'admins reach the Staff switch after the brand, with a visible focus ring');
 
     await desktop.keyboard.press('Tab');
