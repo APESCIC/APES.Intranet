@@ -1,0 +1,20 @@
+{
+  "version": "v0.6.5",
+  "released_at": "2026-11-15",
+  "title": "Modules registry foundation",
+  "summary": "Admins can turn modules and integrations on or off from Admin → Modules. Microsoft 365 app links are now their own integration, so they can be paused without taking the rest of Communications offline.",
+  "audiences": ["staff", "volunteers", "students"],
+  "changes": {
+    "added": [
+      "Admin → Modules: see which modules and integrations are on, turn them off or on with a reason, and edit typed settings.",
+      "Microsoft 365 as its own integration: app links, the dashboard tile and Admin → Microsoft 365 links can be paused together."
+    ],
+    "changed": [
+      "A disabled module no longer shows in the menu or on the dashboard, and its pages return not found until it is turned back on."
+    ]
+  },
+  "internal_notes": [
+    "Shipped #166 ModuleRegistry + module_states/module_settings, #167 enforce disable everywhere, #168 Admin Modules screen (admin.modules.manage + fresh-signin), #169 microsoft-365 Integration extract. Rollback: docs/modules/microsoft-365-rollback.md. Epic #161."
+  ],
+  "published": true
+}
