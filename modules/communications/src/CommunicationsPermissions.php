@@ -8,8 +8,6 @@ final class CommunicationsPermissions
 {
     public const PUBLISH = 'comms.publish';
 
-    public const MANAGE_M365 = 'comms.m365.manage';
-
     /**
      * @return array<string, string>
      */
@@ -17,7 +15,6 @@ final class CommunicationsPermissions
     {
         return [
             self::PUBLISH => 'Publish updates, events and handbook chapters',
-            self::MANAGE_M365 => 'Manage Microsoft 365 link registry',
         ];
     }
 
@@ -29,7 +26,7 @@ final class CommunicationsPermissions
         return [
             RoleName::Management->value => [self::PUBLISH],
             RoleName::Hr->value => [self::PUBLISH],
-            RoleName::Admin->value => [self::PUBLISH, self::MANAGE_M365],
+            RoleName::Admin->value => [self::PUBLISH],
         ];
     }
 }

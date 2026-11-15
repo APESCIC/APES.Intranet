@@ -2,11 +2,12 @@
 
 use App\Core\Access\RoleName;
 use Database\Seeders\CommunicationsBootstrapSeeder;
+use Database\Seeders\Microsoft365BootstrapSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\Communications\CommunicationsPermissions;
 use Modules\Communications\Models\HandbookChapter;
-use Modules\Communications\Models\MicrosoftLink;
+use Modules\Microsoft365\Models\MicrosoftLink;
 use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
@@ -15,6 +16,7 @@ function deploySeed(): void
 {
     test()->seed(RolesAndPermissionsSeeder::class);
     test()->seed(CommunicationsBootstrapSeeder::class);
+    test()->seed(Microsoft365BootstrapSeeder::class);
 }
 
 it('runs the communications seeder after the core seeder on every Cloudron deploy', function () {
@@ -22,10 +24,13 @@ it('runs the communications seeder after the core seeder on every Cloudron deplo
 
     $core = strpos($script, "db:seed --class='Database\\Seeders\\RolesAndPermissionsSeeder'");
     $comms = strpos($script, "db:seed --class='Database\\Seeders\\CommunicationsBootstrapSeeder'");
+    $m365 = strpos($script, "db:seed --class='Database\\Seeders\\Microsoft365BootstrapSeeder'");
 
     expect($core)->not->toBeFalse()
         ->and($comms)->not->toBeFalse()
-        ->and($comms)->toBeGreaterThan($core);
+        ->and($m365)->not->toBeFalse()
+        ->and($comms)->toBeGreaterThan($core)
+        ->and($m365)->toBeGreaterThan($comms);
 });
 
 it('keeps the communications grants after a deploy re-runs the core seeder', function () {

@@ -2,13 +2,11 @@
 
 use App\Core\Access\AccessMatrix;
 use Illuminate\Support\Facades\Route;
-use Modules\Communications\CommunicationsPermissions;
 use Modules\Communications\Http\Controllers\DashboardController;
 use Modules\Communications\Http\Controllers\DismissDashboardCardController;
 use Modules\Communications\Http\Controllers\EventController;
 use Modules\Communications\Http\Controllers\HandbookController;
 use Modules\Communications\Http\Controllers\MenuModeController;
-use Modules\Communications\Http\Controllers\MicrosoftLinkController;
 use Modules\Communications\Http\Controllers\PolicyDocumentController;
 use Modules\Communications\Http\Controllers\UpdatePostController;
 
@@ -45,11 +43,5 @@ Route::middleware(['web', 'auth'])->group(function () {
         Route::get('/policies', [PolicyDocumentController::class, 'index'])->name('communications.policies.index');
         Route::post('/policies', [PolicyDocumentController::class, 'store'])->name('communications.policies.store');
         Route::post('/policies/{policy}/read', [PolicyDocumentController::class, 'markRead'])->name('communications.policies.read');
-    });
-
-    Route::middleware(['can:'.CommunicationsPermissions::MANAGE_M365, 'module:communications'])->prefix('admin/m365-links')->name('admin.m365-links.')->group(function () {
-        Route::get('/', [MicrosoftLinkController::class, 'index'])->name('index');
-        Route::post('/', [MicrosoftLinkController::class, 'store'])->name('store');
-        Route::put('/{link}', [MicrosoftLinkController::class, 'update'])->name('update');
     });
 });
