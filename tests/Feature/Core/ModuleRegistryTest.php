@@ -207,7 +207,9 @@ it('discovers the real shipped module manifests', function () {
     );
 
     expect($registry->manifests()->keys()->sort()->values()->all())
-        ->toBe(['communications', 'helpdesk', 'hr', 'operations', 'people'])
+        ->toBe(['communications', 'helpdesk', 'hr', 'microsoft-365', 'operations', 'people'])
         ->and($registry->enabled('people'))->toBeTrue()
-        ->and($registry->enabled('hr'))->toBeTrue();
+        ->and($registry->enabled('hr'))->toBeTrue()
+        ->and($registry->enabled('microsoft-365'))->toBeTrue()
+        ->and($registry->manifest('microsoft-365')?->kind)->toBe('integration');
 });
