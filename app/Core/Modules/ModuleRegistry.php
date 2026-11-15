@@ -5,6 +5,7 @@ namespace App\Core\Modules;
 use App\Core\Audit\AuditLogger;
 use App\Core\Modules\Models\ModuleSetting;
 use App\Core\Modules\Models\ModuleState;
+use App\Core\System\CloudronAddons;
 use App\Models\User;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Support\Collection;
@@ -181,6 +182,38 @@ final class ModuleRegistry
         return in_array(strtolower($slug), self::CORE_SLUGS, true);
     }
 
+    /**
+     * Enabled modules that list $slug in depends_on (so $slug must stay on).
+     *
+     * @return Collection<int, ModuleManifest>
+     */
+    public function enabledDependents(string $slug): Collection
+    {
+        return $this->manifests()
+            ->filter(fn (ModuleManifest $manifest) => in_array($slug, $manifest->dependsOn, true))
+            ->filter(fn (ModuleManifest $manifest) => $this->enabled($manifest->slug))
+            ->values();
+    }
+
+    /**
+     * Cloudron addon keys the module needs that look missing locally.
+     *
+     * @return list<string>
+     */
+    public function missingCloudronAddons(string $slug): array
+    {
+        $manifest = $this->requireManifest($slug);
+        $missing = [];
+
+        foreach ($manifest->cloudronAddons as $addon) {
+            if (! CloudronAddons::looksPresent($addon)) {
+                $missing[] = $addon;
+            }
+        }
+
+        return $missing;
+    }
+
     private function setEnabled(string $slug, bool $enabled, string $reason, ?User $actor): void
     {
         if ($this->isCoreSlug($slug)) {
@@ -192,6 +225,17 @@ final class ModuleRegistry
         $reason = trim($reason);
         if ($reason === '') {
             throw new InvalidArgumentException('A reason is required when changing module state.');
+        }
+
+        if (! $enabled) {
+            $dependents = $this->enabledDependents($slug);
+            if ($dependents->isNotEmpty()) {
+                $names = $dependents->pluck('name')->implode(', ');
+
+                throw new InvalidArgumentException(
+                    "Cannot disable [{$slug}] while dependent modules are still enabled: {$names}.",
+                );
+            }
         }
 
         $state = ModuleState::query()->updateOrCreate(

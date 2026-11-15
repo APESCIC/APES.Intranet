@@ -79,6 +79,7 @@ final class Menu
                 NavItem::route('audit', 'Audit log', 'scroll-text', AccessMatrix::ADMIN_AUDIT_VIEW, 'admin.audit.index'),
                 NavItem::route('access-review', 'Access review', 'clipboard-check', AccessMatrix::ACCESS_REVIEW_VIEW, 'admin.access-review.index'),
                 NavItem::route('system', 'System status', 'activity', AccessMatrix::ADMIN_SYSTEM_VIEW, 'admin.system.index', 'admin.system.*'),
+                NavItem::route('modules', 'Modules', 'blocks', AccessMatrix::ADMIN_MODULES_MANAGE, 'admin.modules.index', 'admin.modules.*'),
                 NavItem::route('push-delivery', 'Push delivery', 'bell-ring', AccessMatrix::ADMIN_SYSTEM_VIEW, 'admin.push-delivery.index'),
                 NavItem::route('totp', '2FA status', 'shield-half', AccessMatrix::ADMIN_SYSTEM_VIEW, 'admin.totp.index'),
             ]),
