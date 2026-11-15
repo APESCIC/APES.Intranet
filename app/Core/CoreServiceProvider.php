@@ -22,6 +22,7 @@ use App\Core\Helpdesk\Contracts\RaiseItTicket;
 use App\Core\Helpdesk\NullRaiseItTicket;
 use App\Core\Hr\Contracts\ApprovedLeaveLookup;
 use App\Core\Hr\NullApprovedLeaveLookup;
+use App\Core\Modules\ModuleRegistry;
 use App\Core\Navigation\Menu;
 use App\Core\Navigation\MenuMode;
 use App\Core\Qa\QaLogin;
@@ -48,6 +49,7 @@ class CoreServiceProvider extends ServiceProvider
         $this->app->bind(ApprovedLeaveLookup::class, NullApprovedLeaveLookup::class);
         $this->app->bind(RaiseItTicket::class, NullRaiseItTicket::class);
         $this->app->bind(PublishIntranetUpdate::class, NullPublishIntranetUpdate::class);
+        $this->app->singleton(ModuleRegistry::class);
         $this->app->bind(SystemStatus::class, fn ($app) => new SystemStatus([
             $app->make(MysqlCheck::class),
             $app->make(RedisCheck::class),

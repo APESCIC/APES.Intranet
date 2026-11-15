@@ -10,10 +10,10 @@ The intranet follows the same three layers as MyAPES Account (its ADR 0001,
 | Plugins | `plugins/<slug>/` | `Plugins\<Studly>\` | Reserved for a later, approved mechanism. Empty for now |
 
 Terminology (Modules, Integrations, reserved Plugins and Cloudron addons) and
-the proposed enable and disable registry are in
-[ADR 0001](adr/0001-modules-and-integrations.md). Until a Plugins mechanism
-is approved, `plugins/` stays empty and shared features go into Core
-contracts.
+the enable/disable registry (`App\Core\Modules\ModuleRegistry`) are in
+[ADR 0001](adr/0001-modules-and-integrations.md). Each module ships a
+`modules/<slug>/module.php` manifest. Until a Plugins mechanism is approved,
+`plugins/` stays empty and shared features go into Core contracts.
 
 ## Dependency rules
 

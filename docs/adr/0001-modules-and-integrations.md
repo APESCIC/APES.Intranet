@@ -1,17 +1,20 @@
 # ADR 0001: Modules and Integrations, and the module registry
 
-- Status: **Accepted** for terminology and disable behaviour (Bambie, 6
-  November 2026). The registry design below is **proposed**. It is not
-  approved for building.
-- Date: 8 November 2026
+- Status: **Accepted** for terminology, disable behaviour (Bambie, 6
+  November 2026) and the registry design (build approved 15 November 2026,
+  Epic [#161](https://github.com/APESCIC/APES.Intranet/issues/161) / story
+  [#166](https://github.com/APESCIC/APES.Intranet/issues/166)).
+- Date: 8 November 2026 (registry Accepted 15 November 2026)
 - Issue: [#156](https://github.com/APESCIC/APES.Intranet/issues/156), part of
   milestone v0.3.5 Platform discovery (Epic
-  [#154](https://github.com/APESCIC/APES.Intranet/issues/154))
+  [#154](https://github.com/APESCIC/APES.Intranet/issues/154)); registry
+  build is milestone v0.6.5 Modules registry foundation
 - Builds on: [architecture.md](../architecture.md) (Core, then Modules, then
   Plugins) and MyAPES Account ADR 0001
 
-This research does **not** authorise registry pilot coding. A pilot needs
-Bambie's separate approval of a build milestone.
+The registry is implemented in Core as `App\Core\Modules\ModuleRegistry`.
+Disable enforcement, the Admin Modules screen and the Microsoft 365 pilot
+follow in the same milestone.
 
 ## Context
 
@@ -69,7 +72,7 @@ These are **never** disabled: Core sign-in and roles, audit, settings,
 `/healthz` and system checks, the app shell and navigation, and the access
 review.
 
-### Registry (proposed design)
+### Registry (Accepted)
 
 - Each Module ships a manifest, `modules/<slug>/module.php`, with its slug,
   name, kind (`module` or `integration`), description, default state, the
@@ -164,9 +167,11 @@ scaffolding commands.
 
 - The words people see are settled: Module, Integration and Cloudron addon.
   Plugin is held back.
-- A future pilot has a checklist: the disable table above.
-- `architecture.md` keeps its layer table and points here for terminology.
-- Nothing changes in code until a build milestone is approved.
+- Disable behaviour follows the table above; the registry stores state and
+  typed settings in Core (`module_states`, `module_settings`).
+- `architecture.md` and `modules/README.md` point here for terminology and
+  the registry.
+- Each shipped module has a `modules/<slug>/module.php` manifest.
 
 ## Checklist against the approved behaviour
 
