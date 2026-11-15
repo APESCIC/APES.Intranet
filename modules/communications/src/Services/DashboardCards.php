@@ -104,7 +104,7 @@ class DashboardCards
         return array_values(array_filter(
             $cards,
             function (array $card) use ($modules): bool {
-                return match ($card['key'] ?? '') {
+                return match ($card['key']) {
                     'student-area', 'two-factor-nudge' => $modules->enabled('people'),
                     'unread-updates', 'upcoming-event' => $modules->enabled('communications'),
                     default => true,
