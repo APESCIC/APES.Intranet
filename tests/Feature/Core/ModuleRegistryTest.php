@@ -211,5 +211,5 @@ it('discovers the real shipped module manifests', function () {
         ->and($registry->enabled('people'))->toBeTrue()
         ->and($registry->enabled('hr'))->toBeTrue()
         ->and($registry->enabled('microsoft-365'))->toBeTrue()
-        ->and($registry->manifest('microsoft-365')?->kind)->toBe('integration');
+        ->and($registry->manifest('microsoft-365')?->kind)->toBe(ModuleKind::Integration);
 });
