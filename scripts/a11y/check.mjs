@@ -297,6 +297,7 @@ try {
     await visit(desktop, '/notifications', 'Notification inbox');
     await visit(desktop, '/admin', 'Admin overview');
     await visit(desktop, '/admin/roles', 'Roles');
+    await visit(desktop, '/admin/modules', 'Modules');
     await visit(desktop, '/admin/audit', 'Audit log');
     await visit(desktop, '/admin/push-delivery', 'Push delivery');
     await visit(desktop, '/change-log', 'Change log (desktop)');
