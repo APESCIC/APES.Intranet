@@ -10,7 +10,7 @@ use Modules\Hr\Http\Controllers\LeaveController;
 use Modules\Hr\Http\Controllers\RecognitionController;
 use Modules\Hr\Http\Controllers\TrainingController;
 
-Route::middleware(['web', 'auth', 'can:'.AccessMatrix::INTRANET_ACCESS])->prefix('hr')->name('hr.')->group(function () {
+Route::middleware(['web', 'auth', 'can:'.AccessMatrix::INTRANET_ACCESS, 'module:hr'])->prefix('hr')->name('hr.')->group(function () {
     Route::get('/leave', [LeaveController::class, 'index'])->name('leave.index');
     Route::post('/leave', [LeaveController::class, 'store'])->name('leave.store');
     Route::post('/leave/{leaveRequest}/approve', [LeaveController::class, 'approve'])->whereNumber('leaveRequest')->name('leave.approve');
@@ -31,7 +31,7 @@ Route::middleware(['web', 'auth', 'can:'.AccessMatrix::INTRANET_ACCESS])->prefix
     Route::post('/appraisals/{appraisal}/lock', [AppraisalController::class, 'lock'])->whereNumber('appraisal')->name('appraisals.lock');
 });
 
-Route::middleware(['web', 'auth', 'can:'.AccessMatrix::HR_ACCESS])->prefix('hr')->name('hr.')->group(function () {
+Route::middleware(['web', 'auth', 'can:'.AccessMatrix::HR_ACCESS, 'module:hr'])->prefix('hr')->name('hr.')->group(function () {
     Route::get('/records', [HrRecordController::class, 'index'])->name('records.index');
     Route::get('/records/{user}', [HrRecordController::class, 'show'])->whereNumber('user')->name('records.show');
     Route::put('/records/{user}', [HrRecordController::class, 'update'])->whereNumber('user')->name('records.update');

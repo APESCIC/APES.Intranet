@@ -12,24 +12,25 @@ final readonly class NavItem
         public ?string $routeName = null,
         public ?string $activePattern = null,
         public ?string $externalUrl = null,
+        public ?string $module = null,
     ) {}
 
-    public static function route(string $key, string $label, string $icon, string $permission, string $routeName, ?string $activePattern = null): self
+    public static function route(string $key, string $label, string $icon, string $permission, string $routeName, ?string $activePattern = null, ?string $module = null): self
     {
-        return new self($key, $label, $icon, $permission, routeName: $routeName, activePattern: $activePattern ?? $routeName);
+        return new self($key, $label, $icon, $permission, routeName: $routeName, activePattern: $activePattern ?? $routeName, module: $module);
     }
 
-    public static function external(string $key, string $label, string $icon, string $permission, string $url): self
+    public static function external(string $key, string $label, string $icon, string $permission, string $url, ?string $module = null): self
     {
-        return new self($key, $label, $icon, $permission, externalUrl: $url);
+        return new self($key, $label, $icon, $permission, externalUrl: $url, module: $module);
     }
 
     /**
      * A menu entry for a feature planned in a later milestone.
      */
-    public static function soon(string $key, string $label, string $icon, string $permission): self
+    public static function soon(string $key, string $label, string $icon, string $permission, ?string $module = null): self
     {
-        return new self($key, $label, $icon, $permission);
+        return new self($key, $label, $icon, $permission, module: $module);
     }
 
     public function isSoon(): bool

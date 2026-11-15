@@ -26,6 +26,7 @@ use App\Core\Modules\ModuleRegistry;
 use App\Core\Navigation\Menu;
 use App\Core\Navigation\MenuMode;
 use App\Core\Qa\QaLogin;
+use App\Core\Search\SearchProviders;
 use App\Core\System\Checks\LdapCheck;
 use App\Core\System\Checks\MysqlCheck;
 use App\Core\System\Checks\OidcCheck;
@@ -50,6 +51,7 @@ class CoreServiceProvider extends ServiceProvider
         $this->app->bind(RaiseItTicket::class, NullRaiseItTicket::class);
         $this->app->bind(PublishIntranetUpdate::class, NullPublishIntranetUpdate::class);
         $this->app->singleton(ModuleRegistry::class);
+        $this->app->singleton(SearchProviders::class);
         $this->app->bind(SystemStatus::class, fn ($app) => new SystemStatus([
             $app->make(MysqlCheck::class),
             $app->make(RedisCheck::class),

@@ -3,13 +3,19 @@
 namespace Modules\Operations\Dashboard;
 
 use App\Core\Dashboard\DashboardCardContributor;
+use App\Core\Modules\BelongsToModule;
 use App\Models\User;
 use Modules\Operations\Models\ChecklistRun;
 use Modules\Operations\Models\Shift;
 use Modules\Operations\Models\Task;
 
-final class OperationsDashboardCards implements DashboardCardContributor
+final class OperationsDashboardCards implements BelongsToModule, DashboardCardContributor
 {
+    public function moduleSlug(): string
+    {
+        return 'operations';
+    }
+
     public function cards(User $user): array
     {
         $cards = [];
