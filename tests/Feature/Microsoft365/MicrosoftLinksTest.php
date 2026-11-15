@@ -7,17 +7,17 @@ use App\Core\Navigation\MenuMode;
 use App\Core\Navigation\NavGroup;
 use App\Core\Navigation\NavItem;
 use App\Models\User;
-use Database\Seeders\CommunicationsBootstrapSeeder;
+use Database\Seeders\Microsoft365BootstrapSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Modules\Communications\Models\MicrosoftLink;
-use Modules\Communications\Support\MicrosoftUrlAllowlist;
+use Modules\Microsoft365\Models\MicrosoftLink;
+use Modules\Microsoft365\Support\MicrosoftUrlAllowlist;
 
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->seed(RolesAndPermissionsSeeder::class);
-    $this->seed(CommunicationsBootstrapSeeder::class);
+    $this->seed(Microsoft365BootstrapSeeder::class);
 });
 
 it('hides staff-only Microsoft links from volunteers and students', function () {
@@ -33,9 +33,9 @@ it('hides staff-only Microsoft links from volunteers and students', function () 
 });
 
 it('rejects non-allowlisted Microsoft URLs', function () {
-    expect(MicrosoftUrlAllowlist::allows('https://evil.example/x', config('communications.m365_url_allowlist')))->toBeFalse()
-        ->and(MicrosoftUrlAllowlist::allows('http://outlook.office.com/mail/', config('communications.m365_url_allowlist')))->toBeFalse()
-        ->and(MicrosoftUrlAllowlist::allows('https://outlook.office.com/mail/', config('communications.m365_url_allowlist')))->toBeTrue();
+    expect(MicrosoftUrlAllowlist::allows('https://evil.example/x', config('microsoft-365.m365_url_allowlist')))->toBeFalse()
+        ->and(MicrosoftUrlAllowlist::allows('http://outlook.office.com/mail/', config('microsoft-365.m365_url_allowlist')))->toBeFalse()
+        ->and(MicrosoftUrlAllowlist::allows('https://outlook.office.com/mail/', config('microsoft-365.m365_url_allowlist')))->toBeTrue();
 });
 
 it('writes Microsoft link changes to the audit log', function () {

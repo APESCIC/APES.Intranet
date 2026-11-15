@@ -7,6 +7,7 @@ use App\Core\Access\Http\Controllers\RoleIndexController;
 use App\Core\Audit\Http\Controllers\AuditLogIndexController;
 use App\Core\Auth\Http\Controllers\OidcController;
 use App\Core\Changelog\Http\Controllers\ChangeLogController;
+use App\Core\Modules\Http\Controllers\AdminModulesController;
 use App\Core\Navigation\Http\Controllers\AdminOverviewController;
 use App\Core\Notifications\Http\Controllers\NotificationInboxController;
 use App\Core\Notifications\Http\Controllers\NotificationPreferencesController;
@@ -78,6 +79,11 @@ Route::middleware('auth')->group(function () {
             Route::get('/system', SystemStatusController::class)->name('system.index');
             Route::post('/system/test-email', SendTestEmailController::class)->name('system.test-email');
             Route::get('/push-delivery', PushDeliveryStatsController::class)->name('push-delivery.index');
+        });
+        Route::middleware(['can:'.AccessMatrix::ADMIN_MODULES_MANAGE, 'fresh-signin'])->prefix('modules')->name('modules.')->group(function () {
+            Route::get('/', [AdminModulesController::class, 'index'])->name('index');
+            Route::post('/{slug}/state', [AdminModulesController::class, 'updateState'])->name('state');
+            Route::post('/{slug}/settings', [AdminModulesController::class, 'updateSettings'])->name('settings');
         });
     });
 });

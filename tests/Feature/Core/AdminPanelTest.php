@@ -6,6 +6,7 @@ use App\Core\Auth\OidcIdentity;
 use App\Core\System\SystemStatus;
 use App\Models\User;
 use Database\Seeders\CommunicationsPermissionsSeeder;
+use Database\Seeders\Microsoft365PermissionsSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
@@ -20,6 +21,7 @@ const LEGACY_MENU_MODE_KEY = 'intranet.menu_mode';
 beforeEach(function () {
     $this->seed(RolesAndPermissionsSeeder::class);
     $this->seed(CommunicationsPermissionsSeeder::class);
+    $this->seed(Microsoft365PermissionsSeeder::class);
     $this->app->instance(SystemStatus::class, new SystemStatus([]));
     Http::fake(['*' => Http::response('down', 500)]);
 });
@@ -62,6 +64,7 @@ dataset('admin menu pages', [
     'audit log' => 'admin.audit.index',
     'access review' => 'admin.access-review.index',
     'system status' => 'admin.system.index',
+    'modules' => 'admin.modules.index',
     'push delivery' => 'admin.push-delivery.index',
     '2FA status' => 'admin.totp.index',
     'Microsoft 365 links' => 'admin.m365-links.index',
@@ -108,7 +111,7 @@ it('ignores a menu mode left in the session by an earlier release', function () 
 it('lists every admin section on the overview for a full admin', function () {
     $response = $this->actingAs(panelUser(RoleName::Admin))->get(route('admin.overview'))->assertOk();
 
-    foreach (['roles', 'audit', 'access-review', 'system', 'totp', 'm365-links'] as $key) {
+    foreach (['roles', 'audit', 'access-review', 'system', 'modules', 'totp', 'm365-links'] as $key) {
         $response->assertSee('data-admin-section="'.$key.'"', false);
     }
     $response->assertDontSee('data-admin-section="admin-overview"', false);

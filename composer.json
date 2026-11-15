@@ -36,6 +36,7 @@
             "Database\\Seeders\\": "database/seeders/",
             "Modules\\People\\": "modules/people/src/",
             "Modules\\Communications\\": "modules/communications/src/",
+            "Modules\\Microsoft365\\": "modules/microsoft-365/src/",
             "Modules\\Operations\\": "modules/operations/src/",
             "Modules\\Helpdesk\\": "modules/helpdesk/src/",
             "Modules\\Hr\\": "modules/hr/src/"

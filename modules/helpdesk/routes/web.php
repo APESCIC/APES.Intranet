@@ -11,7 +11,7 @@ use Modules\Helpdesk\Http\Controllers\TicketWorkController;
 use Modules\Helpdesk\Models\Ticket;
 
 Route::middleware(['web', 'auth'])->group(function () {
-    Route::middleware('can:'.AccessMatrix::INTRANET_ACCESS)->prefix('help-desk')->name('helpdesk.')->group(function () {
+    Route::middleware(['can:'.AccessMatrix::INTRANET_ACCESS, 'module:helpdesk'])->prefix('help-desk')->name('helpdesk.')->group(function () {
         Route::get('/', [TicketController::class, 'index'])->name('tickets.index');
         Route::get('/tickets/create', [TicketController::class, 'create'])->name('tickets.create');
         Route::post('/tickets', [TicketController::class, 'store'])->name('tickets.store');
@@ -36,7 +36,7 @@ Route::middleware(['web', 'auth'])->group(function () {
         }
     });
 
-    Route::middleware('can:'.HelpdeskPermissions::CATEGORIES_MANAGE)->prefix('admin/help-desk/topics')->name('admin.helpdesk.categories.')->group(function () {
+    Route::middleware(['can:'.HelpdeskPermissions::CATEGORIES_MANAGE, 'module:helpdesk'])->prefix('admin/help-desk/topics')->name('admin.helpdesk.categories.')->group(function () {
         Route::get('/', [CategoryController::class, 'index'])->name('index');
         Route::post('/', [CategoryController::class, 'store'])->name('store');
         Route::put('/{category}', [CategoryController::class, 'update'])->name('update');

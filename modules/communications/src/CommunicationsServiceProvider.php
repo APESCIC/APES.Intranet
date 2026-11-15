@@ -8,13 +8,11 @@ use Illuminate\Support\ServiceProvider;
 use Modules\Communications\Console\SendEventReminders;
 use Modules\Communications\Models\Event;
 use Modules\Communications\Models\HandbookChapter;
-use Modules\Communications\Models\MicrosoftLink;
 use Modules\Communications\Models\PolicyDocument;
 use Modules\Communications\Models\UpdatePost;
 use Modules\Communications\Navigation\CommunicationsMenuContributor;
 use Modules\Communications\Policies\EventPolicy;
 use Modules\Communications\Policies\HandbookChapterPolicy;
-use Modules\Communications\Policies\MicrosoftLinkPolicy;
 use Modules\Communications\Policies\PolicyDocumentPolicy;
 use Modules\Communications\Policies\UpdatePostPolicy;
 use Modules\Communications\Services\CommunicationsPublishIntranetUpdate;
@@ -40,6 +38,5 @@ class CommunicationsServiceProvider extends ServiceProvider
         Gate::policy(Event::class, EventPolicy::class);
         Gate::policy(HandbookChapter::class, HandbookChapterPolicy::class);
         Gate::policy(PolicyDocument::class, PolicyDocumentPolicy::class);
-        Gate::policy(MicrosoftLink::class, MicrosoftLinkPolicy::class);
     }
 }

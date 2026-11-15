@@ -4,16 +4,18 @@ use App\Core\Access\RoleName;
 use App\Models\User;
 use Database\Seeders\CommunicationsBootstrapSeeder;
 use Database\Seeders\HelpdeskBootstrapSeeder;
+use Database\Seeders\Microsoft365BootstrapSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Modules\Communications\Models\MicrosoftLink;
-use Modules\Communications\Support\MicrosoftHelp;
+use Modules\Microsoft365\Models\MicrosoftLink;
+use Modules\Microsoft365\Support\MicrosoftHelp;
 
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->seed(RolesAndPermissionsSeeder::class);
     $this->seed(CommunicationsBootstrapSeeder::class);
+    $this->seed(Microsoft365BootstrapSeeder::class);
     $this->seed(HelpdeskBootstrapSeeder::class);
 });
 

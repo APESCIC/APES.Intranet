@@ -1,10 +1,10 @@
 <?php
 
-namespace Modules\Communications\Services;
+namespace Modules\Microsoft365\Services;
 
 use App\Models\User;
 use Illuminate\Support\Collection;
-use Modules\Communications\Models\MicrosoftLink;
+use Modules\Microsoft365\Models\MicrosoftLink;
 
 class MicrosoftLinkRegistry
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Communications\Support;
+namespace Modules\Microsoft365\Support;
 
 use Illuminate\Support\Facades\Route;
 

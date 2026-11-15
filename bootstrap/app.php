@@ -3,6 +3,7 @@
 use App\Core\Auth\Http\Middleware\RequireFreshSignIn;
 use App\Core\Health\HealthzController;
 use App\Core\Http\Middleware\PreventCachingSignedInPages;
+use App\Core\Modules\Http\Middleware\EnsureModuleEnabled;
 use App\Core\Qa\QaLogin;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -31,7 +32,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->redirectGuestsTo(fn () => route('login'));
-        $middleware->alias(['fresh-signin' => RequireFreshSignIn::class]);
+        $middleware->alias([
+            'fresh-signin' => RequireFreshSignIn::class,
+            'module' => EnsureModuleEnabled::class,
+        ]);
         $middleware->web(append: [PreventCachingSignedInPages::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

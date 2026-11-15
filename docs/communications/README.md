@@ -1,9 +1,11 @@
 # Communications
 
 The Communications module (`modules/communications`, v0.3.x) runs the
-dashboard, updates, events, the handbook, the policy index and the Microsoft
-365 links. SharePoint stays the home for files and Teams for chat; the split
-is in [sharepoint-split.md](sharepoint-split.md).
+dashboard, updates, events, the handbook and the policy index. Microsoft 365
+app links live in the separate Integration package `modules/microsoft-365`
+(see [microsoft-365-rollback.md](../modules/microsoft-365-rollback.md)).
+SharePoint stays the home for files and Teams for chat; the split is in
+[sharepoint-split.md](sharepoint-split.md).
 
 ## Who can do what
 
@@ -16,15 +18,15 @@ Access uses the core permission matrix and the module's permissions
 | Comment on updates, RSVP to events, acknowledge chapters | Yes | Yes | Yes | Yes |
 | Publish updates, events, handbook chapters and policies (`comms.publish`) | | Yes | Yes | Yes |
 | Download handbook acknowledgements | | Yes | Yes | Yes |
-| Microsoft 365 links, Admin panel (`comms.m365.manage`) | | | | Yes |
+| Microsoft 365 links (`comms.m365.manage`, owned by `modules/microsoft-365`) | | | | Yes |
 
 ## Dashboard
 
 The dashboard shows cards for: unread updates, the next event, student
 placements (students only), a nudge to set up a passkey or authenticator
 (dismissible for 14 days, `COMMS_2FA_NUDGE_DISMISS_DAYS`), cards from other
-modules (such as help desk queues and overdue tasks), the Microsoft 365 apps
-and "Chat in Teams".
+modules (help desk queues, overdue tasks, Microsoft 365 apps) and "Chat in
+Teams".
 
 ## Updates
 
@@ -60,14 +62,11 @@ Publishers see the policies due for review in the next 30 days.
 
 ## Microsoft 365 links
 
-Admins manage the links in **Admin → Microsoft 365 links**: name, address,
-icon, audience (everyone or staff only), order and whether it is in use.
-Addresses must be HTTPS on an allowed Microsoft domain (`microsoft.com`,
-`cloud.microsoft`, `office.com`, `sharepoint.com`). Changes are audited
-(`comms.m365_link_created`, `comms.m365_link_updated`). The links show in the
-sidebar and on the dashboard, with the "no licence" help note
-([help desk](../helpdesk/README.md#microsoft-365-help-note)). Accessibility
-and mobile notes are in [microsoft-links-a11y.md](microsoft-links-a11y.md).
+Owned by `modules/microsoft-365`. Admins manage links under **Admin →
+Microsoft 365 links**; the Integration can be disabled from **Admin →
+Modules**. Accessibility notes remain in
+[microsoft-links-a11y.md](microsoft-links-a11y.md); rollback is in
+[microsoft-365-rollback.md](../modules/microsoft-365-rollback.md).
 
 ## Staff and Admin panels
 

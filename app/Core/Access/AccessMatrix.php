@@ -28,6 +28,8 @@ final class AccessMatrix
 
     public const ADMIN_SYSTEM_VIEW = 'admin.system.view';
 
+    public const ADMIN_MODULES_MANAGE = 'admin.modules.manage';
+
     public const ACCESS_REVIEW_VIEW = 'admin.access_review.view';
 
     /**
@@ -46,6 +48,7 @@ final class AccessMatrix
             self::ADMIN_ROLES_VIEW => 'View roles and permissions',
             self::ADMIN_AUDIT_VIEW => 'View the audit log',
             self::ADMIN_SYSTEM_VIEW => 'View system status, push delivery counts and send a test email',
+            self::ADMIN_MODULES_MANAGE => 'View, enable, disable and configure modules',
             self::ACCESS_REVIEW_VIEW => 'Run the quarterly group membership and access review',
         ];
     }

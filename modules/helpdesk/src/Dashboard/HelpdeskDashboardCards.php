@@ -3,12 +3,18 @@
 namespace Modules\Helpdesk\Dashboard;
 
 use App\Core\Dashboard\DashboardCardContributor;
+use App\Core\Modules\BelongsToModule;
 use App\Models\User;
 use Modules\Helpdesk\HelpdeskPermissions;
 use Modules\Helpdesk\Models\Ticket;
 
-final class HelpdeskDashboardCards implements DashboardCardContributor
+final class HelpdeskDashboardCards implements BelongsToModule, DashboardCardContributor
 {
+    public function moduleSlug(): string
+    {
+        return 'helpdesk';
+    }
+
     public function cards(User $user): array
     {
         $cards = [];

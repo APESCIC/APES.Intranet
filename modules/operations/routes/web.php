@@ -16,7 +16,7 @@ use Modules\Operations\Http\Controllers\TimesheetController;
 use Modules\Operations\OperationsPermissions;
 
 Route::middleware(['web', 'auth'])->group(function () {
-    Route::middleware('can:'.AccessMatrix::INTRANET_ACCESS)->prefix('operations')->name('operations.')->group(function () {
+    Route::middleware(['can:'.AccessMatrix::INTRANET_ACCESS, 'module:operations'])->prefix('operations')->name('operations.')->group(function () {
         Route::get('/rota', [RotaController::class, 'index'])->name('rota.index');
         Route::post('/rota/weeks', [RotaController::class, 'storeWeek'])->name('rota.weeks.store');
         Route::get('/rota/weeks/{week}', [RotaController::class, 'showWeek'])->name('rota.weeks.show');
@@ -81,7 +81,7 @@ Route::middleware(['web', 'auth'])->group(function () {
         Route::delete('/rota/availability/{availability}', [AvailabilityController::class, 'destroy'])->name('rota.availability.destroy');
     });
 
-    Route::prefix('admin/operations')->name('admin.operations.')->group(function () {
+    Route::middleware('module:operations')->prefix('admin/operations')->name('admin.operations.')->group(function () {
         Route::middleware('can:'.OperationsPermissions::SITES_MANAGE)->prefix('sites')->name('sites.')->group(function () {
             Route::get('/', [SiteController::class, 'index'])->name('index');
             Route::post('/', [SiteController::class, 'store'])->name('store');

@@ -49,6 +49,26 @@ final class CloudronAddons
     }
 
     /**
+     * Whether any of the addon's variables look set in the process environment.
+     */
+    public static function looksPresent(string $addon): bool
+    {
+        $definition = self::definitions()[$addon] ?? null;
+        if ($definition === null) {
+            return false;
+        }
+
+        foreach ($definition['variables'] as $variable) {
+            $value = $_ENV[$variable] ?? $_SERVER[$variable] ?? false;
+            if (is_string($value) && $value !== '') {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Keys in an env file that copy an addon password.
      *
      * @return list<string>
