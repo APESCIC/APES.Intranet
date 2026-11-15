@@ -12,7 +12,7 @@ use Modules\People\Http\Controllers\StudentPlacementController;
 use Modules\People\Http\Controllers\TotpStatusController;
 
 Route::middleware(['web', 'auth'])->group(function () {
-    Route::middleware('can:'.AccessMatrix::INTRANET_ACCESS)->group(function () {
+    Route::middleware(['can:'.AccessMatrix::INTRANET_ACCESS, 'module:people'])->group(function () {
         Route::get('/people', [DirectoryController::class, 'index'])->name('people.directory.index');
         Route::get('/people/picker', PeoplePickerController::class)->name('people.picker');
         Route::get('/people/org-chart', OrgChartController::class)->name('people.org-chart');
@@ -24,13 +24,14 @@ Route::middleware(['web', 'auth'])->group(function () {
         Route::get('/security', SecurityController::class)->name('people.security');
     });
 
-    Route::prefix('students')->name('people.students.')->group(function () {
+    Route::middleware('module:people')->prefix('students')->name('people.students.')->group(function () {
         Route::get('/', [StudentPlacementController::class, 'index'])->name('index');
         Route::get('/placements/{placement}', [StudentPlacementController::class, 'show'])->name('show');
         Route::post('/placements/{placement}/hours', [StudentPlacementController::class, 'storeHours'])->name('hours.store');
         Route::post('/hours/{hour}/review', [StudentPlacementController::class, 'reviewHours'])->name('hours.review');
     });
 
+    // 2FA status is Core admin (never gated by the People module).
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/2fa-status', [TotpStatusController::class, 'index'])->name('totp.index');
         Route::post('/2fa-status/refresh', [TotpStatusController::class, 'refresh'])->name('totp.refresh');

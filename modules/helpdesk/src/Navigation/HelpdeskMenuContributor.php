@@ -2,6 +2,7 @@
 
 namespace Modules\Helpdesk\Navigation;
 
+use App\Core\Modules\BelongsToModule;
 use App\Core\Navigation\MenuContributor;
 use App\Core\Navigation\MenuMode;
 use App\Core\Navigation\NavGroup;
@@ -9,23 +10,28 @@ use App\Core\Navigation\NavItem;
 use App\Models\User;
 use Modules\Helpdesk\HelpdeskPermissions;
 
-final class HelpdeskMenuContributor implements MenuContributor
+final class HelpdeskMenuContributor implements BelongsToModule, MenuContributor
 {
+    public function moduleSlug(): string
+    {
+        return 'helpdesk';
+    }
+
     public function groups(User $user, MenuMode $mode): array
     {
         if ($mode === MenuMode::Admin) {
             return [
                 new NavGroup('admin-helpdesk', 'Help desk admin', [
-                    NavItem::route('helpdesk-topics', 'Topics and routing', 'tags', HelpdeskPermissions::CATEGORIES_MANAGE, 'admin.helpdesk.categories.index'),
+                    NavItem::route('helpdesk-topics', 'Topics and routing', 'tags', HelpdeskPermissions::CATEGORIES_MANAGE, 'admin.helpdesk.categories.index', null, 'helpdesk'),
                 ]),
             ];
         }
 
         return [
             new NavGroup('helpdesk-queues', 'Help desk queues', [
-                NavItem::route('helpdesk-it', 'IT queue', 'monitor-cog', HelpdeskPermissions::QUEUE_IT, 'helpdesk.queues.it'),
-                NavItem::route('helpdesk-management', 'Management queue', 'briefcase', HelpdeskPermissions::QUEUE_MANAGEMENT, 'helpdesk.queues.management'),
-                NavItem::route('helpdesk-reports', 'Help desk reports', 'chart-column', HelpdeskPermissions::REPORTS_VIEW, 'helpdesk.reports.index', 'helpdesk.reports.*'),
+                NavItem::route('helpdesk-it', 'IT queue', 'monitor-cog', HelpdeskPermissions::QUEUE_IT, 'helpdesk.queues.it', null, 'helpdesk'),
+                NavItem::route('helpdesk-management', 'Management queue', 'briefcase', HelpdeskPermissions::QUEUE_MANAGEMENT, 'helpdesk.queues.management', null, 'helpdesk'),
+                NavItem::route('helpdesk-reports', 'Help desk reports', 'chart-column', HelpdeskPermissions::REPORTS_VIEW, 'helpdesk.reports.index', 'helpdesk.reports.*', 'helpdesk'),
             ]),
         ];
     }

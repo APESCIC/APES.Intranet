@@ -3,6 +3,7 @@
 namespace Modules\Communications\Navigation;
 
 use App\Core\Access\AccessMatrix;
+use App\Core\Modules\BelongsToModule;
 use App\Core\Navigation\MenuContributor;
 use App\Core\Navigation\MenuMode;
 use App\Core\Navigation\NavGroup;
@@ -12,9 +13,14 @@ use Modules\Communications\CommunicationsPermissions;
 use Modules\Communications\Services\MicrosoftLinkRegistry;
 use Modules\Communications\Support\MicrosoftHelp;
 
-final class CommunicationsMenuContributor implements MenuContributor
+final class CommunicationsMenuContributor implements BelongsToModule, MenuContributor
 {
     public function __construct(private readonly MicrosoftLinkRegistry $links) {}
+
+    public function moduleSlug(): string
+    {
+        return 'communications';
+    }
 
     public function groups(User $user, MenuMode $mode): array
     {
@@ -28,6 +34,7 @@ final class CommunicationsMenuContributor implements MenuContributor
                         CommunicationsPermissions::MANAGE_M365,
                         'admin.m365-links.index',
                         'admin.m365-links.*',
+                        'communications',
                     ),
                 ]),
             ];
@@ -46,6 +53,7 @@ final class CommunicationsMenuContributor implements MenuContributor
                 $link->icon,
                 AccessMatrix::INTRANET_ACCESS,
                 $link->url,
+                'communications',
             );
         }
 

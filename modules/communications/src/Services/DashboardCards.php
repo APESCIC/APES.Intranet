@@ -4,6 +4,8 @@ namespace Modules\Communications\Services;
 
 use App\Core\Access\AccessMatrix;
 use App\Core\Dashboard\DashboardCardContributor;
+use App\Core\Modules\BelongsToModule;
+use App\Core\Modules\ModuleRegistry;
 use App\Core\Navigation\Menu;
 use App\Models\User;
 use Modules\Communications\Models\DashboardDismissal;
@@ -62,34 +64,53 @@ class DashboardCards
             ];
         }
 
+        $modules = app(ModuleRegistry::class);
+
         foreach (app()->tagged('intranet.dashboard') as $contributor) {
-            if ($contributor instanceof DashboardCardContributor) {
-                array_push($cards, ...$contributor->cards($user));
+            if (! $contributor instanceof DashboardCardContributor) {
+                continue;
             }
+
+            if ($contributor instanceof BelongsToModule && ! $modules->enabled($contributor->moduleSlug())) {
+                continue;
+            }
+
+            array_push($cards, ...$contributor->cards($user));
         }
 
-        $apps = $this->links->forUser($user);
-        if ($apps->isNotEmpty()) {
+        if ($modules->enabled('communications')) {
+            $apps = $this->links->forUser($user);
+            if ($apps->isNotEmpty()) {
+                $cards[] = [
+                    'key' => 'm365-apps',
+                    'title' => 'Microsoft 365 apps',
+                    'body' => 'Open the apps you use at APES.',
+                    'href' => null,
+                    'apps' => $apps,
+                    'note' => MicrosoftHelp::note(),
+                    'note_links' => MicrosoftHelp::links(),
+                ];
+            }
+
             $cards[] = [
-                'key' => 'm365-apps',
-                'title' => 'Microsoft 365 apps',
-                'body' => 'Open the apps you use at APES.',
-                'href' => null,
-                'apps' => $apps,
-                'note' => MicrosoftHelp::note(),
-                'note_links' => MicrosoftHelp::links(),
+                'key' => 'teams',
+                'title' => 'Chat in Teams',
+                'body' => 'Chat stays in Microsoft Teams.',
+                'href' => Menu::TEAMS_URL,
+                'external' => true,
             ];
         }
 
-        $cards[] = [
-            'key' => 'teams',
-            'title' => 'Chat in Teams',
-            'body' => 'Chat stays in Microsoft Teams.',
-            'href' => Menu::TEAMS_URL,
-            'external' => true,
-        ];
-
-        return $cards;
+        return array_values(array_filter(
+            $cards,
+            function (array $card) use ($modules): bool {
+                return match ($card['key'] ?? '') {
+                    'student-area', 'two-factor-nudge' => $modules->enabled('people'),
+                    'unread-updates', 'upcoming-event' => $modules->enabled('communications'),
+                    default => true,
+                };
+            },
+        ));
     }
 
     private function unreadUpdates(User $user): int

@@ -17,6 +17,13 @@ final class ModuleRegistry
 
     public const CACHE_SETTINGS_PREFIX = 'core.modules.settings.';
 
+    /**
+     * Reserved names that are never modules and cannot be enabled or disabled.
+     *
+     * @var list<string>
+     */
+    public const CORE_SLUGS = ['core', 'auth', 'audit', 'settings', 'health', 'shell'];
+
     /** @var array<string, ModuleManifest>|null */
     private ?array $manifests = null;
 
@@ -169,8 +176,17 @@ final class ModuleRegistry
         $this->forgetCache();
     }
 
+    public function isCoreSlug(string $slug): bool
+    {
+        return in_array(strtolower($slug), self::CORE_SLUGS, true);
+    }
+
     private function setEnabled(string $slug, bool $enabled, string $reason, ?User $actor): void
     {
+        if ($this->isCoreSlug($slug)) {
+            throw new InvalidArgumentException('Core cannot be disabled.');
+        }
+
         $this->requireManifest($slug);
 
         $reason = trim($reason);
