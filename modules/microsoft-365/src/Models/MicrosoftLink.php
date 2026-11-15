@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Communications\Models;
+namespace Modules\Microsoft365\Models;
 
 use App\Core\Access\RoleName;
 use App\Models\User;

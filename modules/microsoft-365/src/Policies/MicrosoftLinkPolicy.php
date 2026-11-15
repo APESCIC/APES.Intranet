@@ -1,9 +1,9 @@
 <?php
 
-namespace Modules\Communications\Policies;
+namespace Modules\Microsoft365\Policies;
 
 use App\Models\User;
-use Modules\Communications\Models\MicrosoftLink;
+use Modules\Microsoft365\Models\MicrosoftLink;
 
 class MicrosoftLinkPolicy
 {

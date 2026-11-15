@@ -1,30 +1,30 @@
 <?php
 
-namespace Modules\Communications\Http\Controllers;
+namespace Modules\Microsoft365\Http\Controllers;
 
 use App\Core\Audit\AuditLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
-use Modules\Communications\CommunicationsPermissions;
-use Modules\Communications\Models\MicrosoftLink;
-use Modules\Communications\Support\MicrosoftUrlAllowlist;
+use Modules\Microsoft365\Microsoft365Permissions;
+use Modules\Microsoft365\Models\MicrosoftLink;
+use Modules\Microsoft365\Support\MicrosoftUrlAllowlist;
 
 class MicrosoftLinkController
 {
     public function index(Request $request): View
     {
-        abort_unless($request->user()?->can(CommunicationsPermissions::MANAGE_M365), 403);
+        abort_unless($request->user()?->can(Microsoft365Permissions::MANAGE), 403);
 
-        return view('communications::m365.index', [
+        return view('microsoft-365::m365.index', [
             'links' => MicrosoftLink::query()->orderBy('sort_order')->orderBy('name')->get(),
         ]);
     }
 
     public function store(Request $request, AuditLogger $audit): RedirectResponse
     {
-        abort_unless($request->user()?->can(CommunicationsPermissions::MANAGE_M365), 403);
+        abort_unless($request->user()?->can(Microsoft365Permissions::MANAGE), 403);
         $data = $this->validated($request);
         $link = MicrosoftLink::query()->create($data);
         $audit->record('comms.m365_link_created', $link, ['key' => $link->key]);
@@ -34,7 +34,7 @@ class MicrosoftLinkController
 
     public function update(Request $request, MicrosoftLink $link, AuditLogger $audit): RedirectResponse
     {
-        abort_unless($request->user()?->can(CommunicationsPermissions::MANAGE_M365), 403);
+        abort_unless($request->user()?->can(Microsoft365Permissions::MANAGE), 403);
         $data = $this->validated($request, $link);
         $link->update($data);
         $audit->record('comms.m365_link_updated', $link, ['key' => $link->key]);
@@ -58,7 +58,7 @@ class MicrosoftLinkController
             'active' => ['sometimes', 'boolean'],
         ]);
 
-        if (! MicrosoftUrlAllowlist::allows($data['url'], config('communications.m365_url_allowlist'))) {
+        if (! MicrosoftUrlAllowlist::allows($data['url'], config('microsoft-365.m365_url_allowlist'))) {
             throw ValidationException::withMessages([
                 'url' => 'The URL must be https and on an allowed Microsoft domain.',
             ]);

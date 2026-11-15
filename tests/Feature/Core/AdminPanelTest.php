@@ -6,6 +6,7 @@ use App\Core\Auth\OidcIdentity;
 use App\Core\System\SystemStatus;
 use App\Models\User;
 use Database\Seeders\CommunicationsPermissionsSeeder;
+use Database\Seeders\Microsoft365PermissionsSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
@@ -20,6 +21,7 @@ const LEGACY_MENU_MODE_KEY = 'intranet.menu_mode';
 beforeEach(function () {
     $this->seed(RolesAndPermissionsSeeder::class);
     $this->seed(CommunicationsPermissionsSeeder::class);
+    $this->seed(Microsoft365PermissionsSeeder::class);
     $this->app->instance(SystemStatus::class, new SystemStatus([]));
     Http::fake(['*' => Http::response('down', 500)]);
 });
