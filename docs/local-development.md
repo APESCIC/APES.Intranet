@@ -240,12 +240,13 @@ they never send anything either.
 | `php -v` is not 8.4 in your own terminal | Run `. .\scripts\herd-env.ps1`, as in [Everyday commands](#everyday-commands) |
 | `/healthz` or `preview.ps1` reports another PHP version | Run `herd isolate 8.4 --site=apes-intranet` |
 | `apes-intranet.test` does not resolve, or shows a 404 from Herd | Check `herd links` lists `apes-intranet` pointing at your clone. If not, run `scripts\herd-setup.ps1` again |
-| Port 80 or 3306 is in use, and Herd or MySQL will not start | Another web server or MySQL is running (for example Laragon). Find it with `Get-NetTCPConnection -State Listen -LocalPort 80,3306`, stop it, then restart Herd |
+| Port 80 or 3306 is in use, and Herd or MySQL will not start | Another web server or MySQL is still running. Check with `Get-NetTCPConnection -LocalPort 80,3306` (without `-State Listen`: without admin rights Windows often leaves State blank), stop the other process, then restart Herd |
 | Port 5174 is in use | Another Vite server is running, usually this project in another terminal. Stop it. Vite will not move to another port, because the preview expects 5174 |
 | `500` error | Use the Herd MCP `site` `error` action, or read `storage/logs/laravel.log`. Check `.env` exists and has an `APP_KEY` |
 | `/healthz` says `"redis": "fail"` | Expected locally. The health check always tries Redis, which Cloudron provides, but the Herd set-up does not use it. `app` and `database` should say `ok` |
 | Unstyled page or "Vite manifest not found" | Start `npm run dev`. Vite writes `public/hot` once it is ready |
-| `herd services:list` says MySQL is stopped, but the site works | Herd loses track of its services after Herd itself restarts. If the database misbehaves, stop and start the service in Herd's **Services** |
+| `herd services:list` says MySQL is stopped, but the site works | Herd can lose track of its services after Herd itself restarts. Start it by id: `herd services:list`, then `herd services:start <id>` (the name `mysql` alone can fail). Or use Herd's **Services** window |
+| `preview.ps1` says nothing listens on MySQL's port, but the site works | Fixed in this version: the gate now probes the port without requiring `-State Listen`. Start MySQL with `herd services:start <id>` if `/healthz` shows `"database":"fail"` |
 | Herd's Node.js settings say you don't use the nvm that ships with Herd | A standalone Node.js, or old `NVM_HOME` and `NVM_SYMLINK` variables, are in the way. Uninstall the standalone Node.js, remove both variables, restart Herd, then click **Install NVM** |
 | Database errors | Check Herd's MySQL service is running (`herd services:list`), and that `.env` has `DB_HOST=127.0.0.1` and `DB_DATABASE=apes_intranet_local` |
 | `Permission denied` writing to `storage` or `bootstrap/cache` | Close anything holding the file open (another `artisan` run, an editor or an antivirus scan), then try again. If it keeps happening, give your Windows user full control of the clone folder |

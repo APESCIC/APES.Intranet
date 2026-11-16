@@ -309,6 +309,8 @@ try {
     await visit(desktop, '/help-desk/queues/management?view=all', 'Management queue');
     await visit(desktop, '/help-desk/reports', 'Help desk reports');
     await visitFirstTicket(desktop, '/help-desk/queues/it', 'Ticket (queue member)');
+    await visit(desktop, '/learning', 'My learning (desktop)');
+    await visit(desktop, '/learning/courses', 'Learning courses (desktop)');
 
     const operations = await (await browser.newContext({ viewport: { width: 1440, height: 900 } })).newPage();
     await signInAs(operations, 'Supervisor');
@@ -339,6 +341,7 @@ try {
     await visit(mobile, '/help-desk', 'My tickets (mobile)');
     await visit(mobile, '/help-desk/tickets/create', 'Raise a ticket (mobile)');
     await visitFirstTicket(mobile, '/help-desk', 'Ticket (requester, mobile)');
+    await visit(mobile, '/learning', 'My learning (mobile)');
     await mobile.getByRole('button', { name: 'Open menu' }).click();
     await mobile.getByRole('dialog', { name: 'Main menu' }).waitFor();
     await mobile.waitForTimeout(300);

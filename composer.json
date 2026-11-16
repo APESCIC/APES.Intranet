@@ -39,7 +39,8 @@
             "Modules\\Microsoft365\\": "modules/microsoft-365/src/",
             "Modules\\Operations\\": "modules/operations/src/",
             "Modules\\Helpdesk\\": "modules/helpdesk/src/",
-            "Modules\\Hr\\": "modules/hr/src/"
+            "Modules\\Hr\\": "modules/hr/src/",
+            "Modules\\Learning\\": "modules/learning/src/"
         }
     },
     "autoload-dev": {
