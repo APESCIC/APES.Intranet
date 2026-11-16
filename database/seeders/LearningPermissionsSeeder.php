@@ -12,14 +12,24 @@ class LearningPermissionsSeeder extends Seeder
 {
     public function run(): void
     {
-        app(PermissionRegistrar::class)->forgetCachedPermissions();
+        $registrar = app(PermissionRegistrar::class);
+        $registrar->forgetCachedPermissions();
 
         foreach (array_keys(LearningPermissions::permissions()) as $name) {
             Permission::findOrCreate($name, 'web');
         }
 
+        // Spatie caches the permission map; refresh before attaching to roles
+        // (same pattern as HelpdeskPermissionsSeeder / OperationsPermissionsSeeder).
+        $registrar->forgetCachedPermissions();
+
         foreach (LearningPermissions::grants() as $roleName => $permissions) {
-            Role::findByName($roleName)->givePermissionTo($permissions);
+            $role = Role::findOrCreate($roleName, 'web');
+            foreach ($permissions as $permission) {
+                if (! $role->hasPermissionTo($permission)) {
+                    $role->givePermissionTo($permission);
+                }
+            }
         }
 
         // Never leave grade edit/release on Cloudron roles, even if an older
@@ -32,6 +42,6 @@ class LearningPermissionsSeeder extends Seeder
             }
         }
 
-        app(PermissionRegistrar::class)->forgetCachedPermissions();
+        $registrar->forgetCachedPermissions();
     }
 }
