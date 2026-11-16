@@ -18,12 +18,14 @@
                 <a href="{{ route('learning.courses.enrolments.index', $course) }}" class="sg-btn">Manage enrolments</a>
                 @can('update', $course)
                     <a href="{{ route('learning.courses.quizzes.index', $course) }}" class="sg-btn">Question bank and quizzes</a>
+                    <a href="{{ route('learning.courses.assignments.index', $course) }}" class="sg-btn">Assignments</a>
                 @endcan
             </p>
         @else
             @can('update', $course)
-                <p class="mt-4">
+                <p class="mt-4 flex flex-wrap gap-2">
                     <a href="{{ route('learning.courses.quizzes.index', $course) }}" class="sg-btn">Question bank and quizzes</a>
+                    <a href="{{ route('learning.courses.assignments.index', $course) }}" class="sg-btn">Assignments</a>
                 </p>
             @endcan
         @endcan
