@@ -13,6 +13,12 @@
             <p class="mt-4 text-sm text-brand" role="status">{{ session('status') }}</p>
         @endif
 
+        @can('enrol', $course)
+            <p class="mt-4">
+                <a href="{{ route('learning.courses.enrolments.index', $course) }}" class="sg-btn">Manage enrolments</a>
+            </p>
+        @endcan
+
         @foreach ($course->sections as $section)
             <section class="mt-10">
                 <h2 class="font-display text-2xl text-ink">{{ $section->title }}</h2>

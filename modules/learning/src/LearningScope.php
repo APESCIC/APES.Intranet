@@ -3,9 +3,9 @@
 namespace Modules\Learning;
 
 /**
- * How wide a learning role assignment applies. Course and cohort ids are
- * stored as integers until those tables land in later issues; learning_admin
- * uses global scope with a null id.
+ * How wide a learning role assignment applies. Course and cohort ids point at
+ * learning_courses / learning_cohorts; learning_admin uses global scope with a
+ * null id.
  */
 enum LearningScope: string
 {

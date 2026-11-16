@@ -9,6 +9,7 @@ use Modules\Learning\Navigation\LearningMenuContributor;
 use Modules\Learning\Policies\CoursePolicy;
 use Modules\Learning\Policies\LearningGradePolicy;
 use Modules\Learning\Services\CourseAuthoringService;
+use Modules\Learning\Services\EnrolmentService;
 use Modules\Learning\Services\LearningAssignmentService;
 
 class LearningServiceProvider extends ServiceProvider
@@ -20,6 +21,7 @@ class LearningServiceProvider extends ServiceProvider
         $this->app->tag([LearningMenuContributor::class], 'intranet.menu');
         $this->app->singleton(LearningAssignmentService::class);
         $this->app->singleton(CourseAuthoringService::class);
+        $this->app->singleton(EnrolmentService::class);
         $this->app->singleton(LearningGradePolicy::class);
     }
 
