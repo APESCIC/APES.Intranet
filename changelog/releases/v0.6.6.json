@@ -1,0 +1,24 @@
+{
+  "version": "v0.6.6",
+  "released_at": "2026-11-16",
+  "title": "Learning courses on the intranet",
+  "summary": "You can take new intranet learning courses from My learning: enrol, follow lessons, and track your progress. This is separate from My training in HR, which still points at the external compliance LMS.",
+  "audiences": ["staff", "volunteers", "students"],
+  "changes": {
+    "added": [
+      "My learning: see the courses you are enrolled on and how far you have got.",
+      "Course player: read lessons on phone or desktop and mark each lesson complete.",
+      "Learning managers can build courses with sections and lessons, enrol people (including by directory group), and set course prerequisites."
+    ],
+    "changed": [
+      "Local development preview checks connect to MySQL more reliably when Herd’s status display is unclear."
+    ],
+    "accessibility": [
+      "My learning is included in the automated accessibility check on desktop and phone widths."
+    ]
+  },
+  "internal_notes": [
+    "Epic #162. Shipped #344 Herd preview MySQL port probe; #170 DPIA + retention.learning; #171 Learning module bootstrap and scoped roles/grade gates; #172 course authoring with lesson versions and learner locks; #173 enrolment/cohorts/prerequisites; #174 lesson progress and course completion (no grades); #175 My learning + player + a11y + SW no grade cache. Moodle (upskilling) untouched."
+  ],
+  "published": true
+}
