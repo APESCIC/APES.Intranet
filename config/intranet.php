@@ -56,8 +56,9 @@ return [
 
     /*
     | How long records are kept. A blank or too-small value falls back to a
-    | safe minimum so a missing setting never wipes the log. HR periods are
-    | years (see docs/dpia/hr-records.md); audit log stays in days.
+    | safe minimum so a missing setting never wipes the log. HR and Learning
+    | periods are years (see docs/dpia/hr-records.md and
+    | docs/dpia/learning-records.md); audit log stays in days.
     */
     'retention' => [
         'audit_log_days' => max(30, (int) (env('AUDIT_LOG_RETENTION_DAYS') ?: 730)),
@@ -70,6 +71,14 @@ return [
             'training_years_after_leave' => max(1, (int) (env('HR_RETENTION_TRAINING_YEARS_AFTER_LEAVE') ?: 6)),
             'checklist_years_after_leave' => max(1, (int) (env('HR_RETENTION_CHECKLIST_YEARS_AFTER_LEAVE') ?: 2)),
             'recognition_years_after_leave' => max(1, (int) (env('HR_RETENTION_RECOGNITION_YEARS_AFTER_LEAVE') ?: 2)),
+        ],
+        'learning' => [
+            'enrolment_years_after_end' => max(1, (int) (env('LEARNING_RETENTION_ENROLMENT_YEARS_AFTER_END') ?: 6)),
+            'progress_years_after_end' => max(1, (int) (env('LEARNING_RETENTION_PROGRESS_YEARS_AFTER_END') ?: 6)),
+            'submission_years_after_end' => max(1, (int) (env('LEARNING_RETENTION_SUBMISSION_YEARS_AFTER_END') ?: 6)),
+            'grade_years_after_end' => max(1, (int) (env('LEARNING_RETENTION_GRADE_YEARS_AFTER_END') ?: 6)),
+            'assignment_years_after_end' => max(1, (int) (env('LEARNING_RETENTION_ASSIGNMENT_YEARS_AFTER_END') ?: 2)),
+            'course_version_years_after_archive' => max(1, (int) (env('LEARNING_RETENTION_COURSE_VERSION_YEARS_AFTER_ARCHIVE') ?: 6)),
         ],
     ],
 
