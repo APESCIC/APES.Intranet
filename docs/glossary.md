@@ -61,6 +61,18 @@ Plain-English meanings of the terms used in this repository's docs.
 | Dependency review | A check that blocks new packages with known security problems. |
 | CodeQL | GitHub's free code security scanner, switched on in the repository settings. |
 
+## Learning
+
+| Term | Meaning |
+| --- | --- |
+| Learning Module | The intranet courses area (`modules/learning`), switchable via the Module Registry. Separate from HR “My training”. |
+| My learning | The learner’s enrolled courses list. |
+| My grades | The learner’s view of *released* grades and feedback only. |
+| Grade approver | A scoped Learning role that can release grades; Cloudron Admin does not get this implicitly. |
+| Release | The state after which learners may see grades and feedback. |
+| Exempt | A grade item removed from the category or course total (not scored as zero). |
+| Append-only grade event | An immutable history row for every grade change (actor, time, old, new, reason). |
+
 ## Local set-up
 
 | Term | Meaning |

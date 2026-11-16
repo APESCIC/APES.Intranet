@@ -38,6 +38,15 @@ final class LearningMenuContributor implements BelongsToModule, MenuContributor
                     'learning',
                 ),
                 NavItem::route(
+                    'learning-grades',
+                    'My grades',
+                    'chart-bar',
+                    LearningPermissions::ACCESS,
+                    'learning.grades.mine',
+                    'learning.grades.*',
+                    'learning',
+                ),
+                NavItem::route(
                     'learning-courses',
                     'Courses',
                     'library',
