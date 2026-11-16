@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * Course-level completion marker (no grades). #174 expands how this is
- * computed from lesson progress; #173 uses it for prerequisite gates.
+ * Course-level completion marker derived from lesson progress (no grades).
+ * Also used as the prerequisite gate for enrolment (#173).
  */
 class CourseCompletion extends Model
 {

@@ -11,6 +11,7 @@ use Modules\Learning\Policies\LearningGradePolicy;
 use Modules\Learning\Services\CourseAuthoringService;
 use Modules\Learning\Services\EnrolmentService;
 use Modules\Learning\Services\LearningAssignmentService;
+use Modules\Learning\Services\ProgressService;
 
 class LearningServiceProvider extends ServiceProvider
 {
@@ -22,6 +23,7 @@ class LearningServiceProvider extends ServiceProvider
         $this->app->singleton(LearningAssignmentService::class);
         $this->app->singleton(CourseAuthoringService::class);
         $this->app->singleton(EnrolmentService::class);
+        $this->app->singleton(ProgressService::class);
         $this->app->singleton(LearningGradePolicy::class);
     }
 
