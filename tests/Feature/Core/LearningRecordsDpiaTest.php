@@ -7,7 +7,7 @@ it('keeps a Learning records DPIA in the repository', function () {
 
     $dpia = file_get_contents($path);
 
-    expect($dpia)->toContain('DPIA: Learning records')
+    expect($dpia)->toContain('Approved by the owner on 16 November 2026')
         ->and($dpia)->toContain('minors')
         ->and($dpia)->toContain('progress')
         ->and($dpia)->toContain('grades')

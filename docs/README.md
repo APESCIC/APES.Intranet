@@ -33,7 +33,7 @@ for organisation members ([where documents live](decisions.md#where-documents-li
 | [accessibility.md](accessibility.md) | The WCAG 2.2 AA baseline, the automated check and rules for new pages |
 | [dpia/clock-in-geofence.md](dpia/clock-in-geofence.md) | The approved data protection impact assessment for the clock-in geofence |
 | [dpia/hr-records.md](dpia/hr-records.md) | The approved DPIA for HR records (DBS, right-to-work, leave, appraisals) |
-| [dpia/learning-records.md](dpia/learning-records.md) | DPIA for Learning Module learner records (enrolment, progress, future grades); owner approval required before real data |
+| [dpia/learning-records.md](dpia/learning-records.md) | The approved DPIA for Learning Module learner records (enrolment, progress, future grades) |
 | [dpia/web-push-notifications.md](dpia/web-push-notifications.md) | Draft DPIA for Web Push and the in-app bell (not complete) |
 | [discovery/lms-inventory.md](discovery/lms-inventory.md) | What the two LMS apps hold, for the Learning versions (full copy in `.github-private`) |
 

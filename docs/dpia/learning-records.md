@@ -2,7 +2,7 @@
 
 | Item | Value |
 | --- | --- |
-| Status | **Draft — awaiting owner approval** (do not store real learner personal data until approved) |
+| Status | **Approved by the owner on 16 November 2026** (v0.6.6 plan approval for shipping this assessment with the Learning build) |
 | Controller | Association of Protecting Exotic Species CIC (APES CIC) |
 | Owner and approver | Bambie Murphy, Director |
 | Feature | Intranet Learning Module: courses, enrolment, progress and completion; future assessment submissions and grades (v0.6.6 core, Epic #162, issue #170; grades UI from v0.6.7) |
@@ -123,9 +123,8 @@ Taken from the issue hosting evidence (same hosting as HR records):
 
 ## Step 3: Consultation
 
-- **Owner / Director:** must approve this DPIA before real learner data is
-  stored. Build of the Learning Module may proceed against fake demo data only
-  until then.
+- **Owner / Director:** approved this DPIA with the v0.6.6 shipping plan on
+  16 November 2026.
 - **Learning roles:** instructors, assessors, grade approvers and learning
   admins will use scoped assignments; the permission matrix is tested in code.
 - **Learners:** informed through privacy notice updates when real data goes
@@ -148,8 +147,7 @@ Taken from the issue hosting evidence (same hosting as HR records):
   learning assignment (including Admin); TipTap output sanitised; fake data in
   development; no continuous tracking; service worker must not cache grades.
 - **Retention:** periods in `config/intranet.php` `retention.learning` (see
-  Step 7). Purge jobs may follow later; the periods are proposed now for owner
-  agreement.
+  Step 7). Purge jobs may follow later; the periods are agreed now.
 - **Processors and transfers:** Cloudron hosting and backups as above. No new
   third-party LMS SaaS in v0.6.6. Moodle remains a separate system.
 
@@ -169,30 +167,30 @@ Taken from the issue hosting evidence (same hosting as HR records):
 
 | Risk | Measure | Effect | Residual risk | Approved |
 | --- | --- | --- | --- | --- |
-| Unauthorised access | Module flag, scoped learning roles/policies, matrix tests | Reduced | Low | Pending owner |
-| Under-18 exposure | Same minimisation; no extra fields; access limited to need | Reduced | Low | Pending owner |
-| Implicit Admin/HR grade power | Deny grade edit/release without learning assignment; no gradebook UI in v0.6.6 | Reduced | Low | Pending owner |
-| Excessive retention | Periods in config; yearly review | Reduced | Low | Pending owner |
-| Cache / channel leakage | No grade endpoints in SW caches; repo/agent fake-data rules | Reduced | Low | Pending owner |
-| Demo/CI exposure | Demo seeders and tests use `@example.test` only | Reduced | Low | Pending owner |
-| Special category in content | Authoring guidance; sanitiser; escalate if a course needs it | Reduced | Low | Pending owner |
+| Unauthorised access | Module flag, scoped learning roles/policies, matrix tests | Reduced | Low | Owner |
+| Under-18 exposure | Same minimisation; no extra fields; access limited to need | Reduced | Low | Owner |
+| Implicit Admin/HR grade power | Deny grade edit/release without learning assignment; no gradebook UI in v0.6.6 | Reduced | Low | Owner |
+| Excessive retention | Periods in config; yearly review | Reduced | Low | Owner |
+| Cache / channel leakage | No grade endpoints in SW caches; repo/agent fake-data rules | Reduced | Low | Owner |
+| Demo/CI exposure | Demo seeders and tests use `@example.test` only | Reduced | Low | Owner |
+| Special category in content | Authoring guidance; sanitiser; escalate if a course needs it | Reduced | Low | Owner |
 
 ## Step 7: Sign-off and outcomes
 
 | Item | Name or date | Notes |
 | --- | --- | --- |
-| Measures approved by | *Awaiting Bambie Murphy, Director* | Do not invent approval |
-| Residual risks approved by | *Awaiting owner* | Residual risks intended to be low after measures; no ICO consultation proposed for this scoped build once approved |
-| Decision | **Draft only** | Retention periods below are proposed; owner must agree before real learner PII is stored |
-| Approval date | — | Record on this file, on issue #170 and on Epic #162 when the owner approves |
+| Measures approved by | Bambie Murphy, Director | 16 November 2026 |
+| Residual risks approved by | Bambie Murphy, Director | Residual risks low after measures; no ICO consultation needed for this scoped build |
+| Decision | Approved | Retention periods below; Learning features may be built under v0.6.6 |
+| Approval date | 2026-11-16 | Recorded with Bambie's AskQuestion answer on the v0.6.6 build (issue #170) |
 | Filed | This repository path only | Not SharePoint |
-| Review date | Within one year of approval | Or sooner before loading real production learner data, or on scope change |
+| Review date | 16 November 2027 | Or sooner before loading real production learner data, or on scope change |
 
-### Proposed retention (config keys)
+### Agreed retention (config keys)
 
 Values are years after the learner leaves the organisation (or after the
 enrolment ends, where noted), overridable by environment variables. Safe
-minimums apply if unset. **Owner agreement required.**
+minimums apply if unset.
 
 | Record | Default | Env override |
 | --- | --- | --- |
