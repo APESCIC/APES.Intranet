@@ -92,8 +92,9 @@ artisan db:seed --class='Database\Seeders\RolesAndPermissionsSeeder' --force
 # After the core seeder: its syncPermissions drops module grants, and this puts them back.
 artisan db:seed --class='Database\Seeders\CommunicationsBootstrapSeeder' --force
 artisan db:seed --class='Database\Seeders\Microsoft365BootstrapSeeder' --force
-  artisan db:seed --class='Database\Seeders\OperationsBootstrapSeeder' --force
-  artisan db:seed --class='Database\Seeders\HelpdeskBootstrapSeeder' --force
+artisan db:seed --class='Database\Seeders\OperationsBootstrapSeeder' --force
+artisan db:seed --class='Database\Seeders\HelpdeskBootstrapSeeder' --force
+artisan db:seed --class='Database\Seeders\LearningBootstrapSeeder' --force
 # A release-notes problem must never block a deploy: the hub keeps its old entries.
 artisan changelog:sync || echo "WARNING: changelog:sync failed; see storage/logs. The deploy carries on." >&2
 artisan optimize
