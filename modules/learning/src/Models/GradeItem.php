@@ -12,12 +12,16 @@ class GradeItem extends Model
 
     protected $fillable = [
         'course_id',
+        'category_id',
         'title',
         'scheme_id',
         'rubric_id',
         'source_type',
         'source_id',
         'weight',
+        'attempt_policy',
+        'due_at',
+        'missing_policy',
     ];
 
     protected function casts(): array
@@ -25,6 +29,7 @@ class GradeItem extends Model
         return [
             'weight' => 'decimal:4',
             'source_id' => 'integer',
+            'due_at' => 'datetime',
         ];
     }
 
@@ -34,6 +39,14 @@ class GradeItem extends Model
     public function course(): BelongsTo
     {
         return $this->belongsTo(Course::class);
+    }
+
+    /**
+     * @return BelongsTo<GradeCategory, $this>
+     */
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(GradeCategory::class, 'category_id');
     }
 
     /**
