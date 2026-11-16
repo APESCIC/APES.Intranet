@@ -311,10 +311,7 @@ class EnrolmentService
             ]);
         }
 
-        if ($existing->enrolled_at === null) {
-            $payload['enrolled_at'] = now();
-        }
-
+        // enrolled_at is non-nullable and set on create; keep the original stamp on reactivate.
         $existing->update($payload);
 
         return $existing->refresh();

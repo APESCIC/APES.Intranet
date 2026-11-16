@@ -3,10 +3,18 @@
 namespace Modules\Learning\Models;
 
 use App\Models\User;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Modules\Learning\EnrolmentMethod;
 
+/**
+ * @property EnrolmentMethod $method
+ * @property CarbonInterface|null $starts_at
+ * @property CarbonInterface|null $ends_at
+ * @property CarbonInterface $enrolled_at
+ * @property CarbonInterface|null $ended_at
+ */
 class Enrolment extends Model
 {
     protected $table = 'learning_enrolments';
