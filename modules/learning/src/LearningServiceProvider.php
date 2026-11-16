@@ -11,6 +11,7 @@ use Modules\Learning\Policies\LearningGradePolicy;
 use Modules\Learning\Services\AssignmentSubmissionService;
 use Modules\Learning\Services\CourseAuthoringService;
 use Modules\Learning\Services\EnrolmentService;
+use Modules\Learning\Services\GradingSchemeService;
 use Modules\Learning\Services\LearningAssignmentService;
 use Modules\Learning\Services\ProgressService;
 use Modules\Learning\Services\QuestionBankService;
@@ -30,6 +31,7 @@ class LearningServiceProvider extends ServiceProvider
         $this->app->singleton(QuestionBankService::class);
         $this->app->singleton(QuizAttemptService::class);
         $this->app->singleton(AssignmentSubmissionService::class);
+        $this->app->singleton(GradingSchemeService::class);
         $this->app->singleton(LearningGradePolicy::class);
     }
 
