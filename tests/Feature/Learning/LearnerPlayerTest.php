@@ -55,8 +55,9 @@ it('shows enrolled courses on My learning and plays a lesson at phone widths', f
         ->assertOk()
         ->assertSee('Induction player')
         ->assertSee('Continue')
-        ->assertDontSee('grade', false)
-        ->assertDontSee('Grade');
+        ->assertSee('My grades') // nav link from v0.6.7; progress UI itself stays grade-free
+        ->assertDontSee('gradebook', false)
+        ->assertDontSee('Gradebook');
 
     $this->actingAs($learner)
         ->withHeader('User-Agent', 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)')
@@ -70,7 +71,7 @@ it('shows enrolled courses on My learning and plays a lesson at phone widths', f
         ->assertOk()
         ->assertSee('Safe content')
         ->assertSee('Mark lesson complete')
-        ->assertDontSee('grade', false);
+        ->assertDontSee('gradebook', false);
 
     $this->actingAs($learner)
         ->post(route('learning.play.complete', [$course, $lesson]))
