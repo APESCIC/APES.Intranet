@@ -11,6 +11,7 @@ parameters:
         - modules/operations/database/migrations
         - modules/helpdesk/database/migrations
         - modules/hr/database/migrations
+        - modules/learning/database/migrations
     paths:
         - app/
         - bootstrap/app.php
