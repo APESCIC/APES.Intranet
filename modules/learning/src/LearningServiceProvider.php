@@ -4,14 +4,22 @@ namespace Modules\Learning;
 
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use Modules\Learning\Gradebook\GradebookCalculator;
 use Modules\Learning\Models\Course;
 use Modules\Learning\Navigation\LearningMenuContributor;
 use Modules\Learning\Policies\CoursePolicy;
 use Modules\Learning\Policies\LearningGradePolicy;
+use Modules\Learning\Services\AssignmentSubmissionService;
 use Modules\Learning\Services\CourseAuthoringService;
 use Modules\Learning\Services\EnrolmentService;
+use Modules\Learning\Services\GradeAuditService;
+use Modules\Learning\Services\GradeReleaseService;
+use Modules\Learning\Services\GradeViewExportService;
+use Modules\Learning\Services\GradingSchemeService;
 use Modules\Learning\Services\LearningAssignmentService;
 use Modules\Learning\Services\ProgressService;
+use Modules\Learning\Services\QuestionBankService;
+use Modules\Learning\Services\QuizAttemptService;
 
 class LearningServiceProvider extends ServiceProvider
 {
@@ -24,6 +32,14 @@ class LearningServiceProvider extends ServiceProvider
         $this->app->singleton(CourseAuthoringService::class);
         $this->app->singleton(EnrolmentService::class);
         $this->app->singleton(ProgressService::class);
+        $this->app->singleton(QuestionBankService::class);
+        $this->app->singleton(QuizAttemptService::class);
+        $this->app->singleton(AssignmentSubmissionService::class);
+        $this->app->singleton(GradingSchemeService::class);
+        $this->app->singleton(GradebookCalculator::class);
+        $this->app->singleton(GradeReleaseService::class);
+        $this->app->singleton(GradeAuditService::class);
+        $this->app->singleton(GradeViewExportService::class);
         $this->app->singleton(LearningGradePolicy::class);
     }
 

@@ -1,0 +1,26 @@
+{
+  "version": "v0.6.7",
+  "released_at": "2026-11-16",
+  "title": "Assessment and gradebook",
+  "summary": "Learning courses can now include quizzes and assignments, with grades released when they are ready. You can open My grades to see your released marks and feedback; instructors can export course grades as a spreadsheet.",
+  "audiences": ["staff", "volunteers", "students"],
+  "changes": {
+    "added": [
+      "Quizzes with a question bank, attempts and marking for open answers.",
+      "Assignments with file upload, feedback and late submission handling.",
+      "Grading schemes and rubrics for consistent marking.",
+      "A gradebook that calculates category and course totals, including exemptions.",
+      "Moderation and grade release so learners only see marks when they are released.",
+      "Append-only grade history, overrides with a reason, and an appeal path.",
+      "My grades: view your released grades and feedback.",
+      "Course grade CSV export for instructors and grade approvers, with formula cells escaped."
+    ],
+    "accessibility": [
+      "My grades is included in the automated accessibility check on desktop and phone widths."
+    ]
+  },
+  "internal_notes": [
+    "Epic #163. Shipped #176 quizzes/question bank; #177 assignments/submissions/feedback; #178 schemes/rubrics; #179 GradebookCalculator (BCMath); #180 moderation/release; #181 audit/overrides/appeals; #182 learner grade view + scoped CSV. Moodle (upskilling) and HR My training untouched. Grade edit/release never from Admin/HR Spatie roles alone."
+  ],
+  "published": true
+}
