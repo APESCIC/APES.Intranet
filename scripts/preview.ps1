@@ -49,13 +49,35 @@ function Invoke-Native([scriptblock]$Command) {
     return [pscustomobject]@{ Code = $LASTEXITCODE; Output = ($output | Out-String).Trim() }
 }
 
+function Test-LocalPortOpen([int]$Port) {
+    # Prefer Get-NetTCPConnection, but without elevation Windows often leaves
+    # State blank even for listeners, so -State Listen alone is a false stop.
+    $conns = @(Get-NetTCPConnection -LocalPort $Port -ErrorAction SilentlyContinue)
+    if ($conns.Count -gt 0) { return $true }
+    try {
+        $client = [System.Net.Sockets.TcpClient]::new()
+        $client.Connect('127.0.0.1', $Port)
+        $ok = $client.Connected
+        $client.Close()
+        return $ok
+    } catch {
+        return $false
+    }
+}
+
+function Get-LocalPortConnections([int]$Port) {
+    # Without admin rights State may be empty; treat blank State as a listener.
+    return @(Get-NetTCPConnection -LocalPort $Port -ErrorAction SilentlyContinue |
+        Where-Object { $_.State -eq 'Listen' -or [string]::IsNullOrWhiteSpace([string]$_.State) })
+}
+
 function Stop-SiteVite([string]$Repo, [int]$Port) {
     # This profile's Vite port is reserved for apes-intranet. Stop listeners on
     # that port when they are node/cmd (Vite), preferring processes whose
     # command line names this repo so another project's accidental bind is not
     # killed unless it is the only listener on our dedicated port.
     $stopped = $false
-    $listeners = @(Get-NetTCPConnection -State Listen -LocalPort $Port -ErrorAction SilentlyContinue)
+    $listeners = @(Get-LocalPortConnections -Port $Port)
     foreach ($listener in $listeners) {
         $proc = Get-Process -Id $listener.OwningProcess -ErrorAction SilentlyContinue
         if ($null -eq $proc) { continue }
@@ -185,7 +207,7 @@ try {
     Write-Step "Herd preview $($p.appUrl)"
     $missing = @('Herd', 'nginx' | Where-Object { -not (Get-Process $_ -ErrorAction SilentlyContinue) })
     if ($missing.Count -gt 0) { Stop-Preview 1 "Not running: $($missing -join ', '). Open Herd." }
-    if (-not (Get-NetTCPConnection -State Listen -LocalPort $p.database.port -ErrorAction SilentlyContinue)) { Stop-Preview 1 "Nothing listens on MySQL's port $($p.database.port). Start Herd's MySQL service (Herd > Services)." }
+    if (-not (Test-LocalPortOpen -Port ([int]$p.database.port))) { Stop-Preview 1 "Nothing listens on MySQL's port $($p.database.port). Start Herd's MySQL service (Herd > Services), or: herd services:start <mysql-id>." }
     $health = Get-Health $p.appUrl
     if ($null -eq $health -or $null -eq $health.local) { Stop-Preview 1 "$($p.appUrl)/healthz did not answer with the local block. Is APP_ENV=local in .env, and is the site linked (herd links)?" }
     if ($health.local.git_revision -ne $head.Substring(0, 12)) {
@@ -203,7 +225,7 @@ try {
 
     # 4. Vite ------------------------------------------------------------------
     Write-Step "Vite on port $($p.viteDevServerPort)"
-    if (Get-NetTCPConnection -State Listen -LocalPort $p.viteDevServerPort -ErrorAction SilentlyContinue) {
+    if (Test-LocalPortOpen -Port ([int]$p.viteDevServerPort)) {
         Write-Ok 'Already running'
     } elseif ($NoVite) {
         Write-Warn 'Not running (-NoVite). Start it with npm run dev.'

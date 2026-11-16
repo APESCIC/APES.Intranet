@@ -145,7 +145,7 @@ Evidence (Packagist, 8 November 2026):
 
 - `nwidart/laravel-modules` v13.3.0 (28 October 2026), MIT. It needs PHP
   ^8.3 and is tested against `laravel/framework` ^13.0, so it **would work**
-  with Laravel 13 on PHP 8.3 (Laragon) and 8.4 (Cloudron). It has no
+  with Laravel 13 on PHP 8.3 (CI / Herd floor) and 8.4 (Herd site and Cloudron). It has no
   Packagist security advisories.
 - It needs `wikimedia/composer-merge-plugin`, a Composer plugin that runs
   during `composer install` and merges each module's `composer.json`. That is

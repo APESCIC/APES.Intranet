@@ -120,7 +120,9 @@ What each automatic check does, and what to do if one fails: [docs/workflows.md]
 - Herd's own `php` runs its global PHP (8.5 or newer), so dot-source
   `scripts\herd-env.ps1` before any `php`, `composer` or `npm` command.
 - After Herd restarts, `herd services:list` can show MySQL as stopped while
-  it still answers on port 3306. Trust `scripts\preview.ps1`.
+  it still answers on port 3306. Start by id (`herd services:start <id>`),
+  not only by the name `mysql`. Trust `scripts\preview.ps1` (it probes the
+  port without needing admin rights for `-State Listen`).
 - Herd injects an "Edit with Herd" badge (`#herd-ai-host`) into local pages;
   the accessibility check excludes it.
 - Herd's nvm needs `C:\Program Files\nodejs` free: no standalone Node.js.
