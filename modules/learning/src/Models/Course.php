@@ -95,6 +95,16 @@ class Course extends Model
         return $this->hasMany(Quiz::class);
     }
 
+    /**
+     * Course assessment assignments (not LearningRoleAssignment rows).
+     *
+     * @return HasMany<Assignment, $this>
+     */
+    public function courseAssignments(): HasMany
+    {
+        return $this->hasMany(Assignment::class);
+    }
+
     public function isPublished(): bool
     {
         return $this->status === self::STATUS_PUBLISHED;

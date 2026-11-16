@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\Learning\Http\Controllers\AssignmentController;
 use Modules\Learning\Http\Controllers\CourseAuthoringController;
 use Modules\Learning\Http\Controllers\CoursePlayerController;
 use Modules\Learning\Http\Controllers\EnrolmentController;
@@ -22,6 +23,9 @@ Route::middleware(['web', 'auth', 'can:'.LearningPermissions::ACCESS, 'module:le
         Route::post('/play/{course}/quizzes/{quiz}/start', [QuizAttemptController::class, 'start'])->name('play.quiz.start');
         Route::get('/play/{course}/quizzes/{quiz}/attempts/{attempt}', [QuizAttemptController::class, 'attempt'])->name('play.quiz.attempt');
         Route::post('/play/{course}/quizzes/{quiz}/attempts/{attempt}', [QuizAttemptController::class, 'submit'])->name('play.quiz.submit');
+        Route::get('/play/{course}/assignments/{assignment}', [AssignmentController::class, 'show'])->name('play.assignment');
+        Route::post('/play/{course}/assignments/{assignment}/submit', [AssignmentController::class, 'submit'])->name('play.assignment.submit');
+        Route::get('/play/{course}/assignments/{assignment}/submissions/{submission}/download', [AssignmentController::class, 'download'])->name('play.assignment.download');
 
         Route::get('/courses', [CourseAuthoringController::class, 'index'])->name('courses.index');
         Route::get('/courses/create', [CourseAuthoringController::class, 'create'])->name('courses.create');
@@ -32,6 +36,11 @@ Route::middleware(['web', 'auth', 'can:'.LearningPermissions::ACCESS, 'module:le
         Route::get('/courses/{course}/lessons/{lesson}/edit', [CourseAuthoringController::class, 'editLesson'])->name('courses.lessons.edit');
         Route::put('/courses/{course}/lessons/{lesson}', [CourseAuthoringController::class, 'updateLesson'])->name('courses.lessons.update');
         Route::post('/courses/{course}/lessons/{lesson}/publish', [CourseAuthoringController::class, 'publishLesson'])->name('courses.lessons.publish');
+
+        Route::get('/courses/{course}/assignments', [AssignmentController::class, 'index'])->name('courses.assignments.index');
+        Route::post('/courses/{course}/assignments', [AssignmentController::class, 'store'])->name('courses.assignments.store');
+        Route::post('/courses/{course}/assignments/{assignment}/publish', [AssignmentController::class, 'publish'])->name('courses.assignments.publish');
+        Route::post('/courses/{course}/assignments/{assignment}/feedback', [AssignmentController::class, 'storeFeedback'])->name('courses.assignments.feedback');
 
         Route::get('/courses/{course}/quizzes', [QuizAuthoringController::class, 'index'])->name('courses.quizzes.index');
         Route::get('/courses/{course}/quizzes/mark-queue', [QuizAuthoringController::class, 'markQueue'])->name('courses.quizzes.mark-queue');
