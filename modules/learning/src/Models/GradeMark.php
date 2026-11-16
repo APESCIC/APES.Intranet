@@ -5,6 +5,7 @@ namespace Modules\Learning\Models;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Modules\Learning\GradeReleaseState;
 
 class GradeMark extends Model
 {
@@ -15,8 +16,13 @@ class GradeMark extends Model
         'user_id',
         'raw_score',
         'passed',
+        'release_state',
         'marked_by',
+        'moderated_by',
+        'released_by',
         'marked_at',
+        'moderated_at',
+        'released_at',
     ];
 
     protected function casts(): array
@@ -24,7 +30,10 @@ class GradeMark extends Model
         return [
             'raw_score' => 'decimal:6',
             'passed' => 'boolean',
+            'release_state' => GradeReleaseState::class,
             'marked_at' => 'datetime',
+            'moderated_at' => 'datetime',
+            'released_at' => 'datetime',
         ];
     }
 

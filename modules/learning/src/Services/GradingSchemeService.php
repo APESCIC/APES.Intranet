@@ -6,6 +6,7 @@ use App\Core\Audit\AuditLogger;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
+use Modules\Learning\GradeReleaseState;
 use Modules\Learning\GradingSchemeType;
 use Modules\Learning\Models\Course;
 use Modules\Learning\Models\GradeItem;
@@ -183,6 +184,7 @@ class GradingSchemeService
             [
                 'raw_score' => $rawScore,
                 'passed' => $passed,
+                'release_state' => GradeReleaseState::Draft,
                 'marked_by' => $marker->id,
                 'marked_at' => now(),
             ],
