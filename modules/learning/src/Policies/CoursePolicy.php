@@ -37,4 +37,9 @@ class CoursePolicy
     {
         return $user->can(LearningPermissions::COURSE_AUTHOR);
     }
+
+    public function enrol(User $user, Course $course): bool
+    {
+        return $user->can(LearningPermissions::ENROL_MANAGE);
+    }
 }

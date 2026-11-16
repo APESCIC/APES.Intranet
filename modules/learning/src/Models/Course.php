@@ -20,8 +20,16 @@ class Course extends Model
         'title',
         'summary',
         'status',
+        'self_enrol_enabled',
         'created_by',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'self_enrol_enabled' => 'boolean',
+        ];
+    }
 
     /**
      * @return HasMany<Section, $this>
@@ -29,6 +37,38 @@ class Course extends Model
     public function sections(): HasMany
     {
         return $this->hasMany(Section::class)->orderBy('sort_order');
+    }
+
+    /**
+     * @return HasMany<Cohort, $this>
+     */
+    public function cohorts(): HasMany
+    {
+        return $this->hasMany(Cohort::class);
+    }
+
+    /**
+     * @return HasMany<Enrolment, $this>
+     */
+    public function enrolments(): HasMany
+    {
+        return $this->hasMany(Enrolment::class);
+    }
+
+    /**
+     * @return HasMany<CourseGroupRule, $this>
+     */
+    public function groupRules(): HasMany
+    {
+        return $this->hasMany(CourseGroupRule::class);
+    }
+
+    /**
+     * @return HasMany<CoursePrerequisite, $this>
+     */
+    public function prerequisites(): HasMany
+    {
+        return $this->hasMany(CoursePrerequisite::class);
     }
 
     /**

@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Learning\Http\Controllers\CourseAuthoringController;
+use Modules\Learning\Http\Controllers\EnrolmentController;
 use Modules\Learning\Http\Controllers\MyLearningController;
 use Modules\Learning\LearningPermissions;
 
@@ -20,4 +21,11 @@ Route::middleware(['web', 'auth', 'can:'.LearningPermissions::ACCESS, 'module:le
         Route::get('/courses/{course}/lessons/{lesson}/edit', [CourseAuthoringController::class, 'editLesson'])->name('courses.lessons.edit');
         Route::put('/courses/{course}/lessons/{lesson}', [CourseAuthoringController::class, 'updateLesson'])->name('courses.lessons.update');
         Route::post('/courses/{course}/lessons/{lesson}/publish', [CourseAuthoringController::class, 'publishLesson'])->name('courses.lessons.publish');
+
+        Route::get('/courses/{course}/enrolments', [EnrolmentController::class, 'index'])->name('courses.enrolments.index');
+        Route::post('/courses/{course}/enrolments/manual', [EnrolmentController::class, 'storeManual'])->name('courses.enrolments.manual');
+        Route::post('/courses/{course}/enrolments/group-rules', [EnrolmentController::class, 'storeGroupRule'])->name('courses.enrolments.group-rules');
+        Route::post('/courses/{course}/enrolments/prerequisites', [EnrolmentController::class, 'storePrerequisite'])->name('courses.enrolments.prerequisites');
+        Route::post('/courses/{course}/enrolments/sync', [EnrolmentController::class, 'sync'])->name('courses.enrolments.sync');
+        Route::post('/courses/{course}/self-enrol', [EnrolmentController::class, 'selfEnrol'])->name('courses.self-enrol');
     });
