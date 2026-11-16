@@ -1,0 +1,28 @@
+# Secrets and credentials (never index for agents)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.json
+credentials.txt
+secrets.json
+**/pending-secrets/
+**/.bw-session*
+**/*.local.json
+
+# Large / generated trees
+vendor/
+node_modules/
+dist/
+build/
+coverage/
+public/build/
+storage/logs/
+storage/framework/cache/
+storage/framework/sessions/
+storage/framework/views/
+bootstrap/cache/
+.git/
