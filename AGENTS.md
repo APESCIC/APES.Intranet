@@ -1,149 +1,144 @@
-# APES Intranet: start here
+# Agent instructions for APES Intranet
 
-For people and Cursor agents. Write UK English. Words in *italics* are in the
-[glossary](docs/glossary.md).
+Cursor's user rules and skills set how work is done here (branches, issues, pull requests, merge, release, deploy, ship gate, decisions and safety). This file describes this repository and fills the named slots below. If anything here disagrees with them, Cursor's rules win and this file is corrected in the same milestone.
 
-## What this repo is
+Cursor/agent layout standard: https://github.com/apescic-director/Cursor/blob/main/docs/cursor-agent-standards.md
 
-The private intranet for APES CIC staff, volunteers and students: updates, the
-directory, rotas, clock in and out, tasks, forms and the help desk, with HR,
-training, agreements and hiring to come. It is a Laravel app, live at
-<https://intranet.apes.org.uk> on *Cloudron*. The owner is Bambie Murphy,
-Director. Her decisions are in [docs/decisions.md](docs/decisions.md).
+The owner is Bambie Murphy, Director. Write UK English (organisation, behaviour, colour, licence) in the product, docs, issues and pull requests. Words in *italics* are in the [glossary](docs/glossary.md). Never print, paste or commit secrets. Secrets live only in APES Vault (Bitwarden).
 
-## Start here
+## About the app
 
-1. Install *Laravel Herd* Pro with PHP 8.4 (`ldap` on), a MySQL 8.4 service
-   on port 3306 and Node 22 through Herd's nvm (the only supported local
-   set-up).
-2. Clone the repo, then run
-   `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\herd-setup.ps1 -SeedDemo`.
-3. Before any work, run the live preview gate:
-   `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\preview.ps1`.
-4. Open <https://apes-intranet.test/login> and use the amber **Developer
-   sign-in** panel (local only) to sign in as a fake account for any role.
-   Once signed in, the amber **QA** pill in the menu switches role in place.
-   <https://apes-intranet.test/qa> still works as a fallback. The local site
-   is HTTPS (`herd secure apes-intranet`); do not use Herd's badge "dev"
-   stack — use `scripts\preview.ps1` and `npm run dev`.
-5. Stuck? See [docs/local-development.md](docs/local-development.md).
+The private intranet for APES CIC staff, volunteers and students: updates, the directory, rotas, clock in and out, tasks, forms and the help desk, with HR, training, agreements and hiring to come. Laravel app, live at <https://intranet.apes.org.uk> on *Cloudron*. Owner decisions: [docs/decisions.md](docs/decisions.md).
 
-## How we work
+- Repository: `APESCIC/APES.Intranet`. Work only in this repository (plus `docs/apes-intranet/` in private `APESCIC/.github-private` for internal-only docs).
 
-Each *milestone* is one version, such as `v0.6.0`, and ships once.
+## Stack and architecture
 
-1. **Work.** Each *issue* gets an *issue branch* from the *version branch*,
-   *commits* as needed, and a *PR* into the version branch. When it has merged
-   and its *checks* pass, the issue gets a "Work complete" comment and is
-   closed. Then the next issue starts.
-2. **Merge.** When every issue is closed, merge `main` into the version branch
-   and open one PR into `main`. After Bambie's *ship gate* answer, it merges
-   with one *merge commit* (never squash or rebase).
-3. **Release.** One *tag* `vX.Y.Z` on that merge commit, and one GitHub
-   *release*.
-4. **Deploy.** One Cloudron *deploy* of that tag, with `/healthz` as evidence.
-   Then the Epic and the milestone close.
+- Laravel on PHP 8.4, MySQL, Vite on port 5174, Redis and mail via Cloudron addons in production.
+- Local stack: Laravel Herd Pro only, with fake demo data. Never real HR, student, volunteer or agreement data.
+- Key paths: `app/`, `resources/`, `routes/`, `database/`, `docs/`, `.cursor/skills/`, `deploy/cloudron/`.
 
-"Complete the next version" means the open milestone with the lowest version
-above the latest tag, never GitHub's milestone number. A *hotfix* needs
-Bambie's written approval on the issue. The full flow, with a worked example,
-is in [CONTRIBUTING.md](CONTRIBUTING.md).
+## Local development and preview
 
-### This repo's flow wins
+| Item | Value |
+| --- | --- |
+| Clone | `C:\Users\BambieMurphy\Documents\GitHub\APES.Intranet` |
+| Herd site | `apes-intranet` (linked; PHP 8.4 isolated, `ldap` on, as on Cloudron) |
+| Preview URL | `https://apes-intranet.test` (Herd secure; `http://` redirects) |
+| Preview command | `scripts\preview.ps1` (live preview gate), then `npm run dev` / Vite |
+| HMR port | 5174 (Vite) |
+| Env file | `.env.example` (key names only, never values) |
+| Database | MySQL `apes_intranet_local` (Herd MySQL 8.4 on 127.0.0.1:3306, `root`, empty password) |
+| Mail | Herd mail catcher (`MAIL_HOST=127.0.0.1`, `MAIL_PORT=2525`) |
+| Setup | `scripts\herd-setup.ps1` (or `composer setup`); demo: `php artisan demo:seed` |
 
-Where a personal Cursor rule or skill describes a different flow, follow this
-repo. In particular:
+Laravel Herd is the only local stack. Use fake demo data only. Values: [docs/herd/profile.json](docs/herd/profile.json); guide: [docs/local-development.md](docs/local-development.md). Rule: [`.cursor/rules/herd.mdc`](.cursor/rules/herd.mdc). Gate skill: [`.cursor/skills/live-preview-gate/SKILL.md`](.cursor/skills/live-preview-gate/SKILL.md).
 
-- One issue branch and one PR per issue into the version branch, not one PR
-  for the whole milestone.
-- Close each issue by hand after its PR merges. The version PR says
-  `Refs #<epic>`, never `Closes`.
-- Branches are `milestone/vX-Y-Z-<slug>` and `<type>/<issue>-<slug>`, not
-  `cursor/feature/...`.
-- Issue comments use the templates in
-  [`.cursor/skills/work-on-issue/templates/`](.cursor/skills/work-on-issue/templates/),
-  not `Add-IssueUpdate.ps1`. The milestone closes with the `gh api` step in
-  the `deploy-version` skill, not `Close-Milestone.ps1`.
+### Local development with Laravel Herd
+
+This project runs on Laravel Herd. Run `herd site:info` for the URL, PHP version and connected services.
+
+- Dot-source `scripts\herd-env.ps1` (or use `herd php` / `herd composer`) so PHP 8.4, Composer and Node 22 win over Herd's newer global PHP.
+- Do not use Herd's badge or app "dev" stack (`php artisan dev`): it clashes with Vite on 5174. Use `scripts\preview.ps1` and `npm run dev`.
+- Sign in locally with the amber **Developer sign-in** panel on `/login`; the amber **QA** pill switches role (`/qa` fallback).
+- Herd MCP (`user-herd`) shows the site's last error, logs and caught mail.
+
+## Tests and checks
+
+| Check | Command |
+| --- | --- |
+| Tests | `composer test` (or `php artisan test`; avoid `--parallel` for footer/changelog/`/healthz` flakes) |
+| Format | `php vendor/bin/pint` |
+| Static analysis | `php vendor/bin/phpstan analyse --memory-limit=1G` |
+| Accessibility | `npm run test:a11y` (set `BASE_URL` first) |
+| CI workflows | `.github/workflows/` (see [docs/workflows.md](docs/workflows.md)) |
+
+## This repo's shipping flow
+
+Each *milestone* is one version (`vMAJOR.MINOR.PATCH` in the title) and ships once. **This repo's flow wins** over personal Cursor skills that use one PR per milestone, `Closes #n`, `cursor/feature/...` branches, or `Close-Milestone.ps1`.
+
+1. **Work.** Each issue gets an issue branch from the version branch, commits, and a PR into the version branch. After merge and green checks: "Work complete" comment, then close the issue. Then the next issue.
+2. **Merge.** When every issue is closed, merge `main` into the version branch and open one PR into `main`. After the ship-gate answer, merge once with a merge commit (never squash or rebase).
+3. **Release.** One tag `vX.Y.Z` and one GitHub release.
+4. **Deploy.** One Cloudron deploy of that tag; `/healthz` is evidence. Then close the Epic and the milestone.
+
+"Complete the next version" means the open milestone with the lowest version above the latest tag, never GitHub's milestone number. Hotfix need written approval on the issue. Full flow: [CONTRIBUTING.md](CONTRIBUTING.md). Skills: `.cursor/skills/`. Rule: [`.cursor/rules/shipping.mdc`](.cursor/rules/shipping.mdc).
+
+Development is tracked only in GitHub issues, sub-issues and `vMAJOR.MINOR.PATCH` milestones — never Linear.
 
 ## Everyday commands
 
-Run them from the repo root with Herd's PHP 8.4 and Node 22 first on `PATH`
-(Herd's global PHP may be newer): run `. .\scripts\herd-env.ps1` once per terminal ([how](docs/local-development.md#everyday-commands)).
+| Command | What it does |
+| --- | --- |
+| `/next-version` | Start or resume the next version |
+| `/work-on-issue` | Work one issue from start to close |
+| `/plan` | Write a plan and wait for approval |
+| `/status` | Version, open issues, PRs (read-only) |
+| `/finish-version` | Release note, version PR, ship gate, merge |
+| `/release` | Tag and GitHub release |
+| `/deploy` | Cloudron deploy, evidence, close-out |
+| `. .\scripts\herd-env.ps1` | Herd PHP 8.4, Composer, Node 22 on `PATH` |
+| `scripts\preview.ps1` | Live preview gate |
+| `scripts\herd-setup.ps1` | Set up or repair the Herd site |
+| `npm run dev` | Vite on 5174 |
+| `php artisan demo:seed` / `demo:reset` | Load / wipe+reload fake demo data (`reset` asks first) |
+| `composer milestone:next` / `milestone:status -- vX.Y.Z` | Next version names / open issues |
 
-| Command | What it does | When |
-| --- | --- | --- |
-| `/next-version` | Cursor: starts or resumes the next version | Starting a version |
-| `/work-on-issue` | Cursor: works one issue from start to close | Each issue |
-| `/plan` | Cursor: writes a plan and waits for approval | Before any big task |
-| `/status` | Cursor: shows the version, its issues and its PR | Any time |
-| `/finish-version` | Cursor: release note, version PR, ship gate, merge | Every issue closed |
-| `/release` | Cursor: tag and GitHub release | After the merge |
-| `/deploy` | Cursor: Cloudron deploy, evidence, close-out | After the release |
-| `. .\scripts\herd-env.ps1` | Puts Herd's PHP 8.4, Composer and Node 22 first on `PATH` | Each new terminal |
-| `scripts\preview.ps1` | Loads the latest code and checks the preview | Before any work |
-| `scripts\herd-setup.ps1` | Sets up or repairs the Herd site for this repo | First time, or when broken |
-| `npm run dev` | Starts Vite hot reload on port 5174 | While working |
-| `php artisan demo:seed` | Loads fake demo data | Once, or after a reset |
-| `php artisan test` | Runs the tests | Before each PR |
-| `php vendor/bin/pint` | Formats PHP code | Before each commit |
-| `php vendor/bin/phpstan analyse --memory-limit=1G` | Finds PHP type errors (Larastan) | Before each PR |
-| `npm run test:a11y` | Accessibility check (set `BASE_URL` first) | Before each PR |
-| `composer milestone:next` | Prints the next version and its names | Starting a version |
-| `composer milestone:status -- vX.Y.Z` | Lists a version's open issues | Before closing a milestone |
+## Workflow slots
 
-What each automatic check does, and what to do if one fails: [docs/workflows.md](docs/workflows.md).
+| Slot | Value |
+| --- | --- |
+| Milestone / version branch | `milestone/vX-Y-Z-<slug>` (`composer milestone:branch`) |
+| Issue branch | `<type>/<issue>-<slug>` from the version branch |
+| Issue PR title | `[vX.Y.Z] <summary> (#<issue>)` into the version branch |
+| Version PR into `main` | `vX.Y.Z: <milestone name>`, body `Refs #<epic>` (not `Closes`) |
+| Version files / release note | `composer milestone:bump -- vX.Y.Z` → `changelog/releases/vX.Y.Z.json` |
+| Release tooling | Annotated tag `vX.Y.Z`; title `vX.Y.Z <milestone name>` |
+| Area labels | As on sibling issues (for example `area:local-dev`, `area:cloudron`) |
+| Issue title prefix | `[Type] Short title` |
+| Issue comments | Templates in `.cursor/skills/work-on-issue/templates/` (not `Add-IssueUpdate.ps1`) |
+| Milestone close | `gh api` step in `deploy-version` skill (not `Close-Milestone.ps1`) |
+
+## Deploy and health
+
+| Item | Value |
+| --- | --- |
+| Target | Cloudron LAMP app |
+| Cloudron app ID | `8bd0acdc-ca6d-467e-aa1e-5c9eb52e3264` |
+| Domain | <https://intranet.apes.org.uk> |
+| Deploy command | `deploy/cloudron/deploy.ps1 -Tag vX.Y.Z` |
+| Deploys | The release tag only (never a branch). Merge and release do not auto-deploy |
+| Auto-deploy couplings | None |
+| Health URL | <https://intranet.apes.org.uk/healthz> |
+| Version field | JSON `version` (tag) and `revision` (first 12 chars of the tag commit) |
+| Secrets live in | APES Vault; Cloudron `shared/.env` (never commit values) |
 
 ## Rules you must follow
 
 - Never commit, print or paste passwords, tokens, keys or `.env` values.
-- Fake data only. No real HR, student, volunteer or agreement data anywhere.
+- Fake data only.
 - Never commit to `main`, force-push, or rebase a shared branch.
-- Ask Bambie with AskQuestion for every decision: best option first, marked
-  "(Recommended)", and a "Stop here" option last.
-- No merge into `main`, release or deploy without her ship-gate answer in the
-  current chat.
-- Ask before running migrations, `demo:reset`, or installing any tool.
-- Work only in `APESCIC/APES.Intranet`, plus `docs/apes-intranet/` in the
-  private `APESCIC/.github-private` for internal-only docs. Don't rename or
-  delete milestones or labels, and don't change DNS or Cloudflare.
-- Docs live in this repo; anything that must not be public goes in
-  `APESCIC/.github-private` `docs/apes-intranet/`. Never hand a document off
-  to SharePoint ([where documents live](docs/decisions.md#where-documents-live)).
-- Laravel Herd only for local work: no containers, virtual machines or
-  `php artisan serve`. The Herd MCP server (`user-herd`) shows the site's
-  last error, logs and caught mail.
-- Free GitHub features only. Security reviews use tests and the
-  `review-security` skill, never Aikido.
+- No merge into `main`, release or deploy without the ship-gate answer in the current chat.
+- Ask before migrations, `demo:reset`, or installing any system tool.
+- Do not rename or delete milestones or labels; do not change DNS or Cloudflare.
+- Docs live in this repo; anything that must not be public goes in `APESCIC/.github-private` `docs/apes-intranet/`. Never hand a document off to SharePoint.
+- Free GitHub features only. Security reviews use tests and the `review-security` skill, never Aikido.
 
-## Herd notes
+## Decisions and gotchas
 
-- Herd's own `php` runs its global PHP (8.5 or newer), so dot-source
-  `scripts\herd-env.ps1` before any `php`, `composer` or `npm` command.
-- After Herd restarts, `herd services:list` can show MySQL as stopped while
-  it still answers on port 3306. Start by id (`herd services:start <id>`),
-  not only by the name `mysql`. Trust `scripts\preview.ps1` (it probes the
-  port without needing admin rights for `-State Listen`).
-- Herd injects an "Edit with Herd" badge (`#herd-ai-host`) into local pages;
-  the accessibility check excludes it.
-- Herd's nvm needs `C:\Program Files\nodejs` free: no standalone Node.js.
-- Leftover `C:\laragon\bin\...` folders on the system `PATH` must not win over
-  Herd, but they can sit ahead of it. After `. .\scripts\herd-env.ps1`,
-  `(Get-Command php).Source` must show `.config\herd\bin\php84`; agent shells
-  may need it in the same command, as `PATH` changes don't always carry over.
-- If the Herd site is secured (`herd secured` lists it), `http://` redirects
-  to `https://apes-intranet.test`. The accessibility check follows that.
-- `php artisan test --parallel` fails a few footer, change log and `/healthz`
-  tests at random, because they all write the `VERSION` file. Run
-  `php artisan test` (as CI does) before trusting a failure there.
+- 2026-11-14: Laravel Herd Pro is the only local set-up (Bambie, #282), replacing Laragon (#213, #344).
+- Herd's global `php` may be newer than 8.4: always use `herd-env.ps1` / `herd php`.
+- After Herd restarts, `herd services:list` can show MySQL stopped while port 3306 still answers; start by service id. Trust `scripts\preview.ps1`.
+- Stale folders on `PATH` (including leftover Laragon `bin` paths) must not win over Herd; after `herd-env.ps1`, `(Get-Command php).Source` must show `.config\herd\bin\php84`.
+- Herd injects `#herd-ai-host`; a11y checks exclude it.
+- `public/.htaccess` is for Cloudron's Apache; keep PHP settings inside `<IfModule php_module>` and keep the `HTTP_AUTHORIZATION` rule.
 
-## Where to find more
+## Where to find things
 
-- Every doc, by what you want to do: [docs/README.md](docs/README.md).
-- The flow, step by step: [CONTRIBUTING.md](CONTRIBUTING.md), and the rule
-  [`.cursor/rules/shipping.mdc`](.cursor/rules/shipping.mdc); the skills are in `.cursor/skills/`.
-- Decisions (stack, sign-in, features, hosting, roadmap): [docs/decisions.md](docs/decisions.md).
-- Local set-up: [docs/local-development.md](docs/local-development.md).
-- Deploying: [docs/deploy/cloudron.md](docs/deploy/cloudron.md).
-- Release notes: [docs/release-notes.md](docs/release-notes.md).
-- Report template for tasks, PRs and releases: [docs/templates/report.md](docs/templates/report.md).
-- Security: [SECURITY.md](SECURITY.md).
+- Doc index: [docs/README.md](docs/README.md)
+- Contributing / flow: [CONTRIBUTING.md](CONTRIBUTING.md)
+- Local set-up: [docs/local-development.md](docs/local-development.md)
+- Deploy: [docs/deploy/cloudron.md](docs/deploy/cloudron.md)
+- Release notes: [docs/release-notes.md](docs/release-notes.md)
+- Report template: [docs/templates/report.md](docs/templates/report.md)
+- Security: [SECURITY.md](SECURITY.md)
