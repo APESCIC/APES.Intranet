@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Learning\Http\Controllers\CourseAuthoringController;
+use Modules\Learning\Http\Controllers\CoursePlayerController;
 use Modules\Learning\Http\Controllers\EnrolmentController;
 use Modules\Learning\Http\Controllers\MyLearningController;
 use Modules\Learning\LearningPermissions;
@@ -11,6 +12,10 @@ Route::middleware(['web', 'auth', 'can:'.LearningPermissions::ACCESS, 'module:le
     ->name('learning.')
     ->group(function () {
         Route::get('/', MyLearningController::class)->name('mine');
+
+        Route::get('/play/{course}', [CoursePlayerController::class, 'show'])->name('play.show');
+        Route::get('/play/{course}/lessons/{lesson}', [CoursePlayerController::class, 'lesson'])->name('play.lesson');
+        Route::post('/play/{course}/lessons/{lesson}/complete', [CoursePlayerController::class, 'complete'])->name('play.complete');
 
         Route::get('/courses', [CourseAuthoringController::class, 'index'])->name('courses.index');
         Route::get('/courses/create', [CourseAuthoringController::class, 'create'])->name('courses.create');
