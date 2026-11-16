@@ -4,6 +4,7 @@ namespace Modules\Learning;
 
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use Modules\Learning\Gradebook\GradebookCalculator;
 use Modules\Learning\Models\Course;
 use Modules\Learning\Navigation\LearningMenuContributor;
 use Modules\Learning\Policies\CoursePolicy;
@@ -32,6 +33,7 @@ class LearningServiceProvider extends ServiceProvider
         $this->app->singleton(QuizAttemptService::class);
         $this->app->singleton(AssignmentSubmissionService::class);
         $this->app->singleton(GradingSchemeService::class);
+        $this->app->singleton(GradebookCalculator::class);
         $this->app->singleton(LearningGradePolicy::class);
     }
 
