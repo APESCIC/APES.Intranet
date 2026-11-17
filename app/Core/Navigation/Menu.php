@@ -37,9 +37,6 @@ final class Menu
             new NavGroup('people', 'People', [
                 NavItem::route('directory', 'Directory', 'users', AccessMatrix::INTRANET_ACCESS, 'people.directory.index', 'people.directory.*', 'people'),
                 NavItem::route('org-chart', 'Organisation chart', 'network', AccessMatrix::INTRANET_ACCESS, 'people.org-chart', null, 'people'),
-                NavItem::route('profile', 'My profile', 'circle-user', AccessMatrix::INTRANET_ACCESS, 'people.profile.edit', null, 'people'),
-                NavItem::route('notifications', 'Notifications', 'bell', AccessMatrix::INTRANET_ACCESS, 'notifications.preferences.edit', 'notifications.preferences.*'),
-                NavItem::route('security', 'Security', 'shield', AccessMatrix::INTRANET_ACCESS, 'people.security', null, 'people'),
                 NavItem::route('students', 'Student placements', 'graduation-cap', AccessMatrix::INTRANET_ACCESS, 'people.students.index', 'people.students.*', 'people'),
             ]),
             new NavGroup('operations', 'Operations', [

@@ -1,0 +1,62 @@
+- generic [active] [ref=f1e1]:
+  - link "Skip to main content" [ref=f1e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=f1e5]:
+    - link "APES Intranet APES CIC" [ref=f1e7] [cursor=pointer]:
+      - /url: https://apes-intranet.test
+      - generic [ref=f1e8]:
+        - generic [ref=f1e9]: APES Intranet
+        - generic [ref=f1e10]: APES CIC
+    - banner [ref=f1e11]:
+      - heading "Sign in" [level=1] [ref=f1e12]
+      - paragraph [ref=f1e13]: Use your APES Cloudron account, the same one you use for email and the LMS.
+    - main [ref=f1e14]:
+      - region "Staff, volunteers and students" [ref=f1e15]:
+        - heading "Staff, volunteers and students" [level=2] [ref=f1e16]
+        - paragraph [ref=f1e17]: You will go to the APES sign-in page, then come back here.
+        - link "Sign in with Cloudron" [ref=f1e18] [cursor=pointer]:
+          - /url: https://apes-intranet.test/auth/redirect
+      - region "Developer sign-in" [ref=f1e22]:
+        - generic [ref=f1e23]:
+          - heading "Developer sign-in" [level=2] [ref=f1e24]
+          - generic [ref=f1e27]: Local only
+        - paragraph [ref=f1e28]:
+          - text: Sign in as a fake
+          - code [ref=f1e29]: "@example.test"
+          - text: account in one approved group, or a common stack of groups.
+        - generic [ref=f1e30]:
+          - region "Approved groups" [ref=f1e31]:
+            - heading "Approved groups" [level=3] [ref=f1e32]
+            - list [ref=f1e33]:
+              - listitem [ref=f1e34]:
+                - button "Staff" [ref=f1e36] [cursor=pointer]
+              - listitem [ref=f1e37]:
+                - button "Volunteer" [ref=f1e39] [cursor=pointer]
+              - listitem [ref=f1e40]:
+                - button "Student" [ref=f1e42] [cursor=pointer]
+              - listitem [ref=f1e43]:
+                - button "Supervisor" [ref=f1e45] [cursor=pointer]
+              - listitem [ref=f1e46]:
+                - button "Management" [ref=f1e48] [cursor=pointer]
+              - listitem [ref=f1e49]:
+                - button "HR" [ref=f1e51] [cursor=pointer]
+              - listitem [ref=f1e52]:
+                - button "Legal" [ref=f1e54] [cursor=pointer]
+              - listitem [ref=f1e55]:
+                - button "Admin" [ref=f1e57] [cursor=pointer]
+          - region "Common stacks" [ref=f1e58]:
+            - heading "Common stacks" [level=3] [ref=f1e59]
+            - list [ref=f1e60]:
+              - listitem [ref=f1e61]:
+                - button "Staff + HR" [ref=f1e63] [cursor=pointer]
+              - listitem [ref=f1e64]:
+                - button "Staff + Management" [ref=f1e66] [cursor=pointer]
+              - listitem [ref=f1e67]:
+                - button "Volunteer + Supervisor" [ref=f1e69] [cursor=pointer]
+              - listitem [ref=f1e70]:
+                - button "Staff + Admin" [ref=f1e72] [cursor=pointer]
+    - contentinfo [ref=f1e73]:
+      - generic [ref=f1e74]: © 2026 Association of Protecting Exotic Species CIC
+      - navigation "Legal" [ref=f1e75]:
+        - link "Privacy notice" [ref=f1e76] [cursor=pointer]:
+          - /url: https://apes-intranet.test/privacy
