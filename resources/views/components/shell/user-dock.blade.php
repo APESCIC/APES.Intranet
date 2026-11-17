@@ -1,4 +1,5 @@
 @props(['user', 'qaProfile' => null, 'qaPicker' => null, 'qaReturnTo' => null, 'qaConfirm' => false])
+{{-- Drawer-only identity strip. Account links live in the top-bar user menu (#321). --}}
 <div class="sg-dock" data-qa-dock>
     <div class="sg-dock__card">
         <span class="sg-avatar" aria-hidden="true">{{ $user->initials() }}</span>

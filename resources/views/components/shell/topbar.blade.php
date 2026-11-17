@@ -2,6 +2,11 @@
     'hasMenu' => false,
     'menu' => [],
     'panel' => null,
+    'user' => null,
+    'qaProfile' => null,
+    'qaPicker' => null,
+    'qaReturnTo' => null,
+    'qaConfirm' => false,
     'unreadNotifications' => 0,
     'recentNotifications' => null,
 ])
@@ -29,7 +34,15 @@
                 :unread-count="$unreadNotifications"
                 :recent="$recentNotifications ?? collect()"
             />
-            {{-- #321: user account menu lives here --}}
+            @if ($user)
+                <x-shell.user-menu
+                    :user="$user"
+                    :qa-profile="$qaProfile"
+                    :qa-picker="$qaPicker"
+                    :qa-return-to="$qaReturnTo"
+                    :qa-confirm="$qaConfirm"
+                />
+            @endif
         @endauth
     </div>
 </div>

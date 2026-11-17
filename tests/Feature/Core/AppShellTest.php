@@ -105,6 +105,22 @@ it('presents the More heading for people who can see HR or agreements', function
         ->and($headings)->not->toContain('HR and legal');
 });
 
+it('keeps account links out of People and in the user menu only', function () {
+    $user = userWithRole(RoleName::Staff);
+    $people = collect(Menu::for($user, MenuMode::Staff))->firstWhere('key', 'people');
+
+    expect(collect($people->items)->pluck('key')->all())
+        ->toContain('directory', 'org-chart', 'students')
+        ->not->toContain('profile', 'notifications', 'security');
+
+    $this->actingAs($user)->get(route('dashboard'))
+        ->assertOk()
+        ->assertSee('data-workspace-user-menu', false)
+        ->assertSee('data-nav-key="profile"', false)
+        ->assertSee('Notification settings')
+        ->assertSee('Sign out');
+});
+
 it('renders the shell with a skip link, labelled menu and the current page marked', function () {
     $response = $this->actingAs(userWithRole(RoleName::Admin))
         ->get(route('admin.roles.index'))
@@ -116,6 +132,7 @@ it('renders the shell with a skip link, labelled menu and the current page marke
         ->assertSee('aria-controls="workspace-drawer"', false)
         ->assertSee('data-workspace-top-nav', false)
         ->assertSee('data-workspace-disclosure-trigger', false)
+        ->assertSee('data-workspace-user-menu', false)
         ->assertSee('Sam Example')
         ->assertSee('SE')
         ->assertSee('data-panel-switch', false);

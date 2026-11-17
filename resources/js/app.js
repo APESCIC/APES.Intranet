@@ -55,6 +55,7 @@ import { initDrawer } from './shell/drawer.js';
 import { initNotificationBell } from './shell/notification-bell.js';
 import { initQaSwitcher } from './shell/qa-switcher.js';
 import { initTopNav } from './shell/top-nav.js';
+import { initUserMenu } from './shell/user-menu.js';
 
 const icons = {
     Activity,
@@ -116,6 +117,7 @@ function init() {
     });
     initDrawer();
     initTopNav();
+    initUserMenu();
     initQaSwitcher();
     initNotificationBell();
     initClockForm();
