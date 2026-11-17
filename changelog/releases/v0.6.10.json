@@ -1,0 +1,17 @@
+{
+  "version": "v0.6.10",
+  "released_at": "2026-11-17",
+  "title": "Herd-first Actions deploy",
+  "summary": "No changes you will notice in day-to-day use. This release updates how the intranet is checked and deployed behind the scenes.",
+  "audiences": ["staff"],
+  "changes": {
+    "changed": [
+      "Deploys of published release tags now run through GitHub Actions, with a health check afterwards.",
+      "Local accessibility checks stay on Laravel Herd and the Cursor browser; Playwright is no longer used for CI or local a11y."
+    ]
+  },
+  "internal_notes": [
+    "Epic #363 (already closed). Shipped #364 Actions Cloudron deploy workflow; #365 remove Playwright from CI and local a11y. Close-out only: release note, tag, GitHub release, deploy, close milestone 32."
+  ],
+  "published": true
+}
