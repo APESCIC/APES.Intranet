@@ -146,6 +146,8 @@ it('renders the Staff and Admin switch for admins, marking the active panel', fu
     $adminPage = $this->actingAs($admin)->get(route('admin.roles.index'))->assertOk()->getContent();
     expect($adminPage)
         ->toContain('aria-label="Switch panel"')
+        ->toContain('sg-switch--topbar')
+        ->toContain('sg-switch--drawer')
         ->toMatch('/href="'.preg_quote(route('admin.overview'), '/').'" class="sg-switch__link"\s+aria-current="true"\s*>Admin</')
         ->toMatch('/href="'.preg_quote(route('dashboard'), '/').'" class="sg-switch__link"\s*>Staff</')
         ->toContain('data-brand-panel>Admin panel<');
@@ -154,6 +156,7 @@ it('renders the Staff and Admin switch for admins, marking the active panel', fu
     expect($staffPage)
         ->toMatch('/href="'.preg_quote(route('dashboard'), '/').'" class="sg-switch__link"\s+aria-current="true"\s*>Staff</')
         ->toContain('data-brand-panel>Staff panel<')
+        ->toContain('sg-switch--topbar')
         ->not->toContain('Normal')
         ->not->toContain('Menu mode');
 });

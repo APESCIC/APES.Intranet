@@ -216,6 +216,23 @@
     color: var(--color-sg-white);
 }
 
+.sg-switch--topbar {
+    display: none;
+    flex: 0 0 auto;
+    margin-top: 0;
+    min-width: 10rem;
+}
+
+.sg-switch--drawer {
+    margin-top: 1rem;
+}
+
+@media (min-width: 64rem) {
+    .sg-switch--topbar {
+        display: grid;
+    }
+}
+
 /* Navigation */
 .sg-nav {
     display: flex;
