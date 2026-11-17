@@ -135,7 +135,9 @@ it('renders the shell with a skip link, labelled menu and the current page marke
         ->assertSee('data-workspace-user-menu', false)
         ->assertSee('Sam Example')
         ->assertSee('SE')
-        ->assertSee('data-panel-switch', false);
+        ->assertSee('data-panel-switch', false)
+        ->assertSee('id="notification-bell-panel"', false)
+        ->assertSee('data-notification-bell', false);
 
     expect($response->getContent())->toMatch('/data-nav-key="roles"\s+aria-current="page"/');
 });
