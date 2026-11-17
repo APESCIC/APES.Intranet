@@ -29,6 +29,7 @@ for organisation members ([where documents live](decisions.md#where-documents-li
 | --- | --- |
 | [decisions.md](decisions.md) | Bambie's decisions: stack, sign-in, features, hosting, shipping, roadmap |
 | [architecture.md](architecture.md) | Core, Modules and Plugins, roles and permissions, fresh sign-in and the audit log |
+| [shell.md](shell.md) | Top horizontal menu, account menu, bell, Staff/Admin switch and mobile drawer |
 | [adr/0001-modules-and-integrations.md](adr/0001-modules-and-integrations.md) | Modules, Integrations and the module registry |
 | [accessibility.md](accessibility.md) | The WCAG 2.2 AA baseline, the automated check and rules for new pages |
 | [dpia/clock-in-geofence.md](dpia/clock-in-geofence.md) | The approved data protection impact assessment for the clock-in geofence |

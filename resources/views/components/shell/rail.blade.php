@@ -6,14 +6,12 @@
     'qaPicker' => null,
     'qaReturnTo' => null,
     'qaConfirm' => false,
-    'unreadNotifications' => 0,
-    'recentNotifications' => null,
 ])
 <div class="sg-rail" data-workspace-rail>
     <div class="sg-rail__top">
         <x-shell.brand :panel="$panel" />
         <div class="sg-rail__top-actions">
-            {{-- Bell lives only in the top bar (#323) so the drawer never clones an unwired copy. --}}
+            {{-- Bell lives only in the top bar so the drawer never clones an unwired copy. --}}
             <button type="button" class="sg-icon-btn" aria-label="Close menu" data-workspace-close hidden>
                 <i data-lucide="x"></i>
             </button>

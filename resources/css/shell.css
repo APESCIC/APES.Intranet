@@ -580,6 +580,34 @@ a.sg-nav-link:hover {
     box-shadow: 0 0.75rem 1.5rem rgba(18, 38, 44, 0.12);
 }
 
+/* Narrow phones: keep the top bar on one row and make the account panel full-width. */
+@media (max-width: 22.5rem) {
+    .sg-topbar {
+        flex-wrap: nowrap;
+        gap: 0.35rem;
+        padding-inline: 0.5rem;
+    }
+
+    .sg-brand__text {
+        display: none;
+    }
+
+    .sg-topbar .sg-brand__mark {
+        width: 2.25rem;
+        height: 2.25rem;
+    }
+
+    .sg-user-menu__panel {
+        position: fixed;
+        inset: auto 0.5rem auto 0.5rem;
+        top: calc(var(--sg-rail-inset) + 3.5rem);
+        right: auto;
+        width: auto;
+        max-width: none;
+        min-width: 0;
+    }
+}
+
 .sg-user-menu__identity {
     display: flex;
     flex-direction: column;
