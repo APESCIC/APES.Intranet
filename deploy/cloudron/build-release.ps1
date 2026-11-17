@@ -124,8 +124,23 @@ try {
     Write-Output ("npm: {0:N0} s ({1})" -f $clock.Elapsed.TotalSeconds, $(if ($nodeWarm) { 'kept node_modules' } else { 'npm ci' }))
 
     $clock.Restart()
-    npm run build
-    if ($LASTEXITCODE -ne 0) { throw 'npm run build failed' }
+    # Herd's npm.ps1 on Windows often fails to resolve node_modules\.bin shims
+    # (vite not recognized). Prefer npm.cmd with .bin on PATH, then fall back
+    # to invoking Vite through node.
+    $npmBin = Join-Path $src 'node_modules\.bin'
+    $env:Path = "$npmBin;$env:Path"
+    $npmCmd = Join-Path (Split-Path (Get-Command npm).Source) 'npm.cmd'
+    if (Test-Path $npmCmd) {
+        & $npmCmd run build
+    } else {
+        npm run build
+    }
+    if ($LASTEXITCODE -ne 0) {
+        $viteJs = Join-Path $src 'node_modules\vite\bin\vite.js'
+        if (-not (Test-Path $viteJs)) { throw 'npm run build failed' }
+        node $viteJs build
+        if ($LASTEXITCODE -ne 0) { throw 'npm run build failed' }
+    }
     Write-Output ("Vite build: {0:N0} s" -f $clock.Elapsed.TotalSeconds)
     Set-Content -NoNewline -Path REVISION -Value $sha
     if ($Version) { Set-Content -NoNewline -Path VERSION -Value $Version }

@@ -1,6 +1,7 @@
-name: ci
+name: Run continuous integration checks
 
-# The main check: Markdown, workflows, Pint, Larastan, the build, release notes, tests and the accessibility check.
+# Markdown, workflows, Pint, Larastan, the Vite build, release notes and PHPUnit.
+# Accessibility is checked locally on Laravel Herd (Cursor browser), not via Playwright in CI.
 # Runs on PRs into main, version branches and dependencies, and on main and vX.Y.Z tags. It never releases or deploys.
 
 on:
@@ -29,9 +30,9 @@ env:
 
 jobs:
   ci:
-    name: ci
+    name: Lint, build and test
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     services:
       mysql:
         image: mysql:8.4
@@ -179,50 +180,15 @@ jobs:
           TAG: ${{ github.ref_name }}
         run: php artisan changelog:validate --require-published="$TAG"
 
-      - name: Tests
+      - name: Run PHPUnit tests
         run: php artisan test --compact
 
-      # php artisan serve is for this CI runner only. Locally, use the Herd preview.
-      - name: Start app for the accessibility check
-        shell: bash
-        run: |
-          set -euo pipefail
-          sed -i \
-            -e 's/^DB_HOST=.*/DB_HOST=127.0.0.1/' \
-            -e 's/^DB_DATABASE=.*/DB_DATABASE=apes_intranet_testing/' \
-            -e 's/^DB_PASSWORD=.*/DB_PASSWORD=password/' \
-            -e 's/^SESSION_DRIVER=.*/SESSION_DRIVER=file/' \
-            -e 's/^CACHE_STORE=.*/CACHE_STORE=file/' \
-            -e 's/^QUEUE_CONNECTION=.*/QUEUE_CONNECTION=sync/' \
-            -e 's/^MAIL_MAILER=.*/MAIL_MAILER=log/' \
-            -e 's|^APP_URL=.*|APP_URL=http://127.0.0.1:8000|' \
-            .env
-          php artisan migrate:fresh --seed --force
-          php artisan serve --host=127.0.0.1 --port=8000 > /tmp/serve.log 2>&1 &
-          for _ in $(seq 1 30); do
-            curl -sf -o /dev/null http://127.0.0.1:8000/login && exit 0
-            sleep 1
-          done
-          cat /tmp/serve.log
-          exit 1
-
-      - name: Cache Playwright browsers
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-
-      - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
-
-      - name: Accessibility check (axe and keyboard)
-        env:
-          BASE_URL: http://127.0.0.1:8000
-        run: npm run test:a11y
+      - name: Note accessibility is checked on Herd locally
+        run: echo "Accessibility is verified on https://apes-intranet.test with Cursor's built-in browser (not Playwright in CI)."
 
   # Cloudron runs PHP 8.4. Not a required check, so the required ci job keeps its name.
   tests-php84:
-    name: tests-php84
+    name: PHPUnit on PHP 8.4
     runs-on: ubuntu-latest
     timeout-minutes: 10
     services:

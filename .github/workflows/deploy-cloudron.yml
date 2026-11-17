@@ -1,0 +1,207 @@
+# Deploy a published release tag to the APES Intranet Cloudron LAMP app.
+# Usage: gh workflow run deploy-cloudron.yml -f tag=vX.Y.Z
+# Requires GitHub environment cloudron-deploy: secrets CLOUDRON_FQDN, CLOUDRON_TOKEN;
+# vars CLOUDRON_APP_ID, APP_URL, HEALTH_PATH (/healthz).
+name: Deploy Intranet to Cloudron
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Published release tag to deploy (vX.Y.Z)'
+        required: true
+        type: string
+
+run-name: Deploy ${{ inputs.tag }} to Cloudron
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-cloudron-intranet
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build release and deploy to Cloudron
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment:
+      name: cloudron-deploy
+      url: ${{ vars.APP_URL }}
+    env:
+      CLOUDRON_FQDN: ${{ secrets.CLOUDRON_FQDN }}
+      CLOUDRON_TOKEN: ${{ secrets.CLOUDRON_TOKEN }}
+      CLOUDRON_APP_ID: ${{ vars.CLOUDRON_APP_ID }}
+      APP_URL: ${{ vars.APP_URL }}
+      HEALTH_PATH: ${{ vars.HEALTH_PATH || '/healthz' }}
+      TAG: ${{ inputs.tag }}
+    steps:
+      - name: Check tag and Cloudron environment secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::tag must be vX.Y.Z"; exit 1; }
+          for name in CLOUDRON_FQDN CLOUDRON_TOKEN CLOUDRON_APP_ID APP_URL; do
+            [[ -n "${!name:-}" ]] || { echo "::error::Missing $name (cloudron-deploy environment)"; exit 1; }
+          done
+
+      - name: Check out the release tag
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.tag }}
+          fetch-depth: 0
+
+      - name: Confirm tag is on main and has a published Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git fetch origin main --depth=50
+          git merge-base --is-ancestor HEAD origin/main || { echo "::error::$TAG is not on main"; exit 1; }
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null
+          expected="${TAG#v}"
+          actual="$(tr -d ' \r\n' < VERSION)"
+          [[ "$actual" == "$expected" ]] || { echo "::error::VERSION is '$actual', expected '$expected'"; exit 1; }
+          echo "RELEASE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - name: Set up PHP 8.4
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: '8.4'
+          extensions: mbstring, intl, pdo_mysql, zip, ldap
+          coverage: none
+          tools: composer:v2
+
+      - name: Set up Node 22
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install PHP and Node production dependencies
+        run: |
+          composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+          npm ci --no-audit --no-fund
+
+      - name: Build front-end assets
+        run: npm run build
+
+      - name: Assemble release directory
+        shell: bash
+        run: |
+          set -euo pipefail
+          release_id="${RELEASE_SHA:0:12}-${GITHUB_RUN_ID}"
+          echo "RELEASE_ID=$release_id" >> "$GITHUB_ENV"
+          rm -rf release && mkdir release
+          rsync -a \
+            --exclude='.git' --exclude='.github' --exclude='node_modules' --exclude='tests' \
+            --exclude='release' --exclude='.env' --exclude='storage/logs' --exclude='storage/framework/cache' \
+            --exclude='storage/framework/sessions' --exclude='storage/framework/views' \
+            ./ release/
+          mkdir -p release/bootstrap/cache release/storage/framework/{cache,sessions,views} release/storage/logs
+          touch release/bootstrap/cache/.gitkeep
+          printf '%s' "$RELEASE_SHA" > release/REVISION
+          printf '%s' "${TAG#v}" > release/VERSION
+
+      - name: Install Cloudron CLI
+        run: npm install --global cloudron@9.0.4
+
+      - name: Create Cloudron backup before deploy
+        run: cloudron --server "$CLOUDRON_FQDN" --token "$CLOUDRON_TOKEN" backup create --app "$CLOUDRON_APP_ID"
+
+      - name: Note the live release for rollback
+        id: previous
+        shell: bash
+        run: |
+          set -euo pipefail
+          previous="$(cloudron --server "$CLOUDRON_FQDN" --token "$CLOUDRON_TOKEN" exec --app "$CLOUDRON_APP_ID" -- \
+            bash -c 'readlink -f /app/data/current 2>/dev/null || true' | tail -n1 | tr -d '\r')"
+          echo "Live release: ${previous:-none}"
+          echo "path=$previous" >> "$GITHUB_OUTPUT"
+
+      - name: Upload release archive to Cloudron
+        shell: bash
+        run: |
+          set -euo pipefail
+          tar -czf "release-${RELEASE_ID}.tar.gz" -C release .
+          cloudron --server "$CLOUDRON_FQDN" --token "$CLOUDRON_TOKEN" push --app "$CLOUDRON_APP_ID" \
+            "release-${RELEASE_ID}.tar.gz" "/tmp/release-${RELEASE_ID}.tar.gz"
+          cloudron --server "$CLOUDRON_FQDN" --token "$CLOUDRON_TOKEN" exec --app "$CLOUDRON_APP_ID" -- bash -lc "
+            set -euo pipefail
+            mkdir -p /app/data/releases/$RELEASE_ID
+            tar -xzf /tmp/release-${RELEASE_ID}.tar.gz -C /app/data/releases/$RELEASE_ID
+            rm -f /tmp/release-${RELEASE_ID}.tar.gz
+          "
+
+      - name: Activate release and run migrations
+        id: activate
+        continue-on-error: true
+        shell: bash
+        run: |
+          cloudron --server "$CLOUDRON_FQDN" --token "$CLOUDRON_TOKEN" exec --app "$CLOUDRON_APP_ID" -- \
+            bash "/app/data/releases/$RELEASE_ID/deploy/cloudron/activate-release.sh" "/app/data/releases/$RELEASE_ID"
+
+      - name: Restart the Cloudron app
+        id: restart
+        if: steps.activate.outcome == 'success'
+        continue-on-error: true
+        run: cloudron --server "$CLOUDRON_FQDN" --token "$CLOUDRON_TOKEN" restart --app "$CLOUDRON_APP_ID"
+
+      - name: Verify healthz version and revision
+        id: verify
+        if: steps.restart.outcome == 'success'
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected_version="${TAG#v}"
+          expected_rev="${RELEASE_SHA:0:12}"
+          for attempt in $(seq 1 18); do
+            body="$(curl -fsS --max-time 10 "$APP_URL$HEALTH_PATH" || true)"
+            code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "$APP_URL$HEALTH_PATH" || true)"
+            if [[ "$code" == "200" ]] && echo "$body" | grep -q "\"version\":\"$expected_version\"" && echo "$body" | grep -q "$expected_rev"; then
+              echo "Healthy: version $expected_version revision $expected_rev"
+              exit 0
+            fi
+            echo "Attempt $attempt: HTTP $code"
+            sleep 10
+          done
+          echo "::error::$APP_URL$HEALTH_PATH did not show version $expected_version / revision $expected_rev"
+          exit 1
+
+      - name: Roll back to the previous release
+        id: rollback
+        if: always() && (steps.activate.outcome == 'failure' || steps.restart.outcome == 'failure' || steps.verify.outcome == 'failure')
+        shell: bash
+        env:
+          PREVIOUS: ${{ steps.previous.outputs.path }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$PREVIOUS" ]]; then
+            echo "::error::No previous release captured. Inspect the app manually."
+            exit 1
+          fi
+          cloudron --server "$CLOUDRON_FQDN" --token "$CLOUDRON_TOKEN" exec --app "$CLOUDRON_APP_ID" -- \
+            bash "$PREVIOUS/deploy/cloudron/rollback-release.sh" "$PREVIOUS"
+          cloudron --server "$CLOUDRON_FQDN" --token "$CLOUDRON_TOKEN" restart --app "$CLOUDRON_APP_ID"
+
+      - name: Summarise deploy result
+        if: always()
+        shell: bash
+        env:
+          VERIFY: ${{ steps.verify.outcome }}
+          ROLLBACK: ${{ steps.rollback.outcome }}
+        run: |
+          {
+            echo "## Cloudron deploy"
+            echo "- Tag: \`$TAG\`"
+            echo "- Release id: \`$RELEASE_ID\`"
+            echo "- Verify: \`${VERIFY:-skipped}\`"
+            echo "- Rollback: \`${ROLLBACK:-not needed}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [[ "$VERIFY" != "success" ]]; then
+            echo "::error::Deploy did not verify."
+            exit 1
+          fi
