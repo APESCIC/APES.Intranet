@@ -28,7 +28,26 @@ it('shows an accessible notification bell with an unread count', function () {
         ->assertOk()
         ->assertSee('aria-label="Notifications, 1 unread"', false)
         ->assertSee('HD-1001')
+        ->assertSee('View all notifications')
         ->assertDontSee('Open the intranet to read it. and then a long reply body');
+});
+
+it('renders one top-bar bell with a unique popover panel id', function () {
+    $html = $this->actingAs(User::factory()->create()->assignRole('staff'))
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->getContent();
+
+    preg_match('/class="sg-rail__top-actions"[^>]*>(.*?)<\/div>/s', $html, $railActions);
+    preg_match('/class="sg-topbar__actions"[^>]*>(.*?)<\/div>\s*<\/div>/s', $html, $topbarActions);
+
+    expect(substr_count($html, 'id="notification-bell-panel"'))->toBe(1)
+        ->and(preg_match_all('/\bdata-notification-bell\b(?!-)/', $html))->toBe(1)
+        ->and(substr_count($html, 'data-notification-bell-toggle'))->toBe(1)
+        ->and(substr_count($html, 'data-notification-bell-panel'))->toBe(1)
+        ->and($html)->toContain('popover')
+        ->and($topbarActions[1] ?? '')->toContain('data-notification-bell')
+        ->and($railActions[1] ?? '')->not->toContain('data-notification-bell');
 });
 
 it('marks a notification as read when opened and follows a safe link', function () {

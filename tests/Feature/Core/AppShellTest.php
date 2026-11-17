@@ -94,7 +94,31 @@ it('gives non-admins the Staff menu even if asked for the Admin panel', function
 it('leaves out a menu group when none of its items are allowed', function () {
     $headings = collect(Menu::for(userWithRole(RoleName::Staff), MenuMode::Staff))->pluck('heading');
 
-    expect($headings)->not->toContain('Admin', 'HR and legal');
+    expect($headings)->not->toContain('Admin', 'HR and legal')
+        ->and($headings)->not->toContain('More');
+});
+
+it('presents the More heading for people who can see HR or agreements', function () {
+    $headings = collect(Menu::for(userWithRole(RoleName::Hr), MenuMode::Staff))->pluck('heading');
+
+    expect($headings)->toContain('More')
+        ->and($headings)->not->toContain('HR and legal');
+});
+
+it('keeps account links out of People and in the user menu only', function () {
+    $user = userWithRole(RoleName::Staff);
+    $people = collect(Menu::for($user, MenuMode::Staff))->firstWhere('key', 'people');
+
+    expect(collect($people->items)->pluck('key')->all())
+        ->toContain('directory', 'org-chart', 'students')
+        ->not->toContain('profile', 'notifications', 'security');
+
+    $this->actingAs($user)->get(route('dashboard'))
+        ->assertOk()
+        ->assertSee('data-workspace-user-menu', false)
+        ->assertSee('data-nav-key="profile"', false)
+        ->assertSee('Notification settings')
+        ->assertSee('Sign out');
 });
 
 it('renders the shell with a skip link, labelled menu and the current page marked', function () {
@@ -106,9 +130,14 @@ it('renders the shell with a skip link, labelled menu and the current page marke
         ->assertSee('id="main-content"', false)
         ->assertSee('aria-label="Main menu"', false)
         ->assertSee('aria-controls="workspace-drawer"', false)
+        ->assertSee('data-workspace-top-nav', false)
+        ->assertSee('data-workspace-disclosure-trigger', false)
+        ->assertSee('data-workspace-user-menu', false)
         ->assertSee('Sam Example')
         ->assertSee('SE')
-        ->assertSee('data-panel-switch', false);
+        ->assertSee('data-panel-switch', false)
+        ->assertSee('id="notification-bell-panel"', false)
+        ->assertSee('data-notification-bell', false);
 
     expect($response->getContent())->toMatch('/data-nav-key="roles"\s+aria-current="page"/');
 });
@@ -119,6 +148,8 @@ it('renders the Staff and Admin switch for admins, marking the active panel', fu
     $adminPage = $this->actingAs($admin)->get(route('admin.roles.index'))->assertOk()->getContent();
     expect($adminPage)
         ->toContain('aria-label="Switch panel"')
+        ->toContain('sg-switch--topbar')
+        ->toContain('sg-switch--drawer')
         ->toMatch('/href="'.preg_quote(route('admin.overview'), '/').'" class="sg-switch__link"\s+aria-current="true"\s*>Admin</')
         ->toMatch('/href="'.preg_quote(route('dashboard'), '/').'" class="sg-switch__link"\s*>Staff</')
         ->toContain('data-brand-panel>Admin panel<');
@@ -127,6 +158,7 @@ it('renders the Staff and Admin switch for admins, marking the active panel', fu
     expect($staffPage)
         ->toMatch('/href="'.preg_quote(route('dashboard'), '/').'" class="sg-switch__link"\s+aria-current="true"\s*>Staff</')
         ->toContain('data-brand-panel>Staff panel<')
+        ->toContain('sg-switch--topbar')
         ->not->toContain('Normal')
         ->not->toContain('Menu mode');
 });
@@ -156,4 +188,37 @@ it('shows the Admin panel to an admin on an admin route', function () {
         ->assertOk()
         ->assertSee('data-nav-key="roles"', false)
         ->assertDontSee('data-nav-key="updates"', false);
+});
+
+it('exposes keyboard and drawer hooks for the mobile shell without a rail bell', function () {
+    $html = $this->actingAs(userWithRole(RoleName::Staff))
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->getContent();
+
+    expect($html)
+        ->toContain('data-workspace-menu-open')
+        ->toContain('aria-controls="workspace-drawer"')
+        ->toContain('data-workspace-drawer')
+        ->toContain('data-workspace-close')
+        ->toContain('data-workspace-user-menu-trigger')
+        ->toContain('data-notification-bell-toggle')
+        ->toContain('data-workspace-disclosure-trigger')
+        ->and(substr_count($html, 'id="notification-bell-panel"'))->toBe(1);
+
+    preg_match('/class="sg-rail__top-actions"[^>]*>(.*?)<\/div>/s', $html, $railActions);
+    expect($railActions[1] ?? '')
+        ->toContain('data-workspace-close')
+        ->not->toContain('data-notification-bell');
+});
+
+it('keeps shell icon and account targets at least 44 CSS pixels', function () {
+    $css = file_get_contents(base_path('resources/css/shell.css'));
+
+    expect($css)
+        ->toContain('.sg-icon-btn')
+        ->toContain('min-width: 2.75rem')
+        ->toContain('min-height: 2.75rem')
+        ->toContain('.sg-user-menu__trigger')
+        ->toContain('@media (max-width: 22.5rem)');
 });

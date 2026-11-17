@@ -6,28 +6,18 @@
     'qaPicker' => null,
     'qaReturnTo' => null,
     'qaConfirm' => false,
-    'unreadNotifications' => 0,
-    'recentNotifications' => null,
 ])
 <div class="sg-rail" data-workspace-rail>
     <div class="sg-rail__top">
         <x-shell.brand :panel="$panel" />
         <div class="sg-rail__top-actions">
-            <x-shell.notification-bell
-                :unread-count="$unreadNotifications"
-                :recent="$recentNotifications ?? collect()"
-            />
+            {{-- Bell lives only in the top bar so the drawer never clones an unwired copy. --}}
             <button type="button" class="sg-icon-btn" aria-label="Close menu" data-workspace-close hidden>
                 <i data-lucide="x"></i>
             </button>
         </div>
     </div>
-    @if ($panel)
-        <nav class="sg-switch" aria-label="Switch panel" data-panel-switch>
-            <a href="{{ route('dashboard') }}" class="sg-switch__link" @if ($panel === \App\Core\Navigation\MenuMode::Staff) aria-current="true" @endif>Staff</a>
-            <a href="{{ route('admin.overview') }}" class="sg-switch__link" @if ($panel === \App\Core\Navigation\MenuMode::Admin) aria-current="true" @endif>Admin</a>
-        </nav>
-    @endif
+    <x-shell.panel-switch :panel="$panel" class="sg-switch--drawer" />
     <x-shell.nav :menu="$menu" />
     <x-shell.user-dock
         :user="$user"

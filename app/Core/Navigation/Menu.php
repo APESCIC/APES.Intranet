@@ -37,9 +37,6 @@ final class Menu
             new NavGroup('people', 'People', [
                 NavItem::route('directory', 'Directory', 'users', AccessMatrix::INTRANET_ACCESS, 'people.directory.index', 'people.directory.*', 'people'),
                 NavItem::route('org-chart', 'Organisation chart', 'network', AccessMatrix::INTRANET_ACCESS, 'people.org-chart', null, 'people'),
-                NavItem::route('profile', 'My profile', 'circle-user', AccessMatrix::INTRANET_ACCESS, 'people.profile.edit', null, 'people'),
-                NavItem::route('notifications', 'Notifications', 'bell', AccessMatrix::INTRANET_ACCESS, 'notifications.preferences.edit', 'notifications.preferences.*'),
-                NavItem::route('security', 'Security', 'shield', AccessMatrix::INTRANET_ACCESS, 'people.security', null, 'people'),
                 NavItem::route('students', 'Student placements', 'graduation-cap', AccessMatrix::INTRANET_ACCESS, 'people.students.index', 'people.students.*', 'people'),
             ]),
             new NavGroup('operations', 'Operations', [
@@ -58,7 +55,7 @@ final class Menu
                 NavItem::route('access-guide', 'Who can see what', 'key-round', AccessMatrix::INTRANET_ACCESS, 'access-guide'),
                 NavItem::route('change-log', 'Change log', 'history', AccessMatrix::INTRANET_ACCESS, 'change-log.index', 'change-log.*'),
             ]),
-            new NavGroup('hr-legal', 'HR and legal', [
+            new NavGroup('hr-legal', 'More', [
                 NavItem::soon('hr', 'HR', 'briefcase', AccessMatrix::HR_ACCESS, 'hr'),
                 NavItem::soon('agreements', 'Agreements', 'file-pen-line', AccessMatrix::LEGAL_ACCESS),
             ]),
@@ -123,7 +120,56 @@ final class Menu
             $groups = array_merge($groups, self::filterGroups($user, $contributor->groups($user, $mode)));
         }
 
-        return $groups;
+        return self::presentGroups($groups);
+    }
+
+    /**
+     * Present contributor groups under the agreed top-bar headings without a
+     * hard-coded second menu: Apps, More, and Help desk queues inside Support.
+     *
+     * @param  list<NavGroup>  $groups
+     * @return list<NavGroup>
+     */
+    private static function presentGroups(array $groups): array
+    {
+        $presented = [];
+        $supportIndex = null;
+        $queueItems = [];
+
+        foreach ($groups as $group) {
+            if ($group->key === 'helpdesk-queues') {
+                $queueItems = array_merge($queueItems, $group->items);
+
+                continue;
+            }
+
+            $group = match ($group->key) {
+                'microsoft-365' => $group->withHeading('Apps'),
+                'hr-legal' => $group->withHeading('More'),
+                default => $group,
+            };
+
+            if ($group->key === 'support') {
+                $supportIndex = count($presented);
+            }
+
+            $presented[] = $group;
+        }
+
+        if ($queueItems === []) {
+            return $presented;
+        }
+
+        if ($supportIndex === null) {
+            $presented[] = new NavGroup('support', 'Support', $queueItems);
+
+            return $presented;
+        }
+
+        $support = $presented[$supportIndex];
+        $presented[$supportIndex] = $support->withItems(array_merge($support->items, $queueItems));
+
+        return $presented;
     }
 
     public static function resolveMode(User $user): MenuMode

@@ -38,7 +38,8 @@ export const initQaSwitcher = () => {
         pillFor(flyout)?.focus();
     }, true);
 
-    const pending = document.querySelector('[data-workspace-rail-dock] [data-qa-flyout][data-qa-autoopen]');
+    const pending = document.querySelector('[data-workspace-user-menu] [data-qa-flyout][data-qa-autoopen]')
+        ?? document.querySelector('[data-workspace-rail-dock] [data-qa-flyout][data-qa-autoopen]');
     if (pending && window.matchMedia(DESKTOP).matches) {
         pending.showPopover();
     }

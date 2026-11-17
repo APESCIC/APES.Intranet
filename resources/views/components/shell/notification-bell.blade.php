@@ -1,4 +1,4 @@
-@props(['unreadCount' => 0, 'recent' => collect()])
+@props(['unreadCount' => 0, 'recent' => collect(), 'panelId' => 'notification-bell-panel'])
 
 <div class="sg-notification-bell" data-notification-bell>
     <button
@@ -6,8 +6,9 @@
         class="sg-icon-btn"
         aria-label="Notifications{{ $unreadCount > 0 ? ', '.$unreadCount.' unread' : '' }}"
         aria-expanded="false"
-        aria-controls="notification-bell-panel"
+        aria-controls="{{ $panelId }}"
         data-notification-bell-toggle
+        popovertarget="{{ $panelId }}"
     >
         <i data-lucide="bell"></i>
         @if ($unreadCount > 0)
@@ -16,11 +17,11 @@
     </button>
 
     <div
-        id="notification-bell-panel"
+        id="{{ $panelId }}"
         class="sg-notification-bell__panel"
         role="region"
         aria-label="Recent notifications"
-        hidden
+        popover
         data-notification-bell-panel
     >
         <div class="sg-notification-bell__header">

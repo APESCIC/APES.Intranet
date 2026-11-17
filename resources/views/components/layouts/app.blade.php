@@ -26,8 +26,6 @@
                         :qa-picker="$qaPicker"
                         :qa-return-to="$qaReturnTo"
                         :qa-confirm="$qaConfirm"
-                        :unread-notifications="$unreadNotifications ?? 0"
-                        :recent-notifications="$recentNotifications ?? collect()"
                     />
                 </aside>
             @endif
@@ -36,7 +34,13 @@
                 <div class="sg-content">
                     <x-shell.topbar
                         :has-menu="(bool) $shellUser"
+                        :menu="$menu ?? []"
                         :panel="$shellPanel ?? null"
+                        :user="$shellUser"
+                        :qa-profile="$qaProfile"
+                        :qa-picker="$qaPicker"
+                        :qa-return-to="$qaReturnTo"
+                        :qa-confirm="$qaConfirm"
                         :unread-notifications="$unreadNotifications ?? 0"
                         :recent-notifications="$recentNotifications ?? collect()"
                     />
