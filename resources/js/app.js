@@ -8,6 +8,7 @@ import {
     CalendarCheck,
     CalendarDays,
     ChartColumn,
+    ChevronDown,
     CircleUser,
     ClipboardCheck,
     ClipboardList,
@@ -53,6 +54,7 @@ import { initPushPreferences, registerPushServiceWorker } from './push.js';
 import { initDrawer } from './shell/drawer.js';
 import { initNotificationBell } from './shell/notification-bell.js';
 import { initQaSwitcher } from './shell/qa-switcher.js';
+import { initTopNav } from './shell/top-nav.js';
 
 const icons = {
     Activity,
@@ -64,6 +66,7 @@ const icons = {
     CalendarCheck,
     CalendarDays,
     ChartColumn,
+    ChevronDown,
     CircleUser,
     ClipboardCheck,
     ClipboardList,
@@ -112,6 +115,7 @@ function init() {
         },
     });
     initDrawer();
+    initTopNav();
     initQaSwitcher();
     initNotificationBell();
     initClockForm();
