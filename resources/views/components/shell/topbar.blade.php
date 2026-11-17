@@ -31,6 +31,7 @@
     <div class="sg-topbar__actions">
         @auth
             <x-shell.notification-bell
+                panel-id="notification-bell-panel"
                 :unread-count="$unreadNotifications"
                 :recent="$recentNotifications ?? collect()"
             />
