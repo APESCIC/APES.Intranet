@@ -22,12 +22,7 @@
             </button>
         </div>
     </div>
-    @if ($panel)
-        <nav class="sg-switch" aria-label="Switch panel" data-panel-switch>
-            <a href="{{ route('dashboard') }}" class="sg-switch__link" @if ($panel === \App\Core\Navigation\MenuMode::Staff) aria-current="true" @endif>Staff</a>
-            <a href="{{ route('admin.overview') }}" class="sg-switch__link" @if ($panel === \App\Core\Navigation\MenuMode::Admin) aria-current="true" @endif>Admin</a>
-        </nav>
-    @endif
+    <x-shell.panel-switch :panel="$panel" class="sg-switch--drawer" />
     <x-shell.nav :menu="$menu" />
     <x-shell.user-dock
         :user="$user"

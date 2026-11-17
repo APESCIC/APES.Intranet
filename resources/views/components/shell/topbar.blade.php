@@ -24,7 +24,7 @@
         </button>
     @endif
     <x-shell.brand :panel="$panel" />
-    {{-- #322: Staff/Admin switcher moves beside the brand --}}
+    <x-shell.panel-switch :panel="$panel" class="sg-switch--topbar" />
     @if ($hasMenu && count($menu) > 0)
         <x-shell.top-nav :menu="$menu" />
     @endif
