@@ -36,6 +36,7 @@
                 <div class="sg-content">
                     <x-shell.topbar
                         :has-menu="(bool) $shellUser"
+                        :menu="$menu ?? []"
                         :panel="$shellPanel ?? null"
                         :unread-notifications="$unreadNotifications ?? 0"
                         :recent-notifications="$recentNotifications ?? collect()"

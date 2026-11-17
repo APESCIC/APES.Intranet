@@ -94,7 +94,15 @@ it('gives non-admins the Staff menu even if asked for the Admin panel', function
 it('leaves out a menu group when none of its items are allowed', function () {
     $headings = collect(Menu::for(userWithRole(RoleName::Staff), MenuMode::Staff))->pluck('heading');
 
-    expect($headings)->not->toContain('Admin', 'HR and legal');
+    expect($headings)->not->toContain('Admin', 'HR and legal')
+        ->and($headings)->not->toContain('More');
+});
+
+it('presents the More heading for people who can see HR or agreements', function () {
+    $headings = collect(Menu::for(userWithRole(RoleName::Hr), MenuMode::Staff))->pluck('heading');
+
+    expect($headings)->toContain('More')
+        ->and($headings)->not->toContain('HR and legal');
 });
 
 it('renders the shell with a skip link, labelled menu and the current page marked', function () {
@@ -106,6 +114,8 @@ it('renders the shell with a skip link, labelled menu and the current page marke
         ->assertSee('id="main-content"', false)
         ->assertSee('aria-label="Main menu"', false)
         ->assertSee('aria-controls="workspace-drawer"', false)
+        ->assertSee('data-workspace-top-nav', false)
+        ->assertSee('data-workspace-disclosure-trigger', false)
         ->assertSee('Sam Example')
         ->assertSee('SE')
         ->assertSee('data-panel-switch', false);

@@ -24,4 +24,9 @@ final readonly class NavGroup
     {
         return new self($this->key, $this->heading, $items, $this->note, $this->noteLinks);
     }
+
+    public function withHeading(string $heading): self
+    {
+        return new self($this->key, $heading, $this->items, $this->note, $this->noteLinks);
+    }
 }
