@@ -189,3 +189,36 @@ it('shows the Admin panel to an admin on an admin route', function () {
         ->assertSee('data-nav-key="roles"', false)
         ->assertDontSee('data-nav-key="updates"', false);
 });
+
+it('exposes keyboard and drawer hooks for the mobile shell without a rail bell', function () {
+    $html = $this->actingAs(userWithRole(RoleName::Staff))
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->getContent();
+
+    expect($html)
+        ->toContain('data-workspace-menu-open')
+        ->toContain('aria-controls="workspace-drawer"')
+        ->toContain('data-workspace-drawer')
+        ->toContain('data-workspace-close')
+        ->toContain('data-workspace-user-menu-trigger')
+        ->toContain('data-notification-bell-toggle')
+        ->toContain('data-workspace-disclosure-trigger')
+        ->and(substr_count($html, 'id="notification-bell-panel"'))->toBe(1);
+
+    preg_match('/class="sg-rail__top-actions"[^>]*>(.*?)<\/div>/s', $html, $railActions);
+    expect($railActions[1] ?? '')
+        ->toContain('data-workspace-close')
+        ->not->toContain('data-notification-bell');
+});
+
+it('keeps shell icon and account targets at least 44 CSS pixels', function () {
+    $css = file_get_contents(base_path('resources/css/shell.css'));
+
+    expect($css)
+        ->toContain('.sg-icon-btn')
+        ->toContain('min-width: 2.75rem')
+        ->toContain('min-height: 2.75rem')
+        ->toContain('.sg-user-menu__trigger')
+        ->toContain('@media (max-width: 22.5rem)');
+});

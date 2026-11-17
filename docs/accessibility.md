@@ -54,17 +54,22 @@ only.
 
 ### Keyboard
 
-Checked with real key presses in the automated check, and by hand in the
-local preview:
+Checked by hand on the Laravel Herd preview (and historically with the
+automated check before Playwright was removed):
 
 - The first Tab shows "Skip to main content". Enter moves focus to the main
   content.
-- Focus moves through the brand link, then the menu in reading order, then the
-  user dock, the page content and the footer.
-- Every focusable element shows a 2 to 3px blue (`#2563eb`) outline.
-- On tablet and mobile, "Open menu" opens the menu as a dialog and moves focus
-  to "Close menu". Tab stays inside the menu. Escape or the backdrop closes it
-  and returns focus to "Open menu".
+- On desktop, focus moves through the brand, Staff/Admin switch (admins),
+  grouped disclosure menus, notification bell and account menu, then the page
+  content and footer. Escape closes an open disclosure, the account menu or
+  the bell and returns focus to the control that opened it.
+- Site navigation uses disclosures, not an ARIA menubar. Enter or Space opens
+  a panel; links inside stay in the tab order.
+- On tablet and mobile, "Open menu" opens the drawer as a dialog and moves
+  focus to "Close menu". Tab stays inside the drawer. Escape or the backdrop
+  closes it and returns focus to "Open menu". The drawer clones the rail and
+  never includes a notification bell (the bell stays in the top bar).
+- Interactive shell targets are at least 44 by 44 CSS pixels.
 - Locally, the amber QA pill opens the role switcher with focus on the
   current role. Escape closes only the switcher, even inside the mobile menu,
   and returns focus to the pill. Every role button is at least 44px tall, and
@@ -73,6 +78,8 @@ local preview:
   available yet".
 - "Chat in Teams" says that it opens in a new tab.
 - `prefers-reduced-motion` turns off the menu slide and other transitions.
+
+Shell layout detail: [shell.md](shell.md).
 
 ### Screen reader
 
@@ -104,4 +111,5 @@ the result here:
 - Links that open a new tab say so, for example with
   `<span class="sr-only">(opens in a new tab)</span>`.
 - Use the theme colours above. Never use the accent colour for text.
-- Add new pages to `scripts/a11y/check.mjs` so CI checks them.
+- Verify new pages on the Herd preview before the ship gate. `npm run test:a11y`
+  only prints guidance until a Herd-friendly checker replaces it.
