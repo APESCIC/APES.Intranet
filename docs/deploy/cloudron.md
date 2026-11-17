@@ -201,16 +201,25 @@ Then deploy, below. Apache keeps serving `/app/data/public` until
 A deploy ships a release that already exists: the version PR is merged, and
 the release `vX.Y.Z` is published from the merge commit.
 
+Preferred (GitHub Actions):
+
+```powershell
+gh workflow run deploy-cloudron.yml -f tag=vX.Y.Z
+```
+
+Break-glass local (Cloudron CLI on this machine):
+
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File deploy\cloudron\deploy.ps1 -Tag vX.Y.Z
 ```
 
-The build runs Composer with Herd's PHP 8.4 (as on Cloudron) and Vite with
+The Actions workflow and `deploy.ps1` both ship a published release tag only.
+The local build runs Composer with Herd's PHP 8.4 (as on Cloudron) and Vite with
 Node from `PATH`, or Herd's Node 22, and stops if the PHP is not 8.4. Pass `-Php` or
 `-Composer` (the path to `composer.phar`) to use a different PHP 8.4 or
 Composer.
 
-`deploy.ps1`:
+`deploy.ps1` (local break-glass):
 
 1. Refuses unless the tag exists, is a published GitHub release, the `ci`
    check is green on its commit, and the tag has a published release note in

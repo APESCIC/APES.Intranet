@@ -26,7 +26,7 @@ can't merge until both pass.
 | Build assets | `npm run build` |
 | Check release notes | `php artisan changelog:validate` |
 | Tests | `php artisan test` |
-| Accessibility check | `$env:BASE_URL = 'https://apes-intranet.test'; $env:A11Y_BROWSER_CHANNEL = 'msedge'; npm run test:a11y` |
+| Accessibility check | Manual on Herd (`https://apes-intranet.test`) in Cursor's browser |
 
 Locally, tests use SQLite; CI uses MySQL 8.4. If a test passes locally but
 fails in CI, look for a MySQL-only difference.
