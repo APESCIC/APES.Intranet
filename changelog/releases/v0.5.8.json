@@ -1,0 +1,28 @@
+{
+  "version": "v0.5.8",
+  "released_at": "2026-11-17",
+  "title": "Top horizontal menu and user menu",
+  "summary": "On a wide screen the main menu now runs across the top with clear groups, an account menu next to your avatar, and a notification bell that opens fully. On a phone, the hamburger menu, bell and account controls stay easy to reach with a keyboard.",
+  "audiences": ["staff", "volunteers", "students"],
+  "changes": {
+    "added": [
+      "A top menu with grouped dropdowns for Home, Communications, People, Operations, Support, Apps and More (and the matching Admin groups on admin pages).",
+      "An account menu on your avatar for My profile, Notification settings, Security and Sign out.",
+      "Staff and Admin switch beside the logo on desktop, and inside the phone menu for admins."
+    ],
+    "changed": [
+      "The notification bell sits only in the top bar and opens a full panel that is no longer cut off by the side menu.",
+      "Account links live in the account menu only; People keeps directory, organisation chart and students."
+    ],
+    "fixed": [
+      "The phone notification bell opens its panel, and the drawer no longer copies an unwired bell."
+    ],
+    "accessibility": [
+      "Shell controls are at least 44 by 44 pixels, work with keyboard and Escape, and keep a usable layout down to about 320px wide."
+    ]
+  },
+  "internal_notes": [
+    "Epic #319. Leaves #320–#324. Navigation uses disclosures, not an ARIA menubar. Bell panel uses the HTML popover top layer. Tag v0.5.8 after merge is a Bambie override (latest tag is already v0.6.10)."
+  ],
+  "published": true
+}
