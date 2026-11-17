@@ -119,6 +119,7 @@ Development is tracked only in GitHub issues, sub-issues and `vMAJOR.MINOR.PATCH
 - Fake data only.
 - Never commit to `main`, force-push, or rebase a shared branch.
 - No merge into `main`, release or deploy without the ship-gate answer in the current chat.
+- The Project coordinator chat title stays `Next version plan – APES.Intranet` unless Bambie asks to change it.
 - Ask before migrations, `demo:reset`, or installing any system tool.
 - Do not rename or delete milestones or labels; do not change DNS or Cloudflare.
 - Docs live in this repo; anything that must not be public goes in `APESCIC/.github-private` `docs/apes-intranet/`. Never hand a document off to SharePoint.
