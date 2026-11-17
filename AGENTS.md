@@ -2,7 +2,7 @@
 
 Cursor's user rules and skills set how work is done here (branches, issues, pull requests, merge, release, deploy, ship gate, decisions and safety). This file describes this repository and fills the named slots below. If anything here disagrees with them, Cursor's rules win and this file is corrected in the same milestone.
 
-Cursor/agent layout standard: https://github.com/apescic-director/Cursor/blob/main/docs/cursor-agent-standards.md
+Cursor user rules and personal skills (Agent Store) own process; this file fills named slots only.
 
 The owner is Bambie Murphy, Director. Write UK English (organisation, behaviour, colour, licence) in the product, docs, issues and pull requests. Words in *italics* are in the [glossary](docs/glossary.md). Never print, paste or commit secrets. Secrets live only in APES Vault (Bitwarden).
 
@@ -50,7 +50,7 @@ This project runs on Laravel Herd. Run `herd site:info` for the URL, PHP version
 | Tests | `composer test` (or `php artisan test`; avoid `--parallel` for footer/changelog/`/healthz` flakes) |
 | Format | `php vendor/bin/pint` |
 | Static analysis | `php vendor/bin/phpstan analyse --memory-limit=1G` |
-| Accessibility | `npm run test:a11y` (set `BASE_URL` first) |
+| Accessibility | Manual on Herd (`https://apes-intranet.test`) in Cursor's browser; `npm run test:a11y` only prints guidance |
 | CI workflows | `.github/workflows/` (see [docs/workflows.md](docs/workflows.md)) |
 
 ## This repo's shipping flow
@@ -106,8 +106,8 @@ Development is tracked only in GitHub issues, sub-issues and `vMAJOR.MINOR.PATCH
 | Target | Cloudron LAMP app |
 | Cloudron app ID | `8bd0acdc-ca6d-467e-aa1e-5c9eb52e3264` |
 | Domain | <https://intranet.apes.org.uk> |
-| Deploy command | `deploy/cloudron/deploy.ps1 -Tag vX.Y.Z` |
-| Deploys | The release tag only (never a branch). Merge and release do not auto-deploy |
+| Deploy command | `gh workflow run deploy-cloudron.yml -f tag=vX.Y.Z` (break-glass local: `deploy/cloudron/deploy.ps1 -Tag vX.Y.Z`) |
+| Deploys | The published release tag only, via GitHub Actions (never a branch). Merge and release do not auto-deploy |
 | Auto-deploy couplings | None |
 | Health URL | <https://intranet.apes.org.uk/healthz> |
 | Version field | JSON `version` (tag) and `revision` (first 12 chars of the tag commit) |
@@ -130,7 +130,8 @@ Development is tracked only in GitHub issues, sub-issues and `vMAJOR.MINOR.PATCH
 - Herd's global `php` may be newer than 8.4: always use `herd-env.ps1` / `herd php`.
 - After Herd restarts, `herd services:list` can show MySQL stopped while port 3306 still answers; start by service id. Trust `scripts\preview.ps1`.
 - Stale folders on `PATH` (including leftover Laragon `bin` paths) must not win over Herd; after `herd-env.ps1`, `(Get-Command php).Source` must show `.config\herd\bin\php84`.
-- Herd injects `#herd-ai-host`; a11y checks exclude it.
+- Herd injects `#herd-ai-host`; ignore it during manual a11y checks.
+- Playwright is not used; do not re-add it for CI or local checks.
 - `public/.htaccess` is for Cloudron's Apache; keep PHP settings inside `<IfModule php_module>` and keep the `HTTP_AUTHORIZATION` rule.
 
 ## Where to find things

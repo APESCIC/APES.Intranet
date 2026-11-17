@@ -198,7 +198,7 @@ php vendor/bin/pint --test
 php vendor/bin/phpstan analyse --memory-limit=1G
 php artisan test
 npm run build
-$env:BASE_URL = 'https://apes-intranet.test'; $env:A11Y_BROWSER_CHANNEL = 'msedge'; npm run test:a11y
+# Accessibility: open https://apes-intranet.test in Cursor's browser (Playwright removed).
 ```
 
 The last line runs the accessibility check (axe and keyboard) against the

@@ -3,35 +3,18 @@
 The intranet aims for WCAG 2.2 AA from the first screen. This page records the
 baseline audit for v0.1.x Foundations and the rules for new pages.
 
-## Automated check
+## Local check (Herd)
 
-`npm run test:a11y` (`scripts/a11y/check.mjs`) runs in the `ci` check on every
-pull request. It:
+Playwright-based automation was removed so CI and local work do not launch
+Chromium. Accessibility is verified on the Laravel Herd preview in Cursor's
+built-in browser before the ship gate.
 
-- runs axe-core with the WCAG 2.0, 2.1 and 2.2 A and AA rules on the sign-in
-  page, privacy notice, 404 and 403 error pages, dashboard (desktop and
-  mobile), roles screen, audit log and the open mobile menu
-- signs in as Staff, Admin and Volunteer through the Developer sign-in panel
-  on `/login`, or the `/qa` fallback when already signed in
-- presses real keys to check the skip link, focus order, focus rings, the
-  mobile menu's focus trap and the QA pill's role switcher (desktop and the
-  320px menu), and runs axe on the open switcher
-- fails on any serious or critical axe issue, or any keyboard failure
+1. Run `scripts\preview.ps1` and open `https://apes-intranet.test`.
+2. Sign in with Developer sign-in / QA roles as needed (`QA_LOGIN_ENABLED=true`, demo data loaded).
+3. Check keyboard focus, skip link, contrast and mobile menus on the pages you changed.
+4. Ignore Herd's `#herd-ai-host` badge; it is not part of the app.
 
-Run it locally against the Herd preview, using the installed Microsoft
-Edge, so Playwright does not need to download its own Chromium. The preview
-must be running, with `QA_LOGIN_ENABLED=true` in `.env` and the demo data
-loaded (`php artisan demo:seed`):
-
-```powershell
-$env:BASE_URL = 'https://apes-intranet.test'; $env:A11Y_BROWSER_CHANNEL = 'msedge'; npm run test:a11y
-```
-
-If the Herd site is secured (`herd secured` lists it), `http://` redirects to
-`https://apes-intranet.test` and the check carries on there.
-
-Herd adds an "Edit with Herd" badge (`#herd-ai-host`) to every local page.
-It is not part of the app, so the check leaves it out.
+`npm run test:a11y` only prints this guidance until a Herd-friendly checker replaces it.
 
 ## Baseline audit, 4 November 2026
 
