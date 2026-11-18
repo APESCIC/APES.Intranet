@@ -221,5 +221,16 @@ it('keeps shell icon and account targets at least 44 CSS pixels', function () {
         ->toContain('min-width: 2.75rem')
         ->toContain('min-height: 2.75rem')
         ->toContain('.sg-user-menu__trigger')
-        ->toContain('@media (max-width: 22.5rem)');
+        ->toContain('@media (max-width: 22.5rem)')
+        ->toContain('.sg-user-menu__panel')
+        ->toContain('background: var(--sg-drawer-surface)');
+});
+
+it('sets the main content column to 95 percent of the viewport width', function () {
+    $appCss = file_get_contents(base_path('resources/css/app.css'));
+    $shellCss = file_get_contents(base_path('resources/css/shell.css'));
+
+    expect($appCss)->toContain('--container-panel: 95%')
+        ->and($shellCss)->toContain('width: var(--container-panel)')
+        ->and($shellCss)->toContain('max-width: var(--container-panel)');
 });
