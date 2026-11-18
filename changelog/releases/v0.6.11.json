@@ -16,6 +16,7 @@
       "The logo no longer shows a Staff or Admin panel subtitle for admins.",
       "Account and menu panels use a solid background so the text is easier to read.",
       "Multi-column mega menus are wider so labels such as Clock in and out stay on one line.",
+      "Mega menus open centred under the top nav so they stay on screen.",
       "Page content uses 95% of the screen width."
     ],
     "removed": [
@@ -26,7 +27,7 @@
     ]
   },
   "internal_notes": [
-    "Epic #375. Shipped #376 always-visible menus; #377 Staff/Admin in account menu; #378 opaque panels and 95% content width; #383 Home link and single-row top nav; #385 compact dropdowns then #387 mega menus and Intranet label; #389 wider mega panels."
+    "Epic #375. Shipped #376 always-visible menus; #377 Staff/Admin in account menu; #378 opaque panels and 95% content width; #383 Home link and single-row top nav; #385 compact dropdowns then #387 mega menus and Intranet label; #389 wider mega panels; #391 centred under the nav."
   ],
   "published": true
 }

@@ -627,6 +627,7 @@ a.sg-nav-link:hover {
 }
 
 .sg-top-nav {
+    position: relative;
     display: flex;
     flex: 1 1 auto;
     align-items: center;
@@ -657,6 +658,10 @@ a.sg-nav-link:hover {
 .sg-disclosure {
     position: relative;
     flex: 0 0 auto;
+}
+
+.sg-top-nav > .sg-disclosure {
+    position: static;
 }
 
 .sg-top-nav__link:hover,
@@ -705,6 +710,13 @@ a.sg-nav-link:hover {
     max-width: min(52rem, 94vw);
 }
 
+.sg-top-nav .sg-mega-panel {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    top: calc(100% + 0.35rem);
+}
+
 .sg-mega-panel[data-columns='2'] {
     min-width: min(34rem, 94vw);
 }
@@ -744,8 +756,6 @@ a.sg-nav-link:hover {
 }
 
 .sg-top-nav__more-panel {
-    right: 0;
-    left: auto;
     min-width: 18rem;
     max-width: min(36rem, 94vw);
 }
@@ -781,7 +791,8 @@ a.sg-nav-link:hover {
 }
 
 @media (max-width: 22.5rem) {
-    .sg-disclosure__panel {
+    .sg-disclosure__panel,
+    .sg-top-nav .sg-mega-panel {
         position: fixed;
         inset: auto 0.5rem auto 0.5rem;
         top: calc(var(--sg-rail-inset) + 3.5rem);
@@ -790,6 +801,7 @@ a.sg-nav-link:hover {
         width: auto;
         max-width: none;
         min-width: 0;
+        transform: none;
         max-height: min(70vh, 28rem);
         overflow: auto;
     }
