@@ -251,6 +251,8 @@ it('keeps the top nav on one row without a clipping horizontal scroll', function
         ->toContain('minmax(14rem, 1fr)')
         ->toContain('.sg-mega-panel[data-columns=\'2\']')
         ->toContain('min-width: min(34rem, 94vw)')
+        ->toContain('.sg-top-nav .sg-mega-panel')
+        ->toContain('translateX(-50%)')
         ->toContain('.sg-top-nav__link')
         ->toContain('.sg-top-nav__more');
 });

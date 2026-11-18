@@ -20,7 +20,7 @@ Interactive shell controls are at least 44 by 44 CSS pixels (`2.75rem`). The she
 ## Top bar pieces
 
 - **Home** — direct link to the dashboard (intranet home); no dropdown.
-- **Section mega menus** — Communications, People (includes Learning), Work, Support (includes soon HR/Agreements and help-desk queues), Apps, and HR when the module adds it (Admin groups on admin pages), from `Menu::for`. Multi-column lists sized so typical groups do not need an inner scroll. Shown after Home on one row without a horizontal scrollbar (scroll would clip the panels).
+- **Section mega menus** — Communications, People (includes Learning), Work, Support (includes soon HR/Agreements and help-desk queues), Apps, and HR when the module adds it (Admin groups on admin pages), from `Menu::for`. Multi-column lists sized so typical groups do not need an inner scroll. Shown after Home on one row without a horizontal scrollbar (scroll would clip the panels). Panels are centred under the top nav so wide menus stay on screen.
 - **More** — when labels do not fit, overflowed sections appear under this trailing disclosure as headed link lists.
 - **Brand** — logo and **APES Intranet**. Admins have no Staff/Admin subtitle under the logo; everyone else sees **APES CIC**.
 - **Notification bell** — one wired instance in the top bar. The panel is an HTML popover (~22rem on desktop, near full-width on mobile).
