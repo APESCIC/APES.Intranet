@@ -38,7 +38,6 @@ it('renders one top-bar bell with a unique popover panel id', function () {
         ->assertOk()
         ->getContent();
 
-    preg_match('/class="sg-rail__top-actions"[^>]*>(.*?)<\/div>/s', $html, $railActions);
     preg_match('/class="sg-topbar__actions"[^>]*>(.*?)<\/div>\s*<\/div>/s', $html, $topbarActions);
 
     expect(substr_count($html, 'id="notification-bell-panel"'))->toBe(1)
@@ -46,8 +45,8 @@ it('renders one top-bar bell with a unique popover panel id', function () {
         ->and(substr_count($html, 'data-notification-bell-toggle'))->toBe(1)
         ->and(substr_count($html, 'data-notification-bell-panel'))->toBe(1)
         ->and($html)->toContain('popover')
-        ->and($topbarActions[1] ?? '')->toContain('data-notification-bell')
-        ->and($railActions[1] ?? '')->not->toContain('data-notification-bell');
+        ->and($html)->not->toContain('data-workspace-rail')
+        ->and($topbarActions[1] ?? '')->toContain('data-notification-bell');
 });
 
 it('marks a notification as read when opened and follows a safe link', function () {

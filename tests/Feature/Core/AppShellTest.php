@@ -129,9 +129,11 @@ it('renders the shell with a skip link, labelled menu and the current page marke
     $response->assertSee('href="#main-content"', false)
         ->assertSee('id="main-content"', false)
         ->assertSee('aria-label="Main menu"', false)
-        ->assertSee('aria-controls="workspace-drawer"', false)
+        ->assertDontSee('aria-controls="workspace-drawer"', false)
+        ->assertDontSee('data-workspace-menu-open', false)
         ->assertSee('data-workspace-top-nav', false)
         ->assertSee('data-workspace-disclosure-trigger', false)
+        ->assertSee('sg-mega-panel', false)
         ->assertSee('data-workspace-user-menu', false)
         ->assertSee('Sam Example')
         ->assertSee('SE')
@@ -149,7 +151,7 @@ it('renders the Staff and Admin switch for admins, marking the active panel', fu
     expect($adminPage)
         ->toContain('aria-label="Switch panel"')
         ->toContain('sg-switch--topbar')
-        ->toContain('sg-switch--drawer')
+        ->not->toContain('sg-switch--drawer')
         ->toMatch('/href="'.preg_quote(route('admin.overview'), '/').'" class="sg-switch__link"\s+aria-current="true"\s*>Admin</')
         ->toMatch('/href="'.preg_quote(route('dashboard'), '/').'" class="sg-switch__link"\s*>Staff</')
         ->toContain('data-brand-panel>Admin panel<');
@@ -190,26 +192,22 @@ it('shows the Admin panel to an admin on an admin route', function () {
         ->assertDontSee('data-nav-key="updates"', false);
 });
 
-it('exposes keyboard and drawer hooks for the mobile shell without a rail bell', function () {
+it('exposes top-level mega menu hooks without a hamburger or drawer', function () {
     $html = $this->actingAs(userWithRole(RoleName::Staff))
         ->get(route('dashboard'))
         ->assertOk()
         ->getContent();
 
     expect($html)
-        ->toContain('data-workspace-menu-open')
-        ->toContain('aria-controls="workspace-drawer"')
-        ->toContain('data-workspace-drawer')
-        ->toContain('data-workspace-close')
+        ->not->toContain('data-workspace-menu-open')
+        ->not->toContain('aria-controls="workspace-drawer"')
+        ->not->toContain('data-workspace-drawer')
+        ->not->toContain('data-workspace-rail')
         ->toContain('data-workspace-user-menu-trigger')
         ->toContain('data-notification-bell-toggle')
         ->toContain('data-workspace-disclosure-trigger')
+        ->toContain('sg-mega-panel__heading')
         ->and(substr_count($html, 'id="notification-bell-panel"'))->toBe(1);
-
-    preg_match('/class="sg-rail__top-actions"[^>]*>(.*?)<\/div>/s', $html, $railActions);
-    expect($railActions[1] ?? '')
-        ->toContain('data-workspace-close')
-        ->not->toContain('data-notification-bell');
 });
 
 it('keeps shell icon and account targets at least 44 CSS pixels', function () {

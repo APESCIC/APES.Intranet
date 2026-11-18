@@ -4,6 +4,7 @@
         @php
             $panelId = 'top-nav-panel-'.$group->key;
             $groupActive = collect($group->items)->contains(fn ($item) => $item->isActive());
+            $itemCount = count($group->items);
         @endphp
         <div class="sg-disclosure" data-workspace-disclosure @if ($groupActive) data-active="true" @endif>
             <button
@@ -18,11 +19,12 @@
             </button>
             <div
                 id="{{ $panelId }}"
-                class="sg-disclosure__panel"
+                class="sg-disclosure__panel sg-mega-panel"
+                @if ($itemCount >= 4) data-columns="2" @endif
                 hidden
                 data-workspace-disclosure-panel
             >
-                <p id="top-nav-heading-{{ $group->key }}" class="sr-only">{{ $group->heading }}</p>
+                <p id="top-nav-heading-{{ $group->key }}" class="sg-mega-panel__heading">{{ $group->heading }}</p>
                 <x-shell.nav-items :group="$group" id-prefix="top-nav" />
             </div>
         </div>
