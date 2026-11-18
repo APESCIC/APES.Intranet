@@ -595,6 +595,15 @@ a.sg-nav-link:hover {
     border-bottom: 1px dashed var(--sg-edge);
 }
 
+.sg-user-menu__panels {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    margin-bottom: 0.65rem;
+    padding-bottom: 0.65rem;
+    border-bottom: 1px dashed var(--sg-edge);
+}
+
 .sg-user-menu__name {
     font-weight: 700;
 }

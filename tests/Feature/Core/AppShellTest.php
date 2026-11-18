@@ -144,23 +144,26 @@ it('renders the shell with a skip link, labelled menu and the current page marke
     expect($response->getContent())->toMatch('/data-nav-key="roles"\s+aria-current="page"/');
 });
 
-it('renders the Staff and Admin switch for admins, marking the active panel', function () {
+it('puts Staff and Admin panel links in the account menu for admins, marking the active panel', function () {
     $admin = userWithRole(RoleName::Admin);
 
     $adminPage = $this->actingAs($admin)->get(route('admin.roles.index'))->assertOk()->getContent();
     expect($adminPage)
         ->toContain('aria-label="Switch panel"')
-        ->toContain('sg-switch--topbar')
-        ->not->toContain('sg-switch--drawer')
-        ->toMatch('/href="'.preg_quote(route('admin.overview'), '/').'" class="sg-switch__link"\s+aria-current="true"\s*>Admin</')
-        ->toMatch('/href="'.preg_quote(route('dashboard'), '/').'" class="sg-switch__link"\s*>Staff</')
+        ->toContain('data-panel-switch')
+        ->toContain('sg-user-menu__panels')
+        ->not->toContain('sg-switch--topbar')
+        ->toMatch('/data-nav-key="admin-panel"[^>]*aria-current="true"/')
+        ->toMatch('/data-nav-key="staff-panel"/')
+        ->toContain('Staff panel')
+        ->toContain('Admin panel')
         ->toContain('data-brand-panel>Admin panel<');
 
     $staffPage = $this->actingAs($admin)->get(route('dashboard'))->assertOk()->getContent();
     expect($staffPage)
-        ->toMatch('/href="'.preg_quote(route('dashboard'), '/').'" class="sg-switch__link"\s+aria-current="true"\s*>Staff</')
+        ->toMatch('/data-nav-key="staff-panel"[^>]*aria-current="true"/')
         ->toContain('data-brand-panel>Staff panel<')
-        ->toContain('sg-switch--topbar')
+        ->not->toContain('sg-switch--topbar')
         ->not->toContain('Normal')
         ->not->toContain('Menu mode');
 });
