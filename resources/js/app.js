@@ -51,7 +51,6 @@ import {
 import { initClockForm } from './operations/clock.js';
 import { initSignaturePads } from './operations/signature.js';
 import { initPushPreferences, registerPushServiceWorker } from './push.js';
-import { initDrawer } from './shell/drawer.js';
 import { initNotificationBell } from './shell/notification-bell.js';
 import { initQaSwitcher } from './shell/qa-switcher.js';
 import { initTopNav } from './shell/top-nav.js';
@@ -115,7 +114,6 @@ function init() {
             focusable: 'false',
         },
     });
-    initDrawer();
     initTopNav();
     initUserMenu();
     initQaSwitcher();

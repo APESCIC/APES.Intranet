@@ -1,8 +1,7 @@
 # Staff and Admin panels
 
 People with the Admin role see a **Staff** and **Admin** switch beside the logo
-in the top bar on desktop, and at the top of the mobile drawer menu. The page
-address decides the panel:
+in the top bar. The page address decides the panel:
 
 - Every `/admin` page (routes named `admin.*`) shows the **Admin** panel. It
   stays selected while an admin moves between admin pages, refreshes, goes

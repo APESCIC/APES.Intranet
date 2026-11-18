@@ -116,20 +116,8 @@
 }
 
 @media (min-width: 64rem) {
-    .sg-main-column--rail {
-        padding-left: 0;
-    }
-
     .sg-content {
         padding: 1.5rem 2rem 4rem;
-    }
-
-    .sg-topbar__menu-open {
-        display: none;
-    }
-
-    .sg-top-nav {
-        display: flex;
     }
 }
 
@@ -217,20 +205,10 @@
 }
 
 .sg-switch--topbar {
-    display: none;
+    display: grid;
     flex: 0 0 auto;
     margin-top: 0;
     min-width: 10rem;
-}
-
-.sg-switch--drawer {
-    margin-top: 1rem;
-}
-
-@media (min-width: 64rem) {
-    .sg-switch--topbar {
-        display: grid;
-    }
 }
 
 /* Navigation */
@@ -640,7 +618,7 @@ a.sg-nav-link:hover {
 }
 
 .sg-top-nav {
-    display: none;
+    display: flex;
     flex: 1 1 auto;
     align-items: center;
     flex-wrap: wrap;
@@ -698,8 +676,30 @@ a.sg-nav-link:hover {
     padding: 0.5rem;
     border-radius: var(--radius-sg-field);
     border: 1px solid var(--sg-edge);
-    background: var(--sg-surface-strong);
+    background: var(--sg-drawer-surface);
     box-shadow: 0 0.75rem 1.5rem rgba(18, 38, 44, 0.12);
+}
+
+.sg-mega-panel {
+    min-width: 18rem;
+    max-width: min(36rem, 94vw);
+    padding: 0.75rem;
+}
+
+.sg-mega-panel__heading {
+    margin: 0 0 0.5rem;
+    padding: 0 0.65rem;
+    color: var(--color-sg-muted);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.sg-mega-panel[data-columns='2'] .sg-nav-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.15rem 0.5rem;
 }
 
 .sg-disclosure__panel .sg-nav-list {
@@ -708,6 +708,23 @@ a.sg-nav-link:hover {
 
 .sg-disclosure__panel .sg-nav-link {
     padding-inline: 0.65rem;
+}
+
+@media (max-width: 22.5rem) {
+    .sg-mega-panel {
+        position: fixed;
+        inset: auto 0.5rem auto 0.5rem;
+        top: calc(var(--sg-rail-inset) + 3.5rem);
+        left: 0.5rem;
+        right: 0.5rem;
+        width: auto;
+        max-width: none;
+        min-width: 0;
+    }
+
+    .sg-mega-panel[data-columns='2'] .sg-nav-list {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {

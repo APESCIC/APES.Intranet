@@ -16,21 +16,7 @@
         <a class="skip-link" href="#main-content">Skip to main content</a>
 
         <div class="sg-page" data-workspace-page>
-            @if ($shellUser)
-                <aside class="sg-rail-dock" aria-label="Main menu" data-workspace-rail-dock>
-                    <x-shell.rail
-                        :menu="$menu"
-                        :user="$shellUser"
-                        :panel="$shellPanel ?? null"
-                        :qa-profile="$qaProfile"
-                        :qa-picker="$qaPicker"
-                        :qa-return-to="$qaReturnTo"
-                        :qa-confirm="$qaConfirm"
-                    />
-                </aside>
-            @endif
-
-            <div @class(['sg-main-column', 'sg-main-column--rail' => $shellUser])>
+            <div class="sg-main-column">
                 <div class="sg-content">
                     <x-shell.topbar
                         :has-menu="(bool) $shellUser"
@@ -73,9 +59,5 @@
                 </div>
             </div>
         </div>
-
-        @if ($shellUser)
-            <x-shell.drawer />
-        @endif
     </body>
 </html>

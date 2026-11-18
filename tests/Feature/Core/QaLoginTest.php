@@ -215,7 +215,7 @@ it('shows the amber QA pill with the current profile, and Sign out of QA, to a Q
     $this->get(route('dashboard'))->assertOk()
         ->assertSee('data-qa-pill', false)
         ->assertSee('QA: Staff + Admin')
-        ->assertSee('popovertarget="qa-switcher"', false)
+        ->assertSee('popovertarget="qa-switcher-user-menu"', false)
         ->assertSee('name="return_to" value="/dashboard"', false)
         ->assertSee('aria-current="true"', false)
         ->assertSee('action="'.route('qa.logout').'"', false)

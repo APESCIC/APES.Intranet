@@ -28,8 +28,8 @@ it('shows the help note to every member in the Microsoft 365 menu section and on
         ->assertSee('data-card-note', false)
         ->assertSee('Most staff have a Microsoft 365 licence; volunteers and students may have a lighter set of apps.');
 
-    // Rail (drawer clone source), top horizontal menu, and the dashboard tile.
-    expect(substr_count($page->getContent(), 'no licence'))->toBe(3);
+    // Top mega menu and the dashboard tile.
+    expect(substr_count($page->getContent(), 'no licence'))->toBe(2);
 })->with([RoleName::Staff, RoleName::Volunteer, RoleName::Student]);
 
 it('links the note to the handbook page and to a Microsoft 365 help desk ticket', function () {
@@ -39,8 +39,8 @@ it('links the note to the handbook page and to a Microsoft 365 help desk ticket'
 
     $page = $this->actingAs($member)->get(route('dashboard'))->assertOk()->getContent();
 
-    expect(substr_count($page, 'href="'.$handbook.'"'))->toBe(3)
-        ->and(substr_count($page, 'href="'.e($helpdesk).'"'))->toBe(3);
+    expect(substr_count($page, 'href="'.$handbook.'"'))->toBe(2)
+        ->and(substr_count($page, 'href="'.e($helpdesk).'"'))->toBe(2);
 
     $this->actingAs($member)->get($handbook)->assertOk()->assertSee('Microsoft 365 accounts and licences');
     $this->actingAs($member)->get($helpdesk)->assertOk()->assertSee('Microsoft 365 apps and licences');

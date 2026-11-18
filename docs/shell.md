@@ -1,29 +1,30 @@
 # App shell
 
-How people move around the intranet from v0.5.8.
+How people move around the intranet from v0.6.11.
 
 ## Layout
 
 | Viewport | What you see |
 | --- | --- |
-| Desktop (≥64rem) | Top bar with logo, Staff/Admin switch (admins only), grouped disclosure menus, notification bell and account menu. The left rail stays in the page as the source for the mobile drawer clone, but it is not the primary desktop navigation. |
-| Tablet and phone | Top bar with hamburger, logo, bell and account avatar. "Open menu" opens a drawer that clones the rail (menu groups, Staff/Admin switch for admins, QA dock when local). The drawer never includes a notification bell. |
+| All widths | Top bar with logo, Staff/Admin switch (admins only, until moved into the account menu), top-level group buttons after the logo (wrap on narrow screens), notification bell and account menu. Each group opens a wider mega panel with a section heading and that group’s links. |
 
-Site navigation uses a **disclosure** pattern (buttons that expand panels), not an ARIA menubar. Keyboard:
+Site navigation uses a **disclosure** pattern (buttons that expand mega panels), not an ARIA menubar. Keyboard:
 
-- Tab through the top bar and drawer in reading order.
-- Enter or Space opens a group dropdown, the account menu or the bell.
+- Tab through the top bar in reading order.
+- Enter or Space opens a group mega panel, the account menu or the bell.
 - Links inside an open panel are in the tab order.
-- Escape closes the open panel (or the drawer) and returns focus to the control that opened it.
+- Escape closes the open panel and returns focus to the control that opened it.
 
 Interactive shell controls are at least 44 by 44 CSS pixels (`2.75rem`). The shell aims for WCAG 2.2 AA; see [accessibility.md](accessibility.md).
 
 ## Top bar pieces
 
-- **Grouped menus** — Home, Communications, People, Operations, Support, Apps, More (and Admin groups on admin pages), from `Menu::for`.
-- **Staff / Admin switch** — beside the logo on desktop; inside the drawer on smaller screens. Navigation only; see [admin-menu-mode.md](communications/admin-menu-mode.md).
-- **Notification bell** — one wired instance in the top bar. The panel is an HTML popover (~22rem on desktop, near full-width on mobile) so overflow on the rail cannot clip it.
+- **Grouped mega menus** — Home, Communications, People, Operations, Support, Apps, More (and Admin groups on admin pages), from `Menu::for`. Always shown after the logo; panels use a multi-column layout when a group has enough links.
+- **Staff / Admin switch** — beside the logo for admins. Navigation only; see [admin-menu-mode.md](communications/admin-menu-mode.md).
+- **Notification bell** — one wired instance in the top bar. The panel is an HTML popover (~22rem on desktop, near full-width on mobile).
 - **Account menu** — avatar disclosure with name and role, My profile, Notification settings, Security, local QA pill when enabled, and Sign out. Those account links are not under People.
+
+There is no hamburger or left-rail drawer; the top-level groups are the navigation on every screen size.
 
 ## Related files
 
