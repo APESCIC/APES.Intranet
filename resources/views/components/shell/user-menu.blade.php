@@ -1,5 +1,6 @@
 @props([
     'user',
+    'panel' => null,
     'qaProfile' => null,
     'qaPicker' => null,
     'qaReturnTo' => null,
@@ -32,6 +33,18 @@
             <span class="sg-user-menu__name">{{ $user->name }}</span>
             <span class="sg-user-menu__role">{{ $user->primaryRoleLabel() ?? 'No intranet role' }}</span>
         </div>
+        @if ($panel)
+            <nav class="sg-user-menu__panels" aria-label="Switch panel" data-panel-switch>
+                <a href="{{ route('dashboard') }}" class="sg-nav-link" data-nav-key="staff-panel" @if ($panel === \App\Core\Navigation\MenuMode::Staff) aria-current="true" @endif>
+                    <i data-lucide="layout-dashboard"></i>
+                    <span>Intranet</span>
+                </a>
+                <a href="{{ route('admin.overview') }}" class="sg-nav-link" data-nav-key="admin-panel" @if ($panel === \App\Core\Navigation\MenuMode::Admin) aria-current="true" @endif>
+                    <i data-lucide="monitor-cog"></i>
+                    <span>Admin panel</span>
+                </a>
+            </nav>
+        @endif
         <ul class="sg-user-menu__list">
             <li>
                 <a href="{{ route('people.profile.edit') }}" class="sg-nav-link" data-nav-key="profile" @if (request()->routeIs('people.profile.*')) aria-current="page" @endif>

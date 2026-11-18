@@ -39,7 +39,7 @@ final class Menu
                 NavItem::route('org-chart', 'Organisation chart', 'network', AccessMatrix::INTRANET_ACCESS, 'people.org-chart', null, 'people'),
                 NavItem::route('students', 'Student placements', 'graduation-cap', AccessMatrix::INTRANET_ACCESS, 'people.students.index', 'people.students.*', 'people'),
             ]),
-            new NavGroup('operations', 'Operations', [
+            new NavGroup('operations', 'Work', [
                 NavItem::route('rota', 'Rota', 'calendar-days', AccessMatrix::INTRANET_ACCESS, 'operations.rota.index', 'operations.rota.*', 'operations'),
                 NavItem::route('clock', 'Clock in and out', 'clock', AccessMatrix::INTRANET_ACCESS, 'operations.clock.index', null, 'operations'),
                 NavItem::route('team-clock', 'Team clock', 'users', AccessMatrix::TEAM_SUPERVISE, 'operations.clock.team', null, 'operations'),
@@ -55,7 +55,7 @@ final class Menu
                 NavItem::route('access-guide', 'Who can see what', 'key-round', AccessMatrix::INTRANET_ACCESS, 'access-guide'),
                 NavItem::route('change-log', 'Change log', 'history', AccessMatrix::INTRANET_ACCESS, 'change-log.index', 'change-log.*'),
             ]),
-            new NavGroup('hr-legal', 'More', [
+            new NavGroup('hr-legal', 'Support extras', [
                 NavItem::soon('hr', 'HR', 'briefcase', AccessMatrix::HR_ACCESS, 'hr'),
                 NavItem::soon('agreements', 'Agreements', 'file-pen-line', AccessMatrix::LEGAL_ACCESS),
             ]),
@@ -124,8 +124,9 @@ final class Menu
     }
 
     /**
-     * Present contributor groups under the agreed top-bar headings without a
-     * hard-coded second menu: Apps, More, and Help desk queues inside Support.
+     * Present contributor groups under the agreed top-bar headings: Apps,
+     * Learning folded into People, soon HR/Agreements and help-desk queues
+     * folded into Support. Operations is shown as Work.
      *
      * @param  list<NavGroup>  $groups
      * @return list<NavGroup>
@@ -133,8 +134,11 @@ final class Menu
     private static function presentGroups(array $groups): array
     {
         $presented = [];
+        $peopleIndex = null;
         $supportIndex = null;
         $queueItems = [];
+        $learningItems = [];
+        $supportExtraItems = [];
 
         foreach ($groups as $group) {
             if ($group->key === 'helpdesk-queues') {
@@ -143,11 +147,27 @@ final class Menu
                 continue;
             }
 
+            if ($group->key === 'learning') {
+                $learningItems = array_merge($learningItems, $group->items);
+
+                continue;
+            }
+
+            if ($group->key === 'hr-legal') {
+                $supportExtraItems = array_merge($supportExtraItems, $group->items);
+
+                continue;
+            }
+
             $group = match ($group->key) {
                 'microsoft-365' => $group->withHeading('Apps'),
-                'hr-legal' => $group->withHeading('More'),
+                'operations' => $group->withHeading('Work'),
                 default => $group,
             };
+
+            if ($group->key === 'people') {
+                $peopleIndex = count($presented);
+            }
 
             if ($group->key === 'support') {
                 $supportIndex = count($presented);
@@ -156,18 +176,29 @@ final class Menu
             $presented[] = $group;
         }
 
-        if ($queueItems === []) {
+        if ($learningItems !== []) {
+            if ($peopleIndex === null) {
+                $presented[] = new NavGroup('people', 'People', $learningItems);
+            } else {
+                $people = $presented[$peopleIndex];
+                $presented[$peopleIndex] = $people->withItems(array_merge($people->items, $learningItems));
+            }
+        }
+
+        $supportExtras = array_merge($supportExtraItems, $queueItems);
+
+        if ($supportExtras === []) {
             return $presented;
         }
 
         if ($supportIndex === null) {
-            $presented[] = new NavGroup('support', 'Support', $queueItems);
+            $presented[] = new NavGroup('support', 'Support', $supportExtras);
 
             return $presented;
         }
 
         $support = $presented[$supportIndex];
-        $presented[$supportIndex] = $support->withItems(array_merge($support->items, $queueItems));
+        $presented[$supportIndex] = $support->withItems(array_merge($support->items, $supportExtras));
 
         return $presented;
     }

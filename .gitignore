@@ -28,3 +28,6 @@ _ide_helper.php
 Thumbs.db
 /REVISION
 /VERSION
+
+.playwright-mcp/
+preview-*.png
