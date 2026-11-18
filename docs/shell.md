@@ -6,9 +6,9 @@ How people move around the intranet from v0.6.11.
 
 | Viewport | What you see |
 | --- | --- |
-| All widths | Top bar with logo, top-level group buttons after the logo (wrap on narrow screens), notification bell and account menu. Each group opens a wider mega panel with a section heading and that group’s links. Admins switch Staff/Admin from the account menu. |
+| All widths | Top bar with logo, a Home link, then top-level group buttons on one row (horizontal scroll if needed), notification bell and account menu. Each group opens a wider mega panel with a section heading and that group’s links. Admins switch Staff/Admin from the account menu. |
 
-Site navigation uses a **disclosure** pattern (buttons that expand mega panels), not an ARIA menubar. Keyboard:
+Site navigation uses a **disclosure** pattern for section groups (buttons that expand mega panels), not an ARIA menubar. Home is a plain link to the dashboard. Keyboard:
 
 - Tab through the top bar in reading order.
 - Enter or Space opens a group mega panel, the account menu or the bell.
@@ -19,7 +19,8 @@ Interactive shell controls are at least 44 by 44 CSS pixels (`2.75rem`). The she
 
 ## Top bar pieces
 
-- **Grouped mega menus** — Home, Communications, People, Operations, Support, Apps, More (and Admin groups on admin pages), from `Menu::for`. Always shown after the logo; panels use a multi-column layout when a group has enough links.
+- **Home** — direct link to the dashboard (intranet home); no mega menu.
+- **Grouped mega menus** — Communications, People, Operations, Support, Apps, More (and Admin groups on admin pages), from `Menu::for`. Shown after Home on one row; panels use a multi-column layout when a group has enough links.
 - **Notification bell** — one wired instance in the top bar. The panel is an HTML popover (~22rem on desktop, near full-width on mobile).
 - **Account menu** — avatar disclosure with name and role, Staff/Admin panel links for admins (navigation only; see [admin-menu-mode.md](communications/admin-menu-mode.md)), My profile, Notification settings, Security, local QA pill when enabled, and Sign out. Those account links are not under People.
 

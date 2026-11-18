@@ -213,6 +213,32 @@ it('exposes top-level mega menu hooks without a hamburger or drawer', function (
         ->and(substr_count($html, 'id="notification-bell-panel"'))->toBe(1);
 });
 
+it('renders Home as a direct dashboard link without a mega panel', function () {
+    $html = $this->actingAs(userWithRole(RoleName::Staff))
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->getContent();
+
+    expect($html)
+        ->toContain('class="sg-top-nav__link"')
+        ->toMatch('/href="'.preg_quote(route('dashboard'), '/').'"\s+class="sg-top-nav__link"/')
+        ->toMatch('/data-nav-key="dashboard"\s+aria-current="page"/')
+        ->not->toContain('id="top-nav-panel-home"')
+        ->not->toContain('aria-controls="top-nav-panel-home"')
+        ->toContain('id="top-nav-panel-communications"')
+        ->toContain('sg-mega-panel__heading');
+});
+
+it('keeps the top nav on one row with horizontal scroll instead of wrapping', function () {
+    $css = file_get_contents(base_path('resources/css/shell.css'));
+
+    expect($css)
+        ->toContain('.sg-top-nav')
+        ->toContain('flex-wrap: nowrap')
+        ->toContain('overflow-x: auto')
+        ->toContain('.sg-top-nav__link');
+});
+
 it('keeps shell icon and account targets at least 44 CSS pixels', function () {
     $css = file_get_contents(base_path('resources/css/shell.css'));
 
