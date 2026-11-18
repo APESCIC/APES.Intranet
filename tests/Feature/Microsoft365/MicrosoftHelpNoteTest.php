@@ -28,7 +28,7 @@ it('shows the help note to every member in the Microsoft 365 menu section and on
         ->assertSee('data-card-note', false)
         ->assertSee('Most staff have a Microsoft 365 licence; volunteers and students may have a lighter set of apps.');
 
-    // Top mega menu and the dashboard tile.
+    // Top section dropdown and the dashboard tile.
     expect(substr_count($page->getContent(), 'no licence'))->toBe(2);
 })->with([RoleName::Staff, RoleName::Volunteer, RoleName::Student]);
 

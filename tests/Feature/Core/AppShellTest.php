@@ -133,7 +133,7 @@ it('renders the shell with a skip link, labelled menu and the current page marke
         ->assertDontSee('data-workspace-menu-open', false)
         ->assertSee('data-workspace-top-nav', false)
         ->assertSee('data-workspace-disclosure-trigger', false)
-        ->assertSee('sg-mega-panel', false)
+        ->assertDontSee('sg-mega-panel', false)
         ->assertSee('data-workspace-user-menu', false)
         ->assertSee('Sam Example')
         ->assertSee('SE')
@@ -195,7 +195,7 @@ it('shows the Admin panel to an admin on an admin route', function () {
         ->assertDontSee('data-nav-key="updates"', false);
 });
 
-it('exposes top-level mega menu hooks without a hamburger or drawer', function () {
+it('exposes top-level dropdown hooks without a hamburger or drawer', function () {
     $html = $this->actingAs(userWithRole(RoleName::Staff))
         ->get(route('dashboard'))
         ->assertOk()
@@ -206,14 +206,16 @@ it('exposes top-level mega menu hooks without a hamburger or drawer', function (
         ->not->toContain('aria-controls="workspace-drawer"')
         ->not->toContain('data-workspace-drawer')
         ->not->toContain('data-workspace-rail')
+        ->not->toContain('sg-mega-panel')
         ->toContain('data-workspace-user-menu-trigger')
         ->toContain('data-notification-bell-toggle')
         ->toContain('data-workspace-disclosure-trigger')
-        ->toContain('sg-mega-panel__heading')
+        ->toContain('data-workspace-top-nav-more')
+        ->toContain('More sections')
         ->and(substr_count($html, 'id="notification-bell-panel"'))->toBe(1);
 });
 
-it('renders Home as a direct dashboard link without a mega panel', function () {
+it('renders Home as a direct dashboard link without a section dropdown', function () {
     $html = $this->actingAs(userWithRole(RoleName::Staff))
         ->get(route('dashboard'))
         ->assertOk()
@@ -222,21 +224,23 @@ it('renders Home as a direct dashboard link without a mega panel', function () {
     expect($html)
         ->toContain('class="sg-top-nav__link"')
         ->toMatch('/href="'.preg_quote(route('dashboard'), '/').'"\s+class="sg-top-nav__link"/')
-        ->toMatch('/data-nav-key="dashboard"\s+aria-current="page"/')
+        ->toMatch('/data-nav-key="dashboard"[^>]*aria-current="page"/')
         ->not->toContain('id="top-nav-panel-home"')
         ->not->toContain('aria-controls="top-nav-panel-home"')
         ->toContain('id="top-nav-panel-communications"')
-        ->toContain('sg-mega-panel__heading');
+        ->toContain('class="sg-disclosure__panel"');
 });
 
-it('keeps the top nav on one row with horizontal scroll instead of wrapping', function () {
+it('keeps the top nav on one row without a clipping horizontal scroll', function () {
     $css = file_get_contents(base_path('resources/css/shell.css'));
 
     expect($css)
         ->toContain('.sg-top-nav')
         ->toContain('flex-wrap: nowrap')
-        ->toContain('overflow-x: auto')
-        ->toContain('.sg-top-nav__link');
+        ->toContain('overflow: visible')
+        ->not->toContain('overflow-x: auto')
+        ->toContain('.sg-top-nav__link')
+        ->toContain('.sg-top-nav__more');
 });
 
 it('keeps shell icon and account targets at least 44 CSS pixels', function () {
