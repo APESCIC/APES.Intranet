@@ -103,7 +103,7 @@
 }
 
 .sg-content {
-    width: 100%;
+    width: var(--container-panel);
     max-width: var(--container-panel);
     margin-inline: auto;
     padding: 1rem 1rem 4rem;
@@ -554,7 +554,7 @@ a.sg-nav-link:hover {
     padding: 0.75rem;
     border-radius: var(--radius-sg-field);
     border: 1px solid var(--sg-edge);
-    background: var(--sg-surface-strong);
+    background: var(--sg-drawer-surface);
     box-shadow: 0 0.75rem 1.5rem rgba(18, 38, 44, 0.12);
 }
 

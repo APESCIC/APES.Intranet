@@ -25,6 +25,8 @@ Interactive shell controls are at least 44 by 44 CSS pixels (`2.75rem`). The she
 
 There is no hamburger or left-rail drawer; the top-level groups are the navigation on every screen size.
 
+The main content column (`.sg-content`) uses **95%** of the visitor’s viewport width on every page that uses the app or error shell. Account and mega menu panels use an opaque surface so text stays readable over the blue shell.
+
 ## Related files
 
 - Views: `resources/views/components/shell/`

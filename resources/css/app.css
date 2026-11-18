@@ -43,7 +43,7 @@
     --shadow-sg-rail: 0 12px 40px rgba(16, 116, 129, 0.14);
     --shadow-sg-primary: 0 6px 18px rgba(16, 116, 129, 0.27);
     --shadow-sg-active: 0 4px 14px rgba(12, 93, 104, 0.12);
-    --container-panel: 70rem;
+    --container-panel: 95%;
     --text-panel-title: 1.75rem;
     --text-panel-title--line-height: 2.125rem;
 }
