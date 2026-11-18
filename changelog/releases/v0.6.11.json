@@ -9,7 +9,8 @@
       "Top-level menu sections after the logo open wider mega panels with section headings."
     ],
     "changed": [
-      "Menu sections stay visible after the logo on every screen size, wrapping when space is tight.",
+      "Menu sections stay visible after the logo on one row (scroll sideways on very narrow screens).",
+      "Home goes straight to the dashboard; other sections still open mega menus.",
       "Admins open Staff panel or Admin panel from the account menu instead of a switch beside the logo.",
       "Account and menu panels use a solid background so the text is easier to read.",
       "Page content uses 95% of the screen width."
@@ -22,7 +23,7 @@
     ]
   },
   "internal_notes": [
-    "Epic #375. Shipped #376 always-visible mega menus; #377 Staff/Admin in account menu; #378 opaque panels and 95% content width."
+    "Epic #375. Shipped #376 always-visible mega menus; #377 Staff/Admin in account menu; #378 opaque panels and 95% content width; #383 Home link and single-row top nav."
   ],
   "published": true
 }

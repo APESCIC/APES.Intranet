@@ -5,28 +5,40 @@
             $panelId = 'top-nav-panel-'.$group->key;
             $groupActive = collect($group->items)->contains(fn ($item) => $item->isActive());
             $itemCount = count($group->items);
+            $homeItem = $group->key === 'home' ? ($group->items[0] ?? null) : null;
         @endphp
-        <div class="sg-disclosure" data-workspace-disclosure @if ($groupActive) data-active="true" @endif>
-            <button
-                type="button"
-                class="sg-disclosure__trigger"
-                aria-expanded="false"
-                aria-controls="{{ $panelId }}"
-                data-workspace-disclosure-trigger
+        @if ($homeItem)
+            <a
+                href="{{ $homeItem->url() }}"
+                class="sg-top-nav__link"
+                data-nav-key="{{ $homeItem->key }}"
+                @if ($homeItem->isActive()) aria-current="page" @endif
             >
-                <span>{{ $group->heading }}</span>
-                <i data-lucide="chevron-down" class="sg-disclosure__chevron" aria-hidden="true"></i>
-            </button>
-            <div
-                id="{{ $panelId }}"
-                class="sg-disclosure__panel sg-mega-panel"
-                @if ($itemCount >= 4) data-columns="2" @endif
-                hidden
-                data-workspace-disclosure-panel
-            >
-                <p id="top-nav-heading-{{ $group->key }}" class="sg-mega-panel__heading">{{ $group->heading }}</p>
-                <x-shell.nav-items :group="$group" id-prefix="top-nav" />
+                {{ $group->heading }}
+            </a>
+        @else
+            <div class="sg-disclosure" data-workspace-disclosure @if ($groupActive) data-active="true" @endif>
+                <button
+                    type="button"
+                    class="sg-disclosure__trigger"
+                    aria-expanded="false"
+                    aria-controls="{{ $panelId }}"
+                    data-workspace-disclosure-trigger
+                >
+                    <span>{{ $group->heading }}</span>
+                    <i data-lucide="chevron-down" class="sg-disclosure__chevron" aria-hidden="true"></i>
+                </button>
+                <div
+                    id="{{ $panelId }}"
+                    class="sg-disclosure__panel sg-mega-panel"
+                    @if ($itemCount >= 4) data-columns="2" @endif
+                    hidden
+                    data-workspace-disclosure-panel
+                >
+                    <p id="top-nav-heading-{{ $group->key }}" class="sg-mega-panel__heading">{{ $group->heading }}</p>
+                    <x-shell.nav-items :group="$group" id-prefix="top-nav" />
+                </div>
             </div>
-        </div>
+        @endif
     @endforeach
 </nav>
