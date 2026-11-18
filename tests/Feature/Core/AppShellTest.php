@@ -98,11 +98,13 @@ it('leaves out a menu group when none of its items are allowed', function () {
         ->and($headings)->not->toContain('More');
 });
 
-it('presents the More heading for people who can see HR or agreements', function () {
-    $headings = collect(Menu::for(userWithRole(RoleName::Hr), MenuMode::Staff))->pluck('heading');
+it('folds soon HR and Agreements into Support for people who can see them', function () {
+    $menu = collect(Menu::for(userWithRole(RoleName::Hr), MenuMode::Staff));
+    $support = $menu->firstWhere('key', 'support');
 
-    expect($headings)->toContain('More')
-        ->and($headings)->not->toContain('HR and legal');
+    expect($menu->pluck('heading'))->toContain('Support', 'Work')
+        ->and($menu->pluck('heading'))->not->toContain('More', 'HR and legal', 'Support extras', 'Operations')
+        ->and(collect($support?->items ?? [])->pluck('key')->all())->toContain('hr');
 });
 
 it('keeps account links out of People and in the user menu only', function () {
@@ -133,7 +135,7 @@ it('renders the shell with a skip link, labelled menu and the current page marke
         ->assertDontSee('data-workspace-menu-open', false)
         ->assertSee('data-workspace-top-nav', false)
         ->assertSee('data-workspace-disclosure-trigger', false)
-        ->assertDontSee('sg-mega-panel', false)
+        ->assertSee('sg-mega-panel', false)
         ->assertSee('data-workspace-user-menu', false)
         ->assertSee('Sam Example')
         ->assertSee('SE')
@@ -144,7 +146,7 @@ it('renders the shell with a skip link, labelled menu and the current page marke
     expect($response->getContent())->toMatch('/data-nav-key="roles"\s+aria-current="page"/');
 });
 
-it('puts Staff and Admin panel links in the account menu for admins, marking the active panel', function () {
+it('puts Intranet and Admin panel links in the account menu for admins, marking the active panel', function () {
     $admin = userWithRole(RoleName::Admin);
 
     $adminPage = $this->actingAs($admin)->get(route('admin.roles.index'))->assertOk()->getContent();
@@ -155,14 +157,16 @@ it('puts Staff and Admin panel links in the account menu for admins, marking the
         ->not->toContain('sg-switch--topbar')
         ->toMatch('/data-nav-key="admin-panel"[^>]*aria-current="true"/')
         ->toMatch('/data-nav-key="staff-panel"/')
-        ->toContain('Staff panel')
+        ->toContain('Intranet')
         ->toContain('Admin panel')
-        ->toContain('data-brand-panel>Admin panel<');
+        ->not->toContain('data-brand-panel')
+        ->not->toContain('Staff panel');
 
     $staffPage = $this->actingAs($admin)->get(route('dashboard'))->assertOk()->getContent();
     expect($staffPage)
         ->toMatch('/data-nav-key="staff-panel"[^>]*aria-current="true"/')
-        ->toContain('data-brand-panel>Staff panel<')
+        ->toContain('Intranet')
+        ->not->toContain('data-brand-panel')
         ->not->toContain('sg-switch--topbar')
         ->not->toContain('Normal')
         ->not->toContain('Menu mode');
@@ -175,7 +179,8 @@ it('does not render hidden menu items or the Admin switcher for non-admins', fun
         ->assertDontSee('data-nav-key="hr"', false)
         ->assertDontSee('data-panel-switch', false)
         ->assertSee('data-brand-panel>APES CIC<', false)
-        ->assertDontSee('Staff panel');
+        ->assertDontSee('Staff panel')
+        ->assertDontSee('data-nav-key="staff-panel"', false);
 });
 
 it('opens Teams in a new tab and marks planned features as not available yet', function () {
@@ -206,12 +211,12 @@ it('exposes top-level dropdown hooks without a hamburger or drawer', function ()
         ->not->toContain('aria-controls="workspace-drawer"')
         ->not->toContain('data-workspace-drawer')
         ->not->toContain('data-workspace-rail')
-        ->not->toContain('sg-mega-panel')
+        ->toContain('sg-mega-panel')
         ->toContain('data-workspace-user-menu-trigger')
         ->toContain('data-notification-bell-toggle')
         ->toContain('data-workspace-disclosure-trigger')
         ->toContain('data-workspace-top-nav-more')
-        ->toContain('More sections')
+        ->not->toContain('More sections')
         ->and(substr_count($html, 'id="notification-bell-panel"'))->toBe(1);
 });
 
@@ -228,7 +233,10 @@ it('renders Home as a direct dashboard link without a section dropdown', functio
         ->not->toContain('id="top-nav-panel-home"')
         ->not->toContain('aria-controls="top-nav-panel-home"')
         ->toContain('id="top-nav-panel-communications"')
-        ->toContain('class="sg-disclosure__panel"');
+        ->toContain('sg-mega-panel')
+        ->toContain('data-top-nav-heading="Work"')
+        ->not->toContain('data-top-nav-heading="Operations"')
+        ->not->toContain('data-top-nav-heading="Learning"');
 });
 
 it('keeps the top nav on one row without a clipping horizontal scroll', function () {
@@ -239,6 +247,7 @@ it('keeps the top nav on one row without a clipping horizontal scroll', function
         ->toContain('flex-wrap: nowrap')
         ->toContain('overflow: visible')
         ->not->toContain('overflow-x: auto')
+        ->toContain('.sg-mega-panel')
         ->toContain('.sg-top-nav__link')
         ->toContain('.sg-top-nav__more');
 });

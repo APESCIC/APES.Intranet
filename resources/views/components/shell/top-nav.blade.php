@@ -5,6 +5,8 @@
             $panelId = 'top-nav-panel-'.$group->key;
             $groupActive = collect($group->items)->contains(fn ($item) => $item->isActive());
             $homeItem = $group->key === 'home' ? ($group->items[0] ?? null) : null;
+            $itemCount = count($group->items);
+            $columns = $itemCount >= 7 ? 3 : ($itemCount >= 4 ? 2 : null);
         @endphp
         @if ($homeItem)
             <a
@@ -36,11 +38,12 @@
                 </button>
                 <div
                     id="{{ $panelId }}"
-                    class="sg-disclosure__panel"
+                    class="sg-disclosure__panel sg-mega-panel"
+                    @if ($columns) data-columns="{{ $columns }}" @endif
                     hidden
                     data-workspace-disclosure-panel
                 >
-                    <p id="top-nav-heading-{{ $group->key }}" class="sr-only">{{ $group->heading }}</p>
+                    <p id="top-nav-heading-{{ $group->key }}" class="sg-mega-panel__heading">{{ $group->heading }}</p>
                     <x-shell.nav-items :group="$group" id-prefix="top-nav" />
                 </div>
             </div>
@@ -55,12 +58,12 @@
             aria-controls="top-nav-panel-more"
             data-workspace-disclosure-trigger
         >
-            <span>More sections</span>
+            <span>More</span>
             <i data-lucide="chevron-down" class="sg-disclosure__chevron" aria-hidden="true"></i>
         </button>
         <div
             id="top-nav-panel-more"
-            class="sg-disclosure__panel sg-top-nav__more-panel"
+            class="sg-disclosure__panel sg-mega-panel sg-top-nav__more-panel"
             hidden
             data-workspace-disclosure-panel
             data-workspace-top-nav-more-panel

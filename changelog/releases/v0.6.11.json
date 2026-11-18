@@ -2,16 +2,18 @@
   "version": "v0.6.11",
   "released_at": "2026-11-18",
   "title": "Shell mega menu and account polish",
-  "summary": "The top menu shows section dropdowns after the logo, with a More sections overflow when space is tight. Admins switch Staff and Admin from the account menu, panels are easier to read, and pages use more of the screen width.",
+  "summary": "The top menu shows tidy mega menus after the logo, with a More overflow when space is tight. Admins switch Intranet and Admin from the account menu, panels are easier to read, and pages use more of the screen width.",
   "audiences": ["staff", "volunteers", "students"],
   "changes": {
     "added": [
-      "Top-level menu sections after the logo open compact dropdown lists.",
-      "When there is not enough room, overflowed sections appear under More sections."
+      "Top-level menu sections after the logo open multi-column mega menus that stay fully visible.",
+      "When there is not enough room, overflowed sections appear under More."
     ],
     "changed": [
       "Home goes straight to the dashboard.",
-      "Admins open Staff panel or Admin panel from the account menu instead of a switch beside the logo.",
+      "Menu groups are clearer: Work (was Operations), Learning under People, soon HR and Agreements under Support.",
+      "Admins open Intranet or Admin panel from the account menu instead of a switch beside the logo.",
+      "The logo no longer shows a Staff or Admin panel subtitle for admins.",
       "Account and menu panels use a solid background so the text is easier to read.",
       "Page content uses 95% of the screen width."
     ],
@@ -19,11 +21,11 @@
       "The hamburger Open menu button and the side drawer that copied the old left menu."
     ],
     "accessibility": [
-      "Keyboard users open and close section dropdowns and the account menu with Enter, Space and Escape."
+      "Keyboard users open and close section mega menus and the account menu with Enter, Space and Escape."
     ]
   },
   "internal_notes": [
-    "Epic #375. Shipped #376 always-visible menus; #377 Staff/Admin in account menu; #378 opaque panels and 95% content width; #383 Home link and single-row top nav; #385 compact dropdowns and More sections overflow."
+    "Epic #375. Shipped #376 always-visible menus; #377 Staff/Admin in account menu; #378 opaque panels and 95% content width; #383 Home link and single-row top nav; #385 compact dropdowns then #387 mega menus, Work/People/Support tidy, brand subtitle removed, Intranet label."
   ],
   "published": true
 }
