@@ -37,7 +37,7 @@
             <nav class="sg-user-menu__panels" aria-label="Switch panel" data-panel-switch>
                 <a href="{{ route('dashboard') }}" class="sg-nav-link" data-nav-key="staff-panel" @if ($panel === \App\Core\Navigation\MenuMode::Staff) aria-current="true" @endif>
                     <i data-lucide="layout-dashboard"></i>
-                    <span>Staff panel</span>
+                    <span>Intranet</span>
                 </a>
                 <a href="{{ route('admin.overview') }}" class="sg-nav-link" data-nav-key="admin-panel" @if ($panel === \App\Core\Navigation\MenuMode::Admin) aria-current="true" @endif>
                     <i data-lucide="monitor-cog"></i>

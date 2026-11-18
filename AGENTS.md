@@ -17,7 +17,7 @@ The private intranet for APES CIC staff, volunteers and students: updates, the d
 - Laravel on PHP 8.4, MySQL, Vite on port 5174, Redis and mail via Cloudron addons in production.
 - Local stack: Laravel Herd Pro only, with fake demo data. Never real HR, student, volunteer or agreement data.
 - Key paths: `app/`, `resources/`, `routes/`, `database/`, `docs/`, `.cursor/skills/`, `deploy/cloudron/`.
-- App shell (from v0.6.11): top bar with logo, Home link, compact section dropdowns (More sections overflow when needed), notification bell and account menu (Staff/Admin panel links for admins); content column at 95% viewport width; opaque panels. No hamburger drawer. Layout and keyboard notes: [docs/shell.md](docs/shell.md).
+- App shell (from v0.6.11): top bar with logo (no Staff/Admin subtitle for admins), Home link, section mega menus (More overflow when needed), notification bell and account menu (Intranet/Admin panel links for admins); content column at 95% viewport width; opaque panels. No hamburger drawer. Layout and keyboard notes: [docs/shell.md](docs/shell.md).
 
 ## Local development and preview
 
