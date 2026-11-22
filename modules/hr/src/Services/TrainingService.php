@@ -15,7 +15,7 @@ final class TrainingService
 {
     public function ensureDefaults(): void
     {
-        $lms = rtrim((string) config('hr.lms_base_url', 'https://lms.intranet.apes.org.uk'), '/');
+        $lms = rtrim((string) config('hr.lms_base_url', 'https://upskilling.intranet.apes.org.uk'), '/');
 
         $defaults = [
             ['code' => 'safeguarding', 'title' => 'Safeguarding essentials', 'path' => '/course/view.php?id=1', 'roles' => ['staff', 'supervisor', 'management', 'hr', 'admin']],
@@ -28,6 +28,11 @@ final class TrainingService
                 ['code' => $row['code']],
                 ['title' => $row['title'], 'lms_url' => $lms.$row['path'], 'active' => true],
             );
+
+            // Keep default LMS links on the configured Moodle base (coexistence signposting).
+            if ($course->lms_url !== $lms.$row['path']) {
+                $course->forceFill(['lms_url' => $lms.$row['path']])->save();
+            }
 
             foreach ($row['roles'] as $role) {
                 TrainingRequirement::query()->firstOrCreate(

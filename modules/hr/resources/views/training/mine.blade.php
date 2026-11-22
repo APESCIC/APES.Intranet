@@ -1,8 +1,10 @@
-<x-layouts.app title="My training" subtitle="Required courses and links to the LMS.">
+<x-layouts.app title="My training" subtitle="Required courses on Moodle Upskilling and the intranet.">
     <p class="mb-4 text-sg-muted">
-        Open a course on
-        <a class="text-sg-brand underline" href="{{ $lmsBase }}" target="_blank" rel="noopener">{{ $lmsBase }}</a>
-        or complete the linked intranet course when one is offered. HR can still record LMS completions.
+        Compliance courses still live on
+        <a class="text-sg-brand underline" href="{{ $lmsBase }}" target="_blank" rel="noopener">Moodle Upskilling</a>
+        ({{ $lmsBase }}). New courses may also be offered in
+        <a class="text-sg-brand underline" href="{{ route('learning.mine') }}">My learning</a>
+        on this intranet. Both stay available while they coexist. HR can still record Moodle completions.
     </p>
 
     <section class="sg-card p-6" aria-labelledby="courses-heading">
@@ -14,7 +16,7 @@
                 @foreach ($rows as $row)
                     <li class="border-b border-sg-border/60 pb-3" data-course="{{ $row['course']->code }}">
                         <a class="font-medium text-sg-brand underline" href="{{ $row['course']->lms_url }}" target="_blank" rel="noopener">{{ $row['course']->title }}</a>
-                        <span class="text-sg-muted text-sm"> (LMS link)</span>
+                        <span class="text-sg-muted text-sm"> (Moodle Upskilling)</span>
                         @if ($row['course']->learning_course_id)
                             <a class="ml-2 text-sm text-sg-brand underline" href="{{ route('learning.play.show', $row['course']->learning_course_id) }}">Intranet course</a>
                         @endif

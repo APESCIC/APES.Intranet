@@ -38,7 +38,8 @@ it('shows a member their required courses and LMS links', function () {
     $this->get(route('hr.training.mine'))
         ->assertOk()
         ->assertSee('Safeguarding essentials')
-        ->assertSee('https://lms.intranet.apes.org.uk')
+        ->assertSee('https://upskilling.intranet.apes.org.uk')
+        ->assertSee('Moodle Upskilling')
         ->assertSee('overdue or missing');
 
     $rows = app(TrainingService::class)->forMember($member);
@@ -115,7 +116,7 @@ it('treats a native Learning Module completion as satisfying a linked requiremen
         ->assertOk()
         ->assertSee('Safeguarding essentials')
         ->assertSee('intranet record')
-        ->assertSee('https://lms.intranet.apes.org.uk');
+        ->assertSee('https://upskilling.intranet.apes.org.uk');
 
     $overdueForMember = collect(app(TrainingService::class)->overdueReport())
         ->first(fn (array $r) => $r['user']->id === $member->id);
