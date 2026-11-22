@@ -7,6 +7,7 @@ use Modules\Learning\Http\Controllers\CourseAuthoringController;
 use Modules\Learning\Http\Controllers\CoursePlayerController;
 use Modules\Learning\Http\Controllers\EnrolmentController;
 use Modules\Learning\Http\Controllers\GradeViewController;
+use Modules\Learning\Http\Controllers\LearningReportController;
 use Modules\Learning\Http\Controllers\MyLearningController;
 use Modules\Learning\Http\Controllers\QuizAttemptController;
 use Modules\Learning\Http\Controllers\QuizAuthoringController;
@@ -27,6 +28,9 @@ Route::middleware(['web', 'auth', 'can:'.LearningPermissions::ACCESS, 'module:le
         Route::get('/grades', [GradeViewController::class, 'mine'])->name('grades.mine');
         Route::get('/courses/{course}/grades/export.csv', [GradeViewController::class, 'export'])->name('courses.grades.export');
         Route::get('/certificates/{certificate}/download', [CertificateController::class, 'download'])->name('certificates.download');
+        Route::get('/reports', [LearningReportController::class, 'index'])->name('reports.index');
+        Route::get('/reports/courses/{course}', [LearningReportController::class, 'show'])->name('reports.show');
+        Route::get('/reports/courses/{course}/completions.csv', [LearningReportController::class, 'exportCompletions'])->name('reports.completions.export');
 
         Route::get('/play/{course}', [CoursePlayerController::class, 'show'])->name('play.show');
         Route::get('/play/{course}/lessons/{lesson}', [CoursePlayerController::class, 'lesson'])->name('play.lesson');

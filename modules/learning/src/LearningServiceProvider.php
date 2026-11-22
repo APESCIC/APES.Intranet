@@ -19,6 +19,7 @@ use Modules\Learning\Services\GradeReleaseService;
 use Modules\Learning\Services\GradeViewExportService;
 use Modules\Learning\Services\GradingSchemeService;
 use Modules\Learning\Services\LearningAssignmentService;
+use Modules\Learning\Services\LearningReportService;
 use Modules\Learning\Services\ProgressService;
 use Modules\Learning\Services\QuestionBankService;
 use Modules\Learning\Services\QuizAttemptService;
@@ -43,6 +44,7 @@ class LearningServiceProvider extends ServiceProvider
         $this->app->singleton(GradeReleaseService::class);
         $this->app->singleton(GradeAuditService::class);
         $this->app->singleton(GradeViewExportService::class);
+        $this->app->singleton(LearningReportService::class);
         $this->app->singleton(LearningGradePolicy::class);
     }
 
