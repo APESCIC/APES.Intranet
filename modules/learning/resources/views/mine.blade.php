@@ -2,9 +2,9 @@
     <div class="mx-auto max-w-3xl px-4 py-8">
         <h1 class="font-display text-3xl text-ink">{{ $title }}</h1>
         <p class="mt-3 text-ink-muted">
-            Courses you are enrolled on. This is separate from
+            Intranet courses you are enrolled on. Compliance courses on Moodle Upskilling stay on
             <a href="{{ route('hr.training.mine') }}" class="text-brand underline">My training</a>
-            in HR, which tracks compliance links to the external LMS.
+            until a later decision. Both systems run together for now.
         </p>
 
         @if (session('status'))
