@@ -61,9 +61,7 @@ jobs:
           git fetch origin main --depth=50
           git merge-base --is-ancestor HEAD origin/main || { echo "::error::$TAG is not on main"; exit 1; }
           gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null
-          expected="${TAG#v}"
-          actual="$(tr -d ' \r\n' < VERSION)"
-          [[ "$actual" == "$expected" ]] || { echo "::error::VERSION is '$actual', expected '$expected'"; exit 1; }
+          # VERSION is stamped into the release bundle below; it is not committed (see fields.json).
           echo "RELEASE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
 
       - name: Set up PHP 8.4
@@ -103,7 +101,7 @@ jobs:
           mkdir -p release/bootstrap/cache release/storage/framework/{cache,sessions,views} release/storage/logs
           touch release/bootstrap/cache/.gitkeep
           printf '%s' "$RELEASE_SHA" > release/REVISION
-          printf '%s' "${TAG#v}" > release/VERSION
+          printf '%s' "$TAG" > release/VERSION
 
       - name: Install Cloudron CLI
         run: npm install --global cloudron@9.0.4
@@ -156,7 +154,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          expected_version="${TAG#v}"
+          expected_version="$TAG"
           expected_rev="${RELEASE_SHA:0:12}"
           for attempt in $(seq 1 18); do
             body="$(curl -fsS --max-time 10 "$APP_URL$HEALTH_PATH" || true)"
