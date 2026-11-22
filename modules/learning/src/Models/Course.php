@@ -21,6 +21,8 @@ class Course extends Model
         'summary',
         'status',
         'self_enrol_enabled',
+        'cpd_hours',
+        'certificate_renew_months',
         'created_by',
     ];
 
@@ -28,7 +30,17 @@ class Course extends Model
     {
         return [
             'self_enrol_enabled' => 'boolean',
+            'cpd_hours' => 'decimal:2',
+            'certificate_renew_months' => 'integer',
         ];
+    }
+
+    /**
+     * @return HasMany<Certificate, $this>
+     */
+    public function certificates(): HasMany
+    {
+        return $this->hasMany(Certificate::class);
     }
 
     /**

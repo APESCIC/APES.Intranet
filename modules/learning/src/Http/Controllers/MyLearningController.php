@@ -5,6 +5,7 @@ namespace Modules\Learning\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\View\View;
+use Modules\Learning\Models\Certificate;
 use Modules\Learning\Models\Enrolment;
 use Modules\Learning\Services\ProgressService;
 
@@ -22,7 +23,13 @@ class MyLearningController extends Controller
             ->get()
             ->filter(fn (Enrolment $enrolment) => $enrolment->isWithinDates());
 
-        $courses = $enrolments->map(function (Enrolment $enrolment) use ($user, $progress) {
+        $certificates = Certificate::query()
+            ->where('user_id', $user->id)
+            ->whereNull('revoked_at')
+            ->get()
+            ->keyBy('course_id');
+
+        $courses = $enrolments->map(function (Enrolment $enrolment) use ($user, $progress, $certificates) {
             $course = $enrolment->course;
             $summary = $progress->courseProgressSummary($user, $course);
 
@@ -31,6 +38,7 @@ class MyLearningController extends Controller
                 'enrolment' => $enrolment,
                 'summary' => $summary,
                 'complete' => $progress->isCourseComplete($user, $course),
+                'certificate' => $certificates->get($course->id),
             ];
         });
 

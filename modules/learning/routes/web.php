@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Learning\Http\Controllers\AssignmentController;
+use Modules\Learning\Http\Controllers\CertificateController;
 use Modules\Learning\Http\Controllers\CourseAuthoringController;
 use Modules\Learning\Http\Controllers\CoursePlayerController;
 use Modules\Learning\Http\Controllers\EnrolmentController;
@@ -11,6 +12,13 @@ use Modules\Learning\Http\Controllers\QuizAttemptController;
 use Modules\Learning\Http\Controllers\QuizAuthoringController;
 use Modules\Learning\LearningPermissions;
 
+Route::middleware(['web'])
+    ->prefix('learning')
+    ->name('learning.')
+    ->group(function () {
+        Route::get('/certificates/verify/{code}', [CertificateController::class, 'verify'])->name('certificates.verify');
+    });
+
 Route::middleware(['web', 'auth', 'can:'.LearningPermissions::ACCESS, 'module:learning'])
     ->prefix('learning')
     ->name('learning.')
@@ -18,6 +26,7 @@ Route::middleware(['web', 'auth', 'can:'.LearningPermissions::ACCESS, 'module:le
         Route::get('/', MyLearningController::class)->name('mine');
         Route::get('/grades', [GradeViewController::class, 'mine'])->name('grades.mine');
         Route::get('/courses/{course}/grades/export.csv', [GradeViewController::class, 'export'])->name('courses.grades.export');
+        Route::get('/certificates/{certificate}/download', [CertificateController::class, 'download'])->name('certificates.download');
 
         Route::get('/play/{course}', [CoursePlayerController::class, 'show'])->name('play.show');
         Route::get('/play/{course}/lessons/{lesson}', [CoursePlayerController::class, 'lesson'])->name('play.lesson');
