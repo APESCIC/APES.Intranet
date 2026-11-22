@@ -8,7 +8,6 @@ use App\Models\User;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Illuminate\Support\Str;
-use Modules\Learning\EnrolmentMethod;
 use Modules\Learning\Models\Certificate;
 use Modules\Learning\Models\Course;
 use Modules\Learning\Models\CourseCompletion;
@@ -33,7 +32,7 @@ class CertificateService
             ->where('course_id', $course->id)
             ->first();
 
-        $verifyCode = $existing?->verify_code ?? $this->uniqueVerifyCode();
+        $verifyCode = $existing !== null ? $existing->verify_code : $this->uniqueVerifyCode();
 
         return Certificate::query()->updateOrCreate(
             [
@@ -179,7 +178,6 @@ class CertificateService
             $enrolment->update([
                 'status' => Enrolment::STATUS_ACTIVE,
                 'ended_at' => null,
-                'method' => $enrolment->method ?: EnrolmentMethod::Manual->value,
             ]);
         }
 
