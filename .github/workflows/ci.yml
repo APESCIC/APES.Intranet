@@ -30,7 +30,7 @@ env:
 
 jobs:
   ci:
-    name: Lint, build and test
+    name: ci
     runs-on: ubuntu-latest
     timeout-minutes: 15
     services:
