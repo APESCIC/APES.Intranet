@@ -164,14 +164,15 @@ v0.1.x Foundations, v0.2.x People, v0.3.x Communications and the v0.3.5 to
 v0.3.12 platform releases). Open, in this order:
 
 1. **v0.6.0 HR and training.** Handbook, training, appraisals and recognition.
-2. **v0.6.5 to v0.6.12 Learning.** Modules registry foundation; learning core
+2. **v0.6.5 to v0.6.13 Learning.** Modules registry foundation; learning core
    (courses, enrolment and progress); assessment and gradebook; learning
    records, certificates and reporting (v0.6.12); new-course pilot and
-   replacement readiness remain later. Each builds on the
+   replacement readiness (v0.6.13). Each builds on the
    [LMS inventory](discovery/lms-inventory.md) and
    [ADR 0001](adr/0001-modules-and-integrations.md). Content standards
    (SCORM, H5P, xAPI, LTI) are **not used**; see
-   [learning/standards.md](learning/standards.md).
+   [learning/standards.md](learning/standards.md). Moodle stays live and
+   untouched until a later, separately approved decision.
 3. **v0.7.0 Agreements and legal.** Agreements register, templates, versions,
    renewals, and DocuSeal e-signing.
 4. **v0.8.0 Hiring and integrations.** Hiring, and links to the LMS, MyAPES
