@@ -190,7 +190,7 @@ class EnrolmentService
 
     public function markCourseComplete(User $learner, Course $course): CourseCompletion
     {
-        return CourseCompletion::query()->updateOrCreate(
+        $completion = CourseCompletion::query()->updateOrCreate(
             [
                 'user_id' => $learner->id,
                 'course_id' => $course->id,
@@ -199,6 +199,10 @@ class EnrolmentService
                 'completed_at' => now(),
             ],
         );
+
+        app(CertificateService::class)->issueForCompletion($learner, $course, $completion);
+
+        return $completion;
     }
 
     public function prerequisitesMet(User $learner, Course $course): bool

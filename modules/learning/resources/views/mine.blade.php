@@ -40,9 +40,16 @@
                                 <div class="h-2 rounded bg-brand" style="width: {{ $row['summary']['percent'] }}%"></div>
                             </div>
                         </div>
-                        <a href="{{ route('learning.play.show', $row['course']) }}" class="sg-btn sg-btn-primary shrink-0">
-                            {{ $row['complete'] ? 'Review course' : 'Continue' }}
-                        </a>
+                        <div class="flex shrink-0 flex-col gap-2 sm:items-end">
+                            <a href="{{ route('learning.play.show', $row['course']) }}" class="sg-btn sg-btn-primary">
+                                {{ $row['complete'] ? 'Review course' : 'Continue' }}
+                            </a>
+                            @if ($row['certificate'] ?? null)
+                                <a href="{{ route('learning.certificates.download', $row['certificate']) }}" class="text-sm text-brand underline">
+                                    Download certificate (PDF)
+                                </a>
+                            @endif
+                        </div>
                     </div>
                 </li>
             @empty

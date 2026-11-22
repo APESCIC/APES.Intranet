@@ -14,6 +14,7 @@ Schedule::command('comms:send-event-reminders')->everyFiveMinutes()->withoutOver
 Schedule::command('operations:flag-missed-clock-outs')->everyFifteenMinutes()->withoutOverlapping()->when(ModuleGuards::whenEnabled('operations'));
 Schedule::command('operations:alert-missed-checklists')->everyFiveMinutes()->withoutOverlapping()->when(ModuleGuards::whenEnabled('operations'));
 Schedule::command('hr:remind-identity-check-expiry')->dailyAt('09:15')->withoutOverlapping()->when(ModuleGuards::whenEnabled('hr'));
+Schedule::command('learning:remind-certificate-expiry')->dailyAt('09:30')->withoutOverlapping()->when(ModuleGuards::whenEnabled('learning'));
 
 Artisan::command('demo:seed', function () {
     if (! app()->environment('local')) {
