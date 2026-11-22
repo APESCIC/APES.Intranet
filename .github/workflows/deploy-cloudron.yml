@@ -68,13 +68,10 @@ jobs:
           fi
           note="$(git show "HEAD:changelog/releases/${TAG}.json" 2>/dev/null || true)"
           [[ -n "$note" ]] || { echo "::error::$TAG has no release note (changelog/releases/${TAG}.json)"; exit 1; }
-          echo "$note" | php -r '
-            $j = json_decode(stream_get_contents(STDIN), true);
-            if (!is_array($j) || ($j["published"] ?? false) !== true) {
-              fwrite(STDERR, "release note is not published; see docs/release-notes.md\n");
-              exit(1);
-            }
-          '
+          if ! printf '%s' "$note" | jq -e '.published == true' >/dev/null; then
+            echo "::error::release note is not published; see docs/release-notes.md"
+            exit 1
+          fi
           echo "RELEASE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
 
       - name: Set up PHP 8.4

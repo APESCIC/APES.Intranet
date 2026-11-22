@@ -16,6 +16,7 @@ it('refuses to deploy a tag without a published release note', function () {
     $confirm = (string) str($workflow)->after('- name: Confirm tag is on main and has a published Release')->before('- name: Set up PHP');
 
     expect($confirm)->toContain('changelog/releases/${TAG}.json')
+        ->and($confirm)->toContain('.published == true')
         ->and($confirm)->toContain('release note is not published')
         ->and($confirm)->not->toContain('tr -d')
         ->and($workflow)->toContain("printf '%s' \"\$TAG\" > release/VERSION")
