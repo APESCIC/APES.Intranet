@@ -85,6 +85,20 @@ If learning (or other) data is wrong after migrations:
 Normal ships use GitHub Actions (`gh workflow run deploy-cloudron.yml -f tag=…`).
 Actions starts with a Cloudron backup. Merge and release do not auto-deploy.
 
+## Drill evidence (v0.6.13)
+
+Ran on 22 Nov 2026 against intranet `8bd0acdc-ca6d-467e-aa1e-5c9eb52e3264`:
+
+| Item | Value |
+| --- | --- |
+| Source backup | `app_8bd0acdc-ca6d-467e-aa1e-5c9eb52e3264_v5.3.2_50771f8e` |
+| Clone location | `intranet-restore-drill.apes.org.uk` |
+| Clone id | `0542f8a6-8c4d-4d4b-8810-f6aa574d8614` |
+| Clone health | running / healthy; `/healthz` status `ok` (database and redis ok) |
+| Learning counts on clone | courses=0, enrolments=0, lesson_progress=0 (schema present; no pilot rows on production yet) |
+| Moodle | not touched |
+| Cleanup | clone uninstalled after the check; production backups kept |
+
 ## Out of scope
 
 - Moodle or TutorLMS backup/restore
