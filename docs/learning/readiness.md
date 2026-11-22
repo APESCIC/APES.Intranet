@@ -5,7 +5,8 @@
 What must be true before Moodle Upskilling could be *considered* for
 replacement. This is criteria and a gap report only. It does **not** authorise
 migration, cutover, archive or decommission. Moodle stays live and untouched
-until Bambie separately approves a later decision (options paper: Task #191).
+until Bambie separately approves a later decision (see
+[options-archive.md](options-archive.md)).
 
 Evidence: [LMS inventory](../discovery/lms-inventory.md) (8 Nov 2026),
 [pilot UAT](pilot-uat.md), [coexistence](coexistence.md),
