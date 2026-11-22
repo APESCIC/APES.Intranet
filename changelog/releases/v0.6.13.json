@@ -10,11 +10,11 @@
       "A pilot UAT checklist and readiness notes for learning managers (docs)."
     ],
     "changed": [
-      "Required training (My training) links default to Moodle Upskilling, where the real LMS courses live, instead of the empty TutorLMS host."
+      "Required training (My training) links default to Moodle Upskilling, where the real LMS courses live, instead of the empty TutorLMS site."
     ]
   },
   "internal_notes": [
-    "Epic #165. Milestone retitled from v0.6.9 to v0.6.13 (latest tag was v0.6.12). Issues #187 pilot UAT, #188 coexistence signposting, #189 restore drill, #190 readiness, #191 options paper. Moodle untouched. HR_LMS_BASE_URL default → upskilling.intranet.apes.org.uk. Restore drill on throwaway clone then uninstalled."
+    "Epic #165. Milestone retitled from v0.6.9 to v0.6.13 (latest tag was v0.6.12). Issues #187 to #191. Moodle untouched. Env name HR_LMS_BASE_URL defaults to Moodle Upskilling. Restore drill on a throwaway clone then uninstalled."
   ],
   "published": true
 }
