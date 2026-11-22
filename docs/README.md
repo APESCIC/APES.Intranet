@@ -37,6 +37,8 @@ for organisation members ([where documents live](decisions.md#where-documents-li
 | [dpia/learning-records.md](dpia/learning-records.md) | The approved DPIA for Learning Module learner records (enrolment, progress, future grades) |
 | [dpia/web-push-notifications.md](dpia/web-push-notifications.md) | Draft DPIA for Web Push and the in-app bell (not complete) |
 | [discovery/lms-inventory.md](discovery/lms-inventory.md) | What the two LMS apps hold, for the Learning versions (full copy in `.github-private`) |
+| [learning/standards.md](learning/standards.md) | Decision: SCORM, H5P, xAPI and LTI are not used; adding one needs Bambie's approval |
+| [learning/dpia.md](learning/dpia.md) | Pointer to the Learning records DPIA |
 
 ## Modules
 

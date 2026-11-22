@@ -19,6 +19,7 @@ class ProgressService
     public function __construct(
         private readonly EnrolmentService $enrolments,
         private readonly CourseAuthoringService $authoring,
+        private readonly CertificateService $certificates,
     ) {}
 
     public function startLesson(User $learner, Lesson $lesson): LessonProgress
@@ -83,7 +84,7 @@ class ProgressService
             return null;
         }
 
-        return CourseCompletion::query()->updateOrCreate(
+        $completion = CourseCompletion::query()->updateOrCreate(
             [
                 'user_id' => $learner->id,
                 'course_id' => $course->id,
@@ -92,6 +93,10 @@ class ProgressService
                 'completed_at' => now(),
             ],
         );
+
+        $this->certificates->issueForCompletion($learner, $course, $completion);
+
+        return $completion;
     }
 
     public function isLessonComplete(User $learner, Lesson $lesson): bool

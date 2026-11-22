@@ -134,6 +134,7 @@ Development is tracked only in GitHub issues, sub-issues and `vMAJOR.MINOR.PATCH
 - Stale folders on `PATH` (including leftover Laragon `bin` paths) must not win over Herd; after `herd-env.ps1`, `(Get-Command php).Source` must show `.config\herd\bin\php84`.
 - Herd injects `#herd-ai-host`; ignore it during manual a11y checks.
 - Playwright is not used; do not re-add it for CI or local checks.
+- Learning reports (v0.6.12): `LEARNING_REPORT_MIN_GROUP_SIZE` (name only; default 5) hides grade distributions for small groups. Certificate PDFs use Dompdf.
 - `public/.htaccess` is for Cloudron's Apache; keep PHP settings inside `<IfModule php_module>` and keep the `HTTP_AUTHORIZATION` rule.
 
 ## Where to find things

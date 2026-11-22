@@ -1,0 +1,21 @@
+{
+  "version": "v0.6.12",
+  "released_at": "2026-11-22",
+  "title": "Learning records, certificates and reporting",
+  "summary": "People who finish an intranet course can download a PDF certificate with a verify code. Required training can use those intranet completions as well as the existing LMS links, and learning managers get scoped completion reports.",
+  "audiences": ["staff", "volunteers", "students"],
+  "changes": {
+    "added": [
+      "PDF certificates when you complete an intranet course, with a verify code and optional CPD hours and expiry.",
+      "A public page to check a certificate verify code (it never shows grades).",
+      "Reminders before a certificate expires, and automatic re-enrolment when it lapses so you can retrain.",
+      "Required training (My training) can treat a linked intranet course completion as complete while keeping the LMS link.",
+      "Learning reports for completion, overdue learners and CSV export, with grade distributions hidden for small groups.",
+      "A decision record that SCORM, H5P, xAPI and LTI are not used unless Bambie separately approves one."
+    ]
+  },
+  "internal_notes": [
+    "Epic #164. Shipped as v0.6.12 (milestone retitled from v0.6.8; latest tag was already v0.6.11). Issues #186 standards, #183 certificates/CPD/expiry (dompdf), #184 HR–Learning bridge, #185 scoped reports. Moodle untouched. Env: LEARNING_REPORT_MIN_GROUP_SIZE (default 5)."
+  ],
+  "published": true
+}
