@@ -131,7 +131,8 @@ It checks:
 - the releases and `current`
 - the addon variables, OIDC, PHP and `gosu`
 
-`deploy.ps1` runs it first.
+Run it when investigating the live app. Production deploys go through GitHub
+Actions only and do not require a local preflight.
 
 ## First-time set-up
 
@@ -199,156 +200,47 @@ Then deploy, below. Apache keeps serving `/app/data/public` until
 ## Each deploy
 
 A deploy ships a release that already exists: the version PR is merged, and
-the release `vX.Y.Z` is published from the merge commit.
-
-Preferred (GitHub Actions):
+the release `vX.Y.Z` is published from the merge commit. **GitHub Actions is
+the only ship path.** There is no local `deploy.ps1`.
 
 ```powershell
 gh workflow run deploy-cloudron.yml -f tag=vX.Y.Z
+gh run watch --exit-status
 ```
 
-Break-glass local (Cloudron CLI on this machine):
+The workflow (`.github/workflows/deploy-cloudron.yml`):
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File deploy\cloudron\deploy.ps1 -Tag vX.Y.Z
-```
+1. Refuses unless the tag is on `main`, has a published GitHub Release, and
+   has a published release note in `changelog/releases/`
+   ([docs/release-notes.md](../release-notes.md)).
+2. Builds production assets, stamps `REVISION` (full commit SHA) and
+   `VERSION` (the full tag with `v`, matching `AppVersion`), and uploads the
+   release to `/app/data/releases/<ReleaseId>`.
+3. Takes a Cloudron backup, notes the live release, runs
+   `activate-release.sh`, and restarts the app.
+4. Verifies `/healthz`: 200, `"status":"ok"`, `version` equal to the tag, and
+   `revision` equal to the first 12 characters of the tag's commit.
+5. On activate, restart or verify failure, rolls back to the earlier release,
+   restarts, and fails the job.
 
-The Actions workflow and `deploy.ps1` both ship a published release tag only.
-The local build runs Composer with Herd's PHP 8.4 (as on Cloudron) and Vite with
-Node from `PATH`, or Herd's Node 22, and stops if the PHP is not 8.4. Pass `-Php` or
-`-Composer` (the path to `composer.phar`) to use a different PHP 8.4 or
-Composer.
-
-`deploy.ps1` (local break-glass):
-
-1. Refuses unless the tag exists, is a published GitHub release, the `ci`
-   check is green on its commit, and the tag has a published release note in
-   `changelog/releases/` ([docs/release-notes.md](../release-notes.md)).
-2. Runs the [preflight](#preflight) and stops on any `FAIL`.
-3. Takes a Cloudron backup and notes its id.
-4. Notes the live release, for a rollback.
-5. Builds the tag with `build-release.ps1` and uploads it to
-   `/app/data/releases/<ReleaseId>`.
-6. Checks the uploaded `REVISION` is the tag's commit, and the uploaded
-   `VERSION` is the tag.
-7. Runs `activate-release.sh`, then restarts the app.
-8. Verifies `/healthz`: 200, `"status":"ok"`, `version` equal to the tag, and
-   `revision` equal to the first 12 characters of the tag's commit. Also
-   checks that the queue worker and scheduler are running, and that the logs
-   show them start.
-9. On any failure from step 7 on, rolls back to the earlier release, restarts,
-   verifies again, and exits 1.
-10. Prints a summary (release id, revision, backup id, `/healthz` output). Paste
-    it on the version's Epic.
-
-Exit code 0 means the release is live and verified. Exit code 1 means nothing
-changed, or the app was rolled back. The summary says which.
+Evidence is the Actions run URL plus `/healthz` showing the new version and
+revision. Paste both on the version's Epic.
 
 `activate-release.sh` may print a PHP warning that JIT is disabled. It is
-harmless.
+harmless. A rollback does not undo migrations; if a migration broke the data,
+restore the backup from the Cloudron dashboard.
 
-To prove the rollback works, `-ForceVerifyFailure` verifies against a
-deliberately wrong revision. The new release is activated, then rolled back,
-and the script exits 1. Use it only with the owner's agreement, because it
-runs the release's migrations.
+### Server-side scripts
 
-A rollback does not undo migrations. If a migration broke the data, restore
-the backup from the summary in the Cloudron dashboard.
+These run on the app (or are pushed by Actions). They are not a local ship
+path:
 
-## Deploying by hand
-
-Use this only if `deploy.ps1` cannot run. It does the same steps.
-
-1. **Check the release.** It must be published, and `ci` must be green on its
-   commit:
-
-   ```powershell
-   $tag = 'vX.Y.Z'
-   gh release view $tag
-   gh run list --branch main --limit 3
-   ```
-
-2. **Preflight:**
-
-   ```powershell
-   powershell -NoProfile -ExecutionPolicy Bypass -File deploy\cloudron\preflight.ps1
-   ```
-
-3. **Back up first.** Note the backup id:
-
-   ```powershell
-   cloudron backup create --app $app
-   cloudron backup list --app $app
-   ```
-
-4. **Note the live release**, for a rollback:
-
-   ```powershell
-   $previous = "$(cloudron exec --app $app '--' readlink -f /app/data/current)".Trim()
-   ```
-
-5. **Build** the tag, never `main`. This uses its own git worktree in
-   `%LOCALAPPDATA%\APES\apes-intranet-build\worktree`, with Composer on
-   Herd's PHP 8.4 and Vite on Herd's Node 22. The worktree keeps
-   `vendor/` and `node_modules/` between builds, so when the lock files have
-   not changed a build takes about 20 seconds instead of about 3 minutes
-   (`-NoCache` starts from scratch):
-
-   ```powershell
-   powershell -NoProfile -ExecutionPolicy Bypass -File deploy\cloudron\build-release.ps1 -Ref $tag
-   ```
-
-   Note the printed `ReleaseId`, `ReleaseDir`, `Revision` and `Version`.
-   Because `-Ref` is a tag, the build also writes a `VERSION` file holding
-   the tag. The footer version pill and `/healthz` read it, so the site shows
-   the version that is actually deployed, not the newest tag. Without a
-   `VERSION` file the app reports `dev`.
-6. **Upload** one archive and unpack it on the app (much faster than
-   uploading thousands of files one by one with `cloudron sync push`, which
-   `deploy.ps1 -SyncPush` still does if you need it):
-
-   ```powershell
-   tar -czf "$env:TEMP\<ReleaseId>.tar.gz" -C "<ReleaseDir>" .
-   cloudron push --app $app "$env:TEMP\<ReleaseId>.tar.gz" /app/data/releases/<ReleaseId>.tar.gz
-   cloudron exec --app $app '--' mkdir -p /app/data/releases/<ReleaseId>
-   cloudron exec --app $app '--' tar -xzf /app/data/releases/<ReleaseId>.tar.gz -C /app/data/releases/<ReleaseId>
-   cloudron exec --app $app '--' rm -f /app/data/releases/<ReleaseId>.tar.gz
-   cloudron exec --app $app '--' cat /app/data/releases/<ReleaseId>/REVISION
-   ```
-
-   The `REVISION` must equal the printed `Revision`, and `VERSION` (same
-   folder) must equal the tag.
-7. **Activate.** This links `.env` and storage, enters maintenance mode, runs
-   migrations, re-syncs roles and permissions, caches config, switches
-   `current` and leaves maintenance mode:
-
-   ```powershell
-   cloudron exec --app $app '--' bash /app/data/releases/<ReleaseId>/deploy/cloudron/activate-release.sh /app/data/releases/<ReleaseId>
-   ```
-
-8. **Restart**, so opcache and `run.sh` pick up the release:
-
-   ```powershell
-   cloudron restart --app $app
-   ```
-
-9. **Verify.** `/healthz` must return 200 with `"status":"ok"`, and
-   `revision` must match the first 12 characters of `Revision`:
-
-   ```powershell
-   curl.exe -s -w "`n%{http_code}`n" "$url/healthz"
-   cloudron logs --app $app --lines 500 | Select-String 'run\.sh .*Starting' | Select-Object -Last 2
-   ```
-
-10. **If verification fails, roll back the code** and check again:
-
-    ```powershell
-    cloudron exec --app $app '--' bash "$previous/deploy/cloudron/rollback-release.sh" $previous
-    cloudron restart --app $app
-    ```
-
-11. **Record** the release id, revision, backup id and `/healthz` output on the
-    version's Epic.
+| Script | Role |
+| --- | --- |
+| `activate-release.sh` | Link shared `.env`/storage, migrate, switch `current` |
+| `rollback-release.sh` | Switch `current` back to a previous release |
+| `build-release.ps1` | Optional local reference build that stamps `VERSION`/`REVISION` |
+| `preflight.ps1` | Read-only checks when investigating the live app |
 
 ## Serving the app, or the holding page
 
@@ -402,7 +294,7 @@ restoring the whole app.
 | `/healthz` returns 404 | Apache is not serving `/app/data/current/public` | Run the preflight. Check the `app.conf` line, and that `current` points at a release with `artisan` |
 | A release folder inside a release folder, such as `releases/<id>/apes-intranet-release-<id>/` | The upload had a trailing `\` on the source, or used an older `build-release.ps1` | Delete the outer folder with `cloudron exec --app $app '--' rm -rf /app/data/releases/<id>`. Then upload again with no trailing `\`. The preflight warns about any release with no `artisan` |
 | `Create /app/data/shared/.env first.` | First-time set-up step 2 was not done | Do [first-time set-up](#first-time-set-up) steps 2 and 3 |
-| `/healthz` `revision` does not match the tag after a deploy | Built from `main` or another ref, not the tag. Or the app was not restarted (opcache). Or activation failed before the switch | Build with `-Ref <tag>`, restart, and check `readlink -f /app/data/current`. `deploy.ps1` rolls back by itself in this case |
+| `/healthz` `revision` does not match the tag after a deploy | Built from `main` or another ref, not the tag. Or the app was not restarted (opcache). Or activation failed before the switch | Re-run `gh workflow run deploy-cloudron.yml -f tag=vX.Y.Z`. Check `readlink -f /app/data/current`. The workflow rolls back by itself in this case |
 | `shared/.env` is owned by `www-data`, not `root` | The LAMP image runs `chown -R www-data:www-data /app/data` on every start | Expected. Mode must be `0640` |
 | `activate-release.sh` prints a PHP warning that JIT is disabled | PHP's opcache JIT setting in the LAMP image | Harmless. No action |
 

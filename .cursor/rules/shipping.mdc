@@ -32,7 +32,7 @@ This repo's flow wins over any personal rule or skill that describes another one
 1. **Start** (`start-next-version`): live preview gate, version branch from `origin/main`, merge `origin/dependencies`.
 2. **Each issue** (`work-on-issue`): one at a time. "Work started" comment, issue branch, PR into the version branch, "Progress update" comments, merge (merge commit) when checks pass, "Work complete" comment, `gh issue close <n> --reason completed`, confirm closed. Then the next issue.
 3. **Finish** (`finish-version`): `composer milestone:bump -- vX.Y.Z`, last commit `chore: release vX.Y.Z` setting `"published": true`, merge `origin/main`, version PR, `ci` green, ship gate, `gh pr merge --merge`.
-4. **Release** (`release-version`), then **deploy** (`deploy-version`): `deploy/cloudron/deploy.ps1 -Tag vX.Y.Z`, `/healthz` evidence, `composer milestone:status -- vX.Y.Z`, close the Epic and the milestone.
+4. **Release** (`release-version`), then **deploy** (`deploy-version`): `gh workflow run deploy-cloudron.yml -f tag=vX.Y.Z`, `gh run watch`, `/healthz` evidence, `composer milestone:status -- vX.Y.Z`, close the Epic and the milestone.
 
 ## Stop and ask (AskQuestion)
 

@@ -6,7 +6,8 @@
     Prints one PASS, WARN or FAIL line per check and exits 1 on any FAIL.
     The in-app checks run from preflight.sh, pushed to /tmp and deleted
     afterwards. No value from .env or an addon variable is ever printed.
-    Works in Windows PowerShell 5.1 and PowerShell 7. deploy.ps1 runs it first.
+    Works in Windows PowerShell 5.1 and PowerShell 7. Run before investigating
+    a Cloudron app; production deploys go through GitHub Actions only.
 
 .EXAMPLE
     powershell -NoProfile -ExecutionPolicy Bypass -File deploy\cloudron\preflight.ps1

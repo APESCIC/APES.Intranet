@@ -84,6 +84,10 @@ Do not change any of them without her approval. Terms are explained in the
   answer to `Back up, then <change> (Recommended)` first. Every change starts
   with a Cloudron backup. Never print `.env` values, `APP_KEY` or addon
   credentials. How to deploy: [deploy/cloudron.md](deploy/cloudron.md).
+- Decided 22 November 2026 (#403): Cloudron deploys ship only via GitHub
+  Actions (`deploy-cloudron.yml`). Local `deploy.ps1` is retired. The release
+  stamps `VERSION` with the full tag `vX.Y.Z` at build time; that file is not
+  committed.
 
 ## Local development
 

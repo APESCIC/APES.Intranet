@@ -12,14 +12,16 @@ it('fails CI on a version tag that has no published release note', function () {
 });
 
 it('refuses to deploy a tag without a published release note', function () {
-    $script = (string) file_get_contents(base_path('deploy/cloudron/deploy.ps1'));
+    $workflow = (string) file_get_contents(base_path('.github/workflows/deploy-cloudron.yml'));
+    $confirm = (string) str($workflow)->after('- name: Confirm tag is on main and has a published Release')->before('- name: Set up PHP');
 
-    $noteCheck = strpos($script, 'changelog/releases/$Tag.json');
-    $build = strpos($script, "build-release.ps1') -Ref");
-
-    expect($noteCheck)->not->toBeFalse()
-        ->and($noteCheck)->toBeLessThan($build)
-        ->and($script)->toContain('release note is not published');
+    expect($confirm)->toContain('changelog/releases/${TAG}.json')
+        ->and($confirm)->toContain('.published == true')
+        ->and($confirm)->toContain('release note is not published')
+        ->and($confirm)->not->toContain('tr -d')
+        ->and($workflow)->toContain("printf '%s' \"\$TAG\" > release/VERSION")
+        ->and($workflow)->toContain('expected_version="$TAG"')
+        ->and($workflow)->not->toContain('deploy/cloudron/deploy.ps1');
 });
 
 it('documents the publish step in the shipping rule and the rollback in the release-notes guide', function () {

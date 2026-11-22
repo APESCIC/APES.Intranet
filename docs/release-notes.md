@@ -64,7 +64,7 @@ The note is part of the version's work, so it ships in the version PR:
 3. Tag and release as usual. CI runs again on the `vX.Y.Z` tag and fails if
    the tag has no published note
    (`php artisan changelog:validate --require-published=vX.Y.Z`).
-   `deploy/cloudron/deploy.ps1` also refuses to deploy a tag without one.
+   The Cloudron deploy workflow also refuses to deploy a tag without one.
 4. After the deploy, check that the footer pill shows the new version and
    links to its note.
 
@@ -79,9 +79,9 @@ The note is part of the version's work, so it ships in the version PR:
 
 ## Rolling back
 
-- A release rolled back by `deploy.ps1` keeps the hub's rows from the newer
-  release, because the sync never deletes. The footer pill and "Current
-  version" badge follow the deployed `VERSION` file, so they show the
+- A release rolled back by the Cloudron deploy workflow keeps the hub's rows
+  from the newer release, because the sync never deletes. The footer pill and
+  "Current version" badge follow the deployed `VERSION` file, so they show the
   rolled-back version straight away.
 - If a published note is wrong, unpublish it as above, rather than reverting
   the file.
