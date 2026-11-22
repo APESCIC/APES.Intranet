@@ -55,6 +55,15 @@ final class LearningMenuContributor implements BelongsToModule, MenuContributor
                     'learning.courses.*',
                     'learning',
                 ),
+                NavItem::route(
+                    'learning-reports',
+                    'Learning reports',
+                    'chart-pie',
+                    LearningPermissions::GRADE_VIEW,
+                    'learning.reports.index',
+                    'learning.reports.*',
+                    'learning',
+                ),
             ]),
         ];
     }
