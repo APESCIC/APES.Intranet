@@ -8,6 +8,8 @@ use Illuminate\Support\Collection;
 use Modules\Hr\Models\TrainingCompletion;
 use Modules\Hr\Models\TrainingCourse;
 use Modules\Hr\Models\TrainingRequirement;
+use Modules\Learning\Models\Certificate;
+use Modules\Learning\Models\CourseCompletion;
 
 final class TrainingService
 {
@@ -39,7 +41,10 @@ final class TrainingService
     /**
      * Required courses for a member with latest completion status.
      *
-     * @return Collection<int, array{course: TrainingCourse, completion: ?TrainingCompletion, overdue: bool}>
+     * Native Learning Module completions (and current certificates) count when
+     * the HR course is linked to a learning course. External LMS links stay.
+     *
+     * @return Collection<int, array{course: TrainingCourse, completion: ?TrainingCompletion, native_complete: bool, overdue: bool}>
      */
     public function forMember(User $user): Collection
     {
@@ -63,14 +68,44 @@ final class TrainingService
                     ->orderByDesc('completed_on')
                     ->first();
 
-                $overdue = $completion === null || ! $completion->isCurrent();
+                $hrCurrent = $completion !== null && $completion->isCurrent();
+                $nativeComplete = $this->nativeLearningSatisfied($user, $course);
+                $overdue = ! $hrCurrent && ! $nativeComplete;
 
                 return [
                     'course' => $course,
                     'completion' => $completion,
+                    'native_complete' => $nativeComplete,
                     'overdue' => $overdue,
                 ];
             });
+    }
+
+    /**
+     * Whether the member has a current native Learning completion or certificate
+     * for the linked learning course.
+     */
+    public function nativeLearningSatisfied(User $user, TrainingCourse $course): bool
+    {
+        $learningCourseId = $course->learning_course_id;
+        if ($learningCourseId === null) {
+            return false;
+        }
+
+        $certificate = Certificate::query()
+            ->where('user_id', $user->id)
+            ->where('course_id', $learningCourseId)
+            ->whereNull('revoked_at')
+            ->first();
+
+        if ($certificate !== null && $certificate->isCurrent()) {
+            return true;
+        }
+
+        return CourseCompletion::query()
+            ->where('user_id', $user->id)
+            ->where('course_id', $learningCourseId)
+            ->exists();
     }
 
     /**

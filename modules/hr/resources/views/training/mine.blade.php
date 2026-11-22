@@ -1,5 +1,9 @@
 <x-layouts.app title="My training" subtitle="Required courses and links to the LMS.">
-    <p class="mb-4 text-sg-muted">Open a course on <a class="text-sg-brand underline" href="{{ $lmsBase }}" target="_blank" rel="noopener">{{ $lmsBase }}</a>. Completions are recorded by HR.</p>
+    <p class="mb-4 text-sg-muted">
+        Open a course on
+        <a class="text-sg-brand underline" href="{{ $lmsBase }}" target="_blank" rel="noopener">{{ $lmsBase }}</a>
+        or complete the linked intranet course when one is offered. HR can still record LMS completions.
+    </p>
 
     <section class="sg-card p-6" aria-labelledby="courses-heading">
         <h2 id="courses-heading" class="mb-3 font-serif text-xl font-semibold">Required for your roles</h2>
@@ -10,11 +14,17 @@
                 @foreach ($rows as $row)
                     <li class="border-b border-sg-border/60 pb-3" data-course="{{ $row['course']->code }}">
                         <a class="font-medium text-sg-brand underline" href="{{ $row['course']->lms_url }}" target="_blank" rel="noopener">{{ $row['course']->title }}</a>
+                        <span class="text-sg-muted text-sm"> (LMS link)</span>
+                        @if ($row['course']->learning_course_id)
+                            <a class="ml-2 text-sm text-sg-brand underline" href="{{ route('learning.play.show', $row['course']->learning_course_id) }}">Intranet course</a>
+                        @endif
                         @if ($row['overdue'])
                             <span class="text-sg-danger"> — overdue or missing</span>
                         @else
                             <span class="text-sg-ok"> — complete
-                                @if ($row['completion']?->expires_on)
+                                @if ($row['native_complete'] ?? false)
+                                    (intranet record)
+                                @elseif ($row['completion']?->expires_on)
                                     (expires {{ $row['completion']->expires_on->format('d M Y') }})
                                 @endif
                             </span>

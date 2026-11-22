@@ -3,13 +3,15 @@
 namespace Modules\Hr\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Modules\Learning\Models\Course as LearningCourse;
 
 class TrainingCourse extends Model
 {
     protected $table = 'hr_training_courses';
 
-    protected $fillable = ['code', 'title', 'lms_url', 'active'];
+    protected $fillable = ['code', 'title', 'lms_url', 'active', 'learning_course_id'];
 
     /**
      * @return array<string, string>
@@ -17,6 +19,16 @@ class TrainingCourse extends Model
     protected function casts(): array
     {
         return ['active' => 'boolean'];
+    }
+
+    /**
+     * Optional native Learning Module course that also satisfies this requirement.
+     *
+     * @return BelongsTo<LearningCourse, $this>
+     */
+    public function learningCourse(): BelongsTo
+    {
+        return $this->belongsTo(LearningCourse::class, 'learning_course_id');
     }
 
     /**
