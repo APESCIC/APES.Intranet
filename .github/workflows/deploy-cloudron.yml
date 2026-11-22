@@ -61,7 +61,20 @@ jobs:
           git fetch origin main --depth=50
           git merge-base --is-ancestor HEAD origin/main || { echo "::error::$TAG is not on main"; exit 1; }
           gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null
-          # VERSION is stamped into the release bundle below; it is not committed (see fields.json).
+          # VERSION is stamped into the release bundle below; it is gitignored and never committed
+          # (see fields.json). Do not read a repo-root VERSION file here.
+          if [[ -f VERSION ]]; then
+            echo "::warning::Unexpected committed or working-tree VERSION file; deploy stamps its own copy."
+          fi
+          note="$(git show "HEAD:changelog/releases/${TAG}.json" 2>/dev/null || true)"
+          [[ -n "$note" ]] || { echo "::error::$TAG has no release note (changelog/releases/${TAG}.json)"; exit 1; }
+          echo "$note" | php -r '
+            $j = json_decode(stream_get_contents(STDIN), true);
+            if (!is_array($j) || ($j["published"] ?? false) !== true) {
+              fwrite(STDERR, "release note is not published; see docs/release-notes.md\n");
+              exit(1);
+            }
+          '
           echo "RELEASE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
 
       - name: Set up PHP 8.4
@@ -189,17 +202,34 @@ jobs:
         if: always()
         shell: bash
         env:
+          ACTIVATE: ${{ steps.activate.outcome }}
+          RESTART: ${{ steps.restart.outcome }}
           VERIFY: ${{ steps.verify.outcome }}
           ROLLBACK: ${{ steps.rollback.outcome }}
         run: |
           {
             echo "## Cloudron deploy"
             echo "- Tag: \`$TAG\`"
-            echo "- Release id: \`$RELEASE_ID\`"
+            echo "- Release id: \`${RELEASE_ID:-n/a}\`"
+            echo "- Activate: \`${ACTIVATE:-skipped}\`"
+            echo "- Restart: \`${RESTART:-skipped}\`"
             echo "- Verify: \`${VERIFY:-skipped}\`"
             echo "- Rollback: \`${ROLLBACK:-not needed}\`"
           } >> "$GITHUB_STEP_SUMMARY"
-          if [[ "$VERIFY" != "success" ]]; then
-            echo "::error::Deploy did not verify."
+          if [[ "${VERIFY:-}" == "success" ]]; then
+            exit 0
+          fi
+          if [[ "${VERIFY:-}" == "failure" ]]; then
+            echo "::error::Deploy did not verify /healthz version and revision."
             exit 1
           fi
+          reason="an earlier step failed before verify"
+          if [[ "${ACTIVATE:-}" == "failure" ]]; then
+            reason="activate failed"
+          elif [[ "${RESTART:-}" == "failure" ]]; then
+            reason="restart failed"
+          elif [[ -z "${RELEASE_ID:-}" ]]; then
+            reason="the job stopped before the release was built"
+          fi
+          echo "::error::Deploy did not complete ($reason)."
+          exit 1

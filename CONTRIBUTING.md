@@ -137,8 +137,9 @@ When every issue is closed:
    release and deploy, e. Stop here.
 4. Merge with `gh pr merge --merge` (one merge commit), tag `vX.Y.Z` on the
    merge commit, and publish the GitHub release.
-5. Deploy with `deploy/cloudron/deploy.ps1 -Tag vX.Y.Z`. `/healthz` must show
-   the tag as `version` and its commit as `revision`.
+5. Deploy with `gh workflow run deploy-cloudron.yml -f tag=vX.Y.Z` and
+   `gh run watch`. `/healthz` must show the tag as `version` and its commit
+   as `revision`.
 6. `composer milestone:status -- vX.Y.Z` must show no open issues. Then post
    the release summary on the Epic, close the Epic and the milestone, and
    merge `origin/main` into `dependencies`.

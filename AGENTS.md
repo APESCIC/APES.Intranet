@@ -107,8 +107,8 @@ Development is tracked only in GitHub issues, sub-issues and `vMAJOR.MINOR.PATCH
 | Target | Cloudron LAMP app |
 | Cloudron app ID | `8bd0acdc-ca6d-467e-aa1e-5c9eb52e3264` |
 | Domain | <https://intranet.apes.org.uk> |
-| Deploy command | `gh workflow run deploy-cloudron.yml -f tag=vX.Y.Z` (break-glass local: `deploy/cloudron/deploy.ps1 -Tag vX.Y.Z`) |
-| Deploys | The published release tag only, via GitHub Actions (never a branch). Merge and release do not auto-deploy |
+| Deploy command | `gh workflow run deploy-cloudron.yml -f tag=vX.Y.Z` then `gh run watch` |
+| Deploys | The published release tag only, via GitHub Actions (never a branch, never local `deploy.ps1`). Merge and release do not auto-deploy |
 | Auto-deploy couplings | None |
 | Health URL | <https://intranet.apes.org.uk/healthz> |
 | Version field | JSON `version` (tag) and `revision` (first 12 chars of the tag commit) |
@@ -136,6 +136,7 @@ Development is tracked only in GitHub issues, sub-issues and `vMAJOR.MINOR.PATCH
 - Playwright is not used; do not re-add it for CI or local checks.
 - Learning reports (v0.6.12): `LEARNING_REPORT_MIN_GROUP_SIZE` (name only; default 5) hides grade distributions for small groups. Certificate PDFs use Dompdf.
 - `public/.htaccess` is for Cloudron's Apache; keep PHP settings inside `<IfModule php_module>` and keep the `HTTP_AUTHORIZATION` rule.
+- Local Cloudron deploy via `deploy.ps1` is retired (#403); ship only with Actions. The release build stamps `VERSION` with the full tag `vX.Y.Z` (never committed; see `fields.json`).
 
 ## Where to find things
 

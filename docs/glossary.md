@@ -40,7 +40,7 @@ Plain-English meanings of the terms used in this repository's docs.
 | Ship gate | The question with options a to e that Bambie answers before any merge into `main`, release or deploy. |
 | Deploy | Putting a release live on Cloudron. |
 | Hotfix | An urgent fix shipped outside the normal version, only with Bambie's written approval on the issue. |
-| Rollback | Going back to the previous release when a deploy fails. `deploy.ps1` does it automatically. |
+| Rollback | Going back to the previous release when a deploy fails. The Cloudron Actions workflow does it automatically. |
 | `/healthz` | The page that reports the live version and commit, for example <https://intranet.apes.org.uk/healthz>. |
 
 ## Checks and automation

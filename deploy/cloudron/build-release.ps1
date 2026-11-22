@@ -6,7 +6,9 @@
     The release folder is named exactly <ReleaseId>, so uploading it with
     `cloudron sync push --app $app "<ReleaseDir>" /app/data/releases/` (no
     trailing slash on the source) creates /app/data/releases/<ReleaseId>.
-    deploy.ps1 runs this for you.
+    Production deploys use GitHub Actions (`.github/workflows/deploy-cloudron.yml`),
+    which stamps VERSION and REVISION itself; this script is a local reference
+    build only, not a ship path.
 
     Composer runs with Herd's PHP 8.4 (as on Cloudron), and npm with Node
     from PATH, or Herd's newest Node 22. The build stops if the PHP is not
