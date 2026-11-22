@@ -1,0 +1,20 @@
+{
+  "version": "v0.6.13",
+  "released_at": "2026-11-22",
+  "title": "New-course pilot and replacement readiness",
+  "summary": "My training now points compliance links at Moodle Upskilling and explains how that sits beside intranet courses in My learning. Staff can keep using both while we decide what happens to Moodle later.",
+  "audiences": ["staff", "volunteers", "students"],
+  "changes": {
+    "added": [
+      "Clearer labels so you can tell Moodle Upskilling courses from intranet Learning courses while both run.",
+      "A pilot UAT checklist and readiness notes for learning managers (docs)."
+    ],
+    "changed": [
+      "Required training (My training) links default to Moodle Upskilling, where the real LMS courses live, instead of the empty TutorLMS host."
+    ]
+  },
+  "internal_notes": [
+    "Epic #165. Milestone retitled from v0.6.9 to v0.6.13 (latest tag was v0.6.12). Issues #187 pilot UAT, #188 coexistence signposting, #189 restore drill, #190 readiness, #191 options paper. Moodle untouched. HR_LMS_BASE_URL default → upskilling.intranet.apes.org.uk. Restore drill on throwaway clone then uninstalled."
+  ],
+  "published": true
+}
