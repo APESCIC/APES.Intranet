@@ -3,6 +3,11 @@
 The intranet aims for WCAG 2.2 AA from the first screen. This page records the
 baseline audit for v0.1.x Foundations and the rules for new pages.
 
+## Theme check (v0.6.14)
+
+Glass and Jungle × light and dark were checked on Herd before shipping themes:
+[accessibility-themes-v0.6.14.md](accessibility-themes-v0.6.14.md).
+
 ## Local check (Herd)
 
 Playwright-based automation was removed so CI and local work do not launch
