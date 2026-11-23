@@ -4,7 +4,6 @@ namespace Modules\Microsoft365\Dashboard;
 
 use App\Core\Dashboard\DashboardCardContributor;
 use App\Core\Modules\BelongsToModule;
-use App\Core\Navigation\Menu;
 use App\Models\User;
 use Modules\Microsoft365\Services\MicrosoftLinkRegistry;
 use Modules\Microsoft365\Support\MicrosoftHelp;
@@ -33,14 +32,6 @@ final class Microsoft365DashboardCards implements BelongsToModule, DashboardCard
                 'note_links' => MicrosoftHelp::links(),
             ];
         }
-
-        $cards[] = [
-            'key' => 'teams',
-            'title' => 'Chat in Teams',
-            'body' => 'Chat stays in Microsoft Teams.',
-            'href' => Menu::TEAMS_URL,
-            'external' => true,
-        ];
 
         return $cards;
     }
