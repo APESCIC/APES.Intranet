@@ -177,10 +177,9 @@ export function initAppearance() {
         wireModeToggle(toggle);
     }
 
-    const panel = root.querySelector('[data-appearance-panel]');
-    if (panel) {
+    root.querySelectorAll('[data-appearance-panel]').forEach((panel) => {
         wireAppearancePanel(panel);
-    }
+    });
 
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
         const current = readStoredPreferences();

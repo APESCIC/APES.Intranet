@@ -64,6 +64,7 @@ import { initSignaturePads } from './operations/signature.js';
 import { initPushPreferences, registerPushServiceWorker } from './push.js';
 import { initNotificationBell } from './shell/notification-bell.js';
 import { initQaSwitcher } from './shell/qa-switcher.js';
+import { initPhoneMenu } from './shell/phone-menu.js';
 import { initTopNav } from './shell/top-nav.js';
 import { initUserMenu } from './shell/user-menu.js';
 
@@ -136,6 +137,7 @@ function init() {
         },
     });
     initAppearance();
+    initPhoneMenu();
     initTopNav();
     initUserMenu();
     initQaSwitcher();
