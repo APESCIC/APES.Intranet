@@ -1,0 +1,42 @@
+{
+    "version": "v0.6.15",
+    "released_at": "2026-11-23",
+    "title": "Core and modules: organisation, versions and toggles",
+    "summary": "Modules show their own versions, own their menus and admin areas, and can be switched with clearer dependency checks. False Cloudron addon warnings on the Modules page are fixed.",
+    "audiences": [
+        "staff",
+        "volunteers",
+        "students"
+    ],
+    "changes": {
+        "added": [
+            "Each module shows its SemVer version; Core shows the release tag on Modules, System status and health checks.",
+            "A clearer Modules table with a locked Core row, dependency checks and a detail page for each module.",
+            "Release notes can list Core and module versions, with a Module versions table on the change log."
+        ],
+        "changed": [
+            "People, Communications, Operations and Help desk menus are owned by each module, so turning a module off removes its items.",
+            "Module schedules and HR permissions live with their modules; admin pages use /admin/<slug> paths with redirects from the old URLs."
+        ],
+        "fixed": [
+            "The Modules page no longer warns that Cloudron addons look missing when System status shows them as OK."
+        ],
+        "accessibility": [
+            "The Modules table and reason dialog are usable with keyboard and screen reader."
+        ]
+    },
+    "internal_notes": [
+        "Epic #412. Leaves #425–#431. ADR 0001 updated for SemVer and depends_on (HR → learning). Deploy via gh workflow run deploy-cloudron.yml -f tag=v0.6.15."
+    ],
+    "module_versions": {
+        "core": "v0.6.15",
+        "communications": "0.1.0",
+        "helpdesk": "0.1.0",
+        "hr": "0.1.0",
+        "learning": "0.1.0",
+        "microsoft-365": "0.1.0",
+        "operations": "0.1.0",
+        "people": "0.1.0"
+    },
+    "published": true
+}
