@@ -2,6 +2,7 @@
 
 use App\Core\Access\RoleName;
 use App\Core\Changelog\Release;
+use App\Core\Version\AppVersion;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -58,12 +59,14 @@ it('links to the hub when the viewer may not read the deployed entry', function 
 });
 
 it('shows a development label from changelog JSON when no version is stamped', function () {
-    pillRelease('v0.6.13');
+    $base = app(AppVersion::class)->baseVersion();
+    expect($base)->toMatch(AppVersion::PATTERN);
+    pillRelease($base);
 
     $footer = footerOf($this->actingAs(pillUser(RoleName::Staff))->get(route('dashboard'))->getContent());
 
-    expect($footer)->toMatch('/v0\.6\.13\+dev(\.[0-9a-f]{7})?</')
-        ->and($footer)->toContain('href="'.route('change-log.show', 'v0.6.13').'"');
+    expect($footer)->toMatch('/'.preg_quote($base, '/').'\+dev(\.[0-9a-f]{7})?</')
+        ->and($footer)->toContain('href="'.route('change-log.show', $base).'"');
 });
 
 it('shows the pill in the Admin panel too', function () {
