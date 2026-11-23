@@ -73,6 +73,14 @@ final class VersionFields
             if (! is_file($targetPath)) {
                 $template = (string) file_get_contents($this->path($note['template']));
                 $contents = preg_replace('/"version"\s*:\s*"[^"]*"/', '"version": "'.$version->tag().'"', $template, 1) ?? $template;
+                $payload = json_decode($contents, true);
+                if (is_array($payload)) {
+                    $payload['module_versions'] = ReleaseModuleVersions::collect($this->root, $version);
+                    $encoded = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+                    if (is_string($encoded)) {
+                        $contents = $encoded."\n";
+                    }
+                }
                 if (! $dryRun) {
                     file_put_contents($targetPath, $contents);
                 }

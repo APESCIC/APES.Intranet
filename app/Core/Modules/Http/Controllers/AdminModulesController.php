@@ -2,6 +2,7 @@
 
 namespace App\Core\Modules\Http\Controllers;
 
+use App\Core\Changelog\Release;
 use App\Core\Modules\InvalidModuleSettingException;
 use App\Core\Modules\ModuleManifest;
 use App\Core\Modules\ModuleRegistry;
@@ -36,9 +37,19 @@ final class AdminModulesController
             abort(404);
         }
 
+        $deployedRelease = null;
+        $baseVersion = $appVersion->baseVersion();
+        if ($baseVersion !== null) {
+            $deployedRelease = Release::query()
+                ->where('version', $baseVersion)
+                ->published()
+                ->first();
+        }
+
         return view('core.admin.modules.show', [
             'row' => $this->row($modules, $manifest),
             'coreVersion' => $appVersion->current(),
+            'deployedRelease' => $deployedRelease,
         ]);
     }
 

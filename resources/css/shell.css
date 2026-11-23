@@ -496,6 +496,24 @@ a.sg-nav-link:hover {
     border-top: 1px dashed var(--sg-edge);
 }
 
+.changelog-release__module-versions {
+    margin-top: 1rem;
+}
+
+.changelog-module-versions {
+    margin-top: 0.5rem;
+}
+
+.changelog-module-versions__row--changed td {
+    background: var(--color-sg-teal-mist);
+}
+
+.changelog-badge--changed {
+    margin-left: 0.5rem;
+    background: var(--color-sg-teal-mist);
+    color: var(--color-sg-teal-dark);
+}
+
 /* Mobile top card and drawer */
 .sg-topbar {
     position: relative;

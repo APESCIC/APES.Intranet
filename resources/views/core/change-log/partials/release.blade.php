@@ -24,6 +24,8 @@
 
     <p class="mt-2">{{ $release->summary }}</p>
 
+    @include('core.change-log.partials.module-versions', ['release' => $release, 'headingId' => $headingId])
+
     @foreach ($types as $type)
         <h3 class="changelog-release__type">{{ \App\Core\Changelog\Release::typeLabel($type) }}</h3>
         <ul class="changelog-release__list">

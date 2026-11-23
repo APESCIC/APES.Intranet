@@ -28,6 +28,7 @@ version pill links to the note for the version that is deployed.
 | `audiences` | Who the note is for: one or more of `staff`, `volunteers` and `students`. Only those groups see it. |
 | `changes` | Lists of plain sentences under `added`, `changed`, `fixed`, `removed`, `security` or `accessibility`. Leave out any type with nothing in it. |
 | `internal_notes` | Optional. Shown to admins only, for context the rest of APES does not need. |
+| `module_versions` | Optional. Object with `core` (`vX.Y.Z`) and each module slug (`SemVer`). Filled by `composer milestone:bump`; the change log shows a table and marks versions that differ from the previous note. Older notes without this field still render. |
 | `published` | `false` while the note is a draft, `true` once it has been reviewed. Drafts are synced but only admins see them. |
 
 ## Editorial rules

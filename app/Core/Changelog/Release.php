@@ -2,6 +2,7 @@
 
 namespace App\Core\Changelog;
 
+use App\Core\Modules\ModuleRegistry;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
@@ -20,6 +21,7 @@ use Illuminate\Support\Carbon;
  * @property list<string> $audiences
  * @property array<string, list<string>> $changes_by_type Named so it cannot clash with Eloquent's own $changes.
  * @property list<string>|null $internal_notes
+ * @property array<string, string>|null $module_versions
  * @property bool $is_published
  */
 class Release extends Model
@@ -31,7 +33,7 @@ class Release extends Model
 
     protected $fillable = [
         'version', 'major', 'minor', 'patch', 'title', 'released_at', 'summary',
-        'audiences', 'changes_by_type', 'internal_notes', 'is_published',
+        'audiences', 'changes_by_type', 'internal_notes', 'module_versions', 'is_published',
     ];
 
     protected function casts(): array
@@ -44,6 +46,7 @@ class Release extends Model
             'audiences' => 'array',
             'changes_by_type' => 'array',
             'internal_notes' => 'array',
+            'module_versions' => 'array',
             'is_published' => 'boolean',
         ];
     }
@@ -98,5 +101,78 @@ class Release extends Model
     public function changesOfType(string $type): array
     {
         return $this->changes_by_type[$type] ?? [];
+    }
+
+    public function previousRelease(): ?self
+    {
+        return self::query()
+            ->olderThan($this)
+            ->newestFirst()
+            ->first();
+    }
+
+    /**
+     * @return list<array{slug: string, label: string, version: string, changed: bool}>
+     */
+    public function moduleVersionRows(): array
+    {
+        $versions = $this->module_versions;
+        if (! is_array($versions) || $versions === []) {
+            return [];
+        }
+
+        $previous = $this->previousRelease()?->module_versions ?? [];
+        $registry = app(ModuleRegistry::class);
+        $rows = [];
+
+        foreach ($this->orderedModuleVersions($versions) as $slug => $version) {
+            $label = $slug === 'core'
+                ? 'Core'
+                : ($registry->manifest($slug)?->name ?? $slug);
+            $rows[] = [
+                'slug' => $slug,
+                'label' => $label,
+                'version' => $version,
+                'changed' => ($previous[$slug] ?? null) !== $version,
+            ];
+        }
+
+        return $rows;
+    }
+
+    /**
+     * @param  Builder<Release>  $query
+     * @return Builder<Release>
+     */
+    public function scopeOlderThan(Builder $query, Release $release): Builder
+    {
+        return $query->where(function (Builder $query) use ($release) {
+            $query->where('major', '<', $release->major)
+                ->orWhere(function (Builder $query) use ($release) {
+                    $query->where('major', $release->major)
+                        ->where('minor', '<', $release->minor);
+                })
+                ->orWhere(function (Builder $query) use ($release) {
+                    $query->where('major', $release->major)
+                        ->where('minor', $release->minor)
+                        ->where('patch', '<', $release->patch);
+                });
+        });
+    }
+
+    /**
+     * @param  array<string, string>  $versions
+     * @return array<string, string>
+     */
+    private function orderedModuleVersions(array $versions): array
+    {
+        $core = $versions['core'] ?? null;
+        unset($versions['core']);
+        ksort($versions, SORT_STRING);
+        if (is_string($core)) {
+            return ['core' => $core] + $versions;
+        }
+
+        return $versions;
     }
 }
