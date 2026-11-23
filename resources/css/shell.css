@@ -619,6 +619,67 @@ a.sg-nav-link:hover {
     border-top: 1px dashed var(--sg-edge);
 }
 
+.sg-user-menu__appearance {
+    margin: 0.5rem 0;
+    padding: 0.75rem;
+    border-radius: 0.65rem;
+    background: var(--sg-hover);
+    border: 1px solid var(--sg-edge);
+}
+
+.sg-user-menu__appearance-heading {
+    margin: 0 0 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-sg-muted, var(--sg-muted));
+}
+
+.sg-appearance-fieldset {
+    margin: 0 0 0.65rem;
+    padding: 0;
+    border: 0;
+}
+
+.sg-appearance-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+.sg-appearance-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.sg-appearance-option input {
+    accent-color: var(--color-sg-teal, var(--sg-teal));
+}
+
+.sg-appearance-check {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.sg-appearance-check input {
+    accent-color: var(--color-sg-teal, var(--sg-teal));
+}
+
+html[data-mode='dark'] [data-appearance-icon-light] {
+    display: none;
+}
+
+html[data-mode='light'] [data-appearance-icon-dark] {
+    display: none;
+}
+
 .sg-top-nav {
     position: relative;
     display: flex;

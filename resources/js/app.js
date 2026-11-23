@@ -42,12 +42,14 @@ import {
     MapPin,
     Megaphone,
     Menu,
+    Moon,
     MessagesSquare,
     MonitorCog,
     Network,
     Newspaper,
     Plus,
     ScrollText,
+    Sun,
     Shield,
     ShieldCheck,
     ShieldHalf,
@@ -56,6 +58,7 @@ import {
     Users,
     X,
 } from 'lucide';
+import { initAppearance } from './shell/appearance.js';
 import { initClockForm } from './operations/clock.js';
 import { initSignaturePads } from './operations/signature.js';
 import { initPushPreferences, registerPushServiceWorker } from './push.js';
@@ -107,12 +110,14 @@ const icons = {
     MapPin,
     Megaphone,
     Menu,
+    Moon,
     MessagesSquare,
     MonitorCog,
     Network,
     Newspaper,
     Plus,
     ScrollText,
+    Sun,
     Shield,
     ShieldCheck,
     ShieldHalf,
@@ -130,6 +135,7 @@ function init() {
             focusable: 'false',
         },
     });
+    initAppearance();
     initTopNav();
     initUserMenu();
     initQaSwitcher();
