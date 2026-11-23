@@ -44,7 +44,9 @@
         "items": [
             "access-guide",
             "change-log",
-            "help-desk"
+            "help-desk",
+            "helpdesk-management",
+            "helpdesk-reports"
         ]
     },
     {

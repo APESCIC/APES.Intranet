@@ -22,12 +22,14 @@ Interactive shell controls are at least 44 by 44 CSS pixels (`2.75rem`). The she
 ## Top bar pieces
 
 - **Home** — direct link to the dashboard (intranet home) on desktop; the same link is the first row in the phone menu panel.
-- **Section mega menus** (desktop) — Communications, People (includes Learning), Work, Support (includes soon HR/Agreements and help-desk queues), Apps, and HR when the module adds it (Admin groups on admin pages), from `Menu::for`. Multi-column lists sized so typical groups do not need an inner scroll. Shown after Home on one row without a horizontal scrollbar (scroll would clip the panels). Panels are centred under the top nav so wide menus stay on screen.
+- **Section mega menus** (desktop) — On the intranet: Communications, People (includes Learning), Work, Support (includes soon HR/Agreements and help-desk queues), Apps, and HR when the module adds it. On admin pages: Dashboard (direct link), Users and access, System, Modules, Apps and content, Operations, and Help desk, each link with a one-line description. From `Menu::for`. Multi-column lists sized so typical groups do not need an inner scroll. Shown after Home (or Dashboard) on one row without a horizontal scrollbar (scroll would clip the panels). Panels are centred under the top nav so wide menus stay on screen.
 - **More** (desktop) — when labels do not fit, overflowed sections appear under this trailing disclosure as headed link lists.
 - **Menu** (below 64rem) — opens a full-height **phone menu** panel with Home, expandable section groups (each with a section icon), nested links and the shared appearance controls. There is no left-rail drawer and no duplicated bell in the panel.
 - **Brand** — logo and **APES Intranet**. Admins have no Staff/Admin subtitle under the logo; everyone else sees **APES CIC**.
 - **Notification bell** — one wired instance in the top bar. The panel is an HTML popover (~22rem on desktop, near full-width on mobile).
 - **Account menu** — avatar disclosure with name and role, Intranet/Admin panel links for admins (navigation only; see [admin-menu-mode.md](communications/admin-menu-mode.md)), appearance controls on desktop only, My profile, Notification settings, Security, local QA pill when enabled, and Sign out. Those account links are not under People.
+
+On **admin pages**, a labelled breadcrumb trail (`Admin panel` → section → page) sits above the page title, and sections with more than one page show a horizontal sub-nav with `aria-current` on the active link (`x-shell.breadcrumbs`, `x-shell.admin-sub-nav`).
 
 The main content column (`.sg-content`) uses **95%** of the visitor’s viewport width on every page that uses the app or error shell. Account, section and phone menu panels use an opaque surface so text stays readable over the blue shell.
 

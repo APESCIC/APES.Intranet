@@ -14,33 +14,39 @@
 
     <p class="mb-3 text-sm text-sg-muted">Last checked: {{ $checkedAt?->toDayDateTimeString() ?: 'Never' }}</p>
 
-    <div class="overflow-x-auto rounded-sg-card bg-sg-white shadow-sg-card">
-        <table class="w-full text-left">
+    <x-admin.table-card>
+        <table class="sg-table w-full text-left">
             <caption class="sr-only">People and whether Cloudron reports TOTP enabled</caption>
-            <thead class="border-b border-sg-info-mist text-sm text-sg-muted">
+            <thead>
                 <tr>
-                    <th scope="col" class="p-4">Name</th>
-                    <th scope="col" class="p-4">Email</th>
-                    <th scope="col" class="p-4">TOTP</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">TOTP</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach ($people as $person)
-                    <tr class="border-b border-sg-info-mist last:border-0">
-                        <th scope="row" class="p-4 font-semibold">{{ $person->name }}</th>
-                        <td class="p-4">{{ $person->email }}</td>
-                        <td class="p-4">
+                @forelse ($people as $person)
+                    <tr>
+                        <th scope="row">{{ $person->name }}</th>
+                        <td>{{ $person->email }}</td>
+                        <td>
                             @if ($person->totp_enabled === null)
-                                Unknown
+                                <span class="sg-badge">Unknown</span>
                             @elseif ($person->totp_enabled)
-                                On
+                                <span class="sg-badge sg-badge--ok">On</span>
                             @else
-                                Off
+                                <span class="sg-badge sg-badge--warn">Off</span>
                             @endif
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="3">
+                            <p class="sg-empty-state">No people to show yet.</p>
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
-    </div>
+    </x-admin.table-card>
 </x-layouts.app>

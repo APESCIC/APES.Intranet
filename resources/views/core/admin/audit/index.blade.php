@@ -1,25 +1,25 @@
 <x-layouts.app title="Audit log" :subtitle="'Sign-ins, role changes and admin actions. Read-only. Entries are kept for '.$retentionDays.' days.'">
-    <div class="overflow-x-auto rounded-sg-card bg-sg-white shadow-sg-card">
-        <table class="w-full text-left">
+    <x-admin.table-card>
+        <table class="sg-table w-full text-left">
             <caption class="sr-only">Audit log entries, newest first</caption>
-            <thead class="border-b border-sg-info-mist text-sm text-sg-muted">
+            <thead>
                 <tr>
-                    <th scope="col" class="p-4">Time</th>
-                    <th scope="col" class="p-4">Event</th>
-                    <th scope="col" class="p-4">By</th>
-                    <th scope="col" class="p-4">Details</th>
-                    <th scope="col" class="p-4">IP address</th>
+                    <th scope="col">Time</th>
+                    <th scope="col">Event</th>
+                    <th scope="col">By</th>
+                    <th scope="col">Details</th>
+                    <th scope="col">IP address</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse ($entries as $entry)
-                    <tr class="border-b border-sg-info-mist last:border-0 align-top">
-                        <td class="p-4 whitespace-nowrap">
+                    <tr class="align-top">
+                        <td class="whitespace-nowrap">
                             <time datetime="{{ $entry->occurred_at->toIso8601String() }}">{{ $entry->occurred_at->timezone('Europe/London')->format('j M Y, H:i:s') }}</time>
                         </td>
-                        <td class="p-4"><code>{{ $entry->event }}</code></td>
-                        <td class="p-4">{{ $entry->actor?->name ?? 'Not signed in' }}</td>
-                        <td class="p-4 text-sm">
+                        <td><code>{{ $entry->event }}</code></td>
+                        <td>{{ $entry->actor?->name ?? 'Not signed in' }}</td>
+                        <td class="text-sm">
                             @if ($entry->subject_type)
                                 <span class="text-sg-muted">{{ class_basename($entry->subject_type) }} #{{ $entry->subject_id }}</span>
                             @endif
@@ -27,16 +27,18 @@
                                 <span class="block"><span class="text-sg-muted">{{ $key }}:</span> {{ is_array($value) ? (implode(', ', $value) ?: 'none') : $value }}</span>
                             @endforeach
                         </td>
-                        <td class="p-4"><code>{{ $entry->ip_address }}</code></td>
+                        <td><code>{{ $entry->ip_address }}</code></td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="p-4 text-sg-muted">No entries yet.</td>
+                        <td colspan="5">
+                            <p class="sg-empty-state">No entries yet.</p>
+                        </td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
-    </div>
+    </x-admin.table-card>
 
     <div class="mt-4">
         {{ $entries->links() }}

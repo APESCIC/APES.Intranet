@@ -1,23 +1,56 @@
 [
     {
-        "key": "admin",
-        "heading": "Admin",
+        "key": "home",
+        "heading": "Dashboard",
         "items": [
-            "admin-overview",
+            "admin-overview"
+        ]
+    },
+    {
+        "key": "admin-users",
+        "heading": "Users and access",
+        "items": [
             "roles",
             "audit",
             "access-review",
-            "system",
-            "modules",
-            "push-delivery",
             "totp"
         ]
     },
     {
-        "key": "admin-m365",
-        "heading": "Microsoft 365 admin",
+        "key": "admin-system",
+        "heading": "System",
+        "items": [
+            "system",
+            "push-delivery"
+        ]
+    },
+    {
+        "key": "admin-modules",
+        "heading": "Modules",
+        "items": [
+            "modules"
+        ]
+    },
+    {
+        "key": "admin-apps",
+        "heading": "Apps and content",
         "items": [
             "m365-links"
+        ]
+    },
+    {
+        "key": "admin-operations",
+        "heading": "Operations",
+        "items": [
+            "operations-sites",
+            "operations-forms"
+        ]
+    },
+    {
+        "key": "admin-helpdesk",
+        "heading": "Help desk",
+        "items": [
+            "helpdesk-topics"
         ]
     }
 ]

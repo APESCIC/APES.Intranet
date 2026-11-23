@@ -53,14 +53,25 @@ it('shows each approved group next to its role, permissions and member count', f
         $row = (string) str($html)->after('data-role="'.$roleName.'"')->before('</tr>');
         expect($row)->toContain($group)
             ->and($row)->toContain(RoleName::from($roleName)->label());
-
-        foreach (Role::findByName($roleName)->permissions as $permission) {
-            expect($row)->toContain($permission->name);
-        }
     }
 
     $volunteers = (string) str($html)->after('data-role="volunteer"')->before('</tr>');
     expect($volunteers)->toMatch('/<td class="p-4">2<\/td>/');
+});
+
+it('groups the selected role permissions by module with label and code once', function () {
+    $admin = User::factory()->create()->assignRole(RoleName::Admin->value);
+    $html = $this->actingAs($admin)
+        ->get(route('admin.roles.index', ['role' => RoleName::Admin->value]))
+        ->assertOk()
+        ->getContent();
+
+    $panel = (string) str($html)->after('data-role-panel="admin"')->before('</aside>');
+    $permission = Role::findByName(RoleName::Admin->value)->permissions->first();
+
+    expect($panel)->toContain($permission->name)
+        ->and(substr_count($panel, $permission->name))->toBe(1)
+        ->and($panel)->toContain('id="perm-group-');
 });
 
 it('shows counts but no names or emails of members', function () {

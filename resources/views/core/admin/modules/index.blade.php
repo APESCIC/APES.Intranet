@@ -6,42 +6,42 @@
         <p class="mb-4 rounded-sg-field bg-sg-error-mist p-3 text-sg-error" role="alert">{{ session('error') }}</p>
     @endif
 
-    <div class="overflow-x-auto rounded-sg-card bg-sg-white shadow-sg-card" data-workspace-modules-index>
-        <table class="w-full text-left text-sm">
+    <x-admin.table-card data-workspace-modules-index>
+        <table class="sg-table w-full text-left text-sm">
             <caption class="sr-only">Modules and integrations. Core is always on. Other rows can be opened for details or switched with a reason.</caption>
-            <thead class="border-b border-sg-info-mist text-sg-muted">
+            <thead>
                 <tr>
-                    <th scope="col" class="p-4">Module</th>
-                    <th scope="col" class="p-4">Kind</th>
-                    <th scope="col" class="p-4">Version</th>
-                    <th scope="col" class="p-4">Needs</th>
-                    <th scope="col" class="p-4">Addon status</th>
-                    <th scope="col" class="p-4">Status</th>
-                    <th scope="col" class="p-4"><span class="sr-only">Switch</span></th>
+                    <th scope="col">Module</th>
+                    <th scope="col">Kind</th>
+                    <th scope="col">Version</th>
+                    <th scope="col">Needs</th>
+                    <th scope="col">Addon status</th>
+                    <th scope="col">Status</th>
+                    <th scope="col"><span class="sr-only">Switch</span></th>
                 </tr>
             </thead>
             <tbody>
                 <tr
                     id="module-core"
-                    class="border-b border-sg-info-mist align-top"
+                    class="align-top"
                     data-module="core"
                     data-enabled="true"
                 >
-                    <th scope="row" class="p-4 font-semibold text-sg-ink">
+                    <th scope="row" class="font-semibold text-sg-ink">
                         <span id="module-heading-core">Core</span>
                     </th>
-                    <td class="p-4">Core</td>
-                    <td class="p-4">
+                    <td>Core</td>
+                    <td>
                         <code data-version="{{ $coreVersion }}">{{ $coreVersion }}</code>
                     </td>
-                    <td class="p-4 text-sg-muted">—</td>
-                    <td class="p-4 text-sg-muted">—</td>
-                    <td class="p-4">
-                        <span class="rounded-full bg-sg-ok-mist px-3 py-1 text-xs font-semibold text-sg-ok" data-status="enabled">
+                    <td class="text-sg-muted">—</td>
+                    <td class="text-sg-muted">—</td>
+                    <td>
+                        <span class="sg-badge sg-badge--ok" data-status="enabled">
                             Always on
                         </span>
                     </td>
-                    <td class="p-4 text-sg-muted">
+                    <td class="text-sg-muted">
                         <span class="text-xs" aria-label="Core cannot be switched off">Locked</span>
                     </td>
                 </tr>
@@ -50,11 +50,11 @@
                     @php($blockDisable = $row['enabled'] && $row['enabled_dependents']->isNotEmpty())
                     <tr
                         id="module-{{ $manifest->slug }}"
-                        class="border-b border-sg-info-mist last:border-0 align-top"
+                        class="align-top"
                         data-module="{{ $manifest->slug }}"
                         data-enabled="{{ $row['enabled'] ? 'true' : 'false' }}"
                     >
-                        <th scope="row" class="p-4 font-medium">
+                        <th scope="row" class="font-medium">
                             <a
                                 href="{{ route('admin.modules.show', $manifest->slug) }}"
                                 class="text-brand underline"
@@ -66,9 +66,9 @@
                                 <p class="mt-1 text-xs font-normal text-sg-muted">{{ $manifest->description }}</p>
                             @endif
                         </th>
-                        <td class="p-4">{{ ucfirst($manifest->kind->value) }}</td>
-                        <td class="p-4"><code data-version="{{ $manifest->version }}">{{ $manifest->version }}</code></td>
-                        <td class="p-4">
+                        <td>{{ ucfirst($manifest->kind->value) }}</td>
+                        <td><code data-version="{{ $manifest->version }}">{{ $manifest->version }}</code></td>
+                        <td>
                             @if ($row['dependencies']->isEmpty())
                                 <span class="text-sg-muted">None</span>
                             @else
@@ -83,18 +83,18 @@
                                 </ul>
                             @endif
                         </td>
-                        <td class="p-4">
+                        <td>
                             @if ($row['missing_addon_labels'] === [])
-                                <span class="text-sg-ok">OK</span>
+                                <span class="sg-badge sg-badge--ok">OK</span>
                             @else
-                                <span class="text-sg-warn" role="status">
+                                <span class="sg-badge sg-badge--warn" role="status">
                                     Missing: {{ implode(', ', $row['missing_addon_labels']) }}
                                 </span>
                             @endif
                         </td>
-                        <td class="p-4">
+                        <td>
                             <span
-                                class="rounded-full px-3 py-1 text-xs font-semibold {{ $row['enabled'] ? 'bg-sg-ok-mist text-sg-ok' : 'bg-sg-warn-mist text-sg-warn' }}"
+                                class="sg-badge {{ $row['enabled'] ? 'sg-badge--ok' : 'sg-badge--warn' }}"
                                 data-status="{{ $row['enabled'] ? 'enabled' : 'disabled' }}"
                             >
                                 {{ $row['enabled'] ? 'Enabled' : 'Disabled' }}
@@ -105,7 +105,7 @@
                                 </p>
                             @endif
                         </td>
-                        <td class="p-4">
+                        <td>
                             <button
                                 type="button"
                                 class="sg-btn {{ $row['enabled'] ? 'sg-btn-secondary' : 'sg-btn-primary' }} sg-btn-sm"
@@ -124,12 +124,14 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="p-4 text-sg-muted">No module manifests were found.</td>
+                        <td colspan="7">
+                            <p class="sg-empty-state">No module manifests were found.</p>
+                        </td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
-    </div>
+    </x-admin.table-card>
 
     <dialog
         id="module-state-dialog"

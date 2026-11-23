@@ -28,7 +28,7 @@ final class Microsoft365MenuContributor implements BelongsToModule, MenuContribu
     {
         if ($mode === MenuMode::Admin) {
             return [
-                new NavGroup('admin-m365', 'Microsoft 365 admin', [
+                new NavGroup('admin-apps', 'Apps and content', [
                     NavItem::route(
                         'm365-links',
                         'Microsoft 365 links',
@@ -37,8 +37,9 @@ final class Microsoft365MenuContributor implements BelongsToModule, MenuContribu
                         'admin.m365-links.index',
                         'admin.m365-links.*',
                         'microsoft-365',
+                        'Links shown under Apps for staff',
                     ),
-                ]),
+                ], icon: 'app-window'),
             ];
         }
 

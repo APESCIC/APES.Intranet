@@ -30,19 +30,19 @@
     <section class="sg-card mb-4 max-w-3xl p-5" aria-labelledby="push-optin-heading">
         <h2 id="push-optin-heading" class="font-serif text-lg font-semibold">Push opt-in by category</h2>
         <p class="mt-2 text-sm text-sg-muted">How many people have browser push switched on for each category.</p>
-        <table class="mt-3 w-full text-left text-sm">
+        <table class="sg-table mt-3 w-full text-left text-sm">
             <caption class="sr-only">Push opt-in counts by category</caption>
             <thead>
                 <tr>
-                    <th scope="col" class="py-2 pr-3">Category</th>
-                    <th scope="col" class="py-2">People opted in</th>
+                    <th scope="col">Category</th>
+                    <th scope="col">People opted in</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach ($optInByCategory as $row)
-                    <tr class="border-t border-sg-info-mist">
-                        <th scope="row" class="py-2 pr-3 font-normal">{{ $row['label'] }}</th>
-                        <td class="py-2" data-opt-in="{{ $row['label'] }}">{{ $row['push'] }}</td>
+                    <tr>
+                        <th scope="row" class="font-normal">{{ $row['label'] }}</th>
+                        <td data-opt-in="{{ $row['label'] }}">{{ $row['push'] }}</td>
                     </tr>
                 @endforeach
             </tbody>
