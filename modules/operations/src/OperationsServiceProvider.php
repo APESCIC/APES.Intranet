@@ -2,8 +2,10 @@
 
 namespace Modules\Operations;
 
+use App\Core\Modules\ModuleGuards;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\ServiceProvider;
 use Modules\Operations\Console\AlertMissedChecklists;
 use Modules\Operations\Console\FlagMissedClockOuts;
@@ -35,5 +37,14 @@ class OperationsServiceProvider extends ServiceProvider
 
         Gate::policy(Task::class, TaskPolicy::class);
         Gate::policy(ChecklistRun::class, ChecklistRunPolicy::class);
+
+        Schedule::command('operations:flag-missed-clock-outs')
+            ->everyFifteenMinutes()
+            ->withoutOverlapping()
+            ->when(ModuleGuards::whenEnabled('operations'));
+        Schedule::command('operations:alert-missed-checklists')
+            ->everyFiveMinutes()
+            ->withoutOverlapping()
+            ->when(ModuleGuards::whenEnabled('operations'));
     }
 }

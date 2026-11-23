@@ -2,7 +2,6 @@
 
 namespace Modules\Hr\Http\Controllers;
 
-use App\Core\Access\AccessMatrix;
 use App\Core\Access\RoleName;
 use App\Core\Access\SensitiveData;
 use App\Core\Audit\AuditLogger;
@@ -11,13 +10,14 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use Modules\Hr\HrPermissions;
 use Modules\Hr\Models\IdentityCheck;
 
 class IdentityCheckController
 {
     public function report(Request $request, SensitiveData $sensitive): View
     {
-        abort_unless($request->user()?->can(AccessMatrix::HR_SPECIAL_CATEGORY_VIEW), 403);
+        abort_unless($request->user()?->can(HrPermissions::SPECIAL_CATEGORY_VIEW), 403);
 
         $checks = IdentityCheck::query()
             ->with('user')

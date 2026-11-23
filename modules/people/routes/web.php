@@ -32,8 +32,11 @@ Route::middleware(['web', 'auth'])->group(function () {
     });
 
     // 2FA status is Core admin (never gated by the People module).
-    Route::prefix('admin')->name('admin.')->group(function () {
+    Route::prefix('admin/people')->name('admin.')->group(function () {
         Route::get('/2fa-status', [TotpStatusController::class, 'index'])->name('totp.index');
         Route::post('/2fa-status/refresh', [TotpStatusController::class, 'refresh'])->name('totp.refresh');
     });
+
+    Route::permanentRedirect('/admin/2fa-status', '/admin/people/2fa-status');
+    Route::post('/admin/2fa-status/refresh', [TotpStatusController::class, 'refresh']);
 });

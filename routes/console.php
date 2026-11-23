@@ -1,6 +1,5 @@
 <?php
 
-use App\Core\Modules\ModuleGuards;
 use Database\Seeders\DemoSeeder;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
@@ -8,13 +7,6 @@ use Illuminate\Support\Facades\Schedule;
 Schedule::command('audit:prune')->dailyAt('03:15');
 Schedule::command('system:check')->everyFiveMinutes()->withoutOverlapping();
 Schedule::command('access-review:remind')->quarterlyOn(1, '09:00');
-Schedule::command('people:sync-directory')->dailyAt('02:15')->withoutOverlapping()->when(ModuleGuards::whenEnabled('people'));
-Schedule::command('people:refresh-totp-status')->dailyAt('02:30')->withoutOverlapping()->when(ModuleGuards::whenEnabled('people'));
-Schedule::command('comms:send-event-reminders')->everyFiveMinutes()->withoutOverlapping()->when(ModuleGuards::whenEnabled('communications'));
-Schedule::command('operations:flag-missed-clock-outs')->everyFifteenMinutes()->withoutOverlapping()->when(ModuleGuards::whenEnabled('operations'));
-Schedule::command('operations:alert-missed-checklists')->everyFiveMinutes()->withoutOverlapping()->when(ModuleGuards::whenEnabled('operations'));
-Schedule::command('hr:remind-identity-check-expiry')->dailyAt('09:15')->withoutOverlapping()->when(ModuleGuards::whenEnabled('hr'));
-Schedule::command('learning:remind-certificate-expiry')->dailyAt('09:30')->withoutOverlapping()->when(ModuleGuards::whenEnabled('learning'));
 
 Artisan::command('demo:seed', function () {
     if (! app()->environment('local')) {

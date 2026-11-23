@@ -2,7 +2,9 @@
 
 namespace Modules\Learning;
 
+use App\Core\Modules\ModuleGuards;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\ServiceProvider;
 use Modules\Learning\Console\RemindCertificateExpiry;
 use Modules\Learning\Gradebook\GradebookCalculator;
@@ -59,5 +61,10 @@ class LearningServiceProvider extends ServiceProvider
         Gate::define('learning.grade.view', [LearningGradePolicy::class, 'view']);
         Gate::define('learning.grade.edit', [LearningGradePolicy::class, 'edit']);
         Gate::define('learning.grade.release', [LearningGradePolicy::class, 'release']);
+
+        Schedule::command('learning:remind-certificate-expiry')
+            ->dailyAt('09:30')
+            ->withoutOverlapping()
+            ->when(ModuleGuards::whenEnabled('learning'));
     }
 }

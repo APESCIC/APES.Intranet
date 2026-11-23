@@ -3,13 +3,16 @@
 use App\Core\Access\AccessMatrix;
 use App\Core\Auth\OidcIdentity;
 use App\Models\User;
+use Database\Seeders\HrPermissionsSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Modules\Hr\HrPermissions;
 
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->seed(RolesAndPermissionsSeeder::class);
+    $this->seed(HrPermissionsSeeder::class);
     fakeCloudron($this);
 });
 
@@ -46,7 +49,7 @@ it('gives a supervisor group member team.supervise but not team.manage', functio
     expect($user->getRoleNames()->sort()->values()->all())->toBe(['supervisor', 'volunteer'])
         ->and($user->can(AccessMatrix::TEAM_SUPERVISE))->toBeTrue()
         ->and($user->can(AccessMatrix::TEAM_MANAGE))->toBeFalse()
-        ->and($user->can(AccessMatrix::HR_ACCESS))->toBeFalse();
+        ->and($user->can(HrPermissions::ACCESS))->toBeFalse();
 });
 
 it('gives a management group member team.supervise, team.manage and HR access', function () {
@@ -56,7 +59,7 @@ it('gives a management group member team.supervise, team.manage and HR access', 
     expect($user->getRoleNames()->sort()->values()->all())->toBe(['management', 'staff'])
         ->and($user->can(AccessMatrix::TEAM_SUPERVISE))->toBeTrue()
         ->and($user->can(AccessMatrix::TEAM_MANAGE))->toBeTrue()
-        ->and($user->can(AccessMatrix::HR_ACCESS))->toBeTrue();
+        ->and($user->can(HrPermissions::ACCESS))->toBeTrue();
 });
 
 it('removes a role at the next sign-in when the group is removed', function () {

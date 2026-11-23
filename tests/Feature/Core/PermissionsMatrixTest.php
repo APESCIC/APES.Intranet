@@ -1,9 +1,11 @@
 <?php
 
 use App\Core\Access\AccessMatrix;
+use App\Core\Access\CoreAccessCatalog;
 use App\Core\Access\RoleName;
 use App\Core\Access\RoleStacks;
 use App\Models\User;
+use Database\Seeders\HrPermissionsSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -29,6 +31,7 @@ const EXPECTED_GRANTS = [
 
 beforeEach(function () {
     $this->seed(RolesAndPermissionsSeeder::class);
+    $this->seed(HrPermissionsSeeder::class);
     fakeCloudron($this);
 });
 
@@ -55,10 +58,10 @@ it('matches the approved matrix exactly', function () {
         sort($permissions);
 
         return $permissions;
-    }, AccessMatrix::grants());
+    }, CoreAccessCatalog::roleGrants());
 
     expect($actual)->toBe(EXPECTED_GRANTS)
-        ->and(array_keys(AccessMatrix::permissions()))->toEqualCanonicalizing(EXPECTED_GRANTS['admin']);
+        ->and(array_keys(CoreAccessCatalog::permissions()))->toEqualCanonicalizing(EXPECTED_GRANTS['admin']);
 });
 
 it('covers the 8 groups and the 4 common stacks', function () {
@@ -78,7 +81,7 @@ it('grants each group and stack exactly its permissions after signing in', funct
     signInWithCloudron($this, $groups)->assertRedirect(route('dashboard'));
     $user = User::where('email', 'alex@example.test')->firstOrFail();
 
-    foreach (array_keys(AccessMatrix::permissions()) as $permission) {
+    foreach (array_keys(CoreAccessCatalog::permissions()) as $permission) {
         expect($user->can($permission))->toBe(in_array($permission, $expected, true), "{$profile} / {$permission}");
     }
 })->with([

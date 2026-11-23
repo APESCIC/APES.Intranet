@@ -80,7 +80,7 @@
         @endif
     </article>
 
-    @can(\App\Core\Access\AccessMatrix::HR_SPECIAL_CATEGORY_VIEW)
+    @can(\Modules\Hr\HrPermissions::SPECIAL_CATEGORY_VIEW)
         <section class="sg-card mt-6 max-w-3xl space-y-4 p-6" aria-labelledby="checks-heading">
             <h2 id="checks-heading" class="font-serif text-xl font-semibold">DBS and right to work</h2>
             <p class="text-sm text-sg-muted">Metadata and a SharePoint link only. Opening these rows is audited as special category data.</p>

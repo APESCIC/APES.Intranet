@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Modules\Hr\HrPermissions;
 use Modules\People\Services\CloudronTotpStatus;
 
 class TotpStatusController
@@ -15,7 +16,7 @@ class TotpStatusController
     {
         abort_unless(
             $request->user()?->can(AccessMatrix::ADMIN_SYSTEM_VIEW)
-            || $request->user()?->can(AccessMatrix::HR_ACCESS),
+            || $request->user()?->can(HrPermissions::ACCESS),
             403,
         );
 
@@ -34,7 +35,7 @@ class TotpStatusController
     {
         abort_unless(
             $request->user()?->can(AccessMatrix::ADMIN_SYSTEM_VIEW)
-            || $request->user()?->can(AccessMatrix::HR_ACCESS),
+            || $request->user()?->can(HrPermissions::ACCESS),
             403,
         );
 

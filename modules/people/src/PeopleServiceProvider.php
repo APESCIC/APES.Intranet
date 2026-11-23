@@ -4,8 +4,10 @@ namespace Modules\People;
 
 use App\Core\Auth\Cloudron\LdapDirectoryGroups;
 use App\Core\Auth\Contracts\DirectoryRoster;
+use App\Core\Modules\ModuleGuards;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\ServiceProvider;
 use Modules\People\Console\RefreshTotpStatus;
 use Modules\People\Console\SyncDirectory;
@@ -38,5 +40,14 @@ class PeopleServiceProvider extends ServiceProvider
         Gate::policy(User::class, ProfilePolicy::class);
         Gate::policy(Placement::class, PlacementPolicy::class);
         Gate::policy(PlacementHour::class, PlacementHourPolicy::class);
+
+        Schedule::command('people:sync-directory')
+            ->dailyAt('02:15')
+            ->withoutOverlapping()
+            ->when(ModuleGuards::whenEnabled('people'));
+        Schedule::command('people:refresh-totp-status')
+            ->dailyAt('02:30')
+            ->withoutOverlapping()
+            ->when(ModuleGuards::whenEnabled('people'));
     }
 }

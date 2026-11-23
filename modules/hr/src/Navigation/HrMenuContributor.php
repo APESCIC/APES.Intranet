@@ -9,6 +9,7 @@ use App\Core\Navigation\MenuMode;
 use App\Core\Navigation\NavGroup;
 use App\Core\Navigation\NavItem;
 use App\Models\User;
+use Modules\Hr\HrPermissions;
 
 final class HrMenuContributor implements BelongsToModule, MenuContributor
 {
@@ -29,10 +30,10 @@ final class HrMenuContributor implements BelongsToModule, MenuContributor
                 NavItem::route('hr-training', 'My training', 'graduation-cap', AccessMatrix::INTRANET_ACCESS, 'hr.training.mine', 'hr.training.mine', 'hr'),
                 NavItem::route('hr-recognition', 'Give recognition', 'heart', AccessMatrix::INTRANET_ACCESS, 'hr.recognition.create', 'hr.recognition.*', 'hr'),
                 NavItem::route('hr-appraisals', 'Appraisals', 'file-pen', AccessMatrix::INTRANET_ACCESS, 'hr.appraisals.index', 'hr.appraisals.*', 'hr'),
-                NavItem::route('hr-records', 'HR records', 'id-card', AccessMatrix::HR_ACCESS, 'hr.records.index', 'hr.records.*', 'hr'),
-                NavItem::route('hr-checklists', 'Onboarding', 'list-checks', AccessMatrix::HR_ACCESS, 'hr.checklists.index', 'hr.checklists.*', 'hr'),
-                NavItem::route('hr-training-overdue', 'Overdue training', 'clipboard-list', AccessMatrix::HR_ACCESS, 'hr.training.overdue', 'hr.training.overdue', 'hr'),
-                NavItem::route('hr-checks', 'DBS and right to work', 'shield-check', AccessMatrix::HR_SPECIAL_CATEGORY_VIEW, 'hr.checks.report', 'hr.checks.*', 'hr'),
+                NavItem::route('hr-records', 'HR records', 'id-card', HrPermissions::ACCESS, 'hr.records.index', 'hr.records.*', 'hr'),
+                NavItem::route('hr-checklists', 'Onboarding', 'list-checks', HrPermissions::ACCESS, 'hr.checklists.index', 'hr.checklists.*', 'hr'),
+                NavItem::route('hr-training-overdue', 'Overdue training', 'clipboard-list', HrPermissions::ACCESS, 'hr.training.overdue', 'hr.training.overdue', 'hr'),
+                NavItem::route('hr-checks', 'DBS and right to work', 'shield-check', HrPermissions::SPECIAL_CATEGORY_VIEW, 'hr.checks.report', 'hr.checks.*', 'hr'),
             ], icon: 'briefcase'),
         ];
     }

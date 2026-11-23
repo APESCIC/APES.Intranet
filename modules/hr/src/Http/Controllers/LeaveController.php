@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\View\View;
+use Modules\Hr\HrPermissions;
 use Modules\Hr\Models\Absence;
 use Modules\Hr\Models\LeaveRequest;
 use Modules\Hr\Services\LeaveService;
@@ -29,12 +30,12 @@ class LeaveController
             ->get();
 
         $toDecide = collect();
-        if ($user->can(AccessMatrix::TEAM_SUPERVISE) || $user->can(AccessMatrix::HR_ACCESS)) {
+        if ($user->can(AccessMatrix::TEAM_SUPERVISE) || $user->can(HrPermissions::ACCESS)) {
             $toDecide = LeaveRequest::query()
                 ->with('user')
                 ->where('status', LeaveRequest::STATUS_PENDING)
                 ->when(
-                    ! $user->can(AccessMatrix::HR_ACCESS) && ! $user->hasRole(RoleName::Admin->value),
+                    ! $user->can(HrPermissions::ACCESS) && ! $user->hasRole(RoleName::Admin->value),
                     fn ($q) => $q->whereHas('user', fn ($u) => $u->where('manager_id', $user->id)),
                 )
                 ->orderBy('starts_on')
@@ -135,7 +136,7 @@ class LeaveController
         $user = $request->user();
         abort_unless($user !== null, 403);
 
-        if ($user->can(AccessMatrix::HR_ACCESS) || $user->hasRole(RoleName::Admin->value)) {
+        if ($user->can(HrPermissions::ACCESS) || $user->hasRole(RoleName::Admin->value)) {
             return;
         }
 
