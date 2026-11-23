@@ -154,6 +154,24 @@ it('does not show admin breadcrumbs on the Staff dashboard', function () {
         ->assertDontSee('data-admin-subnav-key=', false);
 });
 
+it('uses shared admin table and badge building blocks on key admin pages', function (string $route) {
+    $html = $this->actingAs(panelUser(RoleName::Admin))
+        ->withSession(freshSignIn())
+        ->get(route($route))
+        ->assertOk()
+        ->getContent();
+
+    expect($html)
+        ->toContain('aria-label="Breadcrumb"')
+        ->toContain('sg-table')
+        ->toContain('sg-card');
+})->with([
+    'audit' => 'admin.audit.index',
+    'modules' => 'admin.modules.index',
+    'roles' => 'admin.roles.index',
+    '2FA status' => 'admin.totp.index',
+]);
+
 it('leaves a section off the overview when the admin lacks its permission', function () {
     Role::findByName(RoleName::Admin->value)->revokePermissionTo(AccessMatrix::ADMIN_AUDIT_VIEW);
     app(PermissionRegistrar::class)->forgetCachedPermissions();
