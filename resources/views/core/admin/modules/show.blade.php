@@ -85,6 +85,19 @@
         <a href="{{ route('change-log.index') }}" class="text-brand underline">change log</a>.
         Core version <code>{{ $coreVersion }}</code> tracks the app release; this module is at <code>{{ $manifest->version }}</code>.
       </p>
+      @if ($deployedRelease !== null && is_array($deployedRelease->module_versions))
+        @php($notedVersion = $deployedRelease->module_versions[$manifest->slug] ?? null)
+        @if ($notedVersion !== null)
+          <p class="mt-3 text-sm">
+            Recorded in
+            <a href="{{ route('change-log.show', $deployedRelease->version) }}" class="text-brand underline">{{ $deployedRelease->version }}</a>:
+            <code>{{ $notedVersion }}</code>
+            @if ($notedVersion !== $manifest->version)
+              <span class="text-sg-warn">(manifest is now {{ $manifest->version }})</span>
+            @endif
+          </p>
+        @endif
+      @endif
     </section>
 
     @if ($manifest->settings !== [])

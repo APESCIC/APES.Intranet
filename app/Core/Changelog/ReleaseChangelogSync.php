@@ -51,6 +51,7 @@ class ReleaseChangelogSync
                     'audiences' => $payload['audiences'],
                     'changes_by_type' => $payload['changes'],
                     'internal_notes' => $payload['internal_notes'] ?? null,
+                    'module_versions' => $payload['module_versions'] ?? null,
                     'is_published' => $payload['published'],
                 ]);
 

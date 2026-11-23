@@ -13,5 +13,9 @@
     "accessibility": ["Something that is easier to use with a keyboard, screen reader or zoom."]
   },
   "internal_notes": ["Optional. Shown to admins only."],
+  "module_versions": {
+    "core": "vX.Y.Z",
+    "learning": "0.1.0"
+  },
   "published": false
 }

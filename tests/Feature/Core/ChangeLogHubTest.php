@@ -168,3 +168,28 @@ it('lists the change log under Support in the menu', function () {
     $this->actingAs(hubUser(RoleName::Staff))->get(route('change-log.index'))
         ->assertSee('data-nav-key="change-log"', false);
 });
+
+it('shows a module versions table when the release note records them', function () {
+    hubRelease('v0.1.0', [
+        'module_versions' => ['core' => 'v0.1.0', 'learning' => '0.1.0'],
+    ]);
+    hubRelease('v0.2.0', [
+        'module_versions' => ['core' => 'v0.2.0', 'learning' => '0.2.0'],
+    ]);
+
+    $this->actingAs(hubUser(RoleName::Staff))->get(route('change-log.show', 'v0.2.0'))
+        ->assertOk()
+        ->assertSee('Module versions')
+        ->assertSee('Changed')
+        ->assertSee('Learning')
+        ->assertSee('0.2.0');
+});
+
+it('renders older releases that have no module versions field', function () {
+    hubRelease('v0.1.0');
+
+    $this->actingAs(hubUser(RoleName::Staff))->get(route('change-log.show', 'v0.1.0'))
+        ->assertOk()
+        ->assertDontSee('Module versions')
+        ->assertSee('Summary for v0.1.0.');
+});

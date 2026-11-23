@@ -20,15 +20,19 @@ class VersionFieldsTest extends TestCase
         file_put_contents($this->root.'/CloudronManifest.json', "{\n    \"id\": \"uk.org.apes.easm\",\n    \"version\": \"0.0.0\",\n    \"manifestVersion\": 2\n}\n");
         file_put_contents($this->root.'/config/app.php', "<?php\nreturn ['version' => env('APP_VERSION', '0.4.7')];\n");
         file_put_contents($this->root.'/notes/_template.json', "{\n  \"version\": \"vX.Y.Z\",\n  \"published\": false\n}\n");
+        mkdir($this->root.'/modules/demo', recursive: true);
+        file_put_contents($this->root.'/modules/demo/module.php', "<?php\n\nreturn ['slug' => 'demo', 'version' => '0.5.0'];\n");
     }
 
     protected function tearDown(): void
     {
-        foreach (['VERSION', 'CloudronManifest.json', 'config/app.php', 'notes/_template.json', 'notes/v1.3.0.json'] as $file) {
+        foreach (['VERSION', 'CloudronManifest.json', 'config/app.php', 'notes/_template.json', 'notes/v1.3.0.json', 'modules/demo/module.php'] as $file) {
             if (is_file($this->root.'/'.$file)) {
                 unlink($this->root.'/'.$file);
             }
         }
+        @rmdir($this->root.'/modules/demo');
+        @rmdir($this->root.'/modules');
         rmdir($this->root.'/config');
         rmdir($this->root.'/notes');
         rmdir($this->root);
@@ -55,7 +59,9 @@ class VersionFieldsTest extends TestCase
         $this->assertStringContainsString('"version": "1.3.0"', (string) file_get_contents($this->root.'/CloudronManifest.json'));
         $this->assertStringContainsString('"manifestVersion": 2', (string) file_get_contents($this->root.'/CloudronManifest.json'));
         $this->assertStringContainsString("env('APP_VERSION', '1.3.0')", (string) file_get_contents($this->root.'/config/app.php'));
-        $this->assertStringContainsString('"version": "v1.3.0"', (string) file_get_contents($this->root.'/notes/v1.3.0.json'));
+        $note = json_decode((string) file_get_contents($this->root.'/notes/v1.3.0.json'), true);
+        $this->assertSame('v1.3.0', $note['version']);
+        $this->assertSame(['core' => 'v1.3.0', 'demo' => '0.5.0'], $note['module_versions']);
         $this->assertSame(['VERSION', 'CloudronManifest.json', 'config/app.php', 'notes/v1.3.0.json'], array_column($changes, 'file'));
         $this->assertSame([], $this->fields()->mismatches($version));
     }
