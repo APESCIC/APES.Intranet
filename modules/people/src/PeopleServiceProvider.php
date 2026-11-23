@@ -11,6 +11,7 @@ use Modules\People\Console\RefreshTotpStatus;
 use Modules\People\Console\SyncDirectory;
 use Modules\People\Models\Placement;
 use Modules\People\Models\PlacementHour;
+use Modules\People\Navigation\PeopleMenuContributor;
 use Modules\People\Policies\PlacementHourPolicy;
 use Modules\People\Policies\PlacementPolicy;
 use Modules\People\Policies\ProfilePolicy;
@@ -22,6 +23,9 @@ class PeopleServiceProvider extends ServiceProvider
         $this->app->bind(DirectoryRoster::class, LdapDirectoryGroups::class);
 
         $this->mergeConfigFrom(__DIR__.'/../config/people.php', 'people');
+
+        $this->app->singleton(PeopleMenuContributor::class);
+        $this->app->tag([PeopleMenuContributor::class], 'intranet.menu');
     }
 
     public function boot(): void

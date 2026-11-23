@@ -64,7 +64,7 @@ final class LearningMenuContributor implements BelongsToModule, MenuContributor
                     'learning.reports.*',
                     'learning',
                 ),
-            ]),
+            ], foldInto: 'people'),
         ];
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Modules\Helpdesk\Navigation;
 
+use App\Core\Access\AccessMatrix;
 use App\Core\Modules\BelongsToModule;
 use App\Core\Navigation\MenuContributor;
 use App\Core\Navigation\MenuMode;
@@ -28,11 +29,14 @@ final class HelpdeskMenuContributor implements BelongsToModule, MenuContributor
         }
 
         return [
+            new NavGroup('helpdesk', 'Help desk', [
+                NavItem::route('help-desk', 'Help desk', 'life-buoy', AccessMatrix::INTRANET_ACCESS, 'helpdesk.tickets.index', 'helpdesk.tickets.*', 'helpdesk'),
+            ], foldInto: 'support'),
             new NavGroup('helpdesk-queues', 'Help desk queues', [
                 NavItem::route('helpdesk-it', 'IT queue', 'monitor-cog', HelpdeskPermissions::QUEUE_IT, 'helpdesk.queues.it', null, 'helpdesk'),
                 NavItem::route('helpdesk-management', 'Management queue', 'briefcase', HelpdeskPermissions::QUEUE_MANAGEMENT, 'helpdesk.queues.management', null, 'helpdesk'),
                 NavItem::route('helpdesk-reports', 'Help desk reports', 'chart-column', HelpdeskPermissions::REPORTS_VIEW, 'helpdesk.reports.index', 'helpdesk.reports.*', 'helpdesk'),
-            ]),
+            ], foldInto: 'support'),
         ];
     }
 }
