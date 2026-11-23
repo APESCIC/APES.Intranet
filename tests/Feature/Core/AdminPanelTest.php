@@ -117,6 +117,43 @@ it('lists every admin section on the overview for a full admin', function () {
     $response->assertDontSee('data-admin-section="admin-overview"', false);
 });
 
+it('shows labelled breadcrumbs and a section sub-nav on multi-page admin sections', function () {
+    $html = $this->actingAs(panelUser(RoleName::Admin))
+        ->get(route('admin.roles.index'))
+        ->assertOk()
+        ->getContent();
+
+    expect($html)
+        ->toContain('aria-label="Breadcrumb"')
+        ->toContain('aria-current="page">Roles</span>')
+        ->toContain('Users and access')
+        ->toContain('aria-label="Users and access"')
+        ->toMatch('/data-admin-subnav-key="roles"[^>]*aria-current="page"/')
+        ->toContain('data-admin-subnav-key="audit"')
+        ->toContain('data-admin-subnav-key="access-review"')
+        ->toContain('data-admin-subnav-key="totp"');
+});
+
+it('keeps breadcrumbs on the overview without a section sub-nav', function () {
+    $html = $this->actingAs(panelUser(RoleName::Admin))
+        ->get(route('admin.overview'))
+        ->assertOk()
+        ->getContent();
+
+    expect($html)
+        ->toContain('aria-label="Breadcrumb"')
+        ->toContain('aria-current="page">Admin panel</span>')
+        ->not->toContain('data-admin-subnav-key=');
+});
+
+it('does not show admin breadcrumbs on the Staff dashboard', function () {
+    $this->actingAs(panelUser(RoleName::Admin))
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->assertDontSee('aria-label="Breadcrumb"', false)
+        ->assertDontSee('data-admin-subnav-key=', false);
+});
+
 it('leaves a section off the overview when the admin lacks its permission', function () {
     Role::findByName(RoleName::Admin->value)->revokePermissionTo(AccessMatrix::ADMIN_AUDIT_VIEW);
     app(PermissionRegistrar::class)->forgetCachedPermissions();
