@@ -146,7 +146,12 @@ it('lets only admins set up topics', function () {
     expect($topic->refresh()->queue)->toBe('management')->and($topic->active)->toBeFalse()
         ->and(AuditLog::query()->whereIn('event', ['helpdesk.category_created', 'helpdesk.category_updated'])->count())->toBe(2);
 
-    $this->actingAs($this->admin)->get(route('admin.helpdesk.categories.index'))->assertOk()->assertSee('Website problem');
+    $this->actingAs($this->admin)->get(route('admin.helpdesk.categories.index'))
+        ->assertOk()
+        ->assertSee('Website problem')
+        ->assertSee('data-topic-form', false)
+        ->assertSee('data-topic-discard', false)
+        ->assertSee('Save topic');
     $this->actingAs($this->manager)->get(route('admin.helpdesk.categories.index'))->assertForbidden();
     $this->actingAs($this->manager)->post(route('admin.helpdesk.categories.store'), ['name' => 'x', 'queue' => 'it', 'default_priority' => 'low'])->assertForbidden();
 });
