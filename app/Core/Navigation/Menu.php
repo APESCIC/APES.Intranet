@@ -268,6 +268,38 @@ final class Menu
 
     /**
      * @param  list<NavGroup>  $groups
+     */
+    public static function activeGroup(array $groups): ?NavGroup
+    {
+        foreach ($groups as $group) {
+            foreach ($group->items as $item) {
+                if ($item->isActive()) {
+                    return $group;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param  list<NavGroup>  $groups
+     */
+    public static function activeItem(array $groups): ?NavItem
+    {
+        foreach ($groups as $group) {
+            foreach ($group->items as $item) {
+                if ($item->isActive()) {
+                    return $item;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param  list<NavGroup>  $groups
      * @return list<NavGroup>
      */
     private static function filterGroups(User $user, array $groups): array

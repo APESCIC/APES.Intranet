@@ -92,9 +92,13 @@ class CoreServiceProvider extends ServiceProvider
             $user = $user instanceof User ? $user : null;
 
             $mode = $user ? Menu::resolveMode($user) : MenuMode::Staff;
+            $menu = Menu::for($user, $mode);
+            $adminSection = $mode === MenuMode::Admin ? Menu::activeGroup($menu) : null;
             $qaProfile = QaLogin::enabled() ? QaLogin::profileFor($user) : null;
             $view->with([
-                'menu' => Menu::for($user, $mode),
+                'menu' => $menu,
+                'adminSection' => $adminSection,
+                'adminPage' => $adminSection !== null ? Menu::activeItem([$adminSection]) : null,
                 'shellPanel' => $user?->hasRole(RoleName::Admin->value) ? $mode : null,
                 'shellUser' => $user,
                 'qaProfile' => $qaProfile,

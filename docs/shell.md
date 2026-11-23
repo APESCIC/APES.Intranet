@@ -29,6 +29,8 @@ Interactive shell controls are at least 44 by 44 CSS pixels (`2.75rem`). The she
 - **Notification bell** — one wired instance in the top bar. The panel is an HTML popover (~22rem on desktop, near full-width on mobile).
 - **Account menu** — avatar disclosure with name and role, Intranet/Admin panel links for admins (navigation only; see [admin-menu-mode.md](communications/admin-menu-mode.md)), appearance controls on desktop only, My profile, Notification settings, Security, local QA pill when enabled, and Sign out. Those account links are not under People.
 
+On **admin pages**, a labelled breadcrumb trail (`Admin panel` → section → page) sits above the page title, and sections with more than one page show a horizontal sub-nav with `aria-current` on the active link (`x-shell.breadcrumbs`, `x-shell.admin-sub-nav`).
+
 The main content column (`.sg-content`) uses **95%** of the visitor’s viewport width on every page that uses the app or error shell. Account, section and phone menu panels use an opaque surface so text stays readable over the blue shell.
 
 ## Related files

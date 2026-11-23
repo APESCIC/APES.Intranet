@@ -1,9 +1,24 @@
 @props(['title' => null, 'subtitle' => null])
 @php
     use App\Core\Appearance\AppearancePreferences;
+    use App\Core\Navigation\MenuMode;
 
     $appearanceBoot = $appearanceServer ?? AppearancePreferences::defaults();
     $resolvedAppearanceMode = AppearancePreferences::resolvedMode($appearanceBoot['mode']);
+    $isAdminPanel = ($shellPanel ?? null) === MenuMode::Admin;
+    $adminBreadcrumbs = [];
+    if ($isAdminPanel) {
+        $onOverview = ($adminPage?->routeName ?? null) === 'admin.overview';
+        $adminBreadcrumbs[] = $onOverview
+            ? ['label' => 'Admin panel', 'current' => true]
+            : ['label' => 'Admin panel', 'url' => route('admin.overview')];
+        if ($adminSection !== null && ($adminSection->key ?? null) !== 'home') {
+            $adminBreadcrumbs[] = ['label' => $adminSection->heading];
+        }
+        if ($adminPage !== null && ! $onOverview) {
+            $adminBreadcrumbs[] = ['label' => $adminPage->label, 'current' => true];
+        }
+    }
 @endphp
 <!DOCTYPE html>
 <html
@@ -49,11 +64,19 @@
                         :recent-notifications="$recentNotifications ?? collect()"
                     />
 
-                    @if ($title)
+                    @if ($title || $isAdminPanel)
                         <header class="sg-page-header">
-                            <h1 class="sg-page-header__title">{{ $title }}</h1>
-                            @if ($subtitle)
-                                <p class="sg-page-header__subtitle">{{ $subtitle }}</p>
+                            @if ($isAdminPanel)
+                                <x-shell.breadcrumbs :items="$adminBreadcrumbs" />
+                            @endif
+                            @if ($title)
+                                <h1 class="sg-page-header__title">{{ $title }}</h1>
+                                @if ($subtitle)
+                                    <p class="sg-page-header__subtitle">{{ $subtitle }}</p>
+                                @endif
+                            @endif
+                            @if ($isAdminPanel && $adminSection !== null)
+                                <x-shell.admin-sub-nav :group="$adminSection" />
                             @endif
                         </header>
                     @endif
