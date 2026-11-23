@@ -6,6 +6,7 @@ use App\Core\Modules\InvalidModuleSettingException;
 use App\Core\Modules\Models\ModuleSetting;
 use App\Core\Modules\Models\ModuleState;
 use App\Core\Modules\ModuleKind;
+use App\Core\Modules\ModuleManifest;
 use App\Core\Modules\ModuleRegistry;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
@@ -28,6 +29,7 @@ return [
     'slug' => 'sample',
     'name' => 'Sample',
     'kind' => 'module',
+    'version' => '0.1.0',
     'description' => 'Test module for the registry.',
     'default_enabled' => true,
     'depends_on' => [],
@@ -86,9 +88,34 @@ it('discovers manifests and uses the default enabled state when no row exists', 
 
     expect($registry->manifest('sample'))->not->toBeNull()
         ->and($registry->manifest('sample')?->kind)->toBe(ModuleKind::Module)
+        ->and($registry->manifest('sample')?->version)->toBe('0.1.0')
         ->and($registry->enabled('sample'))->toBeTrue()
         ->and($registry->manifests())->toHaveCount(1);
 });
+
+it('rejects a manifest without a valid SemVer version', function (mixed $version) {
+    $raw = [
+        'slug' => 'broken',
+        'name' => 'Broken',
+        'kind' => 'module',
+        'description' => 'Missing or bad version',
+        'default_enabled' => true,
+        'depends_on' => [],
+        'cloudron_addons' => [],
+        'settings' => [],
+    ];
+    if ($version !== null) {
+        $raw['version'] = $version;
+    }
+
+    expect(fn () => ModuleManifest::fromArray($raw, 'broken'))
+        ->toThrow(InvalidModuleSettingException::class);
+})->with([
+    'missing' => [null],
+    'empty' => [''],
+    'not semver' => ['v1.0.0'],
+    'two parts' => ['1.0'],
+]);
 
 it('audits enable and disable with the reason only and keeps the state row', function () {
     $admin = User::factory()->create(['email' => 'admin@example.test']);

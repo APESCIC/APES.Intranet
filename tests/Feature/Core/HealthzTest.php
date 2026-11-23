@@ -2,7 +2,19 @@
 
 use App\Core\Health\HealthCheck;
 use App\Core\Health\LocalRevision;
+use App\Core\Modules\ModuleRegistry;
+use App\Core\Version\AppVersion;
 use Illuminate\Support\Facades\Redis;
+
+function expectedHealthzModules(): array
+{
+    $modules = ['core' => app(AppVersion::class)->current()];
+    foreach (app(ModuleRegistry::class)->manifests() as $manifest) {
+        $modules[$manifest->slug] = $manifest->version;
+    }
+
+    return $modules;
+}
 
 function gitHeadRevision(): ?string
 {
@@ -31,6 +43,7 @@ it('returns 200 when the app, database and Redis are up', function () {
             'checks' => ['app' => 'ok', 'database' => 'ok', 'redis' => 'ok'],
             'version' => 'dev',
             'revision' => null,
+            'modules' => expectedHealthzModules(),
         ]);
 });
 
@@ -61,8 +74,11 @@ it('never includes secrets or settings in the output', function () {
     redisAnswers(true);
 
     $body = $this->getJson('/healthz')->getContent();
+    $json = json_decode($body, true);
 
-    expect(json_decode($body, true))->toHaveKeys(['status', 'checks', 'version', 'revision'])->toHaveCount(4)
+    expect($json)->toHaveKeys(['status', 'checks', 'version', 'revision', 'modules'])->toHaveCount(5)
+        ->and($json['modules'])->toHaveKey('core')
+        ->and($json['modules']['core'])->toBe('dev')
         ->and($body)->not->toContain((string) config('app.key'))
         ->and($body)->not->toContain((string) config('database.connections.mysql.host'));
 });
