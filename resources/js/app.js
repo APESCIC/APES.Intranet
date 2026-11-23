@@ -67,6 +67,7 @@ import { initQaSwitcher } from './shell/qa-switcher.js';
 import { initPhoneMenu } from './shell/phone-menu.js';
 import { initTopNav } from './shell/top-nav.js';
 import { initUserMenu } from './shell/user-menu.js';
+import { initModulesStateDialog } from './admin/modules-state.js';
 
 const icons = {
     Activity,
@@ -140,6 +141,7 @@ function init() {
     initPhoneMenu();
     initTopNav();
     initUserMenu();
+    initModulesStateDialog();
     initQaSwitcher();
     initNotificationBell();
     initClockForm();

@@ -189,9 +189,38 @@ final class ModuleRegistry
      */
     public function enabledDependents(string $slug): Collection
     {
+        return $this->dependents($slug)
+            ->filter(fn (ModuleManifest $manifest) => $this->enabled($manifest->slug))
+            ->values();
+    }
+
+    /**
+     * Every manifest that lists $slug in depends_on.
+     *
+     * @return Collection<int, ModuleManifest>
+     */
+    public function dependents(string $slug): Collection
+    {
         return $this->manifests()
             ->filter(fn (ModuleManifest $manifest) => in_array($slug, $manifest->dependsOn, true))
-            ->filter(fn (ModuleManifest $manifest) => $this->enabled($manifest->slug))
+            ->values();
+    }
+
+    /**
+     * Manifests this module lists in depends_on.
+     *
+     * @return Collection<int, ModuleManifest>
+     */
+    public function dependencies(string $slug): Collection
+    {
+        $manifest = $this->manifest($slug);
+        if ($manifest === null) {
+            return collect();
+        }
+
+        return collect($manifest->dependsOn)
+            ->map(fn (string $dependency) => $this->manifest($dependency))
+            ->filter()
             ->values();
     }
 

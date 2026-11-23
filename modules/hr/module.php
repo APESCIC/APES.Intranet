@@ -7,7 +7,7 @@ return [
     'version' => '0.1.0',
     'description' => 'HR records, leave, training, appraisals, checklists and recognition.',
     'default_enabled' => true,
-    'depends_on' => [],
+    'depends_on' => ['learning'],
     'cloudron_addons' => ['mysql'],
     'settings' => [],
 ];
