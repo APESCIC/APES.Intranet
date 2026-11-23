@@ -20,12 +20,12 @@
     --font-serif: 'Fraunces Variable', Georgia, serif;
 
     --color-sg-ink: #12262c;
-    --color-sg-muted: #40676a;
+    --color-sg-muted: #2f5558;
     --color-sg-teal: #107481;
     --color-sg-teal-dark: #0c5d68;
     /* Decoration only: fails contrast as text. */
     --color-sg-accent: #67c3ce;
-    --color-sg-base: #d2f4fa;
+    --color-sg-base: #c8eaf1;
     --color-sg-ok: #11613b;
     --color-sg-ok-mist: #dcf5e7;
     --color-sg-warn: #8a4b0b;
@@ -35,9 +35,9 @@
     --color-sg-info: #005b5d;
     --color-sg-info-mist: #d5f4f5;
     --color-sg-white: #ffffff;
-    --color-sg-glow-cyan: rgba(127, 231, 234, 0.6);
-    --color-sg-glow-lavender: rgba(185, 198, 255, 0.55);
-    --color-sg-glow-mint: rgba(167, 243, 208, 0.55);
+    --color-sg-glow-cyan: rgba(127, 231, 234, 0.35);
+    --color-sg-glow-lavender: rgba(185, 198, 255, 0.3);
+    --color-sg-glow-mint: rgba(167, 243, 208, 0.3);
     --color-focus: #2563eb;
 
     --radius-sg-card: 1.25rem;
