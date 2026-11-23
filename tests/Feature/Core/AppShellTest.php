@@ -132,8 +132,8 @@ it('renders the shell with a skip link, labelled menu and the current page marke
     $response->assertSee('href="#main-content"', false)
         ->assertSee('id="main-content"', false)
         ->assertSee('aria-label="Main menu"', false)
-        ->assertDontSee('aria-controls="workspace-drawer"', false)
-        ->assertDontSee('data-workspace-menu-open', false)
+        ->assertSee('data-workspace-phone-menu-open', false)
+        ->assertSee('aria-controls="phone-menu-panel"', false)
         ->assertSee('data-workspace-top-nav', false)
         ->assertSee('data-workspace-disclosure-trigger', false)
         ->assertSee('sg-mega-panel', false)
@@ -201,13 +201,18 @@ it('shows the Admin panel to an admin on an admin route', function () {
         ->assertDontSee('data-nav-key="updates"', false);
 });
 
-it('exposes top-level dropdown hooks without a hamburger or drawer', function () {
+it('exposes desktop mega menus and a phone menu button without the old rail drawer', function () {
     $html = $this->actingAs(userWithRole(RoleName::Staff))
         ->get(route('dashboard'))
         ->assertOk()
         ->getContent();
 
     expect($html)
+        ->toContain('data-workspace-phone-menu-open')
+        ->toContain('aria-controls="phone-menu-panel"')
+        ->toContain('data-workspace-phone-menu-panel')
+        ->toContain('data-workspace-phone-disclosure-trigger')
+        ->toContain('data-lucide="menu"')
         ->not->toContain('data-workspace-menu-open')
         ->not->toContain('aria-controls="workspace-drawer"')
         ->not->toContain('data-workspace-drawer')
@@ -219,6 +224,18 @@ it('exposes top-level dropdown hooks without a hamburger or drawer', function ()
         ->toContain('data-workspace-top-nav-more')
         ->not->toContain('More sections')
         ->and(substr_count($html, 'id="notification-bell-panel"'))->toBe(1);
+});
+
+it('hides the horizontal top nav on phone and keeps mega menus from 64rem', function () {
+    $css = file_get_contents(base_path('resources/css/shell.css'));
+
+    expect($css)
+        ->toContain('@media (max-width: 63.9375rem)')
+        ->toContain('.sg-top-nav')
+        ->toContain('display: none !important')
+        ->toContain('.sg-phone-menu__open')
+        ->toContain('@media (min-width: 64rem)')
+        ->toContain('.sg-phone-menu-dock');
 });
 
 it('renders Home as a direct dashboard link without a section dropdown', function () {
@@ -268,6 +285,7 @@ it('keeps shell icon and account targets at least 44 CSS pixels', function () {
         ->toContain('min-width: 2.75rem')
         ->toContain('min-height: 2.75rem')
         ->toContain('.sg-user-menu__trigger')
+        ->toContain('.sg-phone-menu__group-trigger')
         ->toContain('@media (max-width: 22.5rem)')
         ->toContain('.sg-user-menu__panel')
         ->toContain('background: var(--sg-drawer-surface)');

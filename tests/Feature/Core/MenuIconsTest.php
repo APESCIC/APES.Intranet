@@ -76,7 +76,9 @@ it('keeps section icons distinct from chevrons in the shell markup', function ()
 
     expect($html)
         ->toContain('class="sg-top-nav__icon"')
+        ->toContain('class="sg-phone-menu__icon"')
         ->toContain('data-lucide="layout-dashboard"')
         ->toContain('data-lucide="megaphone"')
-        ->toContain('data-lucide="life-buoy"');
+        ->toContain('data-lucide="life-buoy"')
+        ->toContain('data-workspace-phone-disclosure-trigger');
 });

@@ -36,6 +36,12 @@ Do not change any of them without her approval. Terms are explained in the
 
 ## Features
 
+- App shell navigation (22 November 2026, #422): from **64rem** upward, section
+  links stay in the horizontal top bar with mega-menu disclosures. Below
+  **64rem**, a **Menu** control in the top bar opens a full-height phone menu
+  panel (section icons, expandable groups, shared appearance controls). This
+  replaces the v0.6.11 rule that forbade any hamburger or drawer on small
+  screens; the old left-rail drawer clone is still not used.
 - Rota, built in: templates, open shifts, swaps and approvals.
 - Clock in/out by a tap on the web app or PWA. An optional geofence check
   runs at clock-in only. No continuous tracking. A DPIA is required before

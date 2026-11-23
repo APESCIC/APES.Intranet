@@ -13,7 +13,19 @@
 <div class="sg-card sg-topbar">
     <x-shell.brand :panel="$panel" />
     @if ($hasMenu && count($menu) > 0)
+        <button
+            type="button"
+            class="sg-icon-btn sg-phone-menu__open"
+            data-workspace-phone-menu-open
+            aria-expanded="false"
+            aria-controls="phone-menu-panel"
+            aria-haspopup="dialog"
+        >
+            <i data-lucide="menu" aria-hidden="true"></i>
+            <span class="sr-only">Open menu</span>
+        </button>
         <x-shell.top-nav :menu="$menu" />
+        <x-shell.phone-menu :menu="$menu" />
     @endif
     <div class="sg-topbar__actions">
         <button
