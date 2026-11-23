@@ -121,14 +121,16 @@ class Release extends Model
             return [];
         }
 
-        $previous = $this->previousRelease()?->module_versions ?? [];
+        $previousRelease = $this->previousRelease();
+        $previous = $previousRelease !== null ? ($previousRelease->module_versions ?? []) : [];
         $registry = app(ModuleRegistry::class);
         $rows = [];
 
         foreach ($this->orderedModuleVersions($versions) as $slug => $version) {
+            $manifest = $registry->manifest($slug);
             $label = $slug === 'core'
                 ? 'Core'
-                : ($registry->manifest($slug)?->name ?? $slug);
+                : ($manifest !== null ? $manifest->name : $slug);
             $rows[] = [
                 'slug' => $slug,
                 'label' => $label,
