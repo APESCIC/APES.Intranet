@@ -68,6 +68,7 @@ import { initPhoneMenu } from './shell/phone-menu.js';
 import { initTopNav } from './shell/top-nav.js';
 import { initUserMenu } from './shell/user-menu.js';
 import { initModulesStateDialog } from './admin/modules-state.js';
+import { initHelpdeskTopicsEditor } from './helpdesk/topics-editor.js';
 
 const icons = {
     Activity,
@@ -142,6 +143,7 @@ function init() {
     initTopNav();
     initUserMenu();
     initModulesStateDialog();
+    initHelpdeskTopicsEditor();
     initQaSwitcher();
     initNotificationBell();
     initClockForm();

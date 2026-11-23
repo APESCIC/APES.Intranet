@@ -16,10 +16,15 @@ use Modules\Helpdesk\Models\Ticket;
  */
 class CategoryController
 {
-    public function index(): View
+    public function index(Request $request): View
     {
+        $categories = Category::query()->ordered()->withCount('tickets')->get();
+        $requested = (string) $request->query('topic', '');
+        $selectedCategory = $categories->firstWhere('slug', $requested) ?? $categories->first();
+
         return view('helpdesk::admin.categories', [
-            'categories' => Category::query()->ordered()->withCount('tickets')->get(),
+            'categories' => $categories,
+            'selectedCategory' => $selectedCategory,
         ]);
     }
 
@@ -31,7 +36,9 @@ class CategoryController
         $category = Category::query()->create($data);
         $audit->record('helpdesk.category_created', $category, ['queue' => $category->queue]);
 
-        return back()->with('status', 'Topic added: '.$category->name.'.');
+        return redirect()
+            ->route('admin.helpdesk.categories.index', ['topic' => $category->slug])
+            ->with('status', 'Topic added: '.$category->name.'.');
     }
 
     public function update(Request $request, Category $category, AuditLogger $audit): RedirectResponse
@@ -39,7 +46,9 @@ class CategoryController
         $category->update($this->validated($request));
         $audit->record('helpdesk.category_updated', $category, $category->getChanges());
 
-        return back()->with('status', 'Topic saved: '.$category->name.'.');
+        return redirect()
+            ->route('admin.helpdesk.categories.index', ['topic' => $category->slug])
+            ->with('status', 'Topic saved: '.$category->name.'.');
     }
 
     /**
