@@ -1,0 +1,38 @@
+{
+    "version": "v0.6.16",
+    "released_at": "2026-11-23",
+    "title": "Admin panel menus and pages",
+    "summary": "The Admin panel menu is regrouped into clear sections with breadcrumbs and sub-menus. System status, Roles and Help desk topics are easier to scan and edit.",
+    "audiences": [
+        "staff"
+    ],
+    "changes": {
+        "added": [
+            "Admin pages show breadcrumbs and a section sub-menu when a section has more than one page.",
+            "System status opens with summary tiles for checks, version, backup and the queue.",
+            "Roles lists each role with a side panel of permissions grouped by module."
+        ],
+        "changed": [
+            "The Admin panel menu is split into Dashboard, Users and access, System, Modules, Apps and content, Operations and Help desk, with a short description on each link.",
+            "Help desk topics use a topic list and one edit form with a single Save, including an unsaved-changes notice.",
+            "Admin tables and status badges use the same shared patterns across audit, modules, 2FA and push delivery."
+        ],
+        "accessibility": [
+            "Admin breadcrumbs use a labelled landmark; section sub-menus mark the current page with aria-current."
+        ]
+    },
+    "internal_notes": [
+        "Epic #413. Leaves #432–#437. Deploy via gh workflow run deploy-cloudron.yml -f tag=v0.6.16."
+    ],
+    "module_versions": {
+        "core": "v0.6.16",
+        "communications": "0.1.0",
+        "helpdesk": "0.1.0",
+        "hr": "0.1.0",
+        "learning": "0.1.0",
+        "microsoft-365": "0.1.0",
+        "operations": "0.1.0",
+        "people": "0.1.0"
+    },
+    "published": true
+}
