@@ -42,9 +42,43 @@ html[data-theme='glass'][data-mode='light'] {
     --sg-unread-bg: rgba(200, 234, 241, 0.5);
 }
 
-/* Jungle light aliases glass light until #418 replaces the palette. */
 html[data-theme='jungle'][data-mode='light'] {
     color-scheme: light;
+
+    --color-sg-ink: #12261c;
+    --color-sg-muted: #2f5540;
+    --color-sg-teal: #1a6b45;
+    --color-sg-teal-dark: #145236;
+    --color-sg-accent: #c48a2a;
+    --color-sg-base: #dceee4;
+    --color-sg-ok: #11613b;
+    --color-sg-ok-mist: #dcf5e7;
+    --color-sg-warn: #8a4b0b;
+    --color-sg-warn-mist: #fdefd3;
+    --color-sg-error: #a12828;
+    --color-sg-error-mist: #fde4e4;
+    --color-sg-info: #145236;
+    --color-sg-info-mist: #d4ebe0;
+    --color-sg-white: #ffffff;
+    --color-sg-glow-cyan: rgba(94, 207, 138, 0.32);
+    --color-sg-glow-lavender: rgba(196, 138, 42, 0.22);
+    --color-sg-glow-mint: rgba(26, 107, 69, 0.28);
+    --color-focus: #2563eb;
+
+    --sg-surface: rgba(212, 232, 220, 0.82);
+    --sg-surface-strong: rgba(216, 236, 224, 0.9);
+    --sg-rail-surface: rgba(212, 232, 220, 0.7);
+    --sg-drawer-surface: rgba(234, 246, 238, 0.98);
+    --sg-dock-surface: rgba(212, 232, 220, 0.78);
+    --sg-hover: rgba(212, 232, 220, 0.88);
+    --sg-edge: rgba(190, 218, 200, 0.95);
+    --sg-overlay: rgba(18, 38, 28, 0.35);
+
+    --sg-brand-shadow: rgba(18, 38, 28, 0.18);
+    --sg-panel-shadow: rgba(18, 38, 28, 0.12);
+    --sg-nav-hover-bg: rgba(200, 230, 212, 0.7);
+    --sg-nav-expanded-bg: rgba(200, 230, 212, 0.92);
+    --sg-unread-bg: rgba(200, 230, 212, 0.5);
 }
 
 html[data-mode='dark'],
@@ -93,7 +127,76 @@ html[data-theme='glass'][data-mode='dark'] {
     --shadow-sg-active: 0 4px 14px var(--sg-panel-shadow);
 }
 
-/* Jungle dark aliases glass dark until #418 replaces the palette. */
 html[data-theme='jungle'][data-mode='dark'] {
     color-scheme: dark;
+
+    --color-sg-ink: #e6f4ec;
+    --color-sg-muted: #8fb89a;
+    --color-sg-teal: #5ecf8a;
+    --color-sg-teal-dark: #3aaf68;
+    --color-sg-accent: #e8b060;
+    --color-sg-base: #0c1a14;
+    --color-sg-ok: #6dd4a0;
+    --color-sg-ok-mist: #143528;
+    --color-sg-warn: #e8b060;
+    --color-sg-warn-mist: #2a2010;
+    --color-sg-error: #f08a8a;
+    --color-sg-error-mist: #301818;
+    --color-sg-info: #6ed8a8;
+    --color-sg-info-mist: #12261c;
+    --color-sg-white: #f4faf6;
+    --color-sg-glow-cyan: rgba(94, 207, 138, 0.35);
+    --color-sg-glow-lavender: rgba(232, 176, 96, 0.22);
+    --color-sg-glow-mint: rgba(58, 175, 104, 0.24);
+    --color-focus: #60a5fa;
+
+    --sg-surface: rgba(255, 255, 255, 0.08);
+    --sg-surface-strong: rgba(255, 255, 255, 0.14);
+    --sg-rail-surface: rgba(255, 255, 255, 0.06);
+    --sg-drawer-surface: rgba(10, 24, 18, 0.96);
+    --sg-dock-surface: rgba(255, 255, 255, 0.1);
+    --sg-hover: rgba(255, 255, 255, 0.12);
+    --sg-edge: rgba(255, 255, 255, 0.22);
+    --sg-overlay: rgba(0, 0, 0, 0.55);
+
+    --sg-brand-shadow: rgba(0, 0, 0, 0.35);
+    --sg-panel-shadow: rgba(0, 0, 0, 0.4);
+    --sg-nav-hover-bg: rgba(94, 207, 138, 0.18);
+    --sg-nav-expanded-bg: rgba(94, 207, 138, 0.28);
+    --sg-unread-bg: rgba(94, 207, 138, 0.12);
+
+    --shadow-sg-card: 0 8px 30px var(--sg-panel-shadow);
+    --shadow-sg-rail: 0 12px 40px var(--sg-brand-shadow);
+    --shadow-sg-primary: 0 6px 18px var(--sg-brand-shadow);
+    --shadow-sg-active: 0 4px 14px var(--sg-panel-shadow);
+}
+
+/* Jungle leaf silhouettes (decoration only; no layout shift). */
+html[data-theme='jungle'] .workspace-shell::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.1;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240'%3E%3Cg fill='%2312261c'%3E%3Cpath d='M28 168c22-58 48-78 76-92-28 18-40 52-46 86z'/%3E%3Cpath d='M132 44c18 42 12 78-8 114 6-48 30-78 56-96-38 6-68 32-48-18z'/%3E%3Cpath d='M188 152c-30-36-24-72 8-100-18 42-6 84 18 108z'/%3E%3Cpath d='M72 52c-8 28 4 56 22 76-14-36-8-70 12-88-18 4-32 18-34-12z'/%3E%3C/g%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 240px 240px;
+}
+
+html[data-theme='jungle'][data-mode='dark'] .workspace-shell::after {
+    opacity: 0.07;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240'%3E%3Cg fill='%23e6f4ec'%3E%3Cpath d='M28 168c22-58 48-78 76-92-28 18-40 52-46 86z'/%3E%3Cpath d='M132 44c18 42 12 78-8 114 6-48 30-78 56-96-38 6-68 32-48-18z'/%3E%3Cpath d='M188 152c-30-36-24-72 8-100-18 42-6 84 18 108z'/%3E%3Cpath d='M72 52c-8 28 4 56 22 76-14-36-8-70 12-88-18 4-32 18-34-12z'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+html[data-reduced-transparency][data-theme='jungle'] .workspace-shell::after {
+    content: none;
+    display: none;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+    html[data-theme='jungle'] .workspace-shell::after {
+        content: none;
+        display: none;
+    }
 }
