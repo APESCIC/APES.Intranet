@@ -48,8 +48,7 @@ html[data-theme='jungle'][data-mode='light'] {
 }
 
 html[data-mode='dark'],
-html[data-theme='glass'][data-mode='dark'],
-html[data-theme='jungle'][data-mode='dark'] {
+html[data-theme='glass'][data-mode='dark'] {
     color-scheme: dark;
 
     --color-sg-ink: #e6f2f4;
@@ -58,6 +57,7 @@ html[data-theme='jungle'][data-mode='dark'] {
     --color-sg-teal-dark: #3aa8b6;
     --color-sg-accent: #67c3ce;
     --color-sg-base: #0c1c21;
+    /* Status hues keep the same meaning as light (ok / warn / error / info). */
     --color-sg-ok: #6dd4a0;
     --color-sg-ok-mist: #143528;
     --color-sg-warn: #e8b060;
@@ -78,7 +78,7 @@ html[data-theme='jungle'][data-mode='dark'] {
     --sg-drawer-surface: rgba(14, 32, 38, 0.96);
     --sg-dock-surface: rgba(255, 255, 255, 0.1);
     --sg-hover: rgba(255, 255, 255, 0.12);
-    --sg-edge: rgba(255, 255, 255, 0.18);
+    --sg-edge: rgba(255, 255, 255, 0.22);
     --sg-overlay: rgba(0, 0, 0, 0.55);
 
     --sg-brand-shadow: rgba(0, 0, 0, 0.35);
@@ -86,4 +86,14 @@ html[data-theme='jungle'][data-mode='dark'] {
     --sg-nav-hover-bg: rgba(94, 196, 208, 0.18);
     --sg-nav-expanded-bg: rgba(94, 196, 208, 0.28);
     --sg-unread-bg: rgba(94, 196, 208, 0.12);
+
+    --shadow-sg-card: 0 8px 30px var(--sg-panel-shadow);
+    --shadow-sg-rail: 0 12px 40px var(--sg-brand-shadow);
+    --shadow-sg-primary: 0 6px 18px var(--sg-brand-shadow);
+    --shadow-sg-active: 0 4px 14px var(--sg-panel-shadow);
+}
+
+/* Jungle dark aliases glass dark until #418 replaces the palette. */
+html[data-theme='jungle'][data-mode='dark'] {
+    color-scheme: dark;
 }
