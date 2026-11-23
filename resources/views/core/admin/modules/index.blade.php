@@ -1,4 +1,4 @@
-<x-layouts.app title="Modules" subtitle="Switch modules on or off and edit their settings. Core sign-in, audit and health cannot be disabled. Secret values are never shown.">
+<x-layouts.app title="Modules" subtitle="Switch modules on or off and open each module for settings. Core sign-in, audit and health cannot be disabled. Secret values are never shown.">
     @if (session('status'))
         <p class="mb-4 rounded-sg-field bg-sg-ok-mist p-3 text-sg-ok" role="status">{{ session('status') }}</p>
     @endif
@@ -6,186 +6,166 @@
         <p class="mb-4 rounded-sg-field bg-sg-error-mist p-3 text-sg-error" role="alert">{{ session('error') }}</p>
     @endif
 
-    <div class="space-y-6">
-        <section
-            id="module-core"
-            class="sg-card p-5"
-            aria-labelledby="module-heading-core"
-            data-module="core"
-            data-enabled="true"
-        >
-            <div class="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                    <h2 id="module-heading-core" class="font-serif text-lg font-semibold">Core</h2>
-                    <p class="mt-1 text-sm text-sg-muted">
-                        <span class="font-medium text-sg-ink">Core</span>
-                        · Sign-in, roles, audit, health and the app shell. Always on.
-                    </p>
-                    <p class="mt-1 text-sm text-sg-muted" data-version="{{ $coreVersion }}">
-                        Version <code>{{ $coreVersion }}</code>
-                    </p>
-                </div>
-                <span class="rounded-full bg-sg-ok-mist px-3 py-1 text-sm font-semibold text-sg-ok" data-status="enabled">
-                    Always on
-                </span>
-            </div>
-        </section>
-
-        @forelse ($rows as $row)
-            @php($manifest = $row['manifest'])
-            <section
-                id="module-{{ $manifest->slug }}"
-                class="sg-card p-5"
-                aria-labelledby="module-heading-{{ $manifest->slug }}"
-                data-module="{{ $manifest->slug }}"
-                data-enabled="{{ $row['enabled'] ? 'true' : 'false' }}"
-            >
-                <div class="flex flex-wrap items-start justify-between gap-3">
-                    <div>
-                        <h2 id="module-heading-{{ $manifest->slug }}" class="font-serif text-lg font-semibold">
-                            {{ $manifest->name }}
-                        </h2>
-                        <p class="mt-1 text-sm text-sg-muted">
-                            <span class="font-medium text-sg-ink">{{ ucfirst($manifest->kind->value) }}</span>
-                            · {{ $manifest->description !== '' ? $manifest->description : 'No description.' }}
-                        </p>
-                        <p class="mt-1 text-sm text-sg-muted" data-version="{{ $manifest->version }}">
-                            Version <code>{{ $manifest->version }}</code>
-                        </p>
-                    </div>
-                    <span
-                        class="rounded-full px-3 py-1 text-sm font-semibold {{ $row['enabled'] ? 'bg-sg-ok-mist text-sg-ok' : 'bg-sg-warn-mist text-sg-warn' }}"
-                        data-status="{{ $row['enabled'] ? 'enabled' : 'disabled' }}"
-                    >
-                        {{ $row['enabled'] ? 'Enabled' : 'Disabled' }}
-                    </span>
-                </div>
-
-                @if ($row['missing_addons'] !== [])
-                    <p class="mt-3 rounded-sg-field bg-sg-warn-mist p-3 text-sm text-sg-warn" role="status">
-                        Cloudron addon warning: {{ implode(', ', $row['missing_addons']) }} look missing in this environment.
-                    </p>
-                @endif
-
-                @if ($row['enabled_dependents']->isNotEmpty())
-                    <p class="mt-3 text-sm text-sg-muted">
-                        Still depended on by:
-                        {{ $row['enabled_dependents']->pluck('name')->implode(', ') }}.
-                        Disable those first.
-                    </p>
-                @endif
-
-                <form
-                    method="post"
-                    action="{{ route('admin.modules.state', $manifest->slug) }}"
-                    class="mt-4 space-y-3 border-t border-sg-line pt-4"
-                    aria-label="Change state for {{ $manifest->name }}"
+    <div class="overflow-x-auto rounded-sg-card bg-sg-white shadow-sg-card" data-workspace-modules-index>
+        <table class="w-full text-left text-sm">
+            <caption class="sr-only">Modules and integrations. Core is always on. Other rows can be opened for details or switched with a reason.</caption>
+            <thead class="border-b border-sg-info-mist text-sg-muted">
+                <tr>
+                    <th scope="col" class="p-4">Module</th>
+                    <th scope="col" class="p-4">Kind</th>
+                    <th scope="col" class="p-4">Version</th>
+                    <th scope="col" class="p-4">Needs</th>
+                    <th scope="col" class="p-4">Addon status</th>
+                    <th scope="col" class="p-4">Status</th>
+                    <th scope="col" class="p-4"><span class="sr-only">Switch</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr
+                    id="module-core"
+                    class="border-b border-sg-info-mist align-top"
+                    data-module="core"
+                    data-enabled="true"
                 >
-                    @csrf
-                    <input type="hidden" name="enabled" value="{{ $row['enabled'] ? '0' : '1' }}">
-                    <div>
-                        <label for="reason-{{ $manifest->slug }}" class="block text-sm font-medium">Reason</label>
-                        <input
-                            id="reason-{{ $manifest->slug }}"
-                            name="reason"
-                            type="text"
-                            required
-                            maxlength="500"
-                            class="sg-input mt-1 w-full max-w-xl"
-                            @disabled($row['enabled'] && $row['enabled_dependents']->isNotEmpty())
-                        >
-                    </div>
-                    <button
-                        type="submit"
-                        class="sg-btn {{ $row['enabled'] ? 'sg-btn-secondary' : 'sg-btn-primary' }}"
-                        @disabled($row['enabled'] && $row['enabled_dependents']->isNotEmpty())
+                    <th scope="row" class="p-4 font-semibold text-sg-ink">
+                        <span id="module-heading-core">Core</span>
+                    </th>
+                    <td class="p-4">Core</td>
+                    <td class="p-4">
+                        <code data-version="{{ $coreVersion }}">{{ $coreVersion }}</code>
+                    </td>
+                    <td class="p-4 text-sg-muted">—</td>
+                    <td class="p-4 text-sg-muted">—</td>
+                    <td class="p-4">
+                        <span class="rounded-full bg-sg-ok-mist px-3 py-1 text-xs font-semibold text-sg-ok" data-status="enabled">
+                            Always on
+                        </span>
+                    </td>
+                    <td class="p-4 text-sg-muted">
+                        <span class="text-xs" aria-label="Core cannot be switched off">Locked</span>
+                    </td>
+                </tr>
+                @forelse ($rows as $row)
+                    @php($manifest = $row['manifest'])
+                    @php($blockDisable = $row['enabled'] && $row['enabled_dependents']->isNotEmpty())
+                    <tr
+                        id="module-{{ $manifest->slug }}"
+                        class="border-b border-sg-info-mist last:border-0 align-top"
+                        data-module="{{ $manifest->slug }}"
+                        data-enabled="{{ $row['enabled'] ? 'true' : 'false' }}"
                     >
-                        {{ $row['enabled'] ? 'Disable module' : 'Enable module' }}
-                    </button>
-                </form>
-
-                @if ($manifest->settings !== [])
-                    <form
-                        method="post"
-                        action="{{ route('admin.modules.settings', $manifest->slug) }}"
-                        class="mt-4 space-y-3 border-t border-sg-line pt-4"
-                        aria-label="Settings for {{ $manifest->name }}"
-                    >
-                        @csrf
-                        <h3 class="text-sm font-semibold">Settings</h3>
-                        @foreach ($manifest->settings as $key => $definition)
-                            @php($value = $row['settings'][$key] ?? $definition->default)
-                            <div>
-                                <label for="setting-{{ $manifest->slug }}-{{ $key }}" class="block text-sm font-medium">
-                                    {{ $definition->label }}
-                                </label>
-                                @if ($definition->type === \App\Core\Modules\SettingType::Bool)
-                                    <label class="mt-1 inline-flex items-center gap-2 text-sm">
-                                        <input
-                                            id="setting-{{ $manifest->slug }}-{{ $key }}"
-                                            type="checkbox"
-                                            name="settings[{{ $key }}]"
-                                            value="1"
-                                            @checked((bool) $value)
-                                        >
-                                        On
-                                    </label>
-                                @elseif ($definition->type === \App\Core\Modules\SettingType::Enum)
-                                    <select
-                                        id="setting-{{ $manifest->slug }}-{{ $key }}"
-                                        name="settings[{{ $key }}]"
-                                        class="sg-input mt-1 w-full max-w-xl"
-                                    >
-                                        @foreach ($definition->options as $option)
-                                            <option value="{{ $option }}" @selected($value === $option)>{{ $option }}</option>
-                                        @endforeach
-                                    </select>
-                                @elseif ($definition->type === \App\Core\Modules\SettingType::SecretRef)
-                                    @php($isSet = is_array($value) && filled($value['env'] ?? null) && filled($value['vault'] ?? null))
-                                    <p class="mt-1 text-sm text-sg-muted" data-secret-ref="{{ $isSet ? 'set' : 'not-set' }}">
-                                        {{ $isSet ? 'Set' : 'Not set' }} (env key and Vault item name only — never a secret value).
-                                    </p>
-                                    <div class="mt-2 grid gap-2 sm:grid-cols-2">
-                                        <div>
-                                            <label for="setting-{{ $manifest->slug }}-{{ $key }}-env" class="block text-xs text-sg-muted">Env key</label>
-                                            <input
-                                                id="setting-{{ $manifest->slug }}-{{ $key }}-env"
-                                                name="settings[{{ $key }}][env]"
-                                                type="text"
-                                                value="{{ is_array($value) ? ($value['env'] ?? '') : '' }}"
-                                                class="sg-input mt-1 w-full"
-                                                autocomplete="off"
-                                            >
-                                        </div>
-                                        <div>
-                                            <label for="setting-{{ $manifest->slug }}-{{ $key }}-vault" class="block text-xs text-sg-muted">Vault item</label>
-                                            <input
-                                                id="setting-{{ $manifest->slug }}-{{ $key }}-vault"
-                                                name="settings[{{ $key }}][vault]"
-                                                type="text"
-                                                value="{{ is_array($value) ? ($value['vault'] ?? '') : '' }}"
-                                                class="sg-input mt-1 w-full"
-                                                autocomplete="off"
-                                            >
-                                        </div>
-                                    </div>
-                                @else
-                                    <input
-                                        id="setting-{{ $manifest->slug }}-{{ $key }}"
-                                        name="settings[{{ $key }}]"
-                                        type="{{ $definition->type === \App\Core\Modules\SettingType::Int ? 'number' : 'text' }}"
-                                        value="{{ is_scalar($value) ? $value : '' }}"
-                                        class="sg-input mt-1 w-full max-w-xl"
-                                    >
-                                @endif
-                            </div>
-                        @endforeach
-                        <button type="submit" class="sg-btn sg-btn-secondary">Save settings</button>
-                    </form>
-                @endif
-            </section>
-        @empty
-            <p class="text-sg-muted">No module manifests were found.</p>
-        @endforelse
+                        <th scope="row" class="p-4 font-medium">
+                            <a
+                                href="{{ route('admin.modules.show', $manifest->slug) }}"
+                                class="text-brand underline"
+                                id="module-heading-{{ $manifest->slug }}"
+                            >
+                                {{ $manifest->name }}
+                            </a>
+                            @if ($manifest->description !== '')
+                                <p class="mt-1 text-xs font-normal text-sg-muted">{{ $manifest->description }}</p>
+                            @endif
+                        </th>
+                        <td class="p-4">{{ ucfirst($manifest->kind->value) }}</td>
+                        <td class="p-4"><code data-version="{{ $manifest->version }}">{{ $manifest->version }}</code></td>
+                        <td class="p-4">
+                            @if ($row['dependencies']->isEmpty())
+                                <span class="text-sg-muted">None</span>
+                            @else
+                                <ul class="list-none space-y-1">
+                                    @foreach ($row['dependencies'] as $dependency)
+                                        <li>
+                                            <a href="{{ route('admin.modules.show', $dependency->slug) }}" class="text-brand underline">
+                                                {{ $dependency->name }}
+                                            </a>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @endif
+                        </td>
+                        <td class="p-4">
+                            @if ($row['missing_addon_labels'] === [])
+                                <span class="text-sg-ok">OK</span>
+                            @else
+                                <span class="text-sg-warn" role="status">
+                                    Missing: {{ implode(', ', $row['missing_addon_labels']) }}
+                                </span>
+                            @endif
+                        </td>
+                        <td class="p-4">
+                            <span
+                                class="rounded-full px-3 py-1 text-xs font-semibold {{ $row['enabled'] ? 'bg-sg-ok-mist text-sg-ok' : 'bg-sg-warn-mist text-sg-warn' }}"
+                                data-status="{{ $row['enabled'] ? 'enabled' : 'disabled' }}"
+                            >
+                                {{ $row['enabled'] ? 'Enabled' : 'Disabled' }}
+                            </span>
+                            @if ($blockDisable)
+                                <p class="mt-2 text-xs text-sg-muted">
+                                    Disable {{ $row['enabled_dependents']->pluck('name')->implode(', ') }} first.
+                                </p>
+                            @endif
+                        </td>
+                        <td class="p-4">
+                            <button
+                                type="button"
+                                class="sg-btn {{ $row['enabled'] ? 'sg-btn-secondary' : 'sg-btn-primary' }} sg-btn-sm"
+                                data-module-state-open
+                                data-module-slug="{{ $manifest->slug }}"
+                                data-module-name="{{ $manifest->name }}"
+                                data-module-enabled="{{ $row['enabled'] ? 'true' : 'false' }}"
+                                data-module-next-enabled="{{ $row['enabled'] ? '0' : '1' }}"
+                                aria-haspopup="dialog"
+                                aria-controls="module-state-dialog"
+                                @disabled($blockDisable)
+                            >
+                                {{ $row['enabled'] ? 'Disable' : 'Enable' }}
+                            </button>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="7" class="p-4 text-sg-muted">No module manifests were found.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
     </div>
+
+    <dialog
+        id="module-state-dialog"
+        class="sg-card max-w-lg w-[calc(100%-2rem)] p-0 backdrop:bg-sg-ink/40"
+        aria-labelledby="module-state-dialog-title"
+        aria-describedby="module-state-dialog-desc"
+        data-module-state-dialog
+    >
+        <form
+            method="post"
+            action="#"
+            class="flex flex-col gap-4 p-5"
+            data-module-state-form
+        >
+            @csrf
+            <input type="hidden" name="enabled" value="" data-module-state-enabled>
+            <div>
+                <h2 id="module-state-dialog-title" class="font-serif text-lg font-semibold" data-module-state-title></h2>
+                <p id="module-state-dialog-desc" class="mt-2 text-sm text-sg-muted" data-module-state-desc></p>
+            </div>
+            <div>
+                <label for="module-state-reason" class="block text-sm font-medium">Reason</label>
+                <input
+                    id="module-state-reason"
+                    name="reason"
+                    type="text"
+                    required
+                    maxlength="500"
+                    class="sg-input mt-1 w-full"
+                    data-module-state-reason
+                >
+            </div>
+            <div class="flex flex-wrap gap-2 justify-end">
+                <button type="button" class="sg-btn sg-btn-secondary" data-module-state-cancel>Cancel</button>
+                <button type="submit" class="sg-btn sg-btn-primary" data-module-state-submit>Confirm</button>
+            </div>
+        </form>
+    </dialog>
 </x-layouts.app>

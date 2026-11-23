@@ -75,8 +75,10 @@ review.
 ### Registry (Accepted)
 
 - Each Module ships a manifest, `modules/<slug>/module.php`, with its slug,
-  name, kind (`module` or `integration`), description, default state, the
-  Cloudron addons it needs, and its settings schema.
+  name, kind (`module` or `integration`), description, a **SemVer** `version`,
+  optional `depends_on` (other module slugs), default state, the Cloudron
+  addons it needs, and its settings schema. **Core** does not have a manifest;
+  its version is the app release (`AppVersion`, same as `/healthz`).
 - The enabled state lives in a Core table, `module_states` (slug, enabled,
   reason, changed by, changed at). With no row, the manifest's default
   applies. The state is cached and read once per request.
@@ -104,13 +106,18 @@ review.
 
 The four rules in [architecture.md](../architecture.md) stay. In addition:
 
-1. A Module never requires another Module to be enabled, because a Module
-   never imports another Module.
+1. A Module must not import another Module for ordinary features. When code
+   truly couples two areas (shared models or services across module
+   boundaries), the dependent module lists the other in manifest `depends_on`.
+   The registry blocks disabling a module while an **enabled** dependent still
+   lists it in `depends_on`. Prefer Core contracts for optional Integrations.
 2. A Module that uses an Integration does so through a Core contract. If the
    Integration is disabled, the contract reports "unavailable" and the Module
    hides that feature rather than failing.
 3. A Module may list the Cloudron addons it needs. The admin page warns if
    one is missing. It never configures Cloudron.
+4. `depends_on` lists only real code couplings audited in the repository, not
+   navigation links or shared permissions alone.
 
 ### Trust boundary
 
@@ -131,11 +138,15 @@ of issues #148 to #153.
   panel, as every `/admin/*` URL already does.
 - Admin only, through a new `admin.modules.manage` permission, behind
   `fresh-signin`.
-- One row per Module: name, kind, state, description and addon warnings.
+- A **Core** row (always on, locked) plus a data table per Module:
+  name, kind, SemVer version, `depends_on`, addon status, enabled state and a
+  switch. Row names link to a **detail** page (`/admin/modules/{slug}`) with
+  dependencies, change-log link, settings and enable/disable (reason required).
 - Switching off opens a confirmation that lists what stops (from the table
-  above) and asks for a reason. Switching on asks the same.
-- Each Module's settings page shows its typed settings, and `secret_ref`
-  values as "set" or "not set".
+  above) and asks for a reason. Switching on asks the same. The reason is
+  audited with actor and time.
+- Each Module's settings on the detail page show typed settings, and
+  `secret_ref` values as "set" or "not set".
 
 ## nwidart/laravel-modules: adopt or defer
 
