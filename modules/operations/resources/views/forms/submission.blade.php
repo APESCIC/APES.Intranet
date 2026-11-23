@@ -10,7 +10,7 @@
                     <dt class="text-sm font-semibold text-sg-muted">{{ $field->label }}</dt>
                     <dd class="mt-1">
                         @if ($answer?->file_path)
-                            <img src="{{ route('operations.forms.files.show', $answer) }}" alt="{{ $field->type === 'signature' ? 'Signature' : 'Photo' }} for {{ $field->label }}" class="max-h-80 max-w-full rounded-sg-field border border-sg-info-mist bg-white">
+                            <img src="{{ route('operations.forms.files.show', $answer) }}" alt="{{ $field->type === 'signature' ? 'Signature' : 'Photo' }} for {{ $field->label }}" class="max-h-80 max-w-full rounded-sg-field border border-sg-info-mist bg-sg-white">
                         @elseif (filled($answer?->value))
                             <span class="whitespace-pre-wrap">{{ $answer->value }}</span>
                         @else

@@ -101,7 +101,7 @@
                         id="quiet_hours_start"
                         name="quiet_hours_start"
                         value="{{ old('quiet_hours_start', optional($preferences->quiet_hours_start)->format('H:i')) }}"
-                        class="rounded-sg-field border border-sg-info-mist bg-white px-3 py-2"
+                        class="rounded-sg-field border border-sg-info-mist bg-sg-white px-3 py-2"
                     >
                     @error('quiet_hours_start')<p class="mt-1 text-sm text-sg-danger">{{ $message }}</p>@enderror
                 </div>
@@ -112,7 +112,7 @@
                         id="quiet_hours_end"
                         name="quiet_hours_end"
                         value="{{ old('quiet_hours_end', optional($preferences->quiet_hours_end)->format('H:i')) }}"
-                        class="rounded-sg-field border border-sg-info-mist bg-white px-3 py-2"
+                        class="rounded-sg-field border border-sg-info-mist bg-sg-white px-3 py-2"
                     >
                     @error('quiet_hours_end')<p class="mt-1 text-sm text-sg-danger">{{ $message }}</p>@enderror
                 </div>
