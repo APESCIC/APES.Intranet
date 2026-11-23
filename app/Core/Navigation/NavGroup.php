@@ -15,18 +15,28 @@ final readonly class NavGroup
         public array $items,
         public ?string $note = null,
         public array $noteLinks = [],
+        public ?string $icon = null,
     ) {}
+
+    public function sectionIcon(): string
+    {
+        if ($this->icon !== null) {
+            return $this->icon;
+        }
+
+        return $this->items[0]->icon;
+    }
 
     /**
      * @param  list<NavItem>  $items
      */
     public function withItems(array $items): self
     {
-        return new self($this->key, $this->heading, $items, $this->note, $this->noteLinks);
+        return new self($this->key, $this->heading, $items, $this->note, $this->noteLinks, $this->icon);
     }
 
     public function withHeading(string $heading): self
     {
-        return new self($this->key, $heading, $this->items, $this->note, $this->noteLinks);
+        return new self($this->key, $heading, $this->items, $this->note, $this->noteLinks, $this->icon);
     }
 }

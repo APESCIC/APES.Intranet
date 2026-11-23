@@ -57,6 +57,6 @@ final class Microsoft365MenuContributor implements BelongsToModule, MenuContribu
             );
         }
 
-        return [new NavGroup('microsoft-365', 'Apps', $items, MicrosoftHelp::note(), MicrosoftHelp::links())];
+        return [new NavGroup('microsoft-365', 'Apps', $items, MicrosoftHelp::note(), MicrosoftHelp::links(), 'app-window')];
     }
 }
