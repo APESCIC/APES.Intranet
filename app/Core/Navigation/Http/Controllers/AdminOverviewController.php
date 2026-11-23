@@ -30,7 +30,7 @@ class AdminOverviewController
             ));
 
             if ($items !== []) {
-                $groups[] = new NavGroup($group->key, $group->heading, $items);
+                $groups[] = new NavGroup($group->key, $group->heading, $items, icon: $group->icon);
             }
         }
 

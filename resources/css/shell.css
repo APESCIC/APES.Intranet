@@ -672,6 +672,12 @@ a.sg-nav-link:hover {
     background: var(--sg-nav-expanded-bg);
 }
 
+.sg-top-nav__icon {
+    width: 1.125rem;
+    height: 1.125rem;
+    flex: 0 0 auto;
+}
+
 .sg-disclosure__chevron {
     width: 1rem;
     height: 1rem;
