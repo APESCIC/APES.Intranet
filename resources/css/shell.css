@@ -609,6 +609,47 @@ a.sg-nav-link:hover {
     gap: 0.35rem 0.65rem;
 }
 
+.sg-roles-layout {
+    display: grid;
+    gap: 1rem;
+}
+
+@media (min-width: 64rem) {
+    .sg-roles-layout {
+        grid-template-columns: minmax(0, 1.1fr) minmax(18rem, 0.9fr);
+        align-items: start;
+    }
+}
+
+.sg-roles-select {
+    color: var(--color-sg-ink);
+    font-weight: 650;
+    text-decoration: none;
+}
+
+.sg-roles-select:hover,
+.sg-roles-select[aria-current='true'] {
+    color: var(--color-sg-teal);
+    text-decoration: underline;
+}
+
+.sg-roles-row--selected {
+    background: var(--sg-active-surface);
+}
+
+.sg-roles-permission {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    font-size: var(--text-small);
+    line-height: 1.35;
+}
+
+.sg-roles-permission__code {
+    color: var(--color-sg-muted);
+    font-size: var(--text-meta);
+}
+
 .site-footer {
     display: flex;
     flex-wrap: wrap;
