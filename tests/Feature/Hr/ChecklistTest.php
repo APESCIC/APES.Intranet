@@ -2,6 +2,7 @@
 
 use App\Core\Access\RoleName;
 use App\Models\User;
+use Database\Seeders\HrPermissionsSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
@@ -15,6 +16,7 @@ uses(RefreshDatabase::class);
 beforeEach(function () {
     Mail::fake();
     $this->seed(RolesAndPermissionsSeeder::class);
+    $this->seed(HrPermissionsSeeder::class);
     Helpdesk::seed();
 });
 

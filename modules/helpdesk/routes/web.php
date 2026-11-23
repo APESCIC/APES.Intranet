@@ -36,9 +36,12 @@ Route::middleware(['web', 'auth'])->group(function () {
         }
     });
 
-    Route::middleware(['can:'.HelpdeskPermissions::CATEGORIES_MANAGE, 'module:helpdesk'])->prefix('admin/help-desk/topics')->name('admin.helpdesk.categories.')->group(function () {
+    Route::middleware(['can:'.HelpdeskPermissions::CATEGORIES_MANAGE, 'module:helpdesk'])->prefix('admin/helpdesk/topics')->name('admin.helpdesk.categories.')->group(function () {
         Route::get('/', [CategoryController::class, 'index'])->name('index');
         Route::post('/', [CategoryController::class, 'store'])->name('store');
         Route::put('/{category}', [CategoryController::class, 'update'])->name('update');
     });
+
+    Route::permanentRedirect('/admin/help-desk/topics', '/admin/helpdesk/topics');
+    Route::permanentRedirect('/admin/help-desk/topics/{category}', '/admin/helpdesk/topics/{category}');
 });

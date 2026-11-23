@@ -87,6 +87,7 @@ Route::middleware('auth')->group(function () {
         });
         Route::middleware(['can:'.AccessMatrix::ADMIN_MODULES_MANAGE, 'fresh-signin'])->prefix('modules')->name('modules.')->group(function () {
             Route::get('/', [AdminModulesController::class, 'index'])->name('index');
+            Route::get('/{slug}', [AdminModulesController::class, 'show'])->name('show');
             Route::post('/{slug}/state', [AdminModulesController::class, 'updateState'])->name('state');
             Route::post('/{slug}/settings', [AdminModulesController::class, 'updateSettings'])->name('settings');
         });

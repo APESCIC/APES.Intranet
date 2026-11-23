@@ -6,6 +6,7 @@ use App\Core\Access\AccessMatrix;
 use App\Core\Access\Contracts\BelongsToTeam;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
+use Modules\Hr\HrPermissions;
 
 /**
  * Gates for each row of the approved permissions matrix. They check
@@ -20,8 +21,8 @@ final class MatrixPolicies
         }
 
         Gate::define('useStudentArea', fn (User $user) => $user->can(AccessMatrix::STUDENT_AREA));
-        Gate::define('viewHrRecord', fn (User $user) => $user->can(AccessMatrix::HR_ACCESS));
-        Gate::define('viewSpecialCategory', fn (User $user) => $user->can(AccessMatrix::HR_SPECIAL_CATEGORY_VIEW));
+        Gate::define('viewHrRecord', fn (User $user) => $user->can(HrPermissions::ACCESS));
+        Gate::define('viewSpecialCategory', fn (User $user) => $user->can(HrPermissions::SPECIAL_CATEGORY_VIEW));
         Gate::define('viewLegalRecord', fn (User $user) => $user->can(AccessMatrix::LEGAL_ACCESS));
     }
 

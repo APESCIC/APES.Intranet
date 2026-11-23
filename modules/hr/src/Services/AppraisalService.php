@@ -2,8 +2,8 @@
 
 namespace Modules\Hr\Services;
 
-use App\Core\Access\AccessMatrix;
 use App\Models\User;
+use Modules\Hr\HrPermissions;
 use Modules\Hr\Models\Appraisal;
 use Modules\Hr\Models\AppraisalCycle;
 use Modules\Hr\Models\AppraisalObjective;
@@ -40,7 +40,7 @@ final class AppraisalService
     public function saveSelfReview(Appraisal $appraisal, string $text, User $actor): Appraisal
     {
         $this->assertEditable($appraisal, $actor);
-        if ((int) $actor->id !== (int) $appraisal->user_id && ! $actor->can(AccessMatrix::HR_ACCESS)) {
+        if ((int) $actor->id !== (int) $appraisal->user_id && ! $actor->can(HrPermissions::ACCESS)) {
             throw new RuntimeException('Only the member can write the self review.');
         }
 
@@ -57,7 +57,7 @@ final class AppraisalService
         $this->assertEditable($appraisal, $actor);
         $isManager = (int) $actor->id === (int) $appraisal->manager_id
             || (int) $actor->id === (int) $appraisal->user?->manager_id;
-        if (! $isManager && ! $actor->can(AccessMatrix::HR_ACCESS)) {
+        if (! $isManager && ! $actor->can(HrPermissions::ACCESS)) {
             throw new RuntimeException('Only the manager or HR can write the manager review.');
         }
 
@@ -88,7 +88,7 @@ final class AppraisalService
         $this->assertEditable($appraisal, $actor);
 
         if ($as === 'member') {
-            if ((int) $actor->id !== (int) $appraisal->user_id && ! $actor->can(AccessMatrix::HR_ACCESS)) {
+            if ((int) $actor->id !== (int) $appraisal->user_id && ! $actor->can(HrPermissions::ACCESS)) {
                 throw new RuntimeException('Only the member can sign as the member.');
             }
             $appraisal->fill([
@@ -98,7 +98,7 @@ final class AppraisalService
         } elseif ($as === 'manager') {
             $isManager = (int) $actor->id === (int) $appraisal->manager_id
                 || (int) $actor->id === (int) $appraisal->user?->manager_id;
-            if (! $isManager && ! $actor->can(AccessMatrix::HR_ACCESS)) {
+            if (! $isManager && ! $actor->can(HrPermissions::ACCESS)) {
                 throw new RuntimeException('Only the manager can sign as the manager.');
             }
             $appraisal->fill([

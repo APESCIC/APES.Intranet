@@ -134,3 +134,80 @@ it('documents every addon variable it reads', function () {
         }
     }
 });
+
+/**
+ * @param  list<string>  $keys
+ * @return array<string, array{0: string|false, 1: mixed, 2: mixed}>
+ */
+function clearCloudronEnv(array $keys): array
+{
+    $saved = [];
+    foreach ($keys as $key) {
+        $saved[$key] = [getenv($key), $_ENV[$key] ?? null, $_SERVER[$key] ?? null];
+        putenv($key);
+        unset($_ENV[$key], $_SERVER[$key]);
+    }
+
+    return $saved;
+}
+
+/**
+ * @param  array<string, array{0: string|false, 1: mixed, 2: mixed}>  $saved
+ */
+function restoreCloudronEnv(array $saved): void
+{
+    foreach ($saved as $key => [$env, $envArray, $server]) {
+        $env === false ? putenv($key) : putenv("{$key}={$env}");
+        if ($envArray === null) {
+            unset($_ENV[$key]);
+        } else {
+            $_ENV[$key] = $envArray;
+        }
+        if ($server === null) {
+            unset($_SERVER[$key]);
+        } else {
+            $_SERVER[$key] = $server;
+        }
+    }
+}
+
+it('treats an addon as present when System status already listed its variables', function () {
+    $redisKeys = CloudronAddons::definitions()['redis']['variables'];
+    $saved = clearCloudronEnv($redisKeys);
+    config(['intranet.cloudron_variables' => ['CLOUDRON_MYSQL_HOST', 'CLOUDRON_MYSQL_PASSWORD']]);
+
+    try {
+        expect(CloudronAddons::looksPresent('mysql'))->toBeTrue()
+            ->and(CloudronAddons::looksPresent('redis'))->toBeFalse();
+    } finally {
+        restoreCloudronEnv($saved);
+    }
+});
+
+it('treats an addon as present when the value is only available via getenv', function () {
+    $key = 'CLOUDRON_REDIS_HOST';
+    $redisKeys = CloudronAddons::definitions()['redis']['variables'];
+    $saved = clearCloudronEnv($redisKeys);
+    config(['intranet.cloudron_variables' => []]);
+
+    try {
+        putenv("{$key}=redis.addon-only-getenv");
+        unset($_ENV[$key], $_SERVER[$key]);
+
+        expect(CloudronAddons::looksPresent('redis'))->toBeTrue();
+    } finally {
+        restoreCloudronEnv($saved);
+    }
+});
+
+it('still reports an addon as missing when no variable is set', function () {
+    $keys = CloudronAddons::definitions()['sendmail']['variables'];
+    $saved = clearCloudronEnv($keys);
+    config(['intranet.cloudron_variables' => []]);
+
+    try {
+        expect(CloudronAddons::looksPresent('sendmail'))->toBeFalse();
+    } finally {
+        restoreCloudronEnv($saved);
+    }
+});

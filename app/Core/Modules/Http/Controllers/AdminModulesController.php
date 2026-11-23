@@ -2,35 +2,54 @@
 
 namespace App\Core\Modules\Http\Controllers;
 
+use App\Core\Changelog\Release;
 use App\Core\Modules\InvalidModuleSettingException;
+use App\Core\Modules\ModuleManifest;
 use App\Core\Modules\ModuleRegistry;
 use App\Core\Modules\SettingType;
 use App\Core\System\CloudronAddons;
+use App\Core\Version\AppVersion;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\View\View;
 use InvalidArgumentException;
 
 final class AdminModulesController
 {
-    public function index(ModuleRegistry $modules): View
+    public function index(ModuleRegistry $modules, AppVersion $appVersion): View
     {
-        $rows = $modules->manifests()->map(function ($manifest) use ($modules) {
-            $missing = $modules->missingCloudronAddons($manifest->slug);
-
-            return [
-                'manifest' => $manifest,
-                'enabled' => $modules->enabled($manifest->slug),
-                'settings' => $modules->settings($manifest->slug),
-                'missing_addons' => collect($missing)->map(
-                    fn (string $key) => CloudronAddons::definitions()[$key]['label'] ?? $key,
-                )->all(),
-                'enabled_dependents' => $modules->enabledDependents($manifest->slug),
-            ];
-        });
+        $rows = $modules->manifests()
+            ->sortBy(fn (ModuleManifest $manifest) => $manifest->name)
+            ->map(fn (ModuleManifest $manifest) => $this->row($modules, $manifest))
+            ->values();
 
         return view('core.admin.modules.index', [
+            'coreVersion' => $appVersion->current(),
             'rows' => $rows,
+        ]);
+    }
+
+    public function show(string $slug, ModuleRegistry $modules, AppVersion $appVersion): View
+    {
+        $manifest = $modules->manifest($slug);
+        if ($manifest === null) {
+            abort(404);
+        }
+
+        $deployedRelease = null;
+        $baseVersion = $appVersion->baseVersion();
+        if ($baseVersion !== null) {
+            $deployedRelease = Release::query()
+                ->where('version', $baseVersion)
+                ->published()
+                ->first();
+        }
+
+        return view('core.admin.modules.show', [
+            'row' => $this->row($modules, $manifest),
+            'coreVersion' => $appVersion->current(),
+            'deployedRelease' => $deployedRelease,
         ]);
     }
 
@@ -39,6 +58,7 @@ final class AdminModulesController
         $data = $request->validate([
             'enabled' => ['required', 'boolean'],
             'reason' => ['required', 'string', 'max:500'],
+            'return' => ['nullable', 'string', 'in:show'],
         ]);
 
         try {
@@ -48,18 +68,14 @@ final class AdminModulesController
                 $modules->disable($slug, $data['reason'], $request->user());
             }
         } catch (InvalidArgumentException $exception) {
-            return redirect()
-                ->route('admin.modules.index')
-                ->with('error', $exception->getMessage())
-                ->withFragment('module-'.$slug);
+            return $this->redirectFor($request, $slug)
+                ->with('error', $exception->getMessage());
         }
 
         $verb = $data['enabled'] ? 'enabled' : 'disabled';
 
-        return redirect()
-            ->route('admin.modules.index')
-            ->with('status', "Module {$slug} {$verb}.")
-            ->withFragment('module-'.$slug);
+        return $this->redirectFor($request, $slug)
+            ->with('status', "Module {$slug} {$verb}.");
     }
 
     public function updateSettings(Request $request, string $slug, ModuleRegistry $modules): RedirectResponse
@@ -94,15 +110,52 @@ final class AdminModulesController
         try {
             $modules->setSettings($slug, $values);
         } catch (InvalidModuleSettingException $exception) {
-            return redirect()
-                ->route('admin.modules.index')
-                ->with('error', $exception->getMessage())
-                ->withFragment('module-'.$slug);
+            return $this->redirectFor($request, $slug)
+                ->with('error', $exception->getMessage());
+        }
+
+        return $this->redirectFor($request, $slug)
+            ->with('status', "Settings for {$slug} saved.");
+    }
+
+    /**
+     * @return array{
+     *     manifest: ModuleManifest,
+     *     enabled: bool,
+     *     settings: array<string, mixed>,
+     *     missing_addons: list<string>,
+     *     missing_addon_labels: list<string>,
+     *     dependencies: Collection<int, ModuleManifest>,
+     *     dependents: Collection<int, ModuleManifest>,
+     *     enabled_dependents: Collection<int, ModuleManifest>,
+     * }
+     */
+    private function row(ModuleRegistry $modules, ModuleManifest $manifest): array
+    {
+        $missing = $modules->missingCloudronAddons($manifest->slug);
+
+        return [
+            'manifest' => $manifest,
+            'enabled' => $modules->enabled($manifest->slug),
+            'settings' => $modules->settings($manifest->slug),
+            'missing_addons' => $missing,
+            'missing_addon_labels' => collect($missing)->map(
+                fn (string $key) => CloudronAddons::definitions()[$key]['label'] ?? $key,
+            )->all(),
+            'dependencies' => $modules->dependencies($manifest->slug),
+            'dependents' => $modules->dependents($manifest->slug),
+            'enabled_dependents' => $modules->enabledDependents($manifest->slug),
+        ];
+    }
+
+    private function redirectFor(Request $request, string $slug): RedirectResponse
+    {
+        if ($request->input('return') === 'show') {
+            return redirect()->route('admin.modules.show', $slug);
         }
 
         return redirect()
             ->route('admin.modules.index')
-            ->with('status', "Settings for {$slug} saved.")
             ->withFragment('module-'.$slug);
     }
 }

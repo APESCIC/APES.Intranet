@@ -85,7 +85,7 @@ class DemoSeeder extends Seeder
         $registrar->initializeCache();
 
         try {
-            $this->call([RolesAndPermissionsSeeder::class, CommunicationsBootstrapSeeder::class, Microsoft365BootstrapSeeder::class, OperationsBootstrapSeeder::class, HelpdeskBootstrapSeeder::class, LearningBootstrapSeeder::class, QaUserSeeder::class, ReleaseNotesSeeder::class]);
+            $this->call([RolesAndPermissionsSeeder::class, HrBootstrapSeeder::class, CommunicationsBootstrapSeeder::class, Microsoft365BootstrapSeeder::class, OperationsBootstrapSeeder::class, HelpdeskBootstrapSeeder::class, LearningBootstrapSeeder::class, QaUserSeeder::class, ReleaseNotesSeeder::class]);
 
             $this->seedPeople();
             $this->seedPlacements();

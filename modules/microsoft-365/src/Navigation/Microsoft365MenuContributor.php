@@ -15,6 +15,8 @@ use Modules\Microsoft365\Support\MicrosoftHelp;
 
 final class Microsoft365MenuContributor implements BelongsToModule, MenuContributor
 {
+    public const TEAMS_URL = 'https://teams.microsoft.com/';
+
     public function __construct(private readonly MicrosoftLinkRegistry $links) {}
 
     public function moduleSlug(): string
@@ -40,13 +42,18 @@ final class Microsoft365MenuContributor implements BelongsToModule, MenuContribu
             ];
         }
 
-        $links = $this->links->forUser($user);
-        if ($links->isEmpty()) {
-            return [];
-        }
+        $items = [
+            NavItem::external(
+                'teams',
+                'Chat in Teams',
+                'messages-square',
+                AccessMatrix::INTRANET_ACCESS,
+                self::TEAMS_URL,
+                'microsoft-365',
+            ),
+        ];
 
-        $items = [];
-        foreach ($links as $link) {
+        foreach ($this->links->forUser($user) as $link) {
             $items[] = NavItem::external(
                 'm365-'.$link->key,
                 $link->name,

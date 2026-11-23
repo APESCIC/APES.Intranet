@@ -42,5 +42,7 @@ class RolesAndPermissionsSeeder extends Seeder
             });
 
         $registrar->forgetCachedPermissions();
+
+        $this->call(HrPermissionsSeeder::class);
     }
 }

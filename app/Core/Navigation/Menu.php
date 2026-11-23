@@ -7,6 +7,7 @@ use App\Core\Access\RoleName;
 use App\Core\Modules\BelongsToModule;
 use App\Core\Modules\ModuleRegistry;
 use App\Models\User;
+use Modules\Microsoft365\Navigation\Microsoft365MenuContributor;
 
 /**
  * The sidebar menu. Each item shows only to people with its permission.
@@ -16,7 +17,19 @@ use App\Models\User;
  */
 final class Menu
 {
-    public const TEAMS_URL = 'https://teams.microsoft.com/';
+    /** @deprecated Use Microsoft365MenuContributor::TEAMS_URL */
+    public const TEAMS_URL = Microsoft365MenuContributor::TEAMS_URL;
+
+    /** @var array<string, int> */
+    private const STAFF_GROUP_ORDER = [
+        'home' => 0,
+        'communications' => 10,
+        'people' => 20,
+        'operations' => 30,
+        'support' => 40,
+        'microsoft-365' => 50,
+        'hr' => 60,
+    ];
 
     /**
      * Member-facing groups. System admin screens are not listed here.
@@ -29,35 +42,13 @@ final class Menu
             new NavGroup('home', 'Home', [
                 NavItem::route('dashboard', 'Dashboard', 'layout-dashboard', AccessMatrix::INTRANET_ACCESS, 'dashboard'),
             ], icon: 'layout-dashboard'),
-            new NavGroup('communications', 'Communications', [
-                NavItem::route('updates', 'Updates', 'newspaper', AccessMatrix::INTRANET_ACCESS, 'communications.updates.index', 'communications.updates.*', 'communications'),
-                NavItem::route('events', 'Events', 'calendar-days', AccessMatrix::INTRANET_ACCESS, 'communications.events.index', 'communications.events.*', 'communications'),
-                NavItem::external('teams', 'Chat in Teams', 'messages-square', AccessMatrix::INTRANET_ACCESS, self::TEAMS_URL, 'microsoft-365'),
-            ], icon: 'megaphone'),
-            new NavGroup('people', 'People', [
-                NavItem::route('directory', 'Directory', 'users', AccessMatrix::INTRANET_ACCESS, 'people.directory.index', 'people.directory.*', 'people'),
-                NavItem::route('org-chart', 'Organisation chart', 'network', AccessMatrix::INTRANET_ACCESS, 'people.org-chart', null, 'people'),
-                NavItem::route('students', 'Student placements', 'graduation-cap', AccessMatrix::INTRANET_ACCESS, 'people.students.index', 'people.students.*', 'people'),
-            ], icon: 'users'),
-            new NavGroup('operations', 'Work', [
-                NavItem::route('rota', 'Rota', 'calendar-days', AccessMatrix::INTRANET_ACCESS, 'operations.rota.index', 'operations.rota.*', 'operations'),
-                NavItem::route('clock', 'Clock in and out', 'clock', AccessMatrix::INTRANET_ACCESS, 'operations.clock.index', null, 'operations'),
-                NavItem::route('team-clock', 'Team clock', 'users', AccessMatrix::TEAM_SUPERVISE, 'operations.clock.team', null, 'operations'),
-                NavItem::route('timesheets', 'Timesheets', 'timer', AccessMatrix::INTRANET_ACCESS, 'operations.timesheets.index', 'operations.timesheets.*', 'operations'),
-                NavItem::route('tasks', 'Tasks', 'list-checks', AccessMatrix::INTRANET_ACCESS, 'operations.tasks.index', 'operations.tasks.*', 'operations'),
-                NavItem::route('checklists', 'Checklists', 'clipboard-check', AccessMatrix::INTRANET_ACCESS, 'operations.checklists.index', 'operations.checklists.*', 'operations'),
-                NavItem::route('forms', 'Forms', 'clipboard-list', AccessMatrix::INTRANET_ACCESS, 'operations.forms.index', 'operations.forms.*', 'operations'),
-            ], icon: 'briefcase'),
             new NavGroup('support', 'Support', [
-                NavItem::route('help-desk', 'Help desk', 'life-buoy', AccessMatrix::INTRANET_ACCESS, 'helpdesk.tickets.index', 'helpdesk.tickets.*', 'helpdesk'),
-                NavItem::route('handbook', 'Handbook', 'book-open', AccessMatrix::INTRANET_ACCESS, 'communications.handbook.index', 'communications.handbook.*', 'communications'),
-                NavItem::route('policies', 'Policies', 'file-text', AccessMatrix::INTRANET_ACCESS, 'communications.policies.index', 'communications.policies.*', 'communications'),
                 NavItem::route('access-guide', 'Who can see what', 'key-round', AccessMatrix::INTRANET_ACCESS, 'access-guide'),
                 NavItem::route('change-log', 'Change log', 'history', AccessMatrix::INTRANET_ACCESS, 'change-log.index', 'change-log.*'),
             ], icon: 'life-buoy'),
             new NavGroup('hr-legal', 'Support extras', [
                 NavItem::soon('agreements', 'Agreements', 'file-pen', AccessMatrix::LEGAL_ACCESS),
-            ]),
+            ], foldInto: 'support'),
         ];
     }
 
@@ -100,9 +91,9 @@ final class Menu
         }
 
         $mode ??= self::resolveMode($user);
-        $groups = $mode === MenuMode::Admin && $user->hasRole(RoleName::Admin->value)
-            ? self::adminDefinition()
-            : self::staffDefinition();
+        $usingAdminInventory = $mode === MenuMode::Admin && $user->hasRole(RoleName::Admin->value);
+        $groups = $usingAdminInventory ? self::adminDefinition() : self::staffDefinition();
+        $contributorMode = $usingAdminInventory ? MenuMode::Admin : MenuMode::Staff;
 
         $groups = self::filterGroups($user, $groups);
 
@@ -116,88 +107,78 @@ final class Menu
                 continue;
             }
 
-            $groups = array_merge($groups, self::filterGroups($user, $contributor->groups($user, $mode)));
+            $groups = array_merge($groups, self::filterGroups($user, $contributor->groups($user, $contributorMode)));
         }
 
         return self::presentGroups($groups);
     }
 
     /**
-     * Present contributor groups under the agreed top-bar headings: Apps,
-     * Learning folded into People, soon HR/Agreements and help-desk queues
-     * folded into Support. Operations is shown as Work.
-     *
      * @param  list<NavGroup>  $groups
      * @return list<NavGroup>
      */
     private static function presentGroups(array $groups): array
     {
-        $presented = [];
-        $peopleIndex = null;
-        $supportIndex = null;
-        $queueItems = [];
-        $learningItems = [];
-        $supportExtraItems = [];
+        $foldQueues = [];
+        $mainGroups = [];
 
         foreach ($groups as $group) {
-            if ($group->key === 'helpdesk-queues') {
-                $queueItems = array_merge($queueItems, $group->items);
+            if ($group->foldInto !== null) {
+                $foldQueues[] = $group;
 
                 continue;
             }
 
-            if ($group->key === 'learning') {
-                $learningItems = array_merge($learningItems, $group->items);
+            $mainGroups[] = $group;
+        }
 
-                continue;
+        usort($mainGroups, function (NavGroup $left, NavGroup $right): int {
+            $leftOrder = self::STAFF_GROUP_ORDER[$left->key] ?? 1000;
+            $rightOrder = self::STAFF_GROUP_ORDER[$right->key] ?? 1000;
+
+            if ($leftOrder === $rightOrder) {
+                return 0;
             }
 
-            if ($group->key === 'hr-legal') {
-                $supportExtraItems = array_merge($supportExtraItems, $group->items);
+            return $leftOrder <=> $rightOrder;
+        });
 
-                continue;
+        $presented = [];
+        $indexByKey = [];
+
+        foreach ($mainGroups as $group) {
+            if ($group->presentAs !== null) {
+                $group = $group->withHeading($group->presentAs);
             }
 
-            $group = match ($group->key) {
-                'microsoft-365' => $group->withHeading('Apps'),
-                'operations' => $group->withHeading('Work'),
-                default => $group,
-            };
-
-            if ($group->key === 'people') {
-                $peopleIndex = count($presented);
-            }
-
-            if ($group->key === 'support') {
-                $supportIndex = count($presented);
-            }
-
+            $indexByKey[$group->key] = count($presented);
             $presented[] = $group;
         }
 
-        if ($learningItems !== []) {
-            if ($peopleIndex === null) {
-                $presented[] = new NavGroup('people', 'People', $learningItems, icon: 'users');
-            } else {
-                $people = $presented[$peopleIndex];
-                $presented[$peopleIndex] = $people->withItems(array_merge($people->items, $learningItems));
+        foreach ($foldQueues as $group) {
+            $target = $group->foldInto;
+            $items = $group->items;
+
+            if ($items === [] || $target === null) {
+                continue;
             }
+
+            if (isset($indexByKey[$target])) {
+                $index = $indexByKey[$target];
+                $presented[$index] = $presented[$index]->withItems(array_merge($presented[$index]->items, $items));
+
+                continue;
+            }
+
+            $created = match ($target) {
+                'people' => new NavGroup('people', 'People', $items, icon: 'users'),
+                'support' => new NavGroup('support', 'Support', $items, icon: 'life-buoy'),
+                default => new NavGroup($target, $group->heading, $items, icon: $group->icon),
+            };
+
+            $indexByKey[$target] = count($presented);
+            $presented[] = $created;
         }
-
-        $supportExtras = array_merge($supportExtraItems, $queueItems);
-
-        if ($supportExtras === []) {
-            return $presented;
-        }
-
-        if ($supportIndex === null) {
-            $presented[] = new NavGroup('support', 'Support', $supportExtras, icon: 'life-buoy');
-
-            return $presented;
-        }
-
-        $support = $presented[$supportIndex];
-        $presented[$supportIndex] = $support->withItems(array_merge($support->items, $supportExtras));
 
         return $presented;
     }

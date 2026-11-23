@@ -4,6 +4,7 @@ namespace Modules\People\Support;
 
 use App\Core\Access\AccessMatrix;
 use App\Models\User;
+use Modules\Hr\HrPermissions;
 
 /**
  * Which profile fields a viewer may see or edit.
@@ -56,7 +57,7 @@ final class ProfileFields
 
     public static function canViewHrFields(User $viewer): bool
     {
-        return $viewer->can(AccessMatrix::HR_ACCESS);
+        return $viewer->can(HrPermissions::ACCESS);
     }
 
     /**
@@ -70,7 +71,7 @@ final class ProfileFields
             $fields = array_merge($fields, array_diff(self::HR_ONLY, ['totp_enabled']));
         }
 
-        if ($viewer->can(AccessMatrix::ADMIN_SYSTEM_VIEW) || $viewer->can(AccessMatrix::HR_ACCESS)) {
+        if ($viewer->can(AccessMatrix::ADMIN_SYSTEM_VIEW) || $viewer->can(HrPermissions::ACCESS)) {
             $fields[] = 'totp_enabled';
         }
 

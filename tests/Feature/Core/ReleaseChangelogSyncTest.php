@@ -60,6 +60,18 @@ it('updates a row when its file changes', function () {
         ->and(Release::query()->sole()->summary)->toBe('A better summary.');
 });
 
+it('stores module versions when present in the file', function () {
+    writeReleaseNote($this->notes, 'v0.1.0', [
+        'module_versions' => ['core' => 'v0.1.0', 'learning' => '0.1.0'],
+    ]);
+    app(ReleaseChangelogSync::class)->sync();
+
+    expect(Release::query()->sole()->module_versions)->toBe([
+        'core' => 'v0.1.0',
+        'learning' => '0.1.0',
+    ]);
+});
+
 it('stores unpublished entries as drafts', function () {
     writeReleaseNote($this->notes, 'v0.1.0', ['published' => false]);
     app(ReleaseChangelogSync::class)->sync();

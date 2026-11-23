@@ -2,7 +2,6 @@
 
 namespace Modules\Hr\Http\Controllers;
 
-use App\Core\Access\AccessMatrix;
 use App\Core\Access\RoleName;
 use App\Core\Access\SensitiveData;
 use App\Core\Audit\AuditLogger;
@@ -10,6 +9,7 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Modules\Hr\HrPermissions;
 use Modules\Hr\Models\HrRecord;
 use Modules\Hr\Models\IdentityCheck;
 
@@ -17,7 +17,7 @@ class HrRecordController
 {
     public function index(Request $request): View
     {
-        abort_unless($request->user()?->can(AccessMatrix::HR_ACCESS), 403);
+        abort_unless($request->user()?->can(HrPermissions::ACCESS), 403);
 
         $q = trim((string) $request->query('q', ''));
 
@@ -48,7 +48,7 @@ class HrRecordController
 
         $checks = $user->identityChecks()->orderByDesc('expires_on')->get();
         foreach ($checks as $check) {
-            if ($request->user()?->can(AccessMatrix::HR_SPECIAL_CATEGORY_VIEW)) {
+            if ($request->user()?->can(HrPermissions::SPECIAL_CATEGORY_VIEW)) {
                 $sensitive->openSpecialCategory(
                     $check,
                     $check->check_type === IdentityCheck::TYPE_DBS ? SensitiveData::DBS : 'right_to_work'
@@ -61,7 +61,7 @@ class HrRecordController
             'record' => $record,
             'checks' => $checks,
             'canEdit' => $this->canEdit($request->user()),
-            'canEditChecks' => $this->canEdit($request->user()) && $request->user()?->can(AccessMatrix::HR_SPECIAL_CATEGORY_VIEW),
+            'canEditChecks' => $this->canEdit($request->user()) && $request->user()?->can(HrPermissions::SPECIAL_CATEGORY_VIEW),
             'fields' => config('hr.editable_fields'),
         ]);
     }

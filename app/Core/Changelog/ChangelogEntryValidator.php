@@ -2,6 +2,7 @@
 
 namespace App\Core\Changelog;
 
+use App\Core\Modules\ModuleManifest;
 use App\Core\Version\AppVersion;
 use DateTimeImmutable;
 use JsonException;
@@ -14,7 +15,7 @@ class ChangelogEntryValidator
 {
     public const REQUIRED = ['version', 'released_at', 'title', 'summary', 'audiences', 'changes', 'published'];
 
-    public const OPTIONAL = ['internal_notes'];
+    public const OPTIONAL = ['internal_notes', 'module_versions'];
 
     /**
      * Text that must never appear in a release note: secrets and keys, and
@@ -121,6 +122,10 @@ class ChangelogEntryValidator
             $errors = [...$errors, ...$this->textList($payload['internal_notes'], 'internal_notes')];
         }
 
+        if (array_key_exists('module_versions', $payload)) {
+            $errors = [...$errors, ...$this->moduleVersions($payload['module_versions'])];
+        }
+
         if (! is_bool($payload['published'])) {
             $errors[] = 'published must be true or false';
         }
@@ -194,6 +199,41 @@ class ChangelogEntryValidator
     public function decode(string $path): array
     {
         return json_decode((string) file_get_contents($path), true, 32, JSON_THROW_ON_ERROR);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function moduleVersions(mixed $value): array
+    {
+        if (! is_array($value) || $value === [] || array_is_list($value)) {
+            return ['module_versions must be an object with at least "core"'];
+        }
+        if (! isset($value['core']) || ! is_string($value['core']) || ! AppVersion::isValid($value['core'])) {
+            return ['module_versions.core must look like v1.2.3'];
+        }
+
+        $errors = [];
+        foreach ($value as $slug => $version) {
+            if (! is_string($slug) || $slug === '') {
+                $errors[] = 'module_versions keys must be non-empty text';
+
+                continue;
+            }
+            if (! is_string($version) || $version === '') {
+                $errors[] = "module_versions.{$slug} must be non-empty text";
+
+                continue;
+            }
+            if ($slug === 'core') {
+                continue;
+            }
+            if (preg_match(ModuleManifest::VERSION_PATTERN, $version) !== 1) {
+                $errors[] = "module_versions.{$slug} must be a valid SemVer (for example 1.0.0)";
+            }
+        }
+
+        return $errors;
     }
 
     /**

@@ -27,6 +27,7 @@ return [
     'slug' => 'alpha',
     'name' => 'Alpha',
     'kind' => 'module',
+    'version' => '0.1.0',
     'description' => 'Parent module for depends_on tests.',
     'default_enabled' => true,
     'depends_on' => [],
@@ -54,6 +55,7 @@ return [
     'slug' => 'beta',
     'name' => 'Beta',
     'kind' => 'module',
+    'version' => '0.1.0',
     'description' => 'Depends on Alpha.',
     'default_enabled' => true,
     'depends_on' => ['alpha'],
@@ -101,16 +103,25 @@ it('requires fresh sign-in before the Modules screen', function () {
     $this->get(route('admin.modules.index'))->assertRedirect(route('auth.reauth'));
 });
 
-it('lists modules for an admin with a fresh sign-in', function () {
+it('lists modules in an accessible table with core locked first', function () {
     $response = $this->actingAs(adminModulesUser())
         ->withSession(modulesFreshSignIn())
         ->get(route('admin.modules.index'));
 
     $response->assertOk()
+        ->assertSee('data-module="core"', false)
         ->assertSee('data-module="alpha"', false)
         ->assertSee('data-module="beta"', false)
+        ->assertSee('Core')
         ->assertSee('Alpha')
-        ->assertSee('Beta');
+        ->assertSee('Beta')
+        ->assertSee('data-version="0.1.0"', false)
+        ->assertSee('Always on')
+        ->assertSee('Locked', false)
+        ->assertSee('<caption class="sr-only">', false)
+        ->assertSee('data-module-state-dialog', false)
+        ->assertSee('data-module-state-open', false)
+        ->assertSee(route('admin.modules.show', 'alpha'), false);
 });
 
 it('refuses the Modules screen without the manage permission', function () {
@@ -121,6 +132,33 @@ it('refuses the Modules screen without the manage permission', function () {
         ->withSession(modulesFreshSignIn())
         ->get(route('admin.modules.index'))
         ->assertForbidden();
+
+    $this->actingAs(adminModulesUser())
+        ->withSession(modulesFreshSignIn())
+        ->post(route('admin.modules.state', 'alpha'), [
+            'enabled' => false,
+            'reason' => 'No permission',
+        ])
+        ->assertForbidden();
+});
+
+it('shows module detail with dependencies and settings', function () {
+    $this->actingAs(adminModulesUser())
+        ->withSession(modulesFreshSignIn())
+        ->get(route('admin.modules.show', 'beta'))
+        ->assertOk()
+        ->assertSee('Depends on Alpha', false)
+        ->assertSee('Alpha', false)
+        ->assertSee('data-version="0.1.0"', false)
+        ->assertSee(route('change-log.index'), false);
+
+    $this->actingAs(adminModulesUser())
+        ->withSession(modulesFreshSignIn())
+        ->get(route('admin.modules.show', 'alpha'))
+        ->assertOk()
+        ->assertSee('Depended on by', false)
+        ->assertSee('Beta', false)
+        ->assertSee('data-secret-ref', false);
 });
 
 it('blocks disable while a dependent module is still enabled and audits a successful change', function () {
@@ -133,7 +171,7 @@ it('blocks disable while a dependent module is still enabled and audits a succes
             'reason' => 'Trying to disable parent',
         ])
         ->assertRedirect()
-        ->assertSessionHas('error');
+        ->assertSessionHas('error', fn (string $message) => str_contains($message, 'Beta'));
 
     expect(app(ModuleRegistry::class)->enabled('alpha'))->toBeTrue()
         ->and(AuditLog::query()->where('event', 'admin.module.disabled')->count())->toBe(0);
@@ -150,6 +188,11 @@ it('blocks disable while a dependent module is still enabled and audits a succes
     expect(app(ModuleRegistry::class)->enabled('beta'))->toBeFalse();
     expect(AuditLog::query()->where('event', 'admin.module.disabled')->count())->toBe(1);
 
+    $disabled = AuditLog::query()->where('event', 'admin.module.disabled')->first();
+    expect($disabled)->not->toBeNull()
+        ->and($disabled->actor_id)->toBe($admin->id)
+        ->and($disabled->context['reason'] ?? null)->toBe('Pause beta first');
+
     $this->actingAs($admin)
         ->withSession(modulesFreshSignIn())
         ->post(route('admin.modules.state', 'alpha'), [
@@ -163,12 +206,13 @@ it('blocks disable while a dependent module is still enabled and audits a succes
         ->and(AuditLog::query()->where('event', 'admin.module.disabled')->count())->toBe(2);
 });
 
-it('saves typed settings and shows secret_ref as set without storing a secret value', function () {
+it('saves typed settings on the detail page and shows secret_ref as set without storing a secret value', function () {
     $admin = adminModulesUser();
 
     $this->actingAs($admin)
         ->withSession(modulesFreshSignIn())
         ->post(route('admin.modules.settings', 'alpha'), [
+            'return' => 'show',
             'settings' => [
                 'label' => 'Renamed Alpha',
                 'api_token' => [
@@ -177,7 +221,7 @@ it('saves typed settings and shows secret_ref as set without storing a secret va
                 ],
             ],
         ])
-        ->assertRedirect()
+        ->assertRedirect(route('admin.modules.show', 'alpha'))
         ->assertSessionHas('status');
 
     $registry = app(ModuleRegistry::class);
@@ -187,7 +231,7 @@ it('saves typed settings and shows secret_ref as set without storing a secret va
 
     $this->actingAs($admin)
         ->withSession(modulesFreshSignIn())
-        ->get(route('admin.modules.index'))
+        ->get(route('admin.modules.show', 'alpha'))
         ->assertOk()
         ->assertSee('data-secret-ref="set"', false)
         ->assertDontSee('sk-');

@@ -1,9 +1,10 @@
 <?php
 
-use App\Core\Access\AccessMatrix;
+use App\Core\Access\CoreAccessCatalog;
 use App\Core\Access\RoleName;
 use App\Core\Auth\GroupRoleMapper;
 use App\Models\User;
+use Database\Seeders\HrPermissionsSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Symfony\Component\Finder\Finder;
@@ -25,6 +26,7 @@ const LEGACY_GROUPS = [
 
 beforeEach(function () {
     $this->seed(RolesAndPermissionsSeeder::class);
+    $this->seed(HrPermissionsSeeder::class);
     fakeCloudron($this);
 });
 
@@ -75,7 +77,7 @@ it('gives admin every permission, including HR and legal', function () {
     signInWithCloudron($this, ['intranet.admin']);
     $admin = User::where('email', 'alex@example.test')->firstOrFail();
 
-    foreach (array_keys(AccessMatrix::permissions()) as $permission) {
+    foreach (array_keys(CoreAccessCatalog::permissions()) as $permission) {
         expect($admin->can($permission))->toBeTrue("admin is missing {$permission}");
     }
 });

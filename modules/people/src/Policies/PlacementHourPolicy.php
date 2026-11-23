@@ -4,6 +4,7 @@ namespace Modules\People\Policies;
 
 use App\Core\Access\AccessMatrix;
 use App\Models\User;
+use Modules\Hr\HrPermissions;
 use Modules\People\Models\PlacementHour;
 
 class PlacementHourPolicy
@@ -15,7 +16,7 @@ class PlacementHourPolicy
 
     public function review(User $user, PlacementHour $hour): bool
     {
-        if ($user->can(AccessMatrix::TEAM_MANAGE) || $user->can(AccessMatrix::HR_ACCESS)) {
+        if ($user->can(AccessMatrix::TEAM_MANAGE) || $user->can(HrPermissions::ACCESS)) {
             return true;
         }
 

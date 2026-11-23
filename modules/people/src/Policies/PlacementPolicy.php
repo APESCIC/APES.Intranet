@@ -4,13 +4,14 @@ namespace Modules\People\Policies;
 
 use App\Core\Access\AccessMatrix;
 use App\Models\User;
+use Modules\Hr\HrPermissions;
 use Modules\People\Models\Placement;
 
 class PlacementPolicy
 {
     public function view(User $user, Placement $placement): bool
     {
-        if ($user->can(AccessMatrix::HR_ACCESS) || $user->can(AccessMatrix::TEAM_MANAGE)) {
+        if ($user->can(HrPermissions::ACCESS) || $user->can(AccessMatrix::TEAM_MANAGE)) {
             return true;
         }
 
@@ -29,6 +30,6 @@ class PlacementPolicy
     {
         return $user->can(AccessMatrix::STUDENT_AREA)
             || $user->can(AccessMatrix::TEAM_SUPERVISE)
-            || $user->can(AccessMatrix::HR_ACCESS);
+            || $user->can(HrPermissions::ACCESS);
     }
 }

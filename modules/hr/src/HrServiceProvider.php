@@ -3,6 +3,8 @@
 namespace Modules\Hr;
 
 use App\Core\Hr\Contracts\ApprovedLeaveLookup;
+use App\Core\Modules\ModuleGuards;
+use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Modules\Hr\Console\RemindIdentityCheckExpiry;
@@ -43,5 +45,10 @@ class HrServiceProvider extends ServiceProvider
                 ->limit(20)
                 ->get());
         });
+
+        Schedule::command('hr:remind-identity-check-expiry')
+            ->dailyAt('09:15')
+            ->withoutOverlapping()
+            ->when(ModuleGuards::whenEnabled('hr'));
     }
 }

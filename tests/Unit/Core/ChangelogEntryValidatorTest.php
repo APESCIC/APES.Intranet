@@ -34,6 +34,28 @@ it('accepts optional internal notes', function () {
     expect((new ChangelogEntryValidator)->validatePayload(releaseNote(['internal_notes' => ['For admins.']])))->toBe([]);
 });
 
+it('accepts optional module versions', function () {
+    expect((new ChangelogEntryValidator)->validatePayload(releaseNote([
+        'module_versions' => [
+            'core' => 'v1.2.3',
+            'learning' => '0.1.0',
+        ],
+    ])))->toBe([]);
+});
+
+it('rejects bad module versions', function (array $moduleVersions, string $error) {
+    $errors = (new ChangelogEntryValidator)->validatePayload(releaseNote([
+        'module_versions' => $moduleVersions,
+    ]));
+
+    expect(implode("\n", $errors))->toContain($error);
+})->with([
+    'missing core' => [['learning' => '0.1.0'], 'module_versions.core'],
+    'bad core' => [['core' => '1.2.3'], 'module_versions.core'],
+    'bad module semver' => [['core' => 'v1.2.3', 'learning' => 'vbad'], 'module_versions.learning'],
+    'empty object' => [[], 'module_versions must be an object'],
+]);
+
 it('rejects a bad schema', function (array $overrides, string $error) {
     $errors = (new ChangelogEntryValidator)->validatePayload(releaseNote($overrides));
 

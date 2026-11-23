@@ -1,0 +1,72 @@
+[
+    {
+        "key": "home",
+        "heading": "Home",
+        "items": [
+            "dashboard"
+        ]
+    },
+    {
+        "key": "communications",
+        "heading": "Communications",
+        "items": [
+            "updates",
+            "events",
+            "handbook",
+            "policies"
+        ]
+    },
+    {
+        "key": "people",
+        "heading": "People",
+        "items": [
+            "directory",
+            "org-chart",
+            "students"
+        ]
+    },
+    {
+        "key": "operations",
+        "heading": "Work",
+        "items": [
+            "rota",
+            "clock",
+            "timesheets",
+            "tasks",
+            "checklists",
+            "forms"
+        ]
+    },
+    {
+        "key": "support",
+        "heading": "Support",
+        "items": [
+            "access-guide",
+            "change-log",
+            "help-desk"
+        ]
+    },
+    {
+        "key": "microsoft-365",
+        "heading": "Apps",
+        "items": [
+            "teams",
+            "m365-outlook",
+            "m365-onedrive",
+            "m365-teams",
+            "m365-engage",
+            "m365-planner",
+            "m365-sharepoint"
+        ]
+    },
+    {
+        "key": "hr",
+        "heading": "HR",
+        "items": [
+            "hr-leave",
+            "hr-training",
+            "hr-recognition",
+            "hr-appraisals"
+        ]
+    }
+]

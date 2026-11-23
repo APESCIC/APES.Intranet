@@ -50,6 +50,9 @@ final class CloudronAddons
 
     /**
      * Whether any of the addon's variables look set in the process environment.
+     *
+     * Matches System status / config building: values may appear only via
+     * getenv() on Cloudron (not in $_ENV / $_SERVER).
      */
     public static function looksPresent(string $addon): bool
     {
@@ -58,14 +61,39 @@ final class CloudronAddons
             return false;
         }
 
+        /** @var list<string>|null $setNames */
+        $setNames = config('intranet.cloudron_variables');
+        if (is_array($setNames)) {
+            foreach ($definition['variables'] as $variable) {
+                if (in_array($variable, $setNames, true)) {
+                    return true;
+                }
+            }
+        }
+
         foreach ($definition['variables'] as $variable) {
-            $value = $_ENV[$variable] ?? $_SERVER[$variable] ?? false;
-            if (is_string($value) && $value !== '') {
+            if (self::variableLooksSet($variable)) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    /**
+     * True when a process env variable has a non-empty string value.
+     */
+    public static function variableLooksSet(string $variable): bool
+    {
+        foreach ([$_ENV[$variable] ?? null, $_SERVER[$variable] ?? null] as $value) {
+            if (is_string($value) && $value !== '') {
+                return true;
+            }
+        }
+
+        $fromGetenv = getenv($variable);
+
+        return is_string($fromGetenv) && $fromGetenv !== '';
     }
 
     /**
