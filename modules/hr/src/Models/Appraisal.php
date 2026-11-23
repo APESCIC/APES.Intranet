@@ -2,12 +2,12 @@
 
 namespace Modules\Hr\Models;
 
-use App\Core\Access\AccessMatrix;
 use App\Core\Access\RoleName;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Modules\Hr\HrPermissions;
 
 class Appraisal extends Model
 {
@@ -93,7 +93,7 @@ class Appraisal extends Model
 
     public function canBeViewedBy(User $viewer): bool
     {
-        if ($viewer->can(AccessMatrix::HR_ACCESS)) {
+        if ($viewer->can(HrPermissions::ACCESS)) {
             return true;
         }
 
@@ -111,7 +111,7 @@ class Appraisal extends Model
             return false;
         }
 
-        if ($viewer->can(AccessMatrix::HR_ACCESS) || $viewer->hasRole(RoleName::Admin->value)) {
+        if ($viewer->can(HrPermissions::ACCESS) || $viewer->hasRole(RoleName::Admin->value)) {
             return true;
         }
 

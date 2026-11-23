@@ -14,10 +14,6 @@ final class AccessMatrix
 
     public const TEAM_MANAGE = 'team.manage';
 
-    public const HR_ACCESS = 'hr.access';
-
-    public const HR_SPECIAL_CATEGORY_VIEW = 'hr.special_category.view';
-
     public const LEGAL_ACCESS = 'legal.access';
 
     public const STUDENT_AREA = 'student.area';
@@ -41,8 +37,6 @@ final class AccessMatrix
             self::INTRANET_ACCESS => 'Use the intranet',
             self::TEAM_SUPERVISE => 'Oversee their own team: view it and approve its shifts, swaps and timesheets',
             self::TEAM_MANAGE => 'Manage a team, rota or group of people',
-            self::HR_ACCESS => 'Open the HR area',
-            self::HR_SPECIAL_CATEGORY_VIEW => 'See DBS and health information (special category data, every view audited)',
             self::LEGAL_ACCESS => 'Open the agreements and legal area',
             self::STUDENT_AREA => 'Use the student area',
             self::ADMIN_ROLES_VIEW => 'View roles and permissions',
@@ -63,8 +57,8 @@ final class AccessMatrix
             RoleName::Volunteer->value => [self::INTRANET_ACCESS],
             RoleName::Student->value => [self::INTRANET_ACCESS, self::STUDENT_AREA],
             RoleName::Supervisor->value => [self::INTRANET_ACCESS, self::TEAM_SUPERVISE],
-            RoleName::Management->value => [self::INTRANET_ACCESS, self::TEAM_SUPERVISE, self::TEAM_MANAGE, self::HR_ACCESS, self::HR_SPECIAL_CATEGORY_VIEW],
-            RoleName::Hr->value => [self::INTRANET_ACCESS, self::HR_ACCESS, self::HR_SPECIAL_CATEGORY_VIEW, self::ACCESS_REVIEW_VIEW],
+            RoleName::Management->value => [self::INTRANET_ACCESS, self::TEAM_SUPERVISE, self::TEAM_MANAGE],
+            RoleName::Hr->value => [self::INTRANET_ACCESS, self::ACCESS_REVIEW_VIEW],
             RoleName::Legal->value => [self::INTRANET_ACCESS, self::LEGAL_ACCESS],
             RoleName::Admin->value => array_keys(self::permissions()),
         ];

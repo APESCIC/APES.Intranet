@@ -7,6 +7,7 @@ use App\Core\Audit\AuditLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Modules\Hr\HrPermissions;
 use Modules\People\Models\Placement;
 use Modules\People\Models\PlacementHour;
 
@@ -17,20 +18,20 @@ class StudentPlacementController
         $user = $request->user();
         abort_unless($user?->can(AccessMatrix::STUDENT_AREA)
             || $user?->can(AccessMatrix::TEAM_SUPERVISE)
-            || $user?->can(AccessMatrix::HR_ACCESS), 403);
+            || $user?->can(HrPermissions::ACCESS), 403);
 
         $placements = Placement::query()
             ->with(['student', 'supervisor'])
             ->when(
-                $user->can(AccessMatrix::STUDENT_AREA) && ! $user->can(AccessMatrix::HR_ACCESS) && ! $user->can(AccessMatrix::TEAM_MANAGE),
+                $user->can(AccessMatrix::STUDENT_AREA) && ! $user->can(HrPermissions::ACCESS) && ! $user->can(AccessMatrix::TEAM_MANAGE),
                 fn ($q) => $q->where('student_id', $user->getKey()),
             )
             ->when(
-                $user->can(AccessMatrix::TEAM_SUPERVISE) && ! $user->can(AccessMatrix::HR_ACCESS) && ! $user->can(AccessMatrix::TEAM_MANAGE) && ! $user->can(AccessMatrix::STUDENT_AREA),
+                $user->can(AccessMatrix::TEAM_SUPERVISE) && ! $user->can(HrPermissions::ACCESS) && ! $user->can(AccessMatrix::TEAM_MANAGE) && ! $user->can(AccessMatrix::STUDENT_AREA),
                 fn ($q) => $q->where('supervisor_id', $user->getKey()),
             )
             ->when(
-                $user->can(AccessMatrix::TEAM_SUPERVISE) && $user->can(AccessMatrix::STUDENT_AREA) && ! $user->can(AccessMatrix::HR_ACCESS) && ! $user->can(AccessMatrix::TEAM_MANAGE),
+                $user->can(AccessMatrix::TEAM_SUPERVISE) && $user->can(AccessMatrix::STUDENT_AREA) && ! $user->can(HrPermissions::ACCESS) && ! $user->can(AccessMatrix::TEAM_MANAGE),
                 fn ($q) => $q->where(function ($inner) use ($user) {
                     $inner->where('student_id', $user->getKey())->orWhere('supervisor_id', $user->getKey());
                 }),

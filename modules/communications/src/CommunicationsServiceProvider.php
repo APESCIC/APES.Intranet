@@ -3,7 +3,9 @@
 namespace Modules\Communications;
 
 use App\Core\Communications\Contracts\PublishIntranetUpdate;
+use App\Core\Modules\ModuleGuards;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\ServiceProvider;
 use Modules\Communications\Console\SendEventReminders;
 use Modules\Communications\Models\Event;
@@ -38,5 +40,10 @@ class CommunicationsServiceProvider extends ServiceProvider
         Gate::policy(Event::class, EventPolicy::class);
         Gate::policy(HandbookChapter::class, HandbookChapterPolicy::class);
         Gate::policy(PolicyDocument::class, PolicyDocumentPolicy::class);
+
+        Schedule::command('comms:send-event-reminders')
+            ->everyFiveMinutes()
+            ->withoutOverlapping()
+            ->when(ModuleGuards::whenEnabled('communications'));
     }
 }

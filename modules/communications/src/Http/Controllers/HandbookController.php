@@ -14,6 +14,7 @@ use Modules\Communications\CommunicationsPermissions;
 use Modules\Communications\Models\HandbookAcknowledgement;
 use Modules\Communications\Models\HandbookChapter;
 use Modules\Communications\Models\HandbookVersion;
+use Modules\Hr\HrPermissions;
 
 class HandbookController
 {
@@ -144,7 +145,7 @@ class HandbookController
     public function exportAcknowledgements(Request $request, HandbookChapter $chapter): Response
     {
         abort_unless(
-            $request->user()?->can(AccessMatrix::HR_ACCESS)
+            $request->user()?->can(HrPermissions::ACCESS)
             || $request->user()?->can(CommunicationsPermissions::PUBLISH),
             403
         );

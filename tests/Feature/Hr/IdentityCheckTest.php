@@ -4,6 +4,7 @@ use App\Core\Access\RoleName;
 use App\Core\Audit\AuditLog;
 use App\Core\Notifications\Notifications\IntranetAlert;
 use App\Models\User;
+use Database\Seeders\HrPermissionsSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
@@ -13,6 +14,7 @@ uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->seed(RolesAndPermissionsSeeder::class);
+    $this->seed(HrPermissionsSeeder::class);
 });
 
 /**

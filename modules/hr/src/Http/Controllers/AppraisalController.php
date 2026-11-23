@@ -2,7 +2,6 @@
 
 namespace Modules\Hr\Http\Controllers;
 
-use App\Core\Access\AccessMatrix;
 use App\Core\Access\SensitiveData;
 use App\Core\Audit\AuditLogger;
 use App\Models\User;
@@ -10,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use Modules\Hr\HrPermissions;
 use Modules\Hr\Models\Appraisal;
 use Modules\Hr\Models\AppraisalCycle;
 use Modules\Hr\Models\HrRecord;
@@ -23,7 +23,7 @@ class AppraisalController
         $user = $request->user();
         $query = Appraisal::query()->with(['cycle', 'user', 'manager'])->latest();
 
-        if (! $user->can(AccessMatrix::HR_ACCESS)) {
+        if (! $user->can(HrPermissions::ACCESS)) {
             $query->where(function ($q) use ($user) {
                 $q->where('user_id', $user->id)
                     ->orWhere('manager_id', $user->id)
@@ -34,8 +34,8 @@ class AppraisalController
         return view('hr::appraisals.index', [
             'appraisals' => $query->limit(50)->get(),
             'cycles' => AppraisalCycle::query()->orderByDesc('year')->get(),
-            'canManage' => $user->can(AccessMatrix::HR_ACCESS),
-            'members' => $user->can(AccessMatrix::HR_ACCESS)
+            'canManage' => $user->can(HrPermissions::ACCESS),
+            'members' => $user->can(HrPermissions::ACCESS)
                 ? User::query()->active()->orderBy('name')->limit(200)->get(['id', 'name', 'manager_id'])
                 : collect(),
         ]);
@@ -43,7 +43,7 @@ class AppraisalController
 
     public function storeCycle(Request $request, AppraisalService $appraisals, AuditLogger $audit): RedirectResponse
     {
-        abort_unless($request->user()->can(AccessMatrix::HR_ACCESS), 403);
+        abort_unless($request->user()->can(HrPermissions::ACCESS), 403);
 
         $data = $request->validate([
             'name' => ['required', 'string', 'max:200'],
@@ -60,7 +60,7 @@ class AppraisalController
 
     public function store(Request $request, AppraisalService $appraisals, SensitiveData $sensitive, AuditLogger $audit): RedirectResponse
     {
-        abort_unless($request->user()->can(AccessMatrix::HR_ACCESS), 403);
+        abort_unless($request->user()->can(HrPermissions::ACCESS), 403);
 
         $data = $request->validate([
             'cycle_id' => ['required', 'integer', Rule::exists('hr_appraisal_cycles', 'id')],
@@ -88,7 +88,7 @@ class AppraisalController
         abort_unless($appraisal->canBeViewedBy($request->user()), 403);
 
         // HR opens through SensitiveData; member and manager get a plain audit entry.
-        if ($request->user()->can(AccessMatrix::HR_ACCESS)) {
+        if ($request->user()->can(HrPermissions::ACCESS)) {
             $sensitive->openHrRecord(HrRecord::query()->firstOrCreate(['user_id' => $appraisal->user_id]));
         } else {
             $audit->record('hr.appraisal.viewed', $appraisal);
@@ -100,7 +100,7 @@ class AppraisalController
             'isMember' => (int) $request->user()->id === (int) $appraisal->user_id,
             'isManager' => (int) $request->user()->id === (int) $appraisal->manager_id
                 || (int) $request->user()->id === (int) $appraisal->user->manager_id,
-            'isHr' => $request->user()->can(AccessMatrix::HR_ACCESS),
+            'isHr' => $request->user()->can(HrPermissions::ACCESS),
         ]);
     }
 

@@ -2,11 +2,11 @@
 
 namespace Modules\Hr\Console;
 
-use App\Core\Access\AccessMatrix;
 use App\Core\Notifications\AlertDispatcher;
 use App\Core\Notifications\NotificationCategory;
 use App\Models\User;
 use Illuminate\Console\Command;
+use Modules\Hr\HrPermissions;
 use Modules\Hr\Models\IdentityCheck;
 
 class RemindIdentityCheckExpiry extends Command
@@ -38,7 +38,7 @@ class RemindIdentityCheckExpiry extends Command
             return self::SUCCESS;
         }
 
-        $reviewers = User::permission(AccessMatrix::HR_SPECIAL_CATEGORY_VIEW)->get();
+        $reviewers = User::permission(HrPermissions::SPECIAL_CATEGORY_VIEW)->get();
         AlertDispatcher::send(
             $reviewers,
             NotificationCategory::AccountSecurity,

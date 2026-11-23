@@ -1,8 +1,10 @@
 <?php
 
 use App\Core\Access\AccessMatrix;
+use App\Core\Access\CoreAccessCatalog;
 use App\Core\Access\RoleName;
 use App\Models\User;
+use Database\Seeders\HrPermissionsSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Permission;
@@ -12,11 +14,12 @@ uses(RefreshDatabase::class);
 
 it('creates the eight intranet roles with their permissions', function () {
     $this->seed(RolesAndPermissionsSeeder::class);
+    $this->seed(HrPermissionsSeeder::class);
 
     expect(Role::pluck('name')->sort()->values()->all())
         ->toBe(collect(RoleName::cases())->pluck('value')->sort()->values()->all());
 
-    foreach (AccessMatrix::grants() as $roleName => $permissions) {
+    foreach (CoreAccessCatalog::roleGrants() as $roleName => $permissions) {
         expect(Role::findByName($roleName)->permissions->pluck('name')->sort()->values()->all())
             ->toBe(collect($permissions)->sort()->values()->all());
     }
@@ -24,10 +27,12 @@ it('creates the eight intranet roles with their permissions', function () {
 
 it('is idempotent', function () {
     $this->seed(RolesAndPermissionsSeeder::class);
+    $this->seed(HrPermissionsSeeder::class);
     $this->seed(RolesAndPermissionsSeeder::class);
+    $this->seed(HrPermissionsSeeder::class);
 
     expect(Role::count())->toBe(count(RoleName::cases()))
-        ->and(Permission::count())->toBe(count(AccessMatrix::permissions()));
+        ->and(Permission::count())->toBe(count(CoreAccessCatalog::permissions()));
 });
 
 it('removes a role that left the matrix once nobody holds it', function () {

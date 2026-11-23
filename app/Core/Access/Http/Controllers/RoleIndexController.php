@@ -2,7 +2,7 @@
 
 namespace App\Core\Access\Http\Controllers;
 
-use App\Core\Access\AccessMatrix;
+use App\Core\Access\CoreAccessCatalog;
 use App\Core\Audit\AuditLogger;
 use App\Core\Auth\GroupRoleMapper;
 use Illuminate\Support\Facades\Gate;
@@ -31,7 +31,7 @@ class RoleIndexController
             'roles' => $roles,
             'groupFor' => array_flip($groupRoles),
             'groupCount' => count($mapper->approvedGroups()),
-            'descriptions' => AccessMatrix::permissions(),
+            'descriptions' => CoreAccessCatalog::permissions(),
         ]);
     }
 }

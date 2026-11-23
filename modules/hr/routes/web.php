@@ -2,6 +2,7 @@
 
 use App\Core\Access\AccessMatrix;
 use Illuminate\Support\Facades\Route;
+use Modules\Hr\HrPermissions;
 use Modules\Hr\Http\Controllers\AppraisalController;
 use Modules\Hr\Http\Controllers\ChecklistController;
 use Modules\Hr\Http\Controllers\HrRecordController;
@@ -31,12 +32,12 @@ Route::middleware(['web', 'auth', 'can:'.AccessMatrix::INTRANET_ACCESS, 'module:
     Route::post('/appraisals/{appraisal}/lock', [AppraisalController::class, 'lock'])->whereNumber('appraisal')->name('appraisals.lock');
 });
 
-Route::middleware(['web', 'auth', 'can:'.AccessMatrix::HR_ACCESS, 'module:hr'])->prefix('hr')->name('hr.')->group(function () {
+Route::middleware(['web', 'auth', 'can:'.HrPermissions::ACCESS, 'module:hr'])->prefix('hr')->name('hr.')->group(function () {
     Route::get('/records', [HrRecordController::class, 'index'])->name('records.index');
     Route::get('/records/{user}', [HrRecordController::class, 'show'])->whereNumber('user')->name('records.show');
     Route::put('/records/{user}', [HrRecordController::class, 'update'])->whereNumber('user')->name('records.update');
 
-    Route::middleware('can:'.AccessMatrix::HR_SPECIAL_CATEGORY_VIEW)->group(function () {
+    Route::middleware('can:'.HrPermissions::SPECIAL_CATEGORY_VIEW)->group(function () {
         Route::get('/checks/report', [IdentityCheckController::class, 'report'])->name('checks.report');
         Route::post('/records/{user}/checks', [IdentityCheckController::class, 'store'])->whereNumber('user')->name('checks.store');
     });
