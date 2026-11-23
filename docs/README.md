@@ -32,6 +32,7 @@ for organisation members ([where documents live](decisions.md#where-documents-li
 | [shell.md](shell.md) | Top horizontal menu, account menu, bell, Staff/Admin switch and mobile drawer |
 | [adr/0001-modules-and-integrations.md](adr/0001-modules-and-integrations.md) | Modules, Integrations and the module registry |
 | [accessibility.md](accessibility.md) | The WCAG 2.2 AA baseline, the automated check and rules for new pages |
+| [accessibility-themes-v0.6.14.md](accessibility-themes-v0.6.14.md) | Theme contrast and keyboard check for Glass/Jungle × light/dark (v0.6.14) |
 | [dpia/clock-in-geofence.md](dpia/clock-in-geofence.md) | The approved data protection impact assessment for the clock-in geofence |
 | [dpia/hr-records.md](dpia/hr-records.md) | The approved DPIA for HR records (DBS, right-to-work, leave, appraisals) |
 | [dpia/learning-records.md](dpia/learning-records.md) | The approved DPIA for Learning Module learner records (enrolment, progress, future grades) |
