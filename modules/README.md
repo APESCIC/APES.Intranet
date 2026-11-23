@@ -7,7 +7,7 @@ layout, the dependency rules and what a new module needs.
 
 ## Registry
 
-Core answers “is this module on?” through
+Core answers â€œis this module on?â€ through
 `App\Core\Modules\ModuleRegistry` (ADR
 [0001](../docs/adr/0001-modules-and-integrations.md)). Each module ships a
 manifest at `modules/<slug>/module.php` with its slug, name, kind
@@ -35,4 +35,4 @@ those folders and fails when a required piece is missing.
 | Dashboard cards | `modules/<slug>/src/Dashboard/` | Optional `DashboardCardContributor` classes tagged `intranet.dashboard` |
 | Tests | `tests/Feature/<Area>/` (and `tests/Unit/` where useful) | Not inside the module folder |
 
-Studly names come from the slug (`microsoft-365` → `Microsoft365`).
+Studly names come from the slug (`microsoft-365` â†’ `Microsoft365`).
