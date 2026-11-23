@@ -6,6 +6,7 @@ use App\Core\Access\Console\RemindAccessReview;
 use App\Core\Access\Policies\MatrixPolicies;
 use App\Core\Access\Policies\RolePolicy;
 use App\Core\Access\RoleName;
+use App\Core\Appearance\AppearancePreferences;
 use App\Core\Audit\Console\PruneAuditLog;
 use App\Core\Auth\Cloudron\CloudronIdentityProvider;
 use App\Core\Auth\Cloudron\LdapDirectoryGroups;
@@ -74,6 +75,17 @@ class CoreServiceProvider extends ServiceProvider
         Gate::policy(Role::class, RolePolicy::class);
         Gate::policy(Release::class, ReleasePolicy::class);
         MatrixPolicies::register();
+
+        $shareAppearance = function (ViewInstance $view): void {
+            $user = auth()->user();
+            $user = $user instanceof User ? $user : null;
+
+            $view->with([
+                'appearanceServer' => $user ? AppearancePreferences::forUser($user) : null,
+            ]);
+        };
+
+        View::composer(['components.layouts.app', 'components.layouts.error'], $shareAppearance);
 
         View::composer('components.layouts.app', function (ViewInstance $view) {
             $user = auth()->user();

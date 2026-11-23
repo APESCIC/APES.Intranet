@@ -38,6 +38,9 @@ use Spatie\Permission\Traits\HasRoles;
     'employee_number',
     'manager_id',
     'is_active',
+    'appearance_theme',
+    'appearance_mode',
+    'appearance_reduced_transparency',
 ])]
 #[Hidden(['password', 'remember_token', 'oidc_sub'])]
 class User extends Authenticatable
@@ -172,6 +175,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_active' => 'boolean',
+            'appearance_reduced_transparency' => 'boolean',
             'deactivated_at' => 'datetime',
             'skills' => 'array',
             'totp_enabled' => 'boolean',

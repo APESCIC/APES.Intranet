@@ -16,6 +16,15 @@
         <x-shell.top-nav :menu="$menu" />
     @endif
     <div class="sg-topbar__actions">
+        <button
+            type="button"
+            class="sg-icon-btn"
+            data-appearance-mode-toggle
+            aria-label="Switch light or dark mode"
+        >
+            <i data-lucide="sun" data-appearance-icon-light></i>
+            <i data-lucide="moon" data-appearance-icon-dark></i>
+        </button>
         @auth
             <x-shell.notification-bell
                 panel-id="notification-bell-panel"
