@@ -15,6 +15,57 @@ use Modules\Communications\Models\UpdateRead;
 class DashboardCards
 {
     /**
+     * @var array<string, string>
+     */
+    private const SECTION_HEADINGS = [
+        'today' => 'Today',
+        'updates' => 'Updates',
+        'help-desk' => 'My help desk',
+        'm365' => 'Microsoft 365 apps',
+        'events' => 'Events',
+    ];
+
+    /**
+     * @return list<array{key: string, heading: string, cards: list<array<string, mixed>>}>
+     */
+    public function groupedFor(User $user): array
+    {
+        $buckets = array_fill_keys(array_keys(self::SECTION_HEADINGS), []);
+
+        foreach ($this->for($user) as $card) {
+            $buckets[$this->sectionFor($card)][] = $card;
+        }
+
+        $sections = [];
+        foreach (self::SECTION_HEADINGS as $key => $heading) {
+            if ($buckets[$key] === []) {
+                continue;
+            }
+
+            $sections[] = [
+                'key' => $key,
+                'heading' => $heading,
+                'cards' => $buckets[$key],
+            ];
+        }
+
+        return $sections;
+    }
+
+    /**
+     * @param  array{key: string}  $card
+     */
+    private function sectionFor(array $card): string
+    {
+        return match ($card['key']) {
+            'unread-updates' => 'updates',
+            'upcoming-event' => 'events',
+            'm365-apps' => 'm365',
+            default => str_starts_with($card['key'], 'helpdesk-') ? 'help-desk' : 'today',
+        };
+    }
+
+    /**
      * @return list<array{key: string, title: string, body: string, href: ?string, dismissible?: bool}>
      */
     public function for(User $user): array

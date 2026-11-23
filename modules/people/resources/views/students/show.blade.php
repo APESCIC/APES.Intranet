@@ -21,15 +21,15 @@
             <h2 class="font-serif text-lg font-semibold">Log hours</h2>
             <div>
                 <label class="mb-1 block text-sm font-semibold" for="worked_on">Date</label>
-                <input id="worked_on" type="date" name="worked_on" value="{{ old('worked_on', now()->toDateString()) }}" class="w-full rounded-sg-field border border-sg-info-mist bg-white px-3 py-2" required>
+                <input id="worked_on" type="date" name="worked_on" value="{{ old('worked_on', now()->toDateString()) }}" class="w-full rounded-sg-field border border-sg-info-mist bg-sg-white px-3 py-2" required>
             </div>
             <div>
                 <label class="mb-1 block text-sm font-semibold" for="minutes">Minutes</label>
-                <input id="minutes" type="number" name="minutes" min="15" max="720" step="15" value="{{ old('minutes', 60) }}" class="w-full rounded-sg-field border border-sg-info-mist bg-white px-3 py-2" required>
+                <input id="minutes" type="number" name="minutes" min="15" max="720" step="15" value="{{ old('minutes', 60) }}" class="w-full rounded-sg-field border border-sg-info-mist bg-sg-white px-3 py-2" required>
             </div>
             <div>
                 <label class="mb-1 block text-sm font-semibold" for="notes">Notes</label>
-                <textarea id="notes" name="notes" rows="3" class="w-full rounded-sg-field border border-sg-info-mist bg-white px-3 py-2">{{ old('notes') }}</textarea>
+                <textarea id="notes" name="notes" rows="3" class="w-full rounded-sg-field border border-sg-info-mist bg-sg-white px-3 py-2">{{ old('notes') }}</textarea>
             </div>
             <button type="submit" class="sg-btn sg-btn-primary sg-btn-sm">Submit for sign-off</button>
         </form>
@@ -53,7 +53,7 @@
                                 @csrf
                                 <input type="hidden" name="decision" value="returned">
                                 <label class="sr-only" for="reviewer_notes_{{ $hour->id }}">Return notes</label>
-                                <input id="reviewer_notes_{{ $hour->id }}" name="reviewer_notes" class="rounded-sg-field border border-sg-info-mist bg-white px-3 py-2" placeholder="Reason">
+                                <input id="reviewer_notes_{{ $hour->id }}" name="reviewer_notes" class="rounded-sg-field border border-sg-info-mist bg-sg-white px-3 py-2" placeholder="Reason">
                                 <button class="sg-btn sg-btn-secondary sg-btn-sm" type="submit">Return</button>
                             </form>
                         @endif

@@ -59,21 +59,21 @@ it('shows menu items only to roles with their permission', function (RoleName $r
         expect($keys)->not->toContain($key);
     }
 })->with([
-    'staff' => [RoleName::Staff, [], ['hr', 'agreements', 'roles', 'audit']],
-    'volunteer' => [RoleName::Volunteer, [], ['hr', 'agreements', 'roles', 'audit']],
-    'student' => [RoleName::Student, [], ['hr', 'agreements', 'roles', 'audit']],
-    'supervisor' => [RoleName::Supervisor, [], ['hr', 'agreements', 'roles', 'audit']],
-    'management' => [RoleName::Management, ['hr'], ['agreements', 'roles', 'audit']],
-    'hr' => [RoleName::Hr, ['hr'], ['agreements', 'roles', 'audit']],
-    'legal' => [RoleName::Legal, ['agreements'], ['hr', 'roles', 'audit']],
-    'admin' => [RoleName::Admin, ['hr', 'agreements'], ['roles', 'audit']],
+    'staff' => [RoleName::Staff, [], ['hr-records', 'agreements', 'roles', 'audit']],
+    'volunteer' => [RoleName::Volunteer, [], ['hr-records', 'agreements', 'roles', 'audit']],
+    'student' => [RoleName::Student, [], ['hr-records', 'agreements', 'roles', 'audit']],
+    'supervisor' => [RoleName::Supervisor, [], ['hr-records', 'agreements', 'roles', 'audit']],
+    'management' => [RoleName::Management, ['hr-records'], ['agreements', 'roles', 'audit']],
+    'hr' => [RoleName::Hr, ['hr-records'], ['agreements', 'roles', 'audit']],
+    'legal' => [RoleName::Legal, ['agreements'], ['hr-records', 'roles', 'audit']],
+    'admin' => [RoleName::Admin, ['hr-records', 'agreements'], ['roles', 'audit']],
 ]);
 
 it('keeps system admin items out of the Staff menu for admins', function () {
     $keys = menuKeysFor(userWithRole(RoleName::Admin), MenuMode::Staff);
 
     expect($keys)->not->toContain('admin-overview', 'roles', 'audit', 'access-review', 'system', 'totp')
-        ->and($keys)->toContain('hr', 'agreements', 'updates');
+        ->and($keys)->toContain('hr-records', 'agreements', 'updates');
 });
 
 it('shows only the Admin inventory in the Admin panel, starting with the overview', function () {
@@ -98,13 +98,14 @@ it('leaves out a menu group when none of its items are allowed', function () {
         ->and($headings)->not->toContain('More');
 });
 
-it('folds soon HR and Agreements into Support for people who can see them', function () {
-    $menu = collect(Menu::for(userWithRole(RoleName::Hr), MenuMode::Staff));
+it('folds soon Agreements into Support without duplicating HR', function () {
+    $menu = collect(Menu::for(userWithRole(RoleName::Admin), MenuMode::Staff));
     $support = $menu->firstWhere('key', 'support');
 
-    expect($menu->pluck('heading'))->toContain('Support', 'Work')
+    expect($menu->pluck('heading'))->toContain('Support', 'Work', 'HR')
         ->and($menu->pluck('heading'))->not->toContain('More', 'HR and legal', 'Support extras', 'Operations')
-        ->and(collect($support?->items ?? [])->pluck('key')->all())->toContain('hr');
+        ->and(collect($support?->items ?? [])->pluck('key')->all())->toContain('agreements')
+        ->not->toContain('hr');
 });
 
 it('keeps account links out of People and in the user menu only', function () {
@@ -131,8 +132,8 @@ it('renders the shell with a skip link, labelled menu and the current page marke
     $response->assertSee('href="#main-content"', false)
         ->assertSee('id="main-content"', false)
         ->assertSee('aria-label="Main menu"', false)
-        ->assertDontSee('aria-controls="workspace-drawer"', false)
-        ->assertDontSee('data-workspace-menu-open', false)
+        ->assertSee('data-workspace-phone-menu-open', false)
+        ->assertSee('aria-controls="phone-menu-panel"', false)
         ->assertSee('data-workspace-top-nav', false)
         ->assertSee('data-workspace-disclosure-trigger', false)
         ->assertSee('sg-mega-panel', false)
@@ -176,7 +177,7 @@ it('does not render hidden menu items or the Admin switcher for non-admins', fun
     $this->actingAs(userWithRole(RoleName::Volunteer))->get(route('dashboard'))
         ->assertOk()
         ->assertDontSee('data-nav-key="roles"', false)
-        ->assertDontSee('data-nav-key="hr"', false)
+        ->assertDontSee('data-nav-key="agreements"', false)
         ->assertDontSee('data-panel-switch', false)
         ->assertSee('data-brand-panel>APES CIC<', false)
         ->assertDontSee('Staff panel')
@@ -188,7 +189,7 @@ it('opens Teams in a new tab and marks planned features as not available yet', f
         ->assertSee(Menu::TEAMS_URL, false)
         ->assertSee('(opens in a new tab)');
 
-    $this->actingAs(userWithRole(RoleName::Hr))->get(route('dashboard'))
+    $this->actingAs(userWithRole(RoleName::Legal))->get(route('dashboard'))
         ->assertSee('not available yet');
 });
 
@@ -200,13 +201,18 @@ it('shows the Admin panel to an admin on an admin route', function () {
         ->assertDontSee('data-nav-key="updates"', false);
 });
 
-it('exposes top-level dropdown hooks without a hamburger or drawer', function () {
+it('exposes desktop mega menus and a phone menu button without the old rail drawer', function () {
     $html = $this->actingAs(userWithRole(RoleName::Staff))
         ->get(route('dashboard'))
         ->assertOk()
         ->getContent();
 
     expect($html)
+        ->toContain('data-workspace-phone-menu-open')
+        ->toContain('aria-controls="phone-menu-panel"')
+        ->toContain('data-workspace-phone-menu-panel')
+        ->toContain('data-workspace-phone-disclosure-trigger')
+        ->toContain('data-lucide="menu"')
         ->not->toContain('data-workspace-menu-open')
         ->not->toContain('aria-controls="workspace-drawer"')
         ->not->toContain('data-workspace-drawer')
@@ -220,6 +226,18 @@ it('exposes top-level dropdown hooks without a hamburger or drawer', function ()
         ->and(substr_count($html, 'id="notification-bell-panel"'))->toBe(1);
 });
 
+it('hides the horizontal top nav on phone and keeps mega menus from 64rem', function () {
+    $css = file_get_contents(base_path('resources/css/shell.css'));
+
+    expect($css)
+        ->toContain('@media (max-width: 63.9375rem)')
+        ->toContain('.sg-top-nav')
+        ->toContain('display: none !important')
+        ->toContain('.sg-phone-menu__open')
+        ->toContain('@media (min-width: 64rem)')
+        ->toContain('.sg-phone-menu-dock');
+});
+
 it('renders Home as a direct dashboard link without a section dropdown', function () {
     $html = $this->actingAs(userWithRole(RoleName::Staff))
         ->get(route('dashboard'))
@@ -228,6 +246,8 @@ it('renders Home as a direct dashboard link without a section dropdown', functio
 
     expect($html)
         ->toContain('class="sg-top-nav__link"')
+        ->toContain('class="sg-top-nav__icon"')
+        ->toContain('data-lucide="layout-dashboard"')
         ->toMatch('/href="'.preg_quote(route('dashboard'), '/').'"\s+class="sg-top-nav__link"/')
         ->toMatch('/data-nav-key="dashboard"[^>]*aria-current="page"/')
         ->not->toContain('id="top-nav-panel-home"')
@@ -265,6 +285,7 @@ it('keeps shell icon and account targets at least 44 CSS pixels', function () {
         ->toContain('min-width: 2.75rem')
         ->toContain('min-height: 2.75rem')
         ->toContain('.sg-user-menu__trigger')
+        ->toContain('.sg-phone-menu__group-trigger')
         ->toContain('@media (max-width: 22.5rem)')
         ->toContain('.sg-user-menu__panel')
         ->toContain('background: var(--sg-drawer-surface)');

@@ -28,17 +28,17 @@ final class Menu
         return [
             new NavGroup('home', 'Home', [
                 NavItem::route('dashboard', 'Dashboard', 'layout-dashboard', AccessMatrix::INTRANET_ACCESS, 'dashboard'),
-            ]),
+            ], icon: 'layout-dashboard'),
             new NavGroup('communications', 'Communications', [
                 NavItem::route('updates', 'Updates', 'newspaper', AccessMatrix::INTRANET_ACCESS, 'communications.updates.index', 'communications.updates.*', 'communications'),
                 NavItem::route('events', 'Events', 'calendar-days', AccessMatrix::INTRANET_ACCESS, 'communications.events.index', 'communications.events.*', 'communications'),
                 NavItem::external('teams', 'Chat in Teams', 'messages-square', AccessMatrix::INTRANET_ACCESS, self::TEAMS_URL, 'microsoft-365'),
-            ]),
+            ], icon: 'megaphone'),
             new NavGroup('people', 'People', [
                 NavItem::route('directory', 'Directory', 'users', AccessMatrix::INTRANET_ACCESS, 'people.directory.index', 'people.directory.*', 'people'),
                 NavItem::route('org-chart', 'Organisation chart', 'network', AccessMatrix::INTRANET_ACCESS, 'people.org-chart', null, 'people'),
                 NavItem::route('students', 'Student placements', 'graduation-cap', AccessMatrix::INTRANET_ACCESS, 'people.students.index', 'people.students.*', 'people'),
-            ]),
+            ], icon: 'users'),
             new NavGroup('operations', 'Work', [
                 NavItem::route('rota', 'Rota', 'calendar-days', AccessMatrix::INTRANET_ACCESS, 'operations.rota.index', 'operations.rota.*', 'operations'),
                 NavItem::route('clock', 'Clock in and out', 'clock', AccessMatrix::INTRANET_ACCESS, 'operations.clock.index', null, 'operations'),
@@ -47,17 +47,16 @@ final class Menu
                 NavItem::route('tasks', 'Tasks', 'list-checks', AccessMatrix::INTRANET_ACCESS, 'operations.tasks.index', 'operations.tasks.*', 'operations'),
                 NavItem::route('checklists', 'Checklists', 'clipboard-check', AccessMatrix::INTRANET_ACCESS, 'operations.checklists.index', 'operations.checklists.*', 'operations'),
                 NavItem::route('forms', 'Forms', 'clipboard-list', AccessMatrix::INTRANET_ACCESS, 'operations.forms.index', 'operations.forms.*', 'operations'),
-            ]),
+            ], icon: 'briefcase'),
             new NavGroup('support', 'Support', [
                 NavItem::route('help-desk', 'Help desk', 'life-buoy', AccessMatrix::INTRANET_ACCESS, 'helpdesk.tickets.index', 'helpdesk.tickets.*', 'helpdesk'),
                 NavItem::route('handbook', 'Handbook', 'book-open', AccessMatrix::INTRANET_ACCESS, 'communications.handbook.index', 'communications.handbook.*', 'communications'),
                 NavItem::route('policies', 'Policies', 'file-text', AccessMatrix::INTRANET_ACCESS, 'communications.policies.index', 'communications.policies.*', 'communications'),
                 NavItem::route('access-guide', 'Who can see what', 'key-round', AccessMatrix::INTRANET_ACCESS, 'access-guide'),
                 NavItem::route('change-log', 'Change log', 'history', AccessMatrix::INTRANET_ACCESS, 'change-log.index', 'change-log.*'),
-            ]),
+            ], icon: 'life-buoy'),
             new NavGroup('hr-legal', 'Support extras', [
-                NavItem::soon('hr', 'HR', 'briefcase', AccessMatrix::HR_ACCESS, 'hr'),
-                NavItem::soon('agreements', 'Agreements', 'file-pen-line', AccessMatrix::LEGAL_ACCESS),
+                NavItem::soon('agreements', 'Agreements', 'file-pen', AccessMatrix::LEGAL_ACCESS),
             ]),
         ];
     }
@@ -79,7 +78,7 @@ final class Menu
                 NavItem::route('modules', 'Modules', 'blocks', AccessMatrix::ADMIN_MODULES_MANAGE, 'admin.modules.index', 'admin.modules.*'),
                 NavItem::route('push-delivery', 'Push delivery', 'bell-ring', AccessMatrix::ADMIN_SYSTEM_VIEW, 'admin.push-delivery.index'),
                 NavItem::route('totp', '2FA status', 'shield-half', AccessMatrix::ADMIN_SYSTEM_VIEW, 'admin.totp.index'),
-            ]),
+            ], icon: 'layout-grid'),
         ];
     }
 
@@ -178,7 +177,7 @@ final class Menu
 
         if ($learningItems !== []) {
             if ($peopleIndex === null) {
-                $presented[] = new NavGroup('people', 'People', $learningItems);
+                $presented[] = new NavGroup('people', 'People', $learningItems, icon: 'users');
             } else {
                 $people = $presented[$peopleIndex];
                 $presented[$peopleIndex] = $people->withItems(array_merge($people->items, $learningItems));
@@ -192,7 +191,7 @@ final class Menu
         }
 
         if ($supportIndex === null) {
-            $presented[] = new NavGroup('support', 'Support', $supportExtras);
+            $presented[] = new NavGroup('support', 'Support', $supportExtras, icon: 'life-buoy');
 
             return $presented;
         }

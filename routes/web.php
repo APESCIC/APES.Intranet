@@ -4,6 +4,7 @@ use App\Core\Access\AccessMatrix;
 use App\Core\Access\Http\Controllers\AccessGuideController;
 use App\Core\Access\Http\Controllers\AccessReviewController;
 use App\Core\Access\Http\Controllers\RoleIndexController;
+use App\Core\Appearance\Http\Controllers\AppearancePreferencesController;
 use App\Core\Audit\Http\Controllers\AuditLogIndexController;
 use App\Core\Auth\Http\Controllers\OidcController;
 use App\Core\Changelog\Http\Controllers\ChangeLogController;
@@ -34,6 +35,10 @@ Route::get('/auth/reauth', [OidcController::class, 'reauthenticate'])->middlewar
 Route::post('/logout', [OidcController::class, 'logout'])->middleware('auth')->name('logout');
 
 Route::middleware('auth')->group(function () {
+    Route::post('/appearance/preferences', AppearancePreferencesController::class)
+        ->middleware('throttle:60,1')
+        ->name('appearance.preferences.update');
+
     Route::get('/access', AccessGuideController::class)
         ->middleware('can:'.AccessMatrix::INTRANET_ACCESS)
         ->name('access-guide');

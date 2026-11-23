@@ -39,6 +39,9 @@ class UserFactory extends Factory
             'emergency_contact_name' => fake()->name(),
             'emergency_contact_phone' => fake()->numerify('07700 900###'),
             'employee_number' => 'E'.fake()->unique()->numerify('####'),
+            'appearance_theme' => 'glass',
+            'appearance_mode' => 'system',
+            'appearance_reduced_transparency' => false,
         ];
     }
 

@@ -45,6 +45,7 @@
                 </a>
             </nav>
         @endif
+        <x-shell.appearance-controls />
         <ul class="sg-user-menu__list">
             <li>
                 <a href="{{ route('people.profile.edit') }}" class="sg-nav-link" data-nav-key="profile" @if (request()->routeIs('people.profile.*')) aria-current="page" @endif>

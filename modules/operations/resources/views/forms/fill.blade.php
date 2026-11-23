@@ -17,7 +17,7 @@
                         <fieldset class="grid gap-2" data-signature-field>
                             <legend class="sg-label">{{ $field->label }}@if ($field->required)<span aria-hidden="true"> *</span><span class="sr-only"> (required)</span>@endif</legend>
                             <p class="text-sm text-sg-muted" id="{{ $name }}-help">Draw your signature with a finger, stylus or mouse, or type your full name below.</p>
-                            <canvas class="w-full max-w-md touch-none rounded-sg-field border border-sg-info-mist bg-white" width="600" height="200" data-signature-pad aria-hidden="true"></canvas>
+                            <canvas class="w-full max-w-md touch-none rounded-sg-field border border-sg-info-mist bg-sg-white" width="600" height="200" data-signature-pad aria-hidden="true"></canvas>
                             <input type="hidden" name="{{ $name }}" data-signature-input>
                             <div><button type="button" class="sg-btn sg-btn-ghost sg-btn-sm" data-signature-clear>Clear signature</button></div>
                             <label class="sg-label" for="{{ $name }}_typed">Or type your full name</label>

@@ -42,7 +42,7 @@ it('ships every icon the manifest lists, at the stated size', function () {
 it('links the manifest, theme colour and touch icon from every page', function () {
     $this->get(route('login'))
         ->assertSee('rel="manifest"', false)
-        ->assertSee('name="theme-color" content="#d2f4fa"', false)
+        ->assertSee('name="theme-color" content="#c8eaf1"', false)
         ->assertSee('rel="apple-touch-icon"', false);
 });
 

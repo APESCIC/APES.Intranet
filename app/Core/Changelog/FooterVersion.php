@@ -7,9 +7,8 @@ use App\Models\User;
 use Illuminate\Database\QueryException;
 
 /**
- * The footer version pill: the deployed version (never the newest tag),
- * linked to its change log entry when the viewer may read it, otherwise to
- * the hub, so the pill never leads to a 404.
+ * The footer version pill: a real version label on every page (including
+ * signed-out), linked to its change log entry when the viewer may read it.
  */
 class FooterVersion
 {
@@ -19,18 +18,25 @@ class FooterVersion
      * The accessible name is hiddenBefore + label + hiddenAfter, so it always
      * contains the visible text (WCAG 2.5.3 Label in Name).
      *
-     * @return array{label: string, url: string, hiddenBefore: string, hiddenAfter: string}|null
+     * @return array{label: string, url: string|null, hiddenBefore: string, hiddenAfter: string}
      */
-    public function for(?User $user): ?array
+    public function for(?User $user): array
     {
+        $label = $this->version->label();
+        $base = $this->version->baseVersion();
+
         if ($user === null) {
-            return null;
+            return [
+                'label' => $label,
+                'url' => null,
+                'hiddenBefore' => 'Intranet version ',
+                'hiddenAfter' => '',
+            ];
         }
 
-        $current = $this->version->current();
-        if ($current === AppVersion::DEV) {
+        if ($label === AppVersion::DEV || $base === null) {
             return [
-                'label' => AppVersion::DEV,
+                'label' => $label,
                 'url' => route('change-log.index'),
                 'hiddenBefore' => 'View the intranet change log for the ',
                 'hiddenAfter' => ' version',
@@ -38,8 +44,8 @@ class FooterVersion
         }
 
         return [
-            'label' => $current,
-            'url' => $this->canRead($user, $current) ? route('change-log.show', $current) : route('change-log.index'),
+            'label' => $label,
+            'url' => $this->canRead($user, $base) ? route('change-log.show', $base) : route('change-log.index'),
             'hiddenBefore' => 'View the intranet change log for version ',
             'hiddenAfter' => '',
         ];

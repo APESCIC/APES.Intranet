@@ -1,6 +1,10 @@
 @import '@fontsource-variable/fraunces/wght.css';
 @import '@fontsource-variable/nunito-sans/wght.css';
 @import 'tailwindcss';
+
+@custom-variant dark (&:where([data-mode=dark], [data-mode=dark] *));
+
+@import './themes.css';
 @import './shell.css';
 
 @source '../views/**/*.blade.php';
@@ -16,12 +20,12 @@
     --font-serif: 'Fraunces Variable', Georgia, serif;
 
     --color-sg-ink: #12262c;
-    --color-sg-muted: #40676a;
+    --color-sg-muted: #2f5558;
     --color-sg-teal: #107481;
     --color-sg-teal-dark: #0c5d68;
     /* Decoration only: fails contrast as text. */
     --color-sg-accent: #67c3ce;
-    --color-sg-base: #d2f4fa;
+    --color-sg-base: #c8eaf1;
     --color-sg-ok: #11613b;
     --color-sg-ok-mist: #dcf5e7;
     --color-sg-warn: #8a4b0b;
@@ -31,9 +35,9 @@
     --color-sg-info: #005b5d;
     --color-sg-info-mist: #d5f4f5;
     --color-sg-white: #ffffff;
-    --color-sg-glow-cyan: rgba(127, 231, 234, 0.6);
-    --color-sg-glow-lavender: rgba(185, 198, 255, 0.55);
-    --color-sg-glow-mint: rgba(167, 243, 208, 0.55);
+    --color-sg-glow-cyan: rgba(127, 231, 234, 0.35);
+    --color-sg-glow-lavender: rgba(185, 198, 255, 0.3);
+    --color-sg-glow-mint: rgba(167, 243, 208, 0.3);
     --color-focus: #2563eb;
 
     --radius-sg-card: 1.25rem;
@@ -44,8 +48,21 @@
     --shadow-sg-primary: 0 6px 18px rgba(16, 116, 129, 0.27);
     --shadow-sg-active: 0 4px 14px rgba(12, 93, 104, 0.12);
     --container-panel: 95%;
-    --text-panel-title: 1.75rem;
-    --text-panel-title--line-height: 2.125rem;
+
+    /* Type scale: page / section / body / small / meta (px at 16px root). */
+    --text-page-title: 1.875rem;
+    --text-page-title--line-height: 2.25rem;
+    --text-section: 1.25rem;
+    --text-section--line-height: 1.5rem;
+    --text-body: 0.9375rem;
+    --text-body--line-height: 1.45;
+    --text-small: 0.875rem;
+    --text-small--line-height: 1.4;
+    --text-meta: 0.8125rem;
+    --text-meta--line-height: 1.35;
+
+    --text-panel-title: var(--text-page-title);
+    --text-panel-title--line-height: var(--text-page-title--line-height);
 }
 
 @layer base {
@@ -78,18 +95,61 @@
 }
 
 @layer components {
-    .sg-input {
-        border: 1px solid var(--color-sg-info-mist);
+    .sg-type-page {
+        margin: 0;
+        font-family: var(--font-serif);
+        font-size: var(--text-page-title);
+        line-height: var(--text-page-title--line-height);
+        font-weight: 600;
+    }
+
+    .sg-type-section {
+        margin: 0;
+        font-family: var(--font-serif);
+        font-size: var(--text-section);
+        line-height: var(--text-section--line-height);
+        font-weight: 600;
+    }
+
+    .sg-type-body {
+        font-size: var(--text-body);
+        line-height: var(--text-body--line-height);
+    }
+
+    .sg-type-small {
+        font-size: var(--text-small);
+        line-height: var(--text-small--line-height);
+    }
+
+    .sg-type-meta {
+        font-size: var(--text-meta);
+        line-height: var(--text-meta--line-height);
+        color: var(--color-sg-muted);
+    }
+
+    .sg-input,
+    .sg-select,
+    .sg-textarea {
+        width: 100%;
+        border: 1px solid var(--sg-edge);
         border-radius: var(--radius-sg-field);
         background: var(--color-sg-white);
         padding: 0.5rem 0.75rem;
         color: var(--color-sg-ink);
+        font-size: var(--text-body);
+        line-height: var(--text-body--line-height);
+    }
+
+    .sg-input:focus-visible,
+    .sg-select:focus-visible,
+    .sg-textarea:focus-visible {
+        border-color: var(--color-sg-teal);
     }
 
     .sg-label {
         display: block;
         margin-bottom: 0.25rem;
-        font-size: 0.875rem;
+        font-size: var(--text-small);
         font-weight: 600;
     }
 
@@ -111,14 +171,17 @@
         font-weight: 700;
     }
 
-    .sg-badge {
-        display: inline-block;
+    .sg-badge,
+    .sg-status-pill {
+        display: inline-flex;
+        align-items: center;
         border-radius: 999px;
         background: var(--color-sg-info-mist);
-        padding: 0.125rem 0.625rem;
+        padding: 0.2rem 0.7rem;
         color: var(--color-sg-info);
-        font-size: 0.8125rem;
+        font-size: var(--text-small);
         font-weight: 700;
+        line-height: 1.35;
     }
 
     .sg-badge--ok {
@@ -134,5 +197,14 @@
     .sg-badge--error {
         background: var(--color-sg-error-mist);
         color: var(--color-sg-error);
+    }
+
+    .sg-empty-state {
+        margin: 0;
+        max-width: 36rem;
+        padding: 1.25rem 1.5rem;
+        color: var(--color-sg-muted);
+        font-size: var(--text-body);
+        line-height: var(--text-body--line-height);
     }
 }

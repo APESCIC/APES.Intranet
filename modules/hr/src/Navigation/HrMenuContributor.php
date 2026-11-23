@@ -33,7 +33,7 @@ final class HrMenuContributor implements BelongsToModule, MenuContributor
                 NavItem::route('hr-checklists', 'Onboarding', 'list-checks', AccessMatrix::HR_ACCESS, 'hr.checklists.index', 'hr.checklists.*', 'hr'),
                 NavItem::route('hr-training-overdue', 'Overdue training', 'clipboard-list', AccessMatrix::HR_ACCESS, 'hr.training.overdue', 'hr.training.overdue', 'hr'),
                 NavItem::route('hr-checks', 'DBS and right to work', 'shield-check', AccessMatrix::HR_SPECIAL_CATEGORY_VIEW, 'hr.checks.report', 'hr.checks.*', 'hr'),
-            ]),
+            ], icon: 'briefcase'),
         ];
     }
 }

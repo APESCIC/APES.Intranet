@@ -1,14 +1,27 @@
 @props(['code', 'title'])
+@php
+    use App\Core\Appearance\AppearancePreferences;
+
+    $appearanceBoot = $appearanceServer ?? AppearancePreferences::defaults();
+    $resolvedAppearanceMode = AppearancePreferences::resolvedMode($appearanceBoot['mode']);
+@endphp
 {{-- No database, session or menu here, so the page still renders when those are down. --}}
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html
+    lang="{{ str_replace('_', '-', app()->getLocale()) }}"
+    data-theme="{{ $appearanceBoot['theme'] }}"
+    data-mode="{{ $resolvedAppearanceMode }}"
+    data-appearance-mode="{{ $appearanceBoot['mode'] }}"
+    @if ($appearanceBoot['reducedTransparency']) data-reduced-transparency @endif
+>
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="theme-color" content="#d2f4fa">
+        <meta name="theme-color" content="#c8eaf1">
         <meta name="robots" content="noindex">
         <title>{{ $title }} - {{ config('app.name') }}</title>
         <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('brand/apes-favicon-32.png') }}">
+        <x-appearance.boot :appearance-server="$appearanceServer ?? null" />
         @vite(['resources/css/app.css'])
     </head>
     <body class="workspace-shell">
@@ -26,6 +39,8 @@
             </main>
             <footer class="site-footer">
                 <span>&copy; {{ now()->year }} Association of Protecting Exotic Species CIC</span>
+                @php($footerVersion = app(\App\Core\Changelog\FooterVersion::class)->for(null))
+                <span class="site-footer__version" data-app-version><span class="sr-only">{{ $footerVersion['hiddenBefore'] }}</span>{{ $footerVersion['label'] }}</span>
             </footer>
         </div>
     </body>

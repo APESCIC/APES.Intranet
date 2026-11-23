@@ -1,0 +1,26 @@
+{
+  "version": "v0.6.14",
+  "released_at": "2026-11-23",
+  "title": "Themes, dark mode and menu icons",
+  "summary": "You can choose Glass or Jungle, light or dark, and keep the choice for next time. Menus have clearer icons, phones get a full menu panel, and the look is calmer with better contrast.",
+  "audiences": ["staff", "volunteers", "students"],
+  "changes": {
+    "added": [
+      "Glass and Jungle themes, each in light and dark, with a sun/moon toggle and Appearance choices in your account menu.",
+      "Icons on every menu item, including the phone menu panel under wider screens.",
+      "A reduced-transparency option that turns off glass blur when you need a solid surface."
+    ],
+    "changed": [
+      "Softer glass light colours and a clearer type scale across staff pages.",
+      "The footer version pill on local Herd previews now shows the real version instead of “dev”."
+    ],
+    "accessibility": [
+      "Stronger contrast for secondary text, 3 px focus rings, and respect for reduced motion and reduced transparency.",
+      "Theme variants checked on Herd for keyboard and contrast before this release."
+    ]
+  },
+  "internal_notes": [
+    "Epic #411. Leaves #444, #415–#424. Theme tokens on html data-theme/data-mode. User preference migration for theme/mode/reduced transparency. Docs: shell.md, accessibility-themes-v0.6.14.md."
+  ],
+  "published": true
+}

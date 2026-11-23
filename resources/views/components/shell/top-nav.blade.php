@@ -16,7 +16,8 @@
                 data-workspace-top-nav-home
                 @if ($homeItem->isActive()) aria-current="page" @endif
             >
-                {{ $group->heading }}
+                <i data-lucide="{{ $group->sectionIcon() }}" class="sg-top-nav__icon" aria-hidden="true"></i>
+                <span>{{ $group->heading }}</span>
             </a>
         @else
             <div
@@ -33,6 +34,7 @@
                     aria-controls="{{ $panelId }}"
                     data-workspace-disclosure-trigger
                 >
+                    <i data-lucide="{{ $group->sectionIcon() }}" class="sg-top-nav__icon" aria-hidden="true"></i>
                     <span>{{ $group->heading }}</span>
                     <i data-lucide="chevron-down" class="sg-disclosure__chevron" aria-hidden="true"></i>
                 </button>

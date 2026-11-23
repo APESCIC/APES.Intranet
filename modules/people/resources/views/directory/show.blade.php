@@ -58,7 +58,7 @@
                 @method('PATCH')
                 <label class="mb-1 block text-sm font-semibold" for="manager_id">Set manager</label>
                 <div class="flex flex-wrap gap-2">
-                    <select id="manager_id" name="manager_id" class="rounded-sg-field border border-sg-info-mist bg-white px-3 py-2">
+                    <select id="manager_id" name="manager_id" class="rounded-sg-field border border-sg-info-mist bg-sg-white px-3 py-2">
                         <option value="">No manager</option>
                         @foreach (\App\Models\User::query()->active()->whereKeyNot($person->id)->orderBy('name')->get(['id','name']) as $candidate)
                             <option value="{{ $candidate->id }}" @selected((int) $person->manager_id === (int) $candidate->id)>{{ $candidate->name }}</option>
