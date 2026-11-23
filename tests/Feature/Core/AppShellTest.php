@@ -7,6 +7,9 @@ use App\Core\Navigation\NavGroup;
 use App\Core\Navigation\NavItem;
 use App\Models\User;
 use Database\Seeders\CommunicationsPermissionsSeeder;
+use Database\Seeders\HelpdeskPermissionsSeeder;
+use Database\Seeders\Microsoft365PermissionsSeeder;
+use Database\Seeders\OperationsPermissionsSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -15,6 +18,9 @@ uses(RefreshDatabase::class);
 beforeEach(function () {
     $this->seed(RolesAndPermissionsSeeder::class);
     $this->seed(CommunicationsPermissionsSeeder::class);
+    $this->seed(Microsoft365PermissionsSeeder::class);
+    $this->seed(OperationsPermissionsSeeder::class);
+    $this->seed(HelpdeskPermissionsSeeder::class);
 });
 
 function userWithRole(RoleName $role): User
@@ -77,11 +83,26 @@ it('keeps system admin items out of the Staff menu for admins', function () {
 });
 
 it('shows only the Admin inventory in the Admin panel, starting with the overview', function () {
-    $keys = menuKeysFor(userWithRole(RoleName::Admin), MenuMode::Admin);
+    $user = userWithRole(RoleName::Admin);
+    $menu = collect(Menu::for($user, MenuMode::Admin));
+    $keys = menuKeysFor($user, MenuMode::Admin);
 
     expect($keys)->toContain('admin-overview', 'roles', 'audit', 'access-review', 'system', 'totp')
         ->and($keys[0])->toBe('admin-overview')
-        ->and($keys)->not->toContain('dashboard', 'updates', 'directory');
+        ->and($keys)->not->toContain('dashboard', 'updates', 'directory')
+        ->and($menu->pluck('heading')->all())->toContain(
+            'Dashboard',
+            'Users and access',
+            'System',
+            'Modules',
+            'Apps and content',
+            'Operations',
+            'Help desk',
+        )
+        ->and($menu->pluck('heading')->all())->not->toContain('Admin', 'Operations admin', 'Help desk admin', 'Microsoft 365 admin');
+
+    $roles = collect($menu->firstWhere('key', 'admin-users')?->items ?? [])->firstWhere('key', 'roles');
+    expect($roles?->description)->not->toBeEmpty();
 });
 
 it('gives non-admins the Staff menu even if asked for the Admin panel', function () {

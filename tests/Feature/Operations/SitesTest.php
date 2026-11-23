@@ -50,11 +50,11 @@ it('shows the sites link in the Admin panel menu only', function () {
 
     $this->actingAs($admin)->get(route('admin.operations.sites.index'))
         ->assertOk()
-        ->assertSee('Operations admin');
+        ->assertSee('Operations');
 
     $this->actingAs($admin)->get(route('dashboard'))
         ->assertOk()
-        ->assertDontSee('Operations admin');
+        ->assertDontSee('data-nav-key="operations-sites"', false);
 });
 
 it('treats a supervisor as overseeing only the site of their own team', function () {
