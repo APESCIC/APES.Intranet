@@ -63,8 +63,28 @@ it('shows each addon with its presence, health and masked variables', function (
     foreach (['MySQL', 'Redis', 'Sendmail', 'LDAP', 'OIDC client', 'Scheduler'] as $label) {
         $response->assertSee($label);
     }
-    $response->assertSee('CLOUDRON_REDIS_PASSWORD')->assertSee('•••••• (set)')->assertSee('CLOUDRON_LDAP_BIND_PASSWORD');
+    $response->assertSee('data-summary="checks"', false)
+        ->assertSee('data-summary="version"', false)
+        ->assertSee('data-summary="backup"', false)
+        ->assertSee('data-summary="queue"', false)
+        ->assertSee('Details and Cloudron variables')
+        ->assertSee('CLOUDRON_REDIS_PASSWORD')
+        ->assertSee('•••••• (set)')
+        ->assertSee('CLOUDRON_LDAP_BIND_PASSWORD');
     expect(SystemCheck::where('check', 'mysql')->value('status'))->toBe(SystemCheck::OK);
+});
+
+it('keeps Cloudron variable names inside a closed details block by default', function () {
+    freshAdmin($this);
+
+    $html = $this->get(route('admin.system.index'))->assertOk()->getContent();
+    preg_match('/data-addon="redis"[^>]*>([\s\S]*?)data-addon="/', $html, $match);
+    $redis = $match[1] ?? '';
+
+    expect($redis)->toContain('<details')
+        ->and($redis)->not->toContain('<details open')
+        ->and($redis)->toContain('CLOUDRON_REDIS_PASSWORD')
+        ->and($redis)->toContain('sg-badge');
 });
 
 it('shows a stopped Redis as down', function () {
@@ -72,8 +92,7 @@ it('shows a stopped Redis as down', function () {
 
     $html = $this->get(route('admin.system.index'))->assertOk()->getContent();
 
-    $redis = (string) str($html)->after('data-addon="redis"')->before('</section>');
-    expect($redis)->toContain('data-status="down"')
+    expect($html)->toMatch('/data-addon="redis"[^>]*>[\s\S]*?data-status="down"/')
         ->and(SystemCheck::where('check', 'redis')->value('status'))->toBe(SystemCheck::DOWN);
 });
 
