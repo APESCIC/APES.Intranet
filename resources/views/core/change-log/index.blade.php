@@ -1,6 +1,13 @@
 <x-layouts.app title="Change log" subtitle="What changed in each release of the intranet.">
     <p class="mb-4 text-sm text-sg-muted">
-        You are using the intranet <strong>{{ $current === \App\Core\Version\AppVersion::DEV ? 'development version' : $current }}</strong>.
+        @php($appVersion = app(\App\Core\Version\AppVersion::class))
+        @if ($appVersion->isDevelopmentBuild())
+            You are using the intranet <strong>development build {{ $appVersion->label() }}, based on {{ $appVersion->baseVersion() }}</strong>.
+        @elseif ($appVersion->current() === \App\Core\Version\AppVersion::DEV)
+            You are using the intranet <strong>development version</strong>.
+        @else
+            You are using the intranet <strong>{{ $current }}</strong>.
+        @endif
     </p>
 
     <nav class="changelog-filter mb-6" aria-label="Filter by type of change">

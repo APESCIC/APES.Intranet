@@ -57,11 +57,13 @@ it('links to the hub when the viewer may not read the deployed entry', function 
         ->and($footer)->toContain('href="'.route('change-log.index').'"');
 });
 
-it('says dev and links to the hub when no version is stamped', function () {
+it('shows a development label from changelog JSON when no version is stamped', function () {
+    pillRelease('v0.6.13');
+
     $footer = footerOf($this->actingAs(pillUser(RoleName::Staff))->get(route('dashboard'))->getContent());
 
-    expect($footer)->toContain('</span>dev<span class="sr-only"> version</span></a>')
-        ->and($footer)->toContain('href="'.route('change-log.index').'"');
+    expect($footer)->toMatch('/v0\.6\.13\+dev(\.[0-9a-f]{7})?</')
+        ->and($footer)->toContain('href="'.route('change-log.show', 'v0.6.13').'"');
 });
 
 it('shows the pill in the Admin panel too', function () {
@@ -75,11 +77,18 @@ it('shows the pill in the Admin panel too', function () {
     expect($footer)->toContain('data-app-version')->and($footer)->toContain('>v0.3.11</a>');
 });
 
-it('never shows the pill to guests or on error pages', function () {
+it('shows a plain-text version pill to guests on sign-in and error pages', function () {
     file_put_contents(base_path('VERSION'), 'v0.3.11');
 
-    expect($this->get(route('login'))->getContent())->not->toContain('data-app-version')
-        ->and($this->get('/no-such-page')->assertNotFound()->getContent())->not->toContain('data-app-version');
+    $loginFooter = footerOf($this->get(route('login'))->getContent());
+    $errorFooter = footerOf($this->get('/no-such-page')->assertNotFound()->getContent());
+
+    expect($loginFooter)->toContain('<span class="site-footer__version" data-app-version>')
+        ->and($loginFooter)->toContain('>v0.3.11</span>')
+        ->and($loginFooter)->not->toContain('<a class="site-footer__version"')
+        ->and($errorFooter)->toContain('<span class="site-footer__version" data-app-version>')
+        ->and($errorFooter)->toContain('>v0.3.11</span>')
+        ->and($errorFooter)->not->toContain('<a class="site-footer__version"');
 });
 
 it('keeps the pill a 44px target that wraps on small screens', function () {
