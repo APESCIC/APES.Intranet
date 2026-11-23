@@ -41,7 +41,7 @@ class AppearancePreferences
 
         $request ??= request();
 
-        if ($request instanceof Request && self::requestPrefersDark($request)) {
+        if (self::requestPrefersDark($request)) {
             return AppearanceMode::Dark->value;
         }
 
@@ -52,24 +52,16 @@ class AppearancePreferences
     {
         $preference = strtolower((string) $request->header('Sec-CH-Prefers-Color-Scheme', ''));
 
-        if ($preference === 'dark') {
-            return true;
-        }
-
-        if ($preference === 'light') {
-            return false;
-        }
-
-        return false;
+        return $preference === 'dark';
     }
 
     public static function normaliseTheme(?string $theme): string
     {
-        return AppearanceTheme::tryFrom((string) $theme)?->value ?? AppearanceTheme::Glass->value;
+        return (AppearanceTheme::tryFrom((string) $theme) ?? AppearanceTheme::Glass)->value;
     }
 
     public static function normaliseMode(?string $mode): string
     {
-        return AppearanceMode::tryFrom((string) $mode)?->value ?? AppearanceMode::System->value;
+        return (AppearanceMode::tryFrom((string) $mode) ?? AppearanceMode::System)->value;
     }
 }
