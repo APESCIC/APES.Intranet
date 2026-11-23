@@ -26,6 +26,8 @@
             </main>
             <footer class="site-footer">
                 <span>&copy; {{ now()->year }} Association of Protecting Exotic Species CIC</span>
+                @php($footerVersion = app(\App\Core\Changelog\FooterVersion::class)->for(null))
+                <span class="site-footer__version" data-app-version><span class="sr-only">{{ $footerVersion['hiddenBefore'] }}</span>{{ $footerVersion['label'] }}</span>
             </footer>
         </div>
     </body>

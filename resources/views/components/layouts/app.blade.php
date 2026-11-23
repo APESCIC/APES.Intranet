@@ -50,7 +50,11 @@
                     <footer class="site-footer">
                         <span>&copy; {{ now()->year }} Association of Protecting Exotic Species CIC</span>
                         @if ($footerVersion)
-                            <a class="site-footer__version" href="{{ $footerVersion['url'] }}" data-app-version><span class="sr-only">{{ $footerVersion['hiddenBefore'] }}</span>{{ $footerVersion['label'] }}@if ($footerVersion['hiddenAfter'])<span class="sr-only">{{ $footerVersion['hiddenAfter'] }}</span>@endif</a>
+                            @if ($footerVersion['url'])
+                                <a class="site-footer__version" href="{{ $footerVersion['url'] }}" data-app-version><span class="sr-only">{{ $footerVersion['hiddenBefore'] }}</span>{{ $footerVersion['label'] }}@if ($footerVersion['hiddenAfter'])<span class="sr-only">{{ $footerVersion['hiddenAfter'] }}</span>@endif</a>
+                            @else
+                                <span class="site-footer__version" data-app-version><span class="sr-only">{{ $footerVersion['hiddenBefore'] }}</span>{{ $footerVersion['label'] }}@if ($footerVersion['hiddenAfter'])<span class="sr-only">{{ $footerVersion['hiddenAfter'] }}</span>@endif</span>
+                            @endif
                         @endif
                         <nav class="site-footer__links" aria-label="Legal">
                             <a href="{{ route('privacy') }}" @if (request()->routeIs('privacy')) aria-current="page" @endif>Privacy notice</a>

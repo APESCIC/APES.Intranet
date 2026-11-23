@@ -31,7 +31,7 @@ class ChangeLogController
             'releases' => $releases,
             'type' => $type,
             'types' => Release::CHANGE_TYPES,
-            'current' => $version->current(),
+            'current' => $version->baseVersion() ?? $version->label(),
             'seesDrafts' => Gate::allows('viewDrafts', Release::class),
         ]);
     }
@@ -49,7 +49,7 @@ class ChangeLogController
 
         return view('core.change-log.show', [
             'release' => $release,
-            'current' => $appVersion->current(),
+            'current' => $appVersion->baseVersion() ?? $appVersion->label(),
             'seesDrafts' => Gate::allows('viewDrafts', Release::class),
         ]);
     }
