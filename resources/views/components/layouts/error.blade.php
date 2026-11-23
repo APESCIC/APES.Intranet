@@ -1,7 +1,7 @@
 @props(['code', 'title'])
 {{-- No database, session or menu here, so the page still renders when those are down. --}}
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-theme="glass" data-mode="light">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">

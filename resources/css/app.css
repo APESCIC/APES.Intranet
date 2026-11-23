@@ -1,6 +1,10 @@
 @import '@fontsource-variable/fraunces/wght.css';
 @import '@fontsource-variable/nunito-sans/wght.css';
 @import 'tailwindcss';
+
+@custom-variant dark (&:where([data-mode=dark], [data-mode=dark] *));
+
+@import './themes.css';
 @import './shell.css';
 
 @source '../views/**/*.blade.php';
