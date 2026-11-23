@@ -29,12 +29,31 @@ the enable/disable registry (`App\Core\Modules\ModuleRegistry`) are in
 Each module has one service provider and this layout:
 
 ```text
+modules/<slug>/module.php
 modules/<slug>/src/...
 modules/<slug>/{routes,resources/views,lang,config,database/migrations}
 ```
 
-The modules are `people`, `communications`, `operations`, `helpdesk` and `hr`.
-A new module needs:
+Shipped modules today: `people`, `communications`, `microsoft-365`
+(Integration), `operations`, `helpdesk`, `learning` and `hr`. The checklist in
+[modules/README.md](../modules/README.md) lists every piece a new folder must
+include; `tests/Feature/Core/ModuleConventionTest.php` enforces the required
+parts (manifest with SemVer version, provider registration, routes and menu).
+
+| Piece | Location |
+| --- | --- |
+| Manifest and version | `modules/<slug>/module.php` — validated by `App\Core\Modules\ModuleManifest` |
+| Service provider | `modules/<slug>/src/<Studly>ServiceProvider.php` — listed in `bootstrap/providers.php` and `composer.json` PSR-4 |
+| Routes | `modules/<slug>/routes/web.php` — `loadRoutesFrom` in the provider; `module:<slug>` on groups |
+| Menu | `modules/<slug>/src/Navigation/<Studly>MenuContributor.php` — `BelongsToModule` + `MenuContributor`, tagged `intranet.menu` |
+| Permissions | `modules/<slug>/src/*Permissions.php` and `database/seeders/*PermissionsSeeder.php` when the module adds grants |
+| Schedules | Commands under `modules/<slug>/src/Console/`, registered in the provider with `ModuleGuards::whenEnabled` |
+| Settings | Manifest `settings` keys; optional `modules/<slug>/config/<slug>.php` merged in the provider |
+| Migrations | `modules/<slug>/database/migrations/` — also in `databaseMigrationsPath` in `phpstan.neon` |
+| Dashboard cards | `modules/<slug>/src/Dashboard/` — contributors tagged `intranet.dashboard` when the home page needs them |
+| Tests | `tests/Feature/<Area>/` (and `tests/Unit/` where useful), not inside the module |
+
+A new module still needs, at minimum:
 
 - a PSR-4 entry in `composer.json`, for example
   `"Modules\\Training\\": "modules/training/src/"`;
