@@ -22,9 +22,18 @@ final class HelpdeskMenuContributor implements BelongsToModule, MenuContributor
     {
         if ($mode === MenuMode::Admin) {
             return [
-                new NavGroup('admin-helpdesk', 'Help desk admin', [
-                    NavItem::route('helpdesk-topics', 'Topics and routing', 'tags', HelpdeskPermissions::CATEGORIES_MANAGE, 'admin.helpdesk.categories.index', null, 'helpdesk'),
-                ]),
+                new NavGroup('admin-helpdesk', 'Help desk', [
+                    NavItem::route(
+                        'helpdesk-topics',
+                        'Topics and routing',
+                        'tags',
+                        HelpdeskPermissions::CATEGORIES_MANAGE,
+                        'admin.helpdesk.categories.index',
+                        null,
+                        'helpdesk',
+                        'Queues, SLA targets and identity checks',
+                    ),
+                ], icon: 'life-buoy'),
             ];
         }
 

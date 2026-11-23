@@ -4,7 +4,9 @@ use App\Core\Access\RoleName;
 use App\Core\Navigation\MenuMode;
 use App\Models\User;
 use Database\Seeders\CommunicationsPermissionsSeeder;
+use Database\Seeders\HelpdeskPermissionsSeeder;
 use Database\Seeders\Microsoft365BootstrapSeeder;
+use Database\Seeders\OperationsPermissionsSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -14,6 +16,8 @@ beforeEach(function () {
     $this->seed(RolesAndPermissionsSeeder::class);
     $this->seed(CommunicationsPermissionsSeeder::class);
     $this->seed(Microsoft365BootstrapSeeder::class);
+    $this->seed(OperationsPermissionsSeeder::class);
+    $this->seed(HelpdeskPermissionsSeeder::class);
 });
 
 it('writes Menu::for snapshot fixtures when MENU_FIXTURES=1', function () {

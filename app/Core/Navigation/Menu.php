@@ -21,13 +21,19 @@ final class Menu
     public const TEAMS_URL = Microsoft365MenuContributor::TEAMS_URL;
 
     /** @var array<string, int> */
-    private const STAFF_GROUP_ORDER = [
+    private const GROUP_ORDER = [
         'home' => 0,
         'communications' => 10,
         'people' => 20,
         'operations' => 30,
         'support' => 40,
         'microsoft-365' => 50,
+        'admin-users' => 100,
+        'admin-system' => 110,
+        'admin-modules' => 120,
+        'admin-apps' => 130,
+        'admin-operations' => 140,
+        'admin-helpdesk' => 150,
         'hr' => 60,
     ];
 
@@ -60,16 +66,81 @@ final class Menu
     public static function adminDefinition(): array
     {
         return [
-            new NavGroup('admin', 'Admin', [
-                NavItem::route('admin-overview', 'Overview', 'layout-grid', AccessMatrix::INTRANET_ACCESS, 'admin.overview'),
-                NavItem::route('roles', 'Roles', 'shield-check', AccessMatrix::ADMIN_ROLES_VIEW, 'admin.roles.index', 'admin.roles.*'),
-                NavItem::route('audit', 'Audit log', 'scroll-text', AccessMatrix::ADMIN_AUDIT_VIEW, 'admin.audit.index'),
-                NavItem::route('access-review', 'Access review', 'clipboard-check', AccessMatrix::ACCESS_REVIEW_VIEW, 'admin.access-review.index'),
-                NavItem::route('system', 'System status', 'activity', AccessMatrix::ADMIN_SYSTEM_VIEW, 'admin.system.index', 'admin.system.*'),
-                NavItem::route('modules', 'Modules', 'blocks', AccessMatrix::ADMIN_MODULES_MANAGE, 'admin.modules.index', 'admin.modules.*'),
-                NavItem::route('push-delivery', 'Push delivery', 'bell-ring', AccessMatrix::ADMIN_SYSTEM_VIEW, 'admin.push-delivery.index'),
-                NavItem::route('totp', '2FA status', 'shield-half', AccessMatrix::ADMIN_SYSTEM_VIEW, 'admin.totp.index'),
+            new NavGroup('home', 'Dashboard', [
+                NavItem::route(
+                    'admin-overview',
+                    'Overview',
+                    'layout-grid',
+                    AccessMatrix::INTRANET_ACCESS,
+                    'admin.overview',
+                    description: 'Admin home and shortcuts to every section',
+                ),
             ], icon: 'layout-grid'),
+            new NavGroup('admin-users', 'Users and access', [
+                NavItem::route(
+                    'roles',
+                    'Roles',
+                    'shield-check',
+                    AccessMatrix::ADMIN_ROLES_VIEW,
+                    'admin.roles.index',
+                    'admin.roles.*',
+                    description: 'Cloudron groups, people counts and permissions',
+                ),
+                NavItem::route(
+                    'audit',
+                    'Audit log',
+                    'scroll-text',
+                    AccessMatrix::ADMIN_AUDIT_VIEW,
+                    'admin.audit.index',
+                    description: 'Recent admin and security events',
+                ),
+                NavItem::route(
+                    'access-review',
+                    'Access review',
+                    'clipboard-check',
+                    AccessMatrix::ACCESS_REVIEW_VIEW,
+                    'admin.access-review.index',
+                    description: 'Who has which roles right now',
+                ),
+                NavItem::route(
+                    'totp',
+                    '2FA status',
+                    'shield-half',
+                    AccessMatrix::ADMIN_SYSTEM_VIEW,
+                    'admin.totp.index',
+                    description: 'Two-factor enrolment across accounts',
+                ),
+            ], icon: 'shield-check'),
+            new NavGroup('admin-system', 'System', [
+                NavItem::route(
+                    'system',
+                    'System status',
+                    'activity',
+                    AccessMatrix::ADMIN_SYSTEM_VIEW,
+                    'admin.system.index',
+                    'admin.system.*',
+                    description: 'Health checks, mail and Cloudron addons',
+                ),
+                NavItem::route(
+                    'push-delivery',
+                    'Push delivery',
+                    'bell-ring',
+                    AccessMatrix::ADMIN_SYSTEM_VIEW,
+                    'admin.push-delivery.index',
+                    description: 'Web push delivery diagnostics',
+                ),
+            ], icon: 'activity'),
+            new NavGroup('admin-modules', 'Modules', [
+                NavItem::route(
+                    'modules',
+                    'Modules',
+                    'blocks',
+                    AccessMatrix::ADMIN_MODULES_MANAGE,
+                    'admin.modules.index',
+                    'admin.modules.*',
+                    description: 'Turn modules on or off for this site',
+                ),
+            ], icon: 'blocks'),
         ];
     }
 
@@ -133,8 +204,8 @@ final class Menu
         }
 
         usort($mainGroups, function (NavGroup $left, NavGroup $right): int {
-            $leftOrder = self::STAFF_GROUP_ORDER[$left->key] ?? 1000;
-            $rightOrder = self::STAFF_GROUP_ORDER[$right->key] ?? 1000;
+            $leftOrder = self::GROUP_ORDER[$left->key] ?? 1000;
+            $rightOrder = self::GROUP_ORDER[$right->key] ?? 1000;
 
             if ($leftOrder === $rightOrder) {
                 return 0;

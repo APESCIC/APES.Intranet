@@ -22,10 +22,28 @@ final class OperationsMenuContributor implements BelongsToModule, MenuContributo
     {
         if ($mode === MenuMode::Admin) {
             return [
-                new NavGroup('admin-operations', 'Operations admin', [
-                    NavItem::route('operations-sites', 'Sites', 'map-pin', OperationsPermissions::SITES_MANAGE, 'admin.operations.sites.index', 'admin.operations.sites.*', 'operations'),
-                    NavItem::route('operations-forms', 'Form builder', 'file-pen-line', OperationsPermissions::FORMS_MANAGE, 'admin.operations.forms.index', 'admin.operations.forms.*', 'operations'),
-                ]),
+                new NavGroup('admin-operations', 'Operations', [
+                    NavItem::route(
+                        'operations-sites',
+                        'Sites',
+                        'map-pin',
+                        OperationsPermissions::SITES_MANAGE,
+                        'admin.operations.sites.index',
+                        'admin.operations.sites.*',
+                        'operations',
+                        'Locations used on rotas and forms',
+                    ),
+                    NavItem::route(
+                        'operations-forms',
+                        'Form builder',
+                        'file-pen-line',
+                        OperationsPermissions::FORMS_MANAGE,
+                        'admin.operations.forms.index',
+                        'admin.operations.forms.*',
+                        'operations',
+                        'Build and publish staff forms',
+                    ),
+                ], icon: 'briefcase'),
             ];
         }
 

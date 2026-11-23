@@ -5,25 +5,40 @@
             @if ($item->isSoon())
                 <span class="sg-nav-link sg-nav-link--soon" data-nav-key="{{ $item->key }}">
                     <i data-lucide="{{ $item->icon }}"></i>
-                    <span>{{ $item->label }}</span>
+                    <span class="sg-nav-link__text">
+                        <span class="sg-nav-link__label">{{ $item->label }}</span>
+                        @if ($item->description)
+                            <span class="sg-nav-link__desc">{{ $item->description }}</span>
+                        @endif
+                    </span>
                     <span class="sg-nav-soon">Soon<span class="sr-only">, not available yet</span></span>
                 </span>
             @elseif ($item->isExternal())
-                <a href="{{ $item->url() }}" class="sg-nav-link" data-nav-key="{{ $item->key }}" target="_blank" rel="noopener">
+                <a href="{{ $item->url() }}" class="sg-nav-link @if ($item->description) sg-nav-link--described @endif" data-nav-key="{{ $item->key }}" target="_blank" rel="noopener">
                     <i data-lucide="{{ $item->icon }}"></i>
-                    <span>{{ $item->label }}</span>
+                    <span class="sg-nav-link__text">
+                        <span class="sg-nav-link__label">{{ $item->label }}</span>
+                        @if ($item->description)
+                            <span class="sg-nav-link__desc">{{ $item->description }}</span>
+                        @endif
+                    </span>
                     <i data-lucide="external-link" class="sg-nav-external"></i>
                     <span class="sr-only">(opens in a new tab)</span>
                 </a>
             @else
                 <a
                     href="{{ $item->url() }}"
-                    class="sg-nav-link"
+                    class="sg-nav-link @if ($item->description) sg-nav-link--described @endif"
                     data-nav-key="{{ $item->key }}"
                     @if ($item->isActive()) aria-current="page" @endif
                 >
                     <i data-lucide="{{ $item->icon }}"></i>
-                    <span>{{ $item->label }}</span>
+                    <span class="sg-nav-link__text">
+                        <span class="sg-nav-link__label">{{ $item->label }}</span>
+                        @if ($item->description)
+                            <span class="sg-nav-link__desc">{{ $item->description }}</span>
+                        @endif
+                    </span>
                 </a>
             @endif
         </li>
