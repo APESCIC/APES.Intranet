@@ -25,8 +25,8 @@ Access uses the core permission matrix and the module's permissions
 The dashboard shows cards for: unread updates, the next event, student
 placements (students only), a nudge to set up a passkey or authenticator
 (dismissible for 14 days, `COMMS_2FA_NUDGE_DISMISS_DAYS`), cards from other
-modules (help desk queues, overdue tasks, Microsoft 365 apps) and "Chat in
-Teams".
+modules (help desk queues, overdue tasks, Microsoft 365 apps). Sections are
+grouped as Today, Updates, My help desk, Microsoft 365 apps (app tiles, including Teams) and Events.
 
 ## Updates
 

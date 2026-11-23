@@ -13,8 +13,10 @@ class DashboardController
     {
         abort_unless($request->user()?->can(AccessMatrix::INTRANET_ACCESS), 403);
 
+        $user = $request->user();
+
         return view('communications::dashboard.index', [
-            'cards' => $cards->for($request->user()),
+            'sections' => $cards->groupedFor($user),
         ]);
     }
 }

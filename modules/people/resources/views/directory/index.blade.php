@@ -49,7 +49,7 @@
                 </a>
             </li>
         @empty
-            <li class="sg-card p-6 text-sg-muted sm:col-span-2 lg:col-span-3">No people matched those filters.</li>
+            <li class="sg-empty-state sg-card p-6 sm:col-span-2 lg:col-span-3" role="status">No people matched those filters.</li>
         @endforelse
     </ul>
 
