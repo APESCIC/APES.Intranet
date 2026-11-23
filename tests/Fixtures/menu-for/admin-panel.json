@@ -1,0 +1,23 @@
+[
+    {
+        "key": "admin",
+        "heading": "Admin",
+        "items": [
+            "admin-overview",
+            "roles",
+            "audit",
+            "access-review",
+            "system",
+            "modules",
+            "push-delivery",
+            "totp"
+        ]
+    },
+    {
+        "key": "admin-m365",
+        "heading": "Microsoft 365 admin",
+        "items": [
+            "m365-links"
+        ]
+    }
+]
