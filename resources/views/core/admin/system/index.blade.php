@@ -15,6 +15,17 @@
         <p class="mb-4 rounded-sg-field bg-sg-error-mist p-3 text-sg-error" role="alert">{{ session('error') }}</p>
     @endif
 
+    <section class="sg-card mb-4 p-5" aria-labelledby="versions-heading">
+        <h2 id="versions-heading" class="font-serif text-lg font-semibold">Versions</h2>
+        <p class="mt-2 text-sm text-sg-muted">Core is the release tag. Each module has its own SemVer in its manifest.</p>
+        <dl class="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm" data-versions>
+            @foreach ($versions as $row)
+                <dt class="text-sg-muted" data-version-slug="{{ $row['slug'] }}">{{ $row['name'] }}</dt>
+                <dd><code>{{ $row['version'] }}</code></dd>
+            @endforeach
+        </dl>
+    </section>
+
     <section class="sg-card mb-4 flex flex-wrap items-center justify-between gap-3 p-5" aria-labelledby="test-email-heading">
         <div>
             <h2 id="test-email-heading" class="font-serif text-lg font-semibold">Test email</h2>

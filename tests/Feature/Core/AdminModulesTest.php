@@ -27,6 +27,7 @@ return [
     'slug' => 'alpha',
     'name' => 'Alpha',
     'kind' => 'module',
+    'version' => '0.1.0',
     'description' => 'Parent module for depends_on tests.',
     'default_enabled' => true,
     'depends_on' => [],
@@ -54,6 +55,7 @@ return [
     'slug' => 'beta',
     'name' => 'Beta',
     'kind' => 'module',
+    'version' => '0.1.0',
     'description' => 'Depends on Alpha.',
     'default_enabled' => true,
     'depends_on' => ['alpha'],
@@ -107,10 +109,14 @@ it('lists modules for an admin with a fresh sign-in', function () {
         ->get(route('admin.modules.index'));
 
     $response->assertOk()
+        ->assertSee('data-module="core"', false)
         ->assertSee('data-module="alpha"', false)
         ->assertSee('data-module="beta"', false)
+        ->assertSee('Core')
         ->assertSee('Alpha')
-        ->assertSee('Beta');
+        ->assertSee('Beta')
+        ->assertSee('data-version="0.1.0"', false)
+        ->assertSee('Always on');
 });
 
 it('refuses the Modules screen without the manage permission', function () {

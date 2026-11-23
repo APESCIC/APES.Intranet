@@ -6,6 +6,7 @@ use App\Core\Modules\InvalidModuleSettingException;
 use App\Core\Modules\ModuleRegistry;
 use App\Core\Modules\SettingType;
 use App\Core\System\CloudronAddons;
+use App\Core\Version\AppVersion;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -13,7 +14,7 @@ use InvalidArgumentException;
 
 final class AdminModulesController
 {
-    public function index(ModuleRegistry $modules): View
+    public function index(ModuleRegistry $modules, AppVersion $appVersion): View
     {
         $rows = $modules->manifests()->map(function ($manifest) use ($modules) {
             $missing = $modules->missingCloudronAddons($manifest->slug);
@@ -30,6 +31,7 @@ final class AdminModulesController
         });
 
         return view('core.admin.modules.index', [
+            'coreVersion' => $appVersion->current(),
             'rows' => $rows,
         ]);
     }

@@ -2,22 +2,29 @@
 
 namespace App\Core\Health;
 
+use App\Core\Modules\ModuleRegistry;
 use App\Core\Version\AppVersion;
 use Illuminate\Http\JsonResponse;
 
 class HealthzController
 {
-    public function __invoke(HealthCheck $health, AppVersion $version): JsonResponse
+    public function __invoke(HealthCheck $health, AppVersion $version, ModuleRegistry $modules): JsonResponse
     {
         $checks = $health->run();
         $healthy = ! in_array('fail', $checks, true);
         $revision = is_file(base_path('REVISION')) ? substr(trim((string) file_get_contents(base_path('REVISION'))), 0, 12) : null;
+
+        $moduleVersions = ['core' => $version->current()];
+        foreach ($modules->manifests() as $manifest) {
+            $moduleVersions[$manifest->slug] = $manifest->version;
+        }
 
         $body = [
             'status' => $healthy ? 'ok' : 'fail',
             'checks' => $checks,
             'version' => $version->current(),
             'revision' => $revision,
+            'modules' => $moduleVersions,
         ];
 
         // The live preview gate checks the local preview serves this checkout through FastCGI.

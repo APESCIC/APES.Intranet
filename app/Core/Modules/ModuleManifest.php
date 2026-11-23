@@ -4,6 +4,9 @@ namespace App\Core\Modules;
 
 final readonly class ModuleManifest
 {
+    /** SemVer core: MAJOR.MINOR.PATCH with optional pre-release and build metadata. */
+    public const VERSION_PATTERN = '/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/';
+
     /**
      * @param  list<string>  $dependsOn
      * @param  list<string>  $cloudronAddons
@@ -14,6 +17,7 @@ final readonly class ModuleManifest
         public string $name,
         public ModuleKind $kind,
         public string $description,
+        public string $version,
         public bool $defaultEnabled,
         public array $dependsOn = [],
         public array $cloudronAddons = [],
@@ -51,6 +55,13 @@ final readonly class ModuleManifest
             throw new InvalidModuleSettingException("Manifest [{$slug}] description must be a string.");
         }
 
+        $version = $raw['version'] ?? null;
+        if (! is_string($version) || $version === '' || preg_match(self::VERSION_PATTERN, $version) !== 1) {
+            throw new InvalidModuleSettingException(
+                "Manifest [{$slug}] needs a valid SemVer version (for example 1.0.0).",
+            );
+        }
+
         $defaultEnabled = array_key_exists('default_enabled', $raw)
             ? (bool) $raw['default_enabled']
             : true;
@@ -75,6 +86,7 @@ final readonly class ModuleManifest
             $name,
             $kind,
             $description,
+            $version,
             $defaultEnabled,
             $dependsOn,
             $cloudronAddons,

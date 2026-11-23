@@ -7,6 +7,30 @@
     @endif
 
     <div class="space-y-6">
+        <section
+            id="module-core"
+            class="sg-card p-5"
+            aria-labelledby="module-heading-core"
+            data-module="core"
+            data-enabled="true"
+        >
+            <div class="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                    <h2 id="module-heading-core" class="font-serif text-lg font-semibold">Core</h2>
+                    <p class="mt-1 text-sm text-sg-muted">
+                        <span class="font-medium text-sg-ink">Core</span>
+                        · Sign-in, roles, audit, health and the app shell. Always on.
+                    </p>
+                    <p class="mt-1 text-sm text-sg-muted" data-version="{{ $coreVersion }}">
+                        Version <code>{{ $coreVersion }}</code>
+                    </p>
+                </div>
+                <span class="rounded-full bg-sg-ok-mist px-3 py-1 text-sm font-semibold text-sg-ok" data-status="enabled">
+                    Always on
+                </span>
+            </div>
+        </section>
+
         @forelse ($rows as $row)
             @php($manifest = $row['manifest'])
             <section
@@ -24,6 +48,9 @@
                         <p class="mt-1 text-sm text-sg-muted">
                             <span class="font-medium text-sg-ink">{{ ucfirst($manifest->kind->value) }}</span>
                             · {{ $manifest->description !== '' ? $manifest->description : 'No description.' }}
+                        </p>
+                        <p class="mt-1 text-sm text-sg-muted" data-version="{{ $manifest->version }}">
+                            Version <code>{{ $manifest->version }}</code>
                         </p>
                     </div>
                     <span
