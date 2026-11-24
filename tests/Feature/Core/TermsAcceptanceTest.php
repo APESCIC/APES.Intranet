@@ -94,6 +94,26 @@ it('does not prompt after a non-material change to the Terms of use', function (
     expect($legalPages->currentVersion($page)?->number)->toBe(2);
 });
 
+it('prompts again after a material change to the Terms of use', function () {
+    $page = LegalPageFixtures::publishTerms('<h2>v1</h2><p>First.</p>', changeSummary: 'Version 1.');
+    $user = staffUser();
+    $legalPages = app(LegalPages::class);
+
+    $this->actingAs($user)->post(route('legal.accept.store'))->assertRedirect(route('dashboard'));
+
+    $versionTwo = $legalPages->createDraft(
+        $page,
+        '<h2>v2</h2><p>New obligations.</p>',
+        'Material update.',
+        materialChange: true,
+    );
+    $legalPages->publish($versionTwo);
+
+    $this->actingAs($user)
+        ->get(route('dashboard'))
+        ->assertRedirect(route('legal.accept.show'));
+});
+
 it('shows Privacy and Cookies updated notes once per person', function () {
     $privacy = LegalPageFixtures::page('privacy', 'Privacy notice');
     LegalPageFixtures::publishVersion($privacy, '<h2>v1</h2><p>Privacy.</p>', changeSummary: 'First publication.');
