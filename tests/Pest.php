@@ -46,7 +46,15 @@ function fakeCloudron(TestCase $test): void
  */
 function signInWithCloudron(TestCase $test, array $groups, string $sub = 'sub-alex', string $email = 'alex@example.test'): TestResponse
 {
-    $test->idp->identity = new OidcIdentity($sub, $email, 'Alex Example');
+    $normalised = array_values(array_map(fn (string $group) => strtolower($group), $groups));
+    $test->idp->identity = new OidcIdentity(
+        subject: $sub,
+        email: $email,
+        name: 'Alex Example',
+        authTime: null,
+        groups: $normalised,
+        preferredUsername: 'alex',
+    );
     $test->directory->groups = $groups;
 
     return $test->get(route('auth.callback'));

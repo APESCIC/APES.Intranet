@@ -23,8 +23,9 @@ beforeEach(function () {
  */
 function signInAt(object $test, string $group, int $authTime): void
 {
-    $test->idp->identity = new OidcIdentity('sub-alex', 'alex@example.test', 'Alex Example', $authTime);
-    $test->directory->groups = ['intranet.staff', $group];
+    $groups = ['intranet.staff', $group];
+    $test->idp->identity = new OidcIdentity('sub-alex', 'alex@example.test', 'Alex Example', $authTime, $groups, 'alex');
+    $test->directory->groups = $groups;
     $test->get(route('auth.callback'))->assertRedirect();
 }
 
@@ -43,7 +44,7 @@ it('sends a sign-in older than the window back to Cloudron, then returns to the 
     expect($this->idp->lastForceLogin)->toBeTrue()
         ->and(AuditLog::where('event', 'auth.fresh_signin_required')->first()?->context)->toBe(['path' => '/_test/hr-record']);
 
-    $this->idp->identity = new OidcIdentity('sub-alex', 'alex@example.test', 'Alex Example', now()->getTimestamp());
+    $this->idp->identity = new OidcIdentity('sub-alex', 'alex@example.test', 'Alex Example', now()->getTimestamp(), ['intranet.staff', 'intranet.hr'], 'alex');
     $this->get(route('auth.callback'))->assertRedirect(url('/_test/hr-record'));
     $this->get('/_test/hr-record')->assertOk();
 });
@@ -66,7 +67,7 @@ it('refuses when Cloudron did not really ask for a new sign-in', function () {
     $this->get('/_test/hr-record');
     $this->get(route('auth.reauth'));
 
-    $this->idp->identity = new OidcIdentity('sub-alex', 'alex@example.test', 'Alex Example', $stale);
+    $this->idp->identity = new OidcIdentity('sub-alex', 'alex@example.test', 'Alex Example', $stale, ['intranet.staff', 'intranet.hr'], 'alex');
     $this->get(route('auth.callback'))->assertForbidden()->assertSee('Cloudron did not ask you to sign in again');
 
     expect(AuditLog::where('event', 'auth.fresh_signin_not_honoured')->exists())->toBeTrue();

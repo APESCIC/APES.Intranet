@@ -5,10 +5,12 @@ namespace App\Core\Auth\Http\Controllers;
 use App\Core\Audit\AuditLogger;
 use App\Core\Auth\Contracts\DirectoryGroups;
 use App\Core\Auth\Contracts\IdentityProvider;
+use App\Core\Auth\DirectorySource;
 use App\Core\Auth\Exceptions\DirectoryUnavailable;
 use App\Core\Auth\Exceptions\IdentityProviderUnavailable;
 use App\Core\Auth\FreshSignIn;
 use App\Core\Auth\GroupRoleMapper;
+use App\Core\Auth\OidcIdentity;
 use App\Core\Qa\QaLogin;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -87,11 +89,9 @@ class OidcController
 
         $email = Str::lower($identity->email);
 
-        try {
-            $groups = $directory->groupsForEmail($email);
-        } catch (DirectoryUnavailable $exception) {
-            report($exception);
-            abort(503, 'The APES directory is unavailable. Please try again in a few minutes.');
+        $groups = $this->groupsForSignIn($identity, $directory, $email);
+        if ($groups === null) {
+            abort(503, 'Cloudron sign-in is temporarily unavailable. Please try again in a few minutes.');
         }
 
         $roles = $mapper->rolesFor($groups);
@@ -124,6 +124,7 @@ class OidcController
             'oidc_sub' => $identity->subject,
             'email' => $email,
             'name' => $identity->name ?? $email,
+            'cloudron_username' => $identity->preferredUsername ?? $user->cloudron_username,
             'email_verified_at' => $user->email_verified_at ?? now(),
             'is_active' => true,
             'deactivated_at' => null,
@@ -186,6 +187,24 @@ class OidcController
         $query = parse_url($referer, PHP_URL_QUERY);
 
         return url($path.(is_string($query) && $query !== '' ? '?'.$query : ''));
+    }
+
+    /**
+     * @return list<string>|null null when the OIDC groups claim is missing (caller must 503)
+     */
+    private function groupsForSignIn(OidcIdentity $identity, DirectoryGroups $directory, string $email): ?array
+    {
+        if (DirectorySource::isLdap()) {
+            try {
+                return $directory->groupsForEmail($email);
+            } catch (DirectoryUnavailable $exception) {
+                report($exception);
+                abort(503, 'The APES directory is unavailable. Please try again in a few minutes.');
+            }
+        }
+
+        // Missing claim: leave roles alone. Empty list is a real "no groups" answer.
+        return $identity->groups;
     }
 
     private function denied(?User $user, string $reason, ?string $message = null): Response

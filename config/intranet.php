@@ -26,15 +26,15 @@ return [
     'fresh_signin_minutes' => max(1, (int) (env('FRESH_SIGNIN_MINUTES') ?: 15)),
 
     /*
-    | Cloudron OIDC. The OIDC_* values win; otherwise the Cloudron addon
-    | variables are used. Never commit real values.
+    | Cloudron OIDC. CLOUDRON_OIDC_* (addon) is preferred; OIDC_* is the
+    | fallback for local and hand-set shared .env. Never commit real values.
     */
     'oidc' => [
         'issuer' => env('CLOUDRON_OIDC_ISSUER') ?: env('OIDC_ISSUER'),
         'client_id' => env('CLOUDRON_OIDC_CLIENT_ID') ?: env('OIDC_CLIENT_ID'),
         'client_secret' => env('CLOUDRON_OIDC_CLIENT_SECRET') ?: env('OIDC_CLIENT_SECRET'),
         'redirect_uri' => env('OIDC_REDIRECT_URI', rtrim((string) env('CLOUDRON_APP_ORIGIN', ''), '/').'/auth/callback'),
-        'scopes' => $csv(env('OIDC_SCOPES', 'openid,profile,email')),
+        'scopes' => $csv(env('OIDC_SCOPES', 'openid,profile,email,groups')),
     ],
 
     /*
