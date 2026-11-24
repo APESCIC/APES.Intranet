@@ -10,8 +10,38 @@ use App\Models\User;
 final class AdminDashboardLayouts
 {
     /**
-     * @param  list<array{key: string}>  $available
-     * @return list<array{key: string}>
+     * @param  list<array{
+     *     key: string,
+     *     title: string,
+     *     body: string,
+     *     href: ?string,
+     *     permission: string,
+     *     module?: string|null,
+     *     tone?: string,
+     *     icon?: string,
+     *     external?: bool,
+     *     section?: string,
+     *     group?: string,
+     *     group_heading?: string,
+     *     chart?: string,
+     *     preserve_newlines?: bool
+     * }>  $available
+     * @return list<array{
+     *     key: string,
+     *     title: string,
+     *     body: string,
+     *     href: ?string,
+     *     permission: string,
+     *     module?: string|null,
+     *     tone?: string,
+     *     icon?: string,
+     *     external?: bool,
+     *     section?: string,
+     *     group?: string,
+     *     group_heading?: string,
+     *     chart?: string,
+     *     preserve_newlines?: bool
+     * }>
      */
     public function apply(User $user, array $available): array
     {
@@ -69,8 +99,8 @@ final class AdminDashboardLayouts
         return AdminDashboardLayout::query()->updateOrCreate(
             ['user_id' => $user->id],
             [
-                'ordered_keys' => array_values($orderedKeys),
-                'hidden_keys' => array_values($hiddenKeys),
+                'ordered_keys' => $orderedKeys,
+                'hidden_keys' => $hiddenKeys,
             ],
         );
     }
@@ -90,14 +120,14 @@ final class AdminDashboardLayouts
         if ($existing === null) {
             return AdminDashboardLayout::query()->create([
                 'user_id' => null,
-                'ordered_keys' => array_values($orderedKeys),
-                'hidden_keys' => array_values($hiddenKeys),
+                'ordered_keys' => $orderedKeys,
+                'hidden_keys' => $hiddenKeys,
             ]);
         }
 
         $existing->forceFill([
-            'ordered_keys' => array_values($orderedKeys),
-            'hidden_keys' => array_values($hiddenKeys),
+            'ordered_keys' => $orderedKeys,
+            'hidden_keys' => $hiddenKeys,
         ])->save();
 
         return $existing;

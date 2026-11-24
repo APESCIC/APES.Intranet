@@ -65,7 +65,7 @@ class AdminDashboardLayoutController
 
         [$keys[$index], $keys[$swap]] = [$keys[$swap], $keys[$index]];
         $layout = $layouts->layoutFor($user);
-        $hidden = $layout?->hidden_keys ?? [];
+        $hidden = $layout === null ? [] : ($layout->hidden_keys ?? []);
         $layouts->savePersonal($user, $keys, $hidden);
 
         return redirect()->route('admin.overview', ['edit' => 1]);
@@ -83,7 +83,7 @@ class AdminDashboardLayoutController
 
         $visible = array_column($layouts->apply($user, $available), 'key');
         $layout = $layouts->layoutFor($user);
-        $hidden = $layout?->hidden_keys ?? [];
+        $hidden = $layout === null ? [] : ($layout->hidden_keys ?? []);
         $hidden[] = $key;
         $hidden = array_values(array_unique($hidden));
         $ordered = array_values(array_filter($visible, fn (string $k) => $k !== $key));
@@ -103,7 +103,8 @@ class AdminDashboardLayoutController
         }
 
         $layout = $layouts->layoutFor($user);
-        $hidden = array_values(array_filter($layout?->hidden_keys ?? [], fn (string $k) => $k !== $key));
+        $currentHidden = $layout === null ? [] : ($layout->hidden_keys ?? []);
+        $hidden = array_values(array_filter($currentHidden, fn (string $k) => $k !== $key));
         $ordered = array_column($layouts->apply($user, $available), 'key');
         if (! in_array($key, $ordered, true)) {
             $ordered[] = $key;
