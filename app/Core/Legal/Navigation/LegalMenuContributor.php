@@ -26,11 +26,13 @@ final class LegalMenuContributor implements MenuContributor
                 'admin-legal',
                 'Legal',
                 [
-                    NavItem::soon(
+                    NavItem::route(
                         'legal-pages',
                         'Legal pages',
                         'scale',
                         AccessMatrix::LEGAL_PAGES_MANAGE,
+                        'admin.legal.pages.index',
+                        'admin.legal.pages.*',
                         description: 'Draft, preview and publish privacy, cookies, terms and related pages',
                     ),
                     NavItem::route(

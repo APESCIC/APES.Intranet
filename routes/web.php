@@ -10,6 +10,7 @@ use App\Core\Audit\Http\Controllers\AuditLogIndexController;
 use App\Core\Auth\Http\Controllers\OidcController;
 use App\Core\Changelog\Http\Controllers\ChangeLogController;
 use App\Core\Legal\Http\Controllers\AdminFooterLinkController;
+use App\Core\Legal\Http\Controllers\AdminLegalPageController;
 use App\Core\Modules\Http\Controllers\AdminModulesController;
 use App\Core\Navigation\Http\Controllers\AdminOverviewController;
 use App\Core\Notifications\Http\Controllers\NotificationInboxController;
@@ -100,6 +101,10 @@ Route::middleware('auth')->group(function () {
             Route::get('/push-delivery', PushDeliveryStatsController::class)->name('push-delivery.index');
         });
         Route::middleware(['can:'.AccessMatrix::LEGAL_PAGES_MANAGE, 'fresh-signin'])->prefix('legal')->name('legal.')->group(function () {
+            Route::get('pages', [AdminLegalPageController::class, 'index'])->name('pages.index');
+            Route::get('pages/{legalPage}', [AdminLegalPageController::class, 'edit'])->name('pages.edit');
+            Route::post('pages/{legalPage}/draft', [AdminLegalPageController::class, 'saveDraft'])->name('pages.draft');
+            Route::get('pages/{legalPage}/preview', [AdminLegalPageController::class, 'preview'])->name('pages.preview');
             Route::get('footer-links', [AdminFooterLinkController::class, 'index'])->name('footer-links.index');
             Route::post('footer-links', [AdminFooterLinkController::class, 'store'])->name('footer-links.store');
             Route::put('footer-links/{footerLink}', [AdminFooterLinkController::class, 'update'])->name('footer-links.update');
