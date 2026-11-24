@@ -96,6 +96,8 @@ artisan db:seed --class='Database\Seeders\OperationsBootstrapSeeder' --force
 artisan db:seed --class='Database\Seeders\HelpdeskBootstrapSeeder' --force
 artisan db:seed --class='Database\Seeders\LearningBootstrapSeeder' --force
 artisan db:seed --class='Database\Seeders\HrBootstrapSeeder' --force
+# Legal starter pages and footer links (idempotent; no personal data).
+artisan db:seed --class='Database\Seeders\LegalPagesSeeder' --force
 # A release-notes problem must never block a deploy: the hub keeps its old entries.
 artisan changelog:sync || echo "WARNING: changelog:sync failed; see storage/logs. The deploy carries on." >&2
 artisan optimize

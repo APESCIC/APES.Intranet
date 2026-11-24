@@ -27,7 +27,7 @@ The private intranet for APES CIC staff, volunteers and students: updates, the d
 | Clone | `C:\Users\BambieMurphy\Documents\GitHub\APES.Intranet` |
 | Herd site | `apes-intranet` (linked; PHP 8.4 isolated, `ldap` on, as on Cloudron) |
 | Preview URL | `https://apes-intranet.test` (Herd secure; `http://` redirects) |
-| Preview command | `scripts\preview.ps1` (live preview gate), then `npm run dev` / Vite |
+| Preview command | `scripts\preview.ps1` (live preview gate: syncs code, runs pending migrations locally, deploy-safe seeders including legal pages, `/healthz`, Vite), then `npm run dev` / Vite |
 | HMR port | 5174 (Vite) |
 | Env file | `.env.example` (key names only, never values) |
 | Database | MySQL `apes_intranet_local` (Herd MySQL 8.4 on 127.0.0.1:3306, `root`, empty password) |
@@ -80,7 +80,7 @@ Development is tracked only in GitHub issues, sub-issues and `vMAJOR.MINOR.PATCH
 | `/release` | Tag and GitHub release |
 | `/deploy` | Cloudron deploy, evidence, close-out |
 | `. .\scripts\herd-env.ps1` | Herd PHP 8.4, Composer, Node 22 on `PATH` |
-| `scripts\preview.ps1` | Live preview gate |
+| `scripts\preview.ps1` | Live preview gate (migrate pending + deploy-safe seeders) |
 | `scripts\herd-setup.ps1` | Set up or repair the Herd site |
 | `npm run dev` | Vite on 5174 |
 | `php artisan demo:seed` / `demo:reset` | Load / wipe+reload fake demo data (`reset` asks first) |
@@ -122,7 +122,7 @@ Development is tracked only in GitHub issues, sub-issues and `vMAJOR.MINOR.PATCH
 - Never commit to `main`, force-push, or rebase a shared branch.
 - No merge into `main`, release or deploy without the ship-gate answer in the current chat.
 - The Project coordinator chat title stays `Next version plan – APES.Intranet` unless Bambie asks to change it.
-- Ask before migrations, `demo:reset`, or installing any system tool.
+- Ask before `demo:reset`, installing any system tool, or ad-hoc migrations outside `scripts\preview.ps1` / `scripts\herd-setup.ps1` (those already run pending migrations locally).
 - Do not rename or delete milestones or labels; do not change DNS or Cloudflare.
 - Docs live in this repo; anything that must not be public goes in `APESCIC/.github-private` `docs/apes-intranet/`. Never hand a document off to SharePoint.
 - Free GitHub features only. Security reviews use tests and the `review-security` skill, never Aikido.
