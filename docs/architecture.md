@@ -86,7 +86,7 @@ php artisan db:seed --class="Database\Seeders\RolesAndPermissionsSeeder" --force
 | supervisor | `intranet.access`, `team.supervise` |
 | management | `intranet.access`, `team.supervise`, `team.manage`, `hr.access`, `hr.special_category.view` |
 | HR | `intranet.access`, `hr.access`, `hr.special_category.view` |
-| legal | `intranet.access`, `legal.access` |
+| legal | `intranet.access`, `legal.access`, `legal.pages.manage` |
 | admin | Every permission |
 
 Rules for new code:

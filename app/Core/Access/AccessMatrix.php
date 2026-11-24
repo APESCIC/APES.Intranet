@@ -16,6 +16,8 @@ final class AccessMatrix
 
     public const LEGAL_ACCESS = 'legal.access';
 
+    public const LEGAL_PAGES_MANAGE = 'legal.pages.manage';
+
     public const STUDENT_AREA = 'student.area';
 
     public const ADMIN_ROLES_VIEW = 'admin.roles.view';
@@ -38,6 +40,7 @@ final class AccessMatrix
             self::TEAM_SUPERVISE => 'Oversee their own team: view it and approve its shifts, swaps and timesheets',
             self::TEAM_MANAGE => 'Manage a team, rota or group of people',
             self::LEGAL_ACCESS => 'Open the agreements and legal area',
+            self::LEGAL_PAGES_MANAGE => 'Draft, publish and manage legal pages and footer links',
             self::STUDENT_AREA => 'Use the student area',
             self::ADMIN_ROLES_VIEW => 'View roles and permissions',
             self::ADMIN_AUDIT_VIEW => 'View the audit log',
@@ -59,7 +62,7 @@ final class AccessMatrix
             RoleName::Supervisor->value => [self::INTRANET_ACCESS, self::TEAM_SUPERVISE],
             RoleName::Management->value => [self::INTRANET_ACCESS, self::TEAM_SUPERVISE, self::TEAM_MANAGE],
             RoleName::Hr->value => [self::INTRANET_ACCESS, self::ACCESS_REVIEW_VIEW],
-            RoleName::Legal->value => [self::INTRANET_ACCESS, self::LEGAL_ACCESS],
+            RoleName::Legal->value => [self::INTRANET_ACCESS, self::LEGAL_ACCESS, self::LEGAL_PAGES_MANAGE],
             RoleName::Admin->value => array_keys(self::permissions()),
         ];
     }

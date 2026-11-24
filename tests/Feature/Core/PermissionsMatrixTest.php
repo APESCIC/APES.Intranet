@@ -22,10 +22,10 @@ const EXPECTED_GRANTS = [
     'supervisor' => ['intranet.access', 'team.supervise'],
     'management' => ['hr.access', 'hr.special_category.view', 'intranet.access', 'team.manage', 'team.supervise'],
     'hr' => ['admin.access_review.view', 'hr.access', 'hr.special_category.view', 'intranet.access'],
-    'legal' => ['intranet.access', 'legal.access'],
+    'legal' => ['intranet.access', 'legal.access', 'legal.pages.manage'],
     'admin' => [
         'admin.access_review.view', 'admin.audit.view', 'admin.modules.manage', 'admin.roles.view', 'admin.system.view', 'hr.access', 'hr.special_category.view',
-        'intranet.access', 'legal.access', 'student.area', 'team.manage', 'team.supervise',
+        'intranet.access', 'legal.access', 'legal.pages.manage', 'student.area', 'team.manage', 'team.supervise',
     ],
 ];
 
