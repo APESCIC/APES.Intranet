@@ -38,7 +38,15 @@ return [
     ],
 
     /*
-    | Cloudron LDAP, read-only, used to look up a person's groups at sign-in.
+    | Directory source for nightly sync (and, from v0.6.19, sign-in groups when
+    | OIDC groups are wired). cloudron = Cloudron API (default); ldap = switch
+    | back to LDAP. Restart the app after changing. Name only in .env.
+    */
+    'directory_source' => strtolower((string) env('INTRANET_DIRECTORY_SOURCE', 'cloudron')),
+
+    /*
+    | Cloudron LDAP, read-only. Kept for the ldap switch-back and the shadow
+    | comparison while both sources run in parallel.
     */
     'ldap' => [
         'host' => env('CLOUDRON_LDAP_HOST') ?: env('LDAP_HOST'),
