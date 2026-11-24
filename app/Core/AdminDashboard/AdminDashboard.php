@@ -31,7 +31,9 @@ final class AdminDashboard
      *     external?: bool,
      *     section?: string,
      *     group?: string,
-     *     group_heading?: string
+     *     group_heading?: string,
+     *     chart?: string,
+     *     preserve_newlines?: bool
      * }>
      */
     public function cardsFor(User $user): array

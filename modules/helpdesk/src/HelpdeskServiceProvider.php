@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Modules\Helpdesk\Analytics\HelpdeskDailyMetrics;
+use Modules\Helpdesk\Dashboard\HelpdeskAdminDashboardCards;
 use Modules\Helpdesk\Dashboard\HelpdeskDashboardCards;
 use Modules\Helpdesk\Models\Ticket;
 use Modules\Helpdesk\Navigation\HelpdeskMenuContributor;
@@ -22,6 +23,8 @@ class HelpdeskServiceProvider extends ServiceProvider
         $this->app->tag([HelpdeskMenuContributor::class], 'intranet.menu');
         $this->app->singleton(HelpdeskDashboardCards::class);
         $this->app->tag([HelpdeskDashboardCards::class], 'intranet.dashboard');
+        $this->app->singleton(HelpdeskAdminDashboardCards::class);
+        $this->app->tag([HelpdeskAdminDashboardCards::class], 'intranet.admin-dashboard');
         $this->app->singleton(HelpdeskDailyMetrics::class);
         $this->app->tag([HelpdeskDailyMetrics::class], 'intranet.daily-metrics');
         $this->app->bind(RaiseItTicket::class, HelpdeskRaiseItTicket::class);
