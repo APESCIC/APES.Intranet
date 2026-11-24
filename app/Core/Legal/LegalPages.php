@@ -24,9 +24,6 @@ final class LegalPages
         return $page->currentVersion($at);
     }
 
-    /**
-     * @return list<array{id: string, label: string}>
-     */
     public function bodyWithHeadingIds(string $html): string
     {
         return preg_replace_callback(
@@ -45,6 +42,9 @@ final class LegalPages
         ) ?? $html;
     }
 
+    /**
+     * @return list<array{id: string, label: string}>
+     */
     public function contentsNavigation(string $html): array
     {
         if (! preg_match_all('/<h2\b[^>]*>(.*?)<\/h2>/is', $html, $matches)) {
