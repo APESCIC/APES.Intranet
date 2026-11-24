@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Core\Legal\CookieRegister;
 use App\Core\Legal\LegalPages;
 use App\Core\Legal\LegalPageVisibility;
 use Illuminate\Http\RedirectResponse;
@@ -10,7 +11,10 @@ use Illuminate\View\View;
 
 class LegalPageController
 {
-    public function __construct(private readonly LegalPages $legalPages) {}
+    public function __construct(
+        private readonly LegalPages $legalPages,
+        private readonly CookieRegister $cookieRegister,
+    ) {}
 
     public function show(Request $request, string $slug): View|RedirectResponse
     {
@@ -22,15 +26,22 @@ class LegalPageController
         }
 
         $version = $this->legalPages->currentVersion($page);
-        abort_if($version === null, 404);
+        if ($version === null && $slug !== 'cookies') {
+            abort(404);
+        }
 
-        $body = $this->legalPages->bodyWithHeadingIds($version->body);
+        $body = $version !== null
+            ? $this->legalPages->bodyWithHeadingIds($version->body)
+            : '';
+
+        $cookieRegister = $slug === 'cookies' ? $this->cookieRegister->entries() : null;
 
         return view('core.legal.show', [
             'page' => $page,
             'version' => $version,
             'body' => $body,
-            'contents' => $this->legalPages->contentsNavigation($body),
+            'contents' => $body !== '' ? $this->legalPages->contentsNavigation($body) : [],
+            'cookieRegister' => $cookieRegister,
         ]);
     }
 

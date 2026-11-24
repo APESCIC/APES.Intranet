@@ -41,17 +41,21 @@ it('redirects guests to login for signed-in-only legal pages', function () {
         ->assertRedirect(route('login'));
 });
 
-it('hides versions with a future in-effect date until that time', function () {
+it('keeps the cookie register visible when the published wording is not yet in effect', function () {
     $page = LegalPageFixtures::page('cookies', 'Cookies');
     LegalPageFixtures::publishVersion($page, '<h2>Later</h2><p>Not yet.</p>', Carbon::parse('2030-01-01 09:00'));
 
-    $this->get(route('legal.cookies'))->assertNotFound();
+    $this->get(route('legal.cookies'))
+        ->assertOk()
+        ->assertSee('Cookie register')
+        ->assertDontSee('Not yet.');
 
     $this->travelTo(Carbon::parse('2030-01-01 09:00'));
 
     $this->get(route('legal.cookies'))
         ->assertOk()
-        ->assertSee('Later');
+        ->assertSee('Later')
+        ->assertSee('Cookie register');
 });
 
 it('cannot update a published legal page version', function () {
