@@ -56,6 +56,8 @@ class LegalPagesSeeder extends Seeder
         );
 
         $this->seedHostingAndSecurityPage();
+
+        $this->call(FooterLinksSeeder::class);
     }
 
     private function seedDraftVersion(string $slug, string $body, string $changeSummary): void

@@ -9,6 +9,7 @@ use App\Core\Appearance\Http\Controllers\AppearancePreferencesController;
 use App\Core\Audit\Http\Controllers\AuditLogIndexController;
 use App\Core\Auth\Http\Controllers\OidcController;
 use App\Core\Changelog\Http\Controllers\ChangeLogController;
+use App\Core\Legal\Http\Controllers\AdminFooterLinkController;
 use App\Core\Modules\Http\Controllers\AdminModulesController;
 use App\Core\Navigation\Http\Controllers\AdminOverviewController;
 use App\Core\Notifications\Http\Controllers\NotificationInboxController;
@@ -97,6 +98,13 @@ Route::middleware('auth')->group(function () {
             Route::get('/system', SystemStatusController::class)->name('system.index');
             Route::post('/system/test-email', SendTestEmailController::class)->name('system.test-email');
             Route::get('/push-delivery', PushDeliveryStatsController::class)->name('push-delivery.index');
+        });
+        Route::middleware(['can:'.AccessMatrix::LEGAL_PAGES_MANAGE, 'fresh-signin'])->prefix('legal')->name('legal.')->group(function () {
+            Route::get('footer-links', [AdminFooterLinkController::class, 'index'])->name('footer-links.index');
+            Route::post('footer-links', [AdminFooterLinkController::class, 'store'])->name('footer-links.store');
+            Route::put('footer-links/{footerLink}', [AdminFooterLinkController::class, 'update'])->name('footer-links.update');
+            Route::delete('footer-links/{footerLink}', [AdminFooterLinkController::class, 'destroy'])->name('footer-links.destroy');
+            Route::post('footer-links/{footerLink}/reorder', [AdminFooterLinkController::class, 'reorder'])->name('footer-links.reorder');
         });
         Route::middleware(['can:'.AccessMatrix::ADMIN_MODULES_MANAGE, 'fresh-signin'])->prefix('modules')->name('modules.')->group(function () {
             Route::get('/', [AdminModulesController::class, 'index'])->name('index');
