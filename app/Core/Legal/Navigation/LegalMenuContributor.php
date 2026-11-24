@@ -44,11 +44,13 @@ final class LegalMenuContributor implements MenuContributor
                         'admin.legal.footer-links.*',
                         description: 'Choose and order the links in the site footer',
                     ),
-                    NavItem::soon(
+                    NavItem::route(
                         'legal-acceptance',
                         'Acceptance',
                         'clipboard-check',
                         AccessMatrix::LEGAL_PAGES_MANAGE,
+                        'admin.legal.acceptance.index',
+                        'admin.legal.acceptance.*',
                         description: 'Who has accepted the current Terms of use',
                     ),
                     NavItem::soon(
