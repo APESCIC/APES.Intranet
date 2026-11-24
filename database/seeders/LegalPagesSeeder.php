@@ -16,43 +16,73 @@ class LegalPagesSeeder extends Seeder
         $pages = [
             ['slug' => 'privacy', 'title' => 'Privacy notice', 'visibility' => LegalPageVisibility::Everyone],
             ['slug' => 'cookies', 'title' => 'Cookies', 'visibility' => LegalPageVisibility::Everyone],
-            ['slug' => 'terms', 'title' => 'Terms of use', 'visibility' => LegalPageVisibility::Everyone],
+            ['slug' => 'terms', 'title' => 'Terms of use', 'visibility' => LegalPageVisibility::Everyone, 'needs_acceptance' => true],
             ['slug' => 'accessibility', 'title' => 'Accessibility statement', 'visibility' => LegalPageVisibility::Everyone],
             ['slug' => 'hosting-and-security', 'title' => 'Hosting and security', 'visibility' => LegalPageVisibility::SignedIn],
         ];
 
         foreach ($pages as $definition) {
-            LegalPage::query()->firstOrCreate(
+            LegalPage::query()->updateOrCreate(
                 ['slug' => $definition['slug']],
                 [
                     'title' => $definition['title'],
                     'visibility' => $definition['visibility'],
-                    'needs_acceptance' => false,
+                    'needs_acceptance' => $definition['needs_acceptance'] ?? false,
                     'review_interval_months' => 12,
                     'locked' => false,
                 ],
             );
         }
 
-        $privacy = LegalPage::query()->where('slug', 'privacy')->firstOrFail();
-
-        if ($privacy->versions()->doesntExist()) {
-            LegalPageVersion::query()->create([
-                'legal_page_id' => $privacy->id,
-                'number' => 1,
-                'body' => self::privacyDraftBody(),
-                'change_summary' => 'Placeholder draft migrated from the static privacy view.',
-                'status' => LegalPageVersionStatus::Draft,
-                'material_change' => false,
-            ]);
-        }
+        $this->seedDraftVersion(
+            'privacy',
+            self::privacyDraftBody(),
+            'Placeholder draft migrated from the static privacy view.',
+        );
+        $this->seedDraftVersion(
+            'cookies',
+            self::cookiesDraftBody(),
+            'Headings-only draft for the owner to complete from the cookie register.',
+        );
+        $this->seedDraftVersion(
+            'terms',
+            self::termsDraftBody(),
+            'Headings-only draft for the owner to complete, including acceptable use.',
+        );
+        $this->seedDraftVersion(
+            'accessibility',
+            self::accessibilityDraftBody(),
+            'Headings-only draft for the owner to complete.',
+        );
 
         $this->seedHostingAndSecurityPage();
+    }
+
+    private function seedDraftVersion(string $slug, string $body, string $changeSummary): void
+    {
+        $page = LegalPage::query()->where('slug', $slug)->firstOrFail();
+
+        if ($page->versions()->exists()) {
+            return;
+        }
+
+        LegalPageVersion::query()->create([
+            'legal_page_id' => $page->id,
+            'number' => 1,
+            'body' => $body,
+            'change_summary' => $changeSummary,
+            'status' => LegalPageVersionStatus::Draft,
+            'material_change' => false,
+        ]);
     }
 
     private function seedHostingAndSecurityPage(): void
     {
         $page = LegalPage::query()->where('slug', 'hosting-and-security')->firstOrFail();
+
+        if ($page->versions()->where('status', LegalPageVersionStatus::Published)->exists()) {
+            return;
+        }
 
         if ($page->versions()->exists()) {
             return;
@@ -86,6 +116,37 @@ class LegalPagesSeeder extends Seeder
 <li>Cyber Essentials covers Akamai's UK offices and staff, not the servers that run APES applications.</li>
 <li>This page does not list server identifiers, account numbers or internal review findings.</li>
 </ul>
+HTML;
+    }
+
+    public static function cookiesDraftBody(): string
+    {
+        return <<<'HTML'
+<h2 class="font-serif text-xl font-semibold">What cookies we use</h2>
+<h2 class="font-serif text-xl font-semibold">Strictly necessary cookies</h2>
+<h2 class="font-serif text-xl font-semibold">How long they last</h2>
+<h2 class="font-serif text-xl font-semibold">How to contact us</h2>
+HTML;
+    }
+
+    public static function termsDraftBody(): string
+    {
+        return <<<'HTML'
+<h2 class="font-serif text-xl font-semibold">Who we are</h2>
+<h2 class="font-serif text-xl font-semibold">Acceptable use</h2>
+<h2 class="font-serif text-xl font-semibold">Your account</h2>
+<h2 class="font-serif text-xl font-semibold">Changes</h2>
+<h2 class="font-serif text-xl font-semibold">Contact</h2>
+HTML;
+    }
+
+    public static function accessibilityDraftBody(): string
+    {
+        return <<<'HTML'
+<h2 class="font-serif text-xl font-semibold">WCAG 2.2 AA status</h2>
+<h2 class="font-serif text-xl font-semibold">Known issues</h2>
+<h2 class="font-serif text-xl font-semibold">How to report a problem</h2>
+<h2 class="font-serif text-xl font-semibold">Contact</h2>
 HTML;
     }
 
