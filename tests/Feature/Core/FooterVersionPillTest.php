@@ -65,7 +65,8 @@ it('shows a development label from changelog JSON when no version is stamped', f
 
     $footer = footerOf($this->actingAs(pillUser(RoleName::Staff))->get(route('dashboard'))->getContent());
 
-    expect($footer)->toMatch('/'.preg_quote($base, '/').'\+dev(\.[0-9a-f]{7})?</')
+    expect($footer)->toContain('>'.$base.'</a>')
+        ->and($footer)->not->toContain('+dev')
         ->and($footer)->toContain('href="'.route('change-log.show', $base).'"');
 });
 
