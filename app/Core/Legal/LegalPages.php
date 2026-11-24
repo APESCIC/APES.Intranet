@@ -162,4 +162,119 @@ final class LegalPages
             ->get()
             ->all();
     }
+
+    /**
+     * @return list<LegalPageVersion>
+     */
+    public function allVersions(LegalPage $page): array
+    {
+        return $page->versions()->orderByDesc('number')->get()->all();
+    }
+
+    public function restore(LegalPage $page, LegalPageVersion $version): LegalPageVersion
+    {
+        $existing = $this->draftFor($page);
+        if ($existing !== null) {
+            $this->updateDraft(
+                $existing,
+                $version->body,
+                $version->change_summary,
+                $version->material_change,
+            );
+
+            return $existing->fresh();
+        }
+
+        return $this->createDraft(
+            $page,
+            $version->body,
+            $version->change_summary,
+            $version->material_change,
+        );
+    }
+
+    /**
+     * @return list<array{type: 'equal'|'insert'|'delete', text: string}>
+     */
+    public function compare(LegalPageVersion $from, LegalPageVersion $to): array
+    {
+        return $this->diffWords(
+            $this->wordsFromHtml($from->body),
+            $this->wordsFromHtml($to->body),
+        );
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function wordsFromHtml(string $html): array
+    {
+        $text = trim(preg_replace('/\s+/u', ' ', strip_tags($html)) ?? '');
+        if ($text === '') {
+            return [];
+        }
+
+        return preg_split('/\s+/u', $text) ?: [];
+    }
+
+    /**
+     * @param  list<string>  $a
+     * @param  list<string>  $b
+     * @return list<array{type: 'equal'|'insert'|'delete', text: string}>
+     */
+    private function diffWords(array $a, array $b): array
+    {
+        $rows = count($a) + 1;
+        $cols = count($b) + 1;
+        $lcs = array_fill(0, $rows, array_fill(0, $cols, 0));
+
+        for ($i = 1; $i < $rows; $i++) {
+            for ($j = 1; $j < $cols; $j++) {
+                if ($a[$i - 1] === $b[$j - 1]) {
+                    $lcs[$i][$j] = $lcs[$i - 1][$j - 1] + 1;
+                } else {
+                    $lcs[$i][$j] = max($lcs[$i - 1][$j], $lcs[$i][$j - 1]);
+                }
+            }
+        }
+
+        /** @var list<array{type: 'equal'|'insert'|'delete', text: string}> $result */
+        $result = [];
+        $i = count($a);
+        $j = count($b);
+
+        while ($i > 0 || $j > 0) {
+            if ($i > 0 && $j > 0 && $a[$i - 1] === $b[$j - 1]) {
+                $result = $this->pushDiffToken($result, 'equal', $a[$i - 1]);
+                $i--;
+                $j--;
+            } elseif ($j > 0 && ($i === 0 || $lcs[$i][$j - 1] >= $lcs[$i - 1][$j])) {
+                $result = $this->pushDiffToken($result, 'insert', $b[$j - 1]);
+                $j--;
+            } else {
+                $result = $this->pushDiffToken($result, 'delete', $a[$i - 1]);
+                $i--;
+            }
+        }
+
+        return array_reverse($result);
+    }
+
+    /**
+     * @param  list<array{type: 'equal'|'insert'|'delete', text: string}>  $result
+     * @return list<array{type: 'equal'|'insert'|'delete', text: string}>
+     */
+    private function pushDiffToken(array $result, string $type, string $word): array
+    {
+        if ($result !== [] && $result[count($result) - 1]['type'] === $type) {
+            $lastIndex = count($result) - 1;
+            $result[$lastIndex]['text'] .= ' '.$word;
+
+            return $result;
+        }
+
+        $result[] = ['type' => $type, 'text' => $word];
+
+        return $result;
+    }
 }

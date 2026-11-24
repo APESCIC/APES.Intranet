@@ -110,6 +110,95 @@ final class AdminLegalPageController
         ]);
     }
 
+    public function publish(Request $request, LegalPage $legalPage, AuditLogger $audit): RedirectResponse
+    {
+        $draft = $this->legalPages->draftFor($legalPage);
+        abort_if($draft === null, 404);
+
+        $data = $request->validate([
+            'in_effect_at' => ['nullable', 'date'],
+            'mode' => ['required', Rule::in(['now', 'schedule'])],
+        ]);
+
+        $inEffectAt = null;
+        if ($data['mode'] === 'schedule' && isset($data['in_effect_at']) && $data['in_effect_at'] !== '') {
+            $inEffectAt = Carbon::parse($data['in_effect_at'], config('app.timezone'))->startOfDay();
+        }
+
+        $this->legalPages->publish($draft, $request->user(), $inEffectAt);
+
+        $draft->refresh();
+
+        $audit->record(LegalAuditEvents::PAGE_PUBLISHED, $legalPage, [
+            'legal_page_id' => $legalPage->id,
+            'legal_page_version_id' => $draft->id,
+            'slug' => $legalPage->slug,
+            'version_number' => $draft->number,
+            'in_effect_at' => $inEffectAt?->toIso8601String(),
+        ], $request->user());
+
+        $message = $inEffectAt !== null && $inEffectAt->isFuture()
+            ? 'Version '.$draft->number.' is scheduled.'
+            : 'Version '.$draft->number.' is now published.';
+
+        return redirect()
+            ->route('admin.legal.pages.index')
+            ->with('status', $message);
+    }
+
+    public function history(LegalPage $legalPage): View
+    {
+        return view('core.legal.admin.pages.history', [
+            'page' => $legalPage,
+            'versions' => $this->legalPages->allVersions($legalPage),
+            'draft' => $this->legalPages->draftFor($legalPage),
+        ]);
+    }
+
+    public function compare(Request $request, LegalPage $legalPage): View
+    {
+        $data = $request->validate([
+            'from' => ['required', 'integer'],
+            'to' => ['required', 'integer'],
+        ]);
+
+        $from = LegalPageVersion::query()
+            ->where('legal_page_id', $legalPage->id)
+            ->whereKey($data['from'])
+            ->firstOrFail();
+
+        $to = LegalPageVersion::query()
+            ->where('legal_page_id', $legalPage->id)
+            ->whereKey($data['to'])
+            ->firstOrFail();
+
+        return view('core.legal.admin.pages.compare', [
+            'page' => $legalPage,
+            'fromVersion' => $from,
+            'toVersion' => $to,
+            'diff' => $this->legalPages->compare($from, $to),
+        ]);
+    }
+
+    public function restore(Request $request, LegalPage $legalPage, LegalPageVersion $legalPageVersion, AuditLogger $audit): RedirectResponse
+    {
+        abort_if($legalPageVersion->legal_page_id !== $legalPage->id, 404);
+
+        $draft = $this->legalPages->restore($legalPage, $legalPageVersion);
+
+        $audit->record(LegalAuditEvents::PAGE_RESTORED, $legalPage, [
+            'legal_page_id' => $legalPage->id,
+            'legal_page_version_id' => $draft->id,
+            'restored_from_version_id' => $legalPageVersion->id,
+            'restored_from_number' => $legalPageVersion->number,
+            'slug' => $legalPage->slug,
+        ], $request->user());
+
+        return redirect()
+            ->route('admin.legal.pages.edit', $legalPage)
+            ->with('status', 'Draft updated from version '.$legalPageVersion->number.'.');
+    }
+
     /**
      * @return array{
      *     page: LegalPage,

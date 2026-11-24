@@ -48,6 +48,11 @@ it('forbids every admin legal route without legal.pages.manage', function () {
         'body' => '<p>Draft</p>',
         'visibility' => LegalPageVisibility::Everyone,
     ])->assertForbidden();
+    $acting->post(route('admin.legal.pages.publish', $page), ['mode' => 'now'])->assertForbidden();
+    $acting->get(route('admin.legal.pages.history', $page))->assertForbidden();
+    $acting->get(route('admin.legal.pages.compare', ['legalPage' => $page, 'from' => 1, 'to' => 2]))->assertForbidden();
+    $version = $page->versions()->first();
+    $acting->post(route('admin.legal.pages.restore', [$page, $version]))->assertForbidden();
 });
 
 it('renders admin preview with the same pipeline as the public legal page', function () {
