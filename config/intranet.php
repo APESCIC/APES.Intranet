@@ -13,6 +13,13 @@ return [
     'qa_login_enabled' => (bool) env('QA_LOGIN_ENABLED', false),
 
     /*
+    | Organisation Director email. Gates "Set as shared default" on the admin
+    | dashboard layout. Not a Spatie role — compare case-insensitively to the
+    | signed-in user's email. Name only in .env.example; value in APES Vault.
+    */
+    'director_email' => env('INTRANET_DIRECTOR_EMAIL'),
+
+    /*
     | HR and agreements pages ask for a new Cloudron sign-in when the last one
     | is older than this many minutes.
     */

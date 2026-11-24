@@ -4,6 +4,7 @@ use App\Core\Access\AccessMatrix;
 use App\Core\Access\Http\Controllers\AccessGuideController;
 use App\Core\Access\Http\Controllers\AccessReviewController;
 use App\Core\Access\Http\Controllers\RoleIndexController;
+use App\Core\AdminDashboard\Http\Controllers\AdminDashboardLayoutController;
 use App\Core\Appearance\Http\Controllers\AppearancePreferencesController;
 use App\Core\Audit\Http\Controllers\AuditLogIndexController;
 use App\Core\Auth\Http\Controllers\OidcController;
@@ -73,6 +74,12 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/', AdminOverviewController::class)->name('overview');
+        Route::post('/layout', [AdminDashboardLayoutController::class, 'save'])->name('overview.layout.save');
+        Route::post('/layout/reset', [AdminDashboardLayoutController::class, 'reset'])->name('overview.layout.reset');
+        Route::post('/layout/shared-default', [AdminDashboardLayoutController::class, 'setSharedDefault'])->name('overview.layout.shared-default');
+        Route::post('/layout/move', [AdminDashboardLayoutController::class, 'move'])->name('overview.layout.move');
+        Route::post('/layout/hide', [AdminDashboardLayoutController::class, 'hide'])->name('overview.layout.hide');
+        Route::post('/layout/show', [AdminDashboardLayoutController::class, 'show'])->name('overview.layout.show');
         Route::get('/roles', RoleIndexController::class)->name('roles.index');
         Route::get('/audit', AuditLogIndexController::class)
             ->middleware('can:'.AccessMatrix::ADMIN_AUDIT_VIEW)

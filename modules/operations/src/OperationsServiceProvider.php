@@ -7,8 +7,10 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\ServiceProvider;
+use Modules\Operations\Analytics\OperationsDailyMetrics;
 use Modules\Operations\Console\AlertMissedChecklists;
 use Modules\Operations\Console\FlagMissedClockOuts;
+use Modules\Operations\Dashboard\OperationsAdminDashboardCards;
 use Modules\Operations\Dashboard\OperationsDashboardCards;
 use Modules\Operations\Models\ChecklistRun;
 use Modules\Operations\Models\Task;
@@ -25,6 +27,10 @@ class OperationsServiceProvider extends ServiceProvider
         $this->app->tag([OperationsMenuContributor::class], 'intranet.menu');
         $this->app->singleton(OperationsDashboardCards::class);
         $this->app->tag([OperationsDashboardCards::class], 'intranet.dashboard');
+        $this->app->singleton(OperationsAdminDashboardCards::class);
+        $this->app->tag([OperationsAdminDashboardCards::class], 'intranet.admin-dashboard');
+        $this->app->singleton(OperationsDailyMetrics::class);
+        $this->app->tag([OperationsDailyMetrics::class], 'intranet.daily-metrics');
     }
 
     public function boot(): void
