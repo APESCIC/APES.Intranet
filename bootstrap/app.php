@@ -3,6 +3,7 @@
 use App\Core\Auth\Http\Middleware\RequireFreshSignIn;
 use App\Core\Health\HealthzController;
 use App\Core\Http\Middleware\PreventCachingSignedInPages;
+use App\Core\Legal\Http\Middleware\EnsureTermsAccepted;
 use App\Core\Modules\Http\Middleware\EnsureModuleEnabled;
 use App\Core\Qa\QaLogin;
 use Illuminate\Foundation\Application;
@@ -35,8 +36,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'fresh-signin' => RequireFreshSignIn::class,
             'module' => EnsureModuleEnabled::class,
+            'terms-accepted' => EnsureTermsAccepted::class,
         ]);
-        $middleware->web(append: [PreventCachingSignedInPages::class]);
+        $middleware->web(append: [
+            PreventCachingSignedInPages::class,
+            EnsureTermsAccepted::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

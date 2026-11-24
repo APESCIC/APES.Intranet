@@ -11,6 +11,7 @@ use App\Core\Auth\Http\Controllers\OidcController;
 use App\Core\Changelog\Http\Controllers\ChangeLogController;
 use App\Core\Legal\Http\Controllers\AdminFooterLinkController;
 use App\Core\Legal\Http\Controllers\AdminLegalPageController;
+use App\Core\Legal\Http\Controllers\TermsAcceptanceController;
 use App\Core\Modules\Http\Controllers\AdminModulesController;
 use App\Core\Navigation\Http\Controllers\AdminOverviewController;
 use App\Core\Notifications\Http\Controllers\NotificationInboxController;
@@ -44,6 +45,11 @@ Route::get('/auth/reauth', [OidcController::class, 'reauthenticate'])->middlewar
 Route::post('/logout', [OidcController::class, 'logout'])->middleware('auth')->name('logout');
 
 Route::middleware('auth')->group(function () {
+    Route::get('/legal/accept', [TermsAcceptanceController::class, 'show'])->name('legal.accept.show');
+    Route::post('/legal/accept', [TermsAcceptanceController::class, 'store'])->name('legal.accept.store');
+    Route::post('/legal/notices/{legalPage}/dismiss', [TermsAcceptanceController::class, 'dismissNotice'])
+        ->name('legal.notice.dismiss');
+
     Route::post('/appearance/preferences', AppearancePreferencesController::class)
         ->middleware('throttle:60,1')
         ->name('appearance.preferences.update');

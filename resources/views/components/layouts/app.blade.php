@@ -85,6 +85,9 @@
                         @if ($qaProfile)
                             <x-qa.notices :profile="$qaProfile" :confirm="$qaConfirm" :notice="$qaNotice" />
                         @endif
+                        @auth
+                            <x-legal.updated-notice :notices="$legalUpdatedNotices ?? []" />
+                        @endauth
                         {{ $slot }}
                     </main>
 
