@@ -35,6 +35,10 @@
         "key": "admin-apps",
         "heading": "Apps and content",
         "items": [
+            "legal-pages",
+            "legal-footer-links",
+            "legal-acceptance",
+            "legal-audit",
             "m365-links"
         ]
     },
