@@ -1,8 +1,10 @@
 # Cloudron sign-in
 
 Staff, volunteers and students sign in with their Cloudron account through
-OpenID Connect (OIDC). At each sign-in, the intranet reads the person's
-groups from Cloudron LDAP and sets their intranet roles to match.
+OpenID Connect (OIDC). From v0.6.19 the intranet reads groups from the OIDC
+`groups` claim (when `INTRANET_DIRECTORY_SOURCE=cloudron`) and syncs the
+directory from the Cloudron read-only API. LDAP remains available as a
+switch-back for this release only.
 
 The owner, the APES IT Administrator, or an agent with the owner's approval in
 the current chat does the steps below.
@@ -117,6 +119,19 @@ After that the intranet sends the person back to Cloudron with
 depend on how the person signs in (password, passkey or two-factor), only on
 Cloudron's `auth_time` claim. Details are in
 [architecture.md](architecture.md#fresh-sign-in).
+
+## Switching back to LDAP (v0.6.19 only)
+
+Set `INTRANET_DIRECTORY_SOURCE=ldap` in Cloudron `shared/.env` and restart the
+app. Nightly sync and (until OIDC groups are the only path) group lookup use
+LDAP again. Set it back to `cloudron` (or remove the line) and restart to
+return to the Cloudron API. The LDAP addon variables stay on the LAMP package
+for this release so the switch-back works without a redeploy.
+
+When the source is `cloudron` and LDAP is still configured, each nightly sync
+also compares the two directories read-only and records differences in the
+audit log and **Admin > System status**. A comparison failure never blocks
+sign-in or the sync itself.
 
 ## Locally
 
