@@ -6,6 +6,7 @@ use App\Core\Audit\AuditLogger;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Support\LegalPageFixtures;
 
 uses(RefreshDatabase::class);
 
@@ -132,6 +133,8 @@ it('schedules the prune command daily', function () {
 });
 
 it('links the privacy notice in the footer and shows it without signing in', function () {
+    LegalPageFixtures::publishPrivacyNotice();
+
     $this->get(route('login'))->assertSee(route('privacy'), false);
     $this->get(route('privacy'))->assertOk()->assertSee('Privacy notice')->assertSee('audit log');
 });
