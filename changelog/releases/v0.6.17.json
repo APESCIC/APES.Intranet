@@ -1,0 +1,37 @@
+{
+    "version": "v0.6.17",
+    "released_at": "2026-11-24",
+    "title": "Admin dashboard with editable cards",
+    "summary": "The Admin home page is now a card dashboard. Admins see only the cards their permissions allow, can rearrange or hide them, and the Director can set a shared default layout for new admins.",
+    "audiences": [
+        "staff"
+    ],
+    "changes": {
+        "added": [
+            "Admin home shows permission-aware cards for help desk queues and SLA, sign-ins, who is clocked in, rota cover, module health, recent admin activity and versions.",
+            "Each admin can edit their dashboard layout: move cards with buttons, hide cards, and add them back from a picker that lists only cards they may see.",
+            "The Director can save the current layout as the shared default; any admin can reset their layout to that default.",
+            "Daily totals store aggregate counts (no individual tracking) for charts such as sign-ins over the last 14 days."
+        ],
+        "changed": [
+            "Admin home is a card dashboard instead of a simple link grid."
+        ],
+        "accessibility": [
+            "Dashboard layout can be rearranged with Move up and Move down buttons; dragging is not required."
+        ]
+    },
+    "internal_notes": [
+        "Epic #414. Leaves #438–#443. Two new tables (analytics_daily_totals, admin_dashboard_layouts): Cloudron backup before deploy. Director gate via INTRANET_DIRECTOR_EMAIL. DPIA screening in .github-private docs/apes-intranet/admin-analytics-dpia-screening.md."
+    ],
+    "module_versions": {
+        "core": "v0.6.17",
+        "communications": "0.1.0",
+        "helpdesk": "0.1.0",
+        "hr": "0.1.0",
+        "learning": "0.1.0",
+        "microsoft-365": "0.1.0",
+        "operations": "0.1.0",
+        "people": "0.1.0"
+    },
+    "published": true
+}
