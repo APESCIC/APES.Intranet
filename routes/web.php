@@ -10,6 +10,7 @@ use App\Core\Audit\Http\Controllers\AuditLogIndexController;
 use App\Core\Auth\Http\Controllers\OidcController;
 use App\Core\Changelog\Http\Controllers\ChangeLogController;
 use App\Core\Legal\Http\Controllers\AdminFooterLinkController;
+use App\Core\Legal\Http\Controllers\AdminLegalAcceptanceController;
 use App\Core\Legal\Http\Controllers\AdminLegalPageController;
 use App\Core\Legal\Http\Controllers\TermsAcceptanceController;
 use App\Core\Modules\Http\Controllers\AdminModulesController;
@@ -115,6 +116,8 @@ Route::middleware('auth')->group(function () {
             Route::get('pages/{legalPage}/history', [AdminLegalPageController::class, 'history'])->name('pages.history');
             Route::get('pages/{legalPage}/compare', [AdminLegalPageController::class, 'compare'])->name('pages.compare');
             Route::post('pages/{legalPage}/versions/{legalPageVersion}/restore', [AdminLegalPageController::class, 'restore'])->name('pages.restore');
+            Route::get('acceptance', [AdminLegalAcceptanceController::class, 'index'])->name('acceptance.index');
+            Route::get('acceptance/export', [AdminLegalAcceptanceController::class, 'export'])->name('acceptance.export');
             Route::get('footer-links', [AdminFooterLinkController::class, 'index'])->name('footer-links.index');
             Route::post('footer-links', [AdminFooterLinkController::class, 'store'])->name('footer-links.store');
             Route::put('footer-links/{footerLink}', [AdminFooterLinkController::class, 'update'])->name('footer-links.update');

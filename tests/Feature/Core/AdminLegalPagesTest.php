@@ -41,6 +41,8 @@ it('forbids every admin legal route without legal.pages.manage', function () {
     $acting = $this->actingAs($staff)->withSession($session);
 
     $acting->get(route('admin.legal.footer-links.index'))->assertForbidden();
+    $acting->get(route('admin.legal.acceptance.index'))->assertForbidden();
+    $acting->get(route('admin.legal.acceptance.export'))->assertForbidden();
     $acting->get(route('admin.legal.pages.index'))->assertForbidden();
     $acting->get(route('admin.legal.pages.edit', $page))->assertForbidden();
     $acting->get(route('admin.legal.pages.preview', $page))->assertForbidden();
