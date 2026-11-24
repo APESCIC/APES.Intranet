@@ -2,13 +2,11 @@
 
 namespace App\Core\Version;
 
-use App\Core\Health\LocalRevision;
-
 /**
  * The version that is actually running. The stamped VERSION file (from the
  * release bundle) wins. When it is missing (Herd, CI), the display label uses
- * the highest published change-log JSON plus a short git commit from .git
- * files — never a shell call. Health checks keep the strict stamped value.
+ * the highest published change-log JSON as a plain vX.Y.Z. Health checks keep
+ * the strict stamped value.
  */
 class AppVersion
 {
@@ -36,7 +34,7 @@ class AppVersion
 
     /**
      * Label for the footer pill and change-log hub. Prefer the stamped file;
-     * otherwise the newest published release JSON with +dev[.shortsha].
+     * otherwise the newest published release JSON (plain vX.Y.Z, no +dev suffix).
      */
     public function label(): string
     {
@@ -98,17 +96,7 @@ class AppVersion
             return $stamped;
         }
 
-        $published = $this->highestPublishedRelease();
-        if ($published === null) {
-            return self::DEV;
-        }
-
-        $sha = (new LocalRevision($this->root()))->current();
-        if ($sha === null || $sha === '') {
-            return $published.'+dev';
-        }
-
-        return $published.'+dev.'.substr($sha, 0, 7);
+        return $this->highestPublishedRelease() ?? self::DEV;
     }
 
     private function highestPublishedRelease(): ?string
