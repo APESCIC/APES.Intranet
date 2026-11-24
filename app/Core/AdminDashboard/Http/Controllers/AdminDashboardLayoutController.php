@@ -5,6 +5,7 @@ namespace App\Core\AdminDashboard\Http\Controllers;
 use App\Core\Access\RoleName;
 use App\Core\AdminDashboard\AdminDashboard;
 use App\Core\AdminDashboard\AdminDashboardLayouts;
+use App\Core\AdminDashboard\DirectorGate;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -42,6 +43,23 @@ class AdminDashboardLayoutController
         $layouts->resetPersonal($user);
 
         return redirect()->route('admin.overview')->with('status', 'Your admin dashboard was reset to the shared default.');
+    }
+
+    public function setSharedDefault(Request $request, AdminDashboard $dashboard, AdminDashboardLayouts $layouts, DirectorGate $director): RedirectResponse
+    {
+        $user = $this->admin($request);
+        abort_unless($director->allows($user), 403);
+        abort_unless($request->boolean('confirm'), 422);
+
+        $available = $dashboard->cardsFor($user);
+        $visible = $layouts->apply($user, $available);
+        $hidden = $layouts->hiddenCards($user, $available);
+        $layouts->saveSharedDefault(
+            array_column($visible, 'key'),
+            array_column($hidden, 'key'),
+        );
+
+        return redirect()->route('admin.overview')->with('status', 'The shared default admin dashboard layout was updated.');
     }
 
     public function move(Request $request, AdminDashboard $dashboard, AdminDashboardLayouts $layouts): RedirectResponse

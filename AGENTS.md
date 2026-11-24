@@ -128,6 +128,7 @@ Development is tracked only in GitHub issues, sub-issues and `vMAJOR.MINOR.PATCH
 
 ## Decisions and gotchas
 
+- 2026-11-22: Admin dashboard shared default is gated by `INTRANET_DIRECTOR_EMAIL` → `config('intranet.director_email')` (email match, not a Spatie role). Name only in `.env.example`; value in APES Vault / Cloudron env.
 - 2026-11-14: Laravel Herd Pro is the only local set-up (Bambie, #282), replacing Laragon (#213, #344).
 - Herd's global `php` may be newer than 8.4: always use `herd-env.ps1` / `herd php`.
 - After Herd restarts, `herd services:list` can show MySQL stopped while port 3306 still answers; start by service id. Trust `scripts\preview.ps1`.

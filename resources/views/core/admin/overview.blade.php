@@ -10,6 +10,18 @@
                 @csrf
                 <button type="submit" class="sg-btn sg-btn-ghost sg-btn-sm">Reset to default</button>
             </form>
+            @if ($isDirector)
+                <form
+                    method="post"
+                    action="{{ route('admin.overview.layout.shared-default') }}"
+                    class="inline"
+                    onsubmit="return confirm('Save the current card order and visibility as the shared default for all admins who have not customised their layout?');"
+                >
+                    @csrf
+                    <input type="hidden" name="confirm" value="1">
+                    <button type="submit" class="sg-btn sg-btn-secondary sg-btn-sm" data-set-shared-default>Set as shared default</button>
+                </form>
+            @endif
         @else
             <a href="{{ route('admin.overview', ['edit' => 1]) }}" class="sg-btn sg-btn-secondary sg-btn-sm" data-admin-edit-layout>Edit layout</a>
         @endif

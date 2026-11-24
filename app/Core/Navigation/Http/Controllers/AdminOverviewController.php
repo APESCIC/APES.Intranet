@@ -5,6 +5,7 @@ namespace App\Core\Navigation\Http\Controllers;
 use App\Core\Access\RoleName;
 use App\Core\AdminDashboard\AdminDashboard;
 use App\Core\AdminDashboard\AdminDashboardLayouts;
+use App\Core\AdminDashboard\DirectorGate;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -15,7 +16,7 @@ use Illuminate\View\View;
  */
 class AdminOverviewController
 {
-    public function __invoke(Request $request, AdminDashboard $dashboard, AdminDashboardLayouts $layouts): View
+    public function __invoke(Request $request, AdminDashboard $dashboard, AdminDashboardLayouts $layouts, DirectorGate $director): View
     {
         $user = $request->user();
         abort_unless($user instanceof User && $user->hasRole(RoleName::Admin->value), 403);
@@ -44,6 +45,7 @@ class AdminOverviewController
             'flatCards' => $visible,
             'hiddenCards' => $hidden,
             'hasPersonalLayout' => $layouts->personalLayout($user) !== null,
+            'isDirector' => $director->allows($user),
         ]);
     }
 }

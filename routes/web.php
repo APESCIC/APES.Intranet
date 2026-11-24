@@ -76,6 +76,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/', AdminOverviewController::class)->name('overview');
         Route::post('/layout', [AdminDashboardLayoutController::class, 'save'])->name('overview.layout.save');
         Route::post('/layout/reset', [AdminDashboardLayoutController::class, 'reset'])->name('overview.layout.reset');
+        Route::post('/layout/shared-default', [AdminDashboardLayoutController::class, 'setSharedDefault'])->name('overview.layout.shared-default');
         Route::post('/layout/move', [AdminDashboardLayoutController::class, 'move'])->name('overview.layout.move');
         Route::post('/layout/hide', [AdminDashboardLayoutController::class, 'hide'])->name('overview.layout.hide');
         Route::post('/layout/show', [AdminDashboardLayoutController::class, 'show'])->name('overview.layout.show');
