@@ -133,6 +133,7 @@ it('schedules the prune command daily', function () {
 });
 
 it('links the privacy notice in the footer and shows it without signing in', function () {
+    $this->seed(\Database\Seeders\FooterLinksSeeder::class);
     LegalPageFixtures::publishPrivacyNotice();
 
     $this->get(route('login'))->assertSee(route('privacy'), false);
