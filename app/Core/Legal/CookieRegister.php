@@ -38,7 +38,7 @@ final class CookieRegister
      */
     public function registeredNames(): array
     {
-        return array_values(array_column($this->entries(), 'name'));
+        return array_column($this->entries(), 'name');
     }
 
     /**
