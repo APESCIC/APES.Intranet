@@ -2,6 +2,7 @@
 
 namespace App\Core\Legal;
 
+use App\Core\Legal\Exceptions\OpenLegalDraftExistsException;
 use App\Core\Legal\Exceptions\PublishedLegalVersionException;
 use App\Core\Support\HtmlSanitizer;
 use App\Models\LegalPage;
@@ -67,8 +68,37 @@ final class LegalPages
         return $items;
     }
 
+    public function draftFor(LegalPage $page): ?LegalPageVersion
+    {
+        return $page->versions()
+            ->where('status', LegalPageVersionStatus::Draft)
+            ->orderByDesc('number')
+            ->first();
+    }
+
+    public function openDraft(LegalPage $page): LegalPageVersion
+    {
+        $existing = $this->draftFor($page);
+        if ($existing !== null) {
+            return $existing;
+        }
+
+        $latestPublished = $page->versions()
+            ->where('status', LegalPageVersionStatus::Published)
+            ->orderByDesc('number')
+            ->first();
+
+        $body = $latestPublished !== null ? $latestPublished->body : '';
+
+        return $this->createDraft($page, $body);
+    }
+
     public function createDraft(LegalPage $page, string $body, ?string $changeSummary = null, bool $materialChange = false): LegalPageVersion
     {
+        if ($this->draftFor($page) !== null) {
+            throw new OpenLegalDraftExistsException;
+        }
+
         $number = (int) $page->versions()->max('number') + 1;
 
         return $page->versions()->create([
@@ -80,8 +110,13 @@ final class LegalPages
         ]);
     }
 
-    public function updateDraft(LegalPageVersion $version, string $body, ?string $changeSummary = null): void
-    {
+    public function updateDraft(
+        LegalPageVersion $version,
+        string $body,
+        ?string $changeSummary = null,
+        bool $materialChange = false,
+        ?Carbon $inEffectAt = null,
+    ): void {
         if ($version->status === LegalPageVersionStatus::Published) {
             throw new PublishedLegalVersionException;
         }
@@ -89,6 +124,8 @@ final class LegalPages
         $version->update([
             'body' => $this->sanitizer->clean($body),
             'change_summary' => $changeSummary,
+            'material_change' => $materialChange,
+            'in_effect_at' => $inEffectAt,
         ]);
     }
 
