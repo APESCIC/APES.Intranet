@@ -33,11 +33,13 @@ final class LegalMenuContributor implements MenuContributor
                         AccessMatrix::LEGAL_PAGES_MANAGE,
                         description: 'Draft, preview and publish privacy, cookies, terms and related pages',
                     ),
-                    NavItem::soon(
+                    NavItem::route(
                         'legal-footer-links',
                         'Footer links',
                         'link',
                         AccessMatrix::LEGAL_PAGES_MANAGE,
+                        'admin.legal.footer-links.index',
+                        'admin.legal.footer-links.*',
                         description: 'Choose and order the links in the site footer',
                     ),
                     NavItem::soon(
