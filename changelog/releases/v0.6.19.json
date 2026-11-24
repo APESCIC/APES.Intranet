@@ -1,0 +1,36 @@
+{
+    "version": "v0.6.19",
+    "released_at": "2026-11-24",
+    "title": "Sign-in groups from Cloudron",
+    "summary": "Your intranet role now comes from your Cloudron groups when you sign in. The footer version shows a plain version number, without a development build suffix.",
+    "audiences": [
+        "staff",
+        "volunteers",
+        "students"
+    ],
+    "changes": {
+        "added": [
+            "Sign-in uses your Cloudron groups to set your intranet role, so access stays in step with Cloudron."
+        ],
+        "changed": [
+            "The footer version pill shows the plain published version (for example v0.6.19), without a +dev build suffix."
+        ],
+        "fixed": [
+            "Development previews no longer show a confusing +dev commit suffix on the version pill."
+        ]
+    },
+    "internal_notes": [
+        "Epic #471. Leaves #515, #473, #474, #475, #476, #477. INTRANET_DIRECTORY_SOURCE cloudron|ldap; OIDC groups claim; CloudronApiDirectoryRoster; shadow compare; Rollback 1/2 runbook in docs/deploy/cloudron.md. Follow-up: 7-night LDAP shadow zero-diff monitoring after go-live."
+    ],
+    "module_versions": {
+        "core": "v0.6.19",
+        "communications": "0.1.0",
+        "helpdesk": "0.1.0",
+        "hr": "0.1.0",
+        "learning": "0.1.0",
+        "microsoft-365": "0.1.0",
+        "operations": "0.1.0",
+        "people": "0.1.0"
+    },
+    "published": true
+}
