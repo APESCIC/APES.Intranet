@@ -8,6 +8,7 @@ use App\Core\Access\Policies\RolePolicy;
 use App\Core\Access\RoleName;
 use App\Core\AdminDashboard\AdminDashboard;
 use App\Core\AdminDashboard\AdminSectionCards;
+use App\Core\Analytics\RecordDailyAnalytics;
 use App\Core\Appearance\AppearancePreferences;
 use App\Core\Audit\Console\PruneAuditLog;
 use App\Core\Auth\Cloudron\CloudronIdentityProvider;
@@ -71,6 +72,7 @@ class CoreServiceProvider extends ServiceProvider
     {
         $this->commands([
             PruneAuditLog::class,
+            RecordDailyAnalytics::class,
             RunSystemChecks::class,
             RemindAccessReview::class,
             ValidateChangelog::class,
