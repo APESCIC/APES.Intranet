@@ -32,6 +32,7 @@ use App\Core\Hr\NullApprovedLeaveLookup;
 use App\Core\Legal\FooterLinkPresenter;
 use App\Core\Legal\FooterLinks;
 use App\Core\Legal\Navigation\LegalMenuContributor;
+use App\Core\Legal\TermsAcceptance;
 use App\Core\Modules\ModuleRegistry;
 use App\Core\Navigation\Menu;
 use App\Core\Navigation\MenuMode;
@@ -131,6 +132,7 @@ class CoreServiceProvider extends ServiceProvider
                 'recentNotifications' => $user
                     ? $user->notifications()->latest()->limit(8)->get()
                     : collect(),
+                'legalUpdatedNotices' => $user ? app(TermsAcceptance::class)->pendingUpdatedNotices($user) : [],
             ]);
         });
     }

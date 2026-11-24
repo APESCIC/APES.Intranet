@@ -2,6 +2,10 @@
 
 return [
 
+    'acceptance' => [
+        'enabled' => env('LEGAL_ACCEPTANCE_PROMPT', true),
+    ],
+
     /*
     | Cookies placed by the intranet today. Each entry is listed on /cookies.
     | Use name_from when the cookie name comes from another config value.
