@@ -18,6 +18,7 @@ The private intranet for APES CIC staff, volunteers and students: updates, the d
 - Local stack: Laravel Herd Pro only, with fake demo data. Never real HR, student, volunteer or agreement data.
 - Key paths: `app/`, `resources/`, `routes/`, `database/`, `docs/`, `.cursor/skills/`, `deploy/cloudron/`.
 - App shell (v0.6.11+, phone menu #422): top bar with logo (no Staff/Admin subtitle for admins); **64rem+** Home link and section mega menus (More overflow when needed); **below 64rem** Menu button opening a full-height phone menu panel (section icons, appearance controls); notification bell and account menu (Intranet/Admin panel links for admins); content column at 95% viewport width; opaque panels. No left-rail drawer. Layout and keyboard notes: [docs/shell.md](docs/shell.md).
+- Site footer (v0.6.18+): grouped links (Legal, Trust and help, About) from `footer_links`, plus the existing version pill; Privacy and Cookies stay locked for Everyone. Legal pages how-to: [docs/legal-pages.md](docs/legal-pages.md).
 
 ## Local development and preview
 
