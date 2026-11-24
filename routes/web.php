@@ -21,13 +21,19 @@ use App\Core\Qa\Http\Controllers\QaLoginController;
 use App\Core\Qa\Http\Middleware\EnsureQaLoginEnabled;
 use App\Core\System\Http\Controllers\SendTestEmailController;
 use App\Core\System\Http\Controllers\SystemStatusController;
+use App\Http\Controllers\LegalPageController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return redirect()->route(auth()->check() ? 'dashboard' : 'login');
 });
 
-Route::view('/privacy', 'core.privacy')->name('privacy');
+Route::get('/privacy', [LegalPageController::class, 'show'])->defaults('slug', 'privacy')->name('privacy');
+Route::get('/cookies', [LegalPageController::class, 'show'])->defaults('slug', 'cookies')->name('legal.cookies');
+Route::get('/terms', [LegalPageController::class, 'show'])->defaults('slug', 'terms')->name('legal.terms');
+Route::get('/accessibility', [LegalPageController::class, 'show'])->defaults('slug', 'accessibility')->name('legal.accessibility');
+Route::get('/hosting-and-security', [LegalPageController::class, 'show'])->defaults('slug', 'hosting-and-security')->name('legal.hosting-and-security');
+Route::get('/legal/{slug}/versions', [LegalPageController::class, 'versions'])->name('legal.versions');
 
 Route::get('/login', [OidcController::class, 'show'])->name('login');
 Route::get('/auth/redirect', [OidcController::class, 'redirect'])->name('auth.redirect');
