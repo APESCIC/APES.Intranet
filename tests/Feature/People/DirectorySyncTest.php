@@ -27,6 +27,16 @@ it('creates updates and deactivates members from a fake LDAP roster', function (
         'is_active' => true,
     ])->assignRole(RoleName::Staff->value);
 
+    // Keep enough active members so one leaver stays under the 20% safety stop.
+    foreach (range(1, 4) as $i) {
+        User::factory()->create([
+            'email' => "keep{$i}@example.test",
+            'oidc_sub' => "sub-keep-{$i}",
+            'cloudron_username' => "keep{$i}",
+            'is_active' => true,
+        ])->assignRole(RoleName::Staff->value);
+    }
+
     DB::table('sessions')->insert([
         'id' => 'session-leaver',
         'user_id' => $existing->id,
@@ -39,6 +49,10 @@ it('creates updates and deactivates members from a fake LDAP roster', function (
     $this->roster->people = [
         new DirectoryPerson('alex@example.test', 'Alex Example', 'alex', ['intranet.staff'], true),
         new DirectoryPerson('blake@example.test', 'Blake Example', 'blake', ['intranet.volunteer'], true),
+        new DirectoryPerson('keep1@example.test', 'Keep 1', 'keep1', ['intranet.staff'], true),
+        new DirectoryPerson('keep2@example.test', 'Keep 2', 'keep2', ['intranet.staff'], true),
+        new DirectoryPerson('keep3@example.test', 'Keep 3', 'keep3', ['intranet.staff'], true),
+        new DirectoryPerson('keep4@example.test', 'Keep 4', 'keep4', ['intranet.staff'], true),
     ];
 
     $summary = app(MemberDirectorySync::class)->run('ldap');
