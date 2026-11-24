@@ -7,6 +7,7 @@ use App\Core\Access\Policies\MatrixPolicies;
 use App\Core\Access\Policies\RolePolicy;
 use App\Core\Access\RoleName;
 use App\Core\AdminDashboard\AdminDashboard;
+use App\Core\AdminDashboard\AdminDashboardLayouts;
 use App\Core\AdminDashboard\AdminSectionCards;
 use App\Core\AdminDashboard\CoreAdminCards;
 use App\Core\Analytics\RecordDailyAnalytics;
@@ -58,6 +59,7 @@ class CoreServiceProvider extends ServiceProvider
         $this->app->singleton(ModuleRegistry::class);
         $this->app->singleton(SearchProviders::class);
         $this->app->singleton(AdminDashboard::class);
+        $this->app->singleton(AdminDashboardLayouts::class);
         $this->app->singleton(AdminSectionCards::class);
         $this->app->singleton(CoreAdminCards::class);
         $this->app->tag([AdminSectionCards::class, CoreAdminCards::class], 'intranet.admin-dashboard');
