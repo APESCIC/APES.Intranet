@@ -122,6 +122,10 @@ Cloudron's `auth_time` claim. Details are in
 
 ## Switching back to LDAP (v0.6.19 only)
 
+Full switch-over and rollback steps (backup, preflight, smoke checks,
+Rollback 1 without redeploy, Rollback 2 to `v0.6.18`) are in
+[deploy/cloudron.md — Switch-over and rollback](deploy/cloudron.md#switch-over-and-rollback-v0619-cloudron-groups).
+
 Set `INTRANET_DIRECTORY_SOURCE=ldap` in Cloudron `shared/.env` and restart the
 app. Nightly sync and (until OIDC groups are the only path) group lookup use
 LDAP again. Set it back to `cloudron` (or remove the line) and restart to
