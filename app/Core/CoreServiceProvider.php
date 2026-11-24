@@ -29,6 +29,7 @@ use App\Core\Helpdesk\Contracts\RaiseItTicket;
 use App\Core\Helpdesk\NullRaiseItTicket;
 use App\Core\Hr\Contracts\ApprovedLeaveLookup;
 use App\Core\Hr\NullApprovedLeaveLookup;
+use App\Core\Legal\Navigation\LegalMenuContributor;
 use App\Core\Modules\ModuleRegistry;
 use App\Core\Navigation\Menu;
 use App\Core\Navigation\MenuMode;
@@ -65,6 +66,8 @@ class CoreServiceProvider extends ServiceProvider
         $this->app->singleton(AdminSectionCards::class);
         $this->app->singleton(CoreAdminCards::class);
         $this->app->tag([AdminSectionCards::class, CoreAdminCards::class], 'intranet.admin-dashboard');
+        $this->app->singleton(LegalMenuContributor::class);
+        $this->app->tag([LegalMenuContributor::class], 'intranet.menu');
         $this->app->bind(SystemStatus::class, fn ($app) => new SystemStatus([
             $app->make(MysqlCheck::class),
             $app->make(RedisCheck::class),

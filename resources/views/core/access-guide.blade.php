@@ -41,6 +41,10 @@
             <li><strong>HR records</strong> can be seen by HR, management and admin.</li>
             <li><strong>Agreements and legal records</strong> can be seen by legal and admin.</li>
             <li>
+                <strong>Legal pages</strong> (Privacy notice, Cookies, Terms of use, Accessibility statement, and
+                Hosting and security) can be drafted and published by legal and admin. Publishing is audited.
+            </li>
+            <li>
                 <strong>DBS checks and health information</strong> are special category data under UK GDPR. Only
                 people who need them can open them.
             </li>

@@ -39,6 +39,8 @@ it('says admin and management can see HR records and that access is audited', fu
 
     $this->actingAs($user)->get(route('access-guide'))
         ->assertSee('HR records</strong> can be seen by HR, management and admin', false)
+        ->assertSee('Legal pages</strong>', false)
+        ->assertSee('drafted and published by legal and admin')
         ->assertSee('Access is audited')
         ->assertSee('This applies to admin too');
 });
