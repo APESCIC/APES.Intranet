@@ -114,7 +114,8 @@ return [
 
     /*
     | Cloudron dashboard links and optional read-only API access. The API
-    | token is for the 2FA status view only; never commit a real value.
+    | token is for the 2FA status view and (from v0.6.19) directory sync;
+    | never commit a real value.
     */
     'cloudron' => [
         'profile_url' => env('CLOUDRON_PROFILE_URL', 'https://my.cloudron.apes.org.uk/#/profile'),

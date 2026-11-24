@@ -3,7 +3,7 @@
 namespace App\Core\Auth;
 
 /**
- * One person as read from Cloudron LDAP (or a test fake).
+ * One person as read from Cloudron LDAP, the Cloudron API, or a test fake.
  */
 final readonly class DirectoryPerson
 {
