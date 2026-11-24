@@ -27,7 +27,7 @@ The private intranet for APES CIC staff, volunteers and students: updates, the d
 | Clone | `C:\Users\BambieMurphy\Documents\GitHub\APES.Intranet` |
 | Herd site | `apes-intranet` (linked; PHP 8.4 isolated, `ldap` on, as on Cloudron) |
 | Preview URL | `https://apes-intranet.test` (Herd secure; `http://` redirects) |
-| Preview command | `scripts\preview.ps1` (live preview gate: syncs code, runs pending migrations locally, deploy-safe seeders including legal pages, `/healthz`, Vite), then `npm run dev` / Vite |
+| Preview command | `scripts\preview.ps1` (live preview gate: syncs code, runs pending migrations locally, idempotent `LegalPagesSeeder` only, `/healthz`, Vite), then `npm run dev` / Vite |
 | HMR port | 5174 (Vite) |
 | Env file | `.env.example` (key names only, never values) |
 | Database | MySQL `apes_intranet_local` (Herd MySQL 8.4 on 127.0.0.1:3306, `root`, empty password) |
@@ -80,7 +80,7 @@ Development is tracked only in GitHub issues, sub-issues and `vMAJOR.MINOR.PATCH
 | `/release` | Tag and GitHub release |
 | `/deploy` | Cloudron deploy, evidence, close-out |
 | `. .\scripts\herd-env.ps1` | Herd PHP 8.4, Composer, Node 22 on `PATH` |
-| `scripts\preview.ps1` | Live preview gate (migrate pending + deploy-safe seeders) |
+| `scripts\preview.ps1` | Live preview gate (migrate pending + idempotent LegalPagesSeeder) |
 | `scripts\herd-setup.ps1` | Set up or repair the Herd site |
 | `npm run dev` | Vite on 5174 |
 | `php artisan demo:seed` / `demo:reset` | Load / wipe+reload fake demo data (`reset` asks first) |
