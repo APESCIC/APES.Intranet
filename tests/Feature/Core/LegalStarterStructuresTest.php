@@ -39,6 +39,9 @@ it('requires acceptance of terms of use', function () {
     expect($terms->needs_acceptance)->toBeTrue();
 });
 
-it('returns not found for guests on cookies when only a draft exists', function () {
-    $this->get(route('legal.cookies'))->assertNotFound();
+it('shows the cookie register for guests when only a draft exists', function () {
+    $this->get(route('legal.cookies'))
+        ->assertOk()
+        ->assertSee('Cookie register')
+        ->assertSee('XSRF-TOKEN');
 });
