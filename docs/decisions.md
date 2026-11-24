@@ -36,6 +36,13 @@ Do not change any of them without her approval. Terms are explained in the
 
 ## Features
 
+- Legal pages and footer (22 November 2026, #445 / v0.6.18): Admin and Legal
+  roles publish editable legal pages (`legal.pages.manage`); no second
+  approver. Hosting and security is signed-in only with approved hosting
+  wording. Terms acceptance prompts at first sign-in and after a material
+  Terms change; Privacy and Cookies get a one-time “updated” note only. No
+  cookie banner while only strictly necessary cookies are used. Safeguarding
+  is not a footer link in this version. How-to: [legal-pages.md](legal-pages.md).
 - App shell navigation (22 November 2026, #422): from **64rem** upward, section
   links stay in the horizontal top bar with mega-menu disclosures. Below
   **64rem**, a **Menu** control in the top bar opens a full-height phone menu
