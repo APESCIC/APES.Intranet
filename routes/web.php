@@ -105,6 +105,10 @@ Route::middleware('auth')->group(function () {
             Route::get('pages/{legalPage}', [AdminLegalPageController::class, 'edit'])->name('pages.edit');
             Route::post('pages/{legalPage}/draft', [AdminLegalPageController::class, 'saveDraft'])->name('pages.draft');
             Route::get('pages/{legalPage}/preview', [AdminLegalPageController::class, 'preview'])->name('pages.preview');
+            Route::post('pages/{legalPage}/publish', [AdminLegalPageController::class, 'publish'])->name('pages.publish');
+            Route::get('pages/{legalPage}/history', [AdminLegalPageController::class, 'history'])->name('pages.history');
+            Route::get('pages/{legalPage}/compare', [AdminLegalPageController::class, 'compare'])->name('pages.compare');
+            Route::post('pages/{legalPage}/versions/{legalPageVersion}/restore', [AdminLegalPageController::class, 'restore'])->name('pages.restore');
             Route::get('footer-links', [AdminFooterLinkController::class, 'index'])->name('footer-links.index');
             Route::post('footer-links', [AdminFooterLinkController::class, 'store'])->name('footer-links.store');
             Route::put('footer-links/{footerLink}', [AdminFooterLinkController::class, 'update'])->name('footer-links.update');

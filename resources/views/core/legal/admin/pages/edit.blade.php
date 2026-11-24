@@ -7,7 +7,7 @@
         <a href="{{ route('admin.legal.pages.index') }}" class="underline">Back to legal pages</a>
     </p>
 
-    <nav class="mb-6 flex flex-wrap gap-2" role="tablist" aria-label="Editor views">
+    <nav class="mb-6 flex flex-wrap items-center gap-2" role="tablist" aria-label="Editor views">
         <span class="sg-btn sg-btn-secondary sg-btn-sm" role="tab" aria-selected="true">Write</span>
         <a
             href="{{ route('admin.legal.pages.preview', $page) }}"
@@ -15,6 +15,15 @@
             role="tab"
             aria-selected="false"
         >Preview</a>
+        <a
+            href="{{ route('admin.legal.pages.history', $page) }}"
+            class="sg-btn sg-btn-ghost sg-btn-sm"
+        >History</a>
+        <button
+            type="button"
+            class="sg-btn sg-btn-primary sg-btn-sm"
+            onclick="document.getElementById('legal-publish-dialog').showModal()"
+        >Publish</button>
     </nav>
 
     @if ($published)
@@ -97,4 +106,32 @@
 
         <button class="sg-btn sg-btn-primary justify-self-start" type="submit">Save draft</button>
     </form>
+
+    <dialog id="legal-publish-dialog" class="sg-card max-w-md w-full border border-sg-line p-0 backdrop:bg-black/40">
+        <form method="post" action="{{ route('admin.legal.pages.publish', $page) }}" class="p-6">
+            @csrf
+            <h2 class="font-serif text-lg font-semibold text-sg-ink">Publish draft</h2>
+            <p class="mt-2 text-sm text-sg-muted">
+                Version {{ $draft->number }} will become a published revision. Save any wording changes before publishing.
+            </p>
+
+            <div class="mt-4">
+                <label for="publish_in_effect_at" class="mb-1 block text-sm font-semibold text-sg-ink">In effect from (for scheduled publish)</label>
+                <input
+                    type="date"
+                    name="in_effect_at"
+                    id="publish_in_effect_at"
+                    value="{{ old('in_effect_at', $draft->in_effect_at?->timezone(config('app.timezone'))->format('Y-m-d')) }}"
+                    class="sg-input w-full"
+                />
+                <p class="mt-1 text-xs text-sg-muted">Leave empty when publishing now.</p>
+            </div>
+
+            <div class="mt-6 flex flex-wrap gap-2 justify-end">
+                <button type="button" class="sg-btn sg-btn-ghost" onclick="document.getElementById('legal-publish-dialog').close()">Cancel</button>
+                <button type="submit" name="mode" value="now" class="sg-btn sg-btn-secondary">Publish now</button>
+                <button type="submit" name="mode" value="schedule" class="sg-btn sg-btn-primary">Schedule</button>
+            </div>
+        </form>
+    </dialog>
 </x-layouts.app>
