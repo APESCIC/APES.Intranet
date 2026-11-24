@@ -22,36 +22,42 @@ final class LegalMenuContributor implements MenuContributor
         }
 
         return [
-            new NavGroup('admin-apps', 'Apps and content', [
-                NavItem::soon(
-                    'legal-pages',
-                    'Legal pages',
-                    'scale',
-                    AccessMatrix::LEGAL_PAGES_MANAGE,
-                    description: 'Draft, preview and publish privacy, cookies, terms and related pages',
-                ),
-                NavItem::soon(
-                    'legal-footer-links',
-                    'Footer links',
-                    'link',
-                    AccessMatrix::LEGAL_PAGES_MANAGE,
-                    description: 'Choose and order the links in the site footer',
-                ),
-                NavItem::soon(
-                    'legal-acceptance',
-                    'Acceptance',
-                    'clipboard-check',
-                    AccessMatrix::LEGAL_PAGES_MANAGE,
-                    description: 'Who has accepted the current Terms of use',
-                ),
-                NavItem::soon(
-                    'legal-audit',
-                    'Legal audit log',
-                    'scroll-text',
-                    AccessMatrix::LEGAL_PAGES_MANAGE,
-                    description: 'Draft, publish, restore, footer and export events',
-                ),
-            ], icon: 'app-window'),
+            new NavGroup(
+                'admin-legal',
+                'Legal',
+                [
+                    NavItem::soon(
+                        'legal-pages',
+                        'Legal pages',
+                        'scale',
+                        AccessMatrix::LEGAL_PAGES_MANAGE,
+                        description: 'Draft, preview and publish privacy, cookies, terms and related pages',
+                    ),
+                    NavItem::soon(
+                        'legal-footer-links',
+                        'Footer links',
+                        'link',
+                        AccessMatrix::LEGAL_PAGES_MANAGE,
+                        description: 'Choose and order the links in the site footer',
+                    ),
+                    NavItem::soon(
+                        'legal-acceptance',
+                        'Acceptance',
+                        'clipboard-check',
+                        AccessMatrix::LEGAL_PAGES_MANAGE,
+                        description: 'Who has accepted the current Terms of use',
+                    ),
+                    NavItem::soon(
+                        'legal-audit',
+                        'Legal audit log',
+                        'scroll-text',
+                        AccessMatrix::LEGAL_PAGES_MANAGE,
+                        description: 'Draft, publish, restore, footer and export events',
+                    ),
+                ],
+                icon: 'scale',
+                foldInto: 'admin-apps',
+            ),
         ];
     }
 }
