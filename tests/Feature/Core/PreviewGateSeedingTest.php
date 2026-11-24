@@ -5,7 +5,9 @@ it('syncs roles and permissions in the live preview gate from the deploy seeder 
 
     expect($gate)->toContain('activate-release.sh')
         ->and($gate)->toContain('db:seed --class=')
-        ->and($gate)->toContain('permission:cache-reset');
+        ->and($gate)->toContain('permission:cache-reset')
+        ->and($gate)->toContain('php artisan migrate --force')
+        ->and($gate)->not->toContain('Ask before running php artisan migrate');
 });
 
 it('finds the deploy seeders the live preview gate runs', function () {
@@ -14,6 +16,7 @@ it('finds the deploy seeders the live preview gate runs', function () {
     preg_match_all("/db:seed --class='([^']+)'/", $script, $matches);
 
     expect($matches[1])->toContain('Database\\Seeders\\RolesAndPermissionsSeeder')
+        ->and($matches[1])->toContain('Database\\Seeders\\LegalPagesSeeder')
         ->and($matches[1][0])->toBe('Database\\Seeders\\RolesAndPermissionsSeeder');
 
     foreach ($matches[1] as $seeder) {

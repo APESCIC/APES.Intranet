@@ -11,10 +11,11 @@
        packages, and npm ci when package-lock.json's content hash differs from
        the hash stored after the last install (not the lock file's date). Before
        npm ci it stops this site's Vite on the profile port, then starts it
-       again afterwards. Reports migrations that have not run (it never runs
-       them). When no migrations are pending, it runs the deploy-safe seeders
-       that deploy/cloudron/activate-release.sh runs (roles, permissions and
-       module defaults, no personal data), so local grants match Cloudron.
+       again afterwards. Runs any pending migrations with php artisan migrate
+       (local APP_ENV only; never demo:reset). Then runs the deploy-safe
+       seeders that deploy/cloudron/activate-release.sh runs (roles,
+       permissions, module defaults and legal starter pages, no personal data),
+       so local grants and legal/footer rows match Cloudron.
     3. Checks Herd and its MySQL service are running, the site answers, and /healthz shows the
        expected PHP version through FastCGI and the checked-out revision.
        Clears Laravel's caches once if the revision is stale.
@@ -188,20 +189,28 @@ try {
         }
     } else { Write-Ok 'npm dependencies are current' }
     $pending = Invoke-Native { php artisan migrate:status --pending --no-ansi }
-    if ($pending.Code -eq 0 -and $pending.Output -match '\bPending\b' -and $pending.Output -notmatch 'No pending migrations') {
-        Write-Warn 'There are migrations that have not run. Ask before running php artisan migrate, then run this again to sync roles and permissions.'
+    $hasPending = $pending.Code -eq 0 -and $pending.Output -match '\bPending\b' -and $pending.Output -notmatch 'No pending migrations'
+    if ($hasPending) {
+        $appEnv = Invoke-Native { php artisan env --no-ansi }
+        if ($appEnv.Output -notmatch '\[local\]') {
+            Stop-Preview 1 "Pending migrations exist but APP_ENV is not local (got: $($appEnv.Output)). Refusing to migrate."
+        }
+        Write-Step 'Pending migrations'
+        $migrate = Invoke-Native { php artisan migrate --force --no-interaction }
+        if ($migrate.Code -ne 0) { Stop-Preview 1 "php artisan migrate failed: $($migrate.Output)" }
+        Write-Ok 'Ran pending migrations'
     } else {
         Write-Ok 'No pending migrations'
-        $seeders = @([regex]::Matches((Get-Content 'deploy\cloudron\activate-release.sh' -Raw), "db:seed --class='([^']+)'") | ForEach-Object { $_.Groups[1].Value })
-        if ($seeders.Count -eq 0) { Stop-Preview 1 'Found no db:seed --class lines in deploy\cloudron\activate-release.sh.' }
-        foreach ($seeder in $seeders) {
-            $seed = Invoke-Native { php artisan db:seed "--class=$seeder" --force --no-interaction }
-            if ($seed.Code -ne 0) { Stop-Preview 1 "php artisan db:seed --class=$seeder failed: $($seed.Output)" }
-        }
-        $reset = Invoke-Native { php artisan permission:cache-reset }
-        if ($reset.Code -ne 0) { Stop-Preview 1 "php artisan permission:cache-reset failed: $($reset.Output)" }
-        Write-Ok "Synced roles and permissions ($($seeders.Count) deploy seeders, as on Cloudron)"
     }
+    $seeders = @([regex]::Matches((Get-Content 'deploy\cloudron\activate-release.sh' -Raw), "db:seed --class='([^']+)'") | ForEach-Object { $_.Groups[1].Value })
+    if ($seeders.Count -eq 0) { Stop-Preview 1 'Found no db:seed --class lines in deploy\cloudron\activate-release.sh.' }
+    foreach ($seeder in $seeders) {
+        $seed = Invoke-Native { php artisan db:seed "--class=$seeder" --force --no-interaction }
+        if ($seed.Code -ne 0) { Stop-Preview 1 "php artisan db:seed --class=$seeder failed: $($seed.Output)" }
+    }
+    $reset = Invoke-Native { php artisan permission:cache-reset }
+    if ($reset.Code -ne 0) { Stop-Preview 1 "php artisan permission:cache-reset failed: $($reset.Output)" }
+    Write-Ok "Synced roles and permissions ($($seeders.Count) deploy seeders, as on Cloudron)"
 
     # 3. Herd and the preview ----------------------------------------------------
     Write-Step "Herd preview $($p.appUrl)"

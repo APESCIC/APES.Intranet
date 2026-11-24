@@ -116,12 +116,12 @@ repository folder.
 
 Before any work, run the live preview gate,
 `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\preview.ps1`. It
-loads the latest code and dependencies and reports pending migrations (ask
-before running them). When no migrations are pending, it also syncs roles and
-permissions as a deploy does, by running the seeders in
-`deploy/cloudron/activate-release.sh`. Then it checks Herd and its MySQL
-service are running, and that `/healthz` serves the checked-out revision on
-PHP 8.4 through FastCGI, and starts Vite.
+loads the latest code and dependencies, and runs any pending migrations with
+`php artisan migrate` (local `APP_ENV` only; it never runs `demo:reset`). It
+then syncs roles, permissions and legal starter pages as a deploy does, by
+running the seeders in `deploy/cloudron/activate-release.sh`. Then it checks
+Herd and its MySQL service are running, and that `/healthz` serves the
+checked-out revision on PHP 8.4 through FastCGI, and starts Vite.
 
 `npm run dev` starts Vite on port 5174 and writes `public/hot`, so the pages
 at <https://apes-intranet.test> load their CSS and JavaScript from Vite. Saving
