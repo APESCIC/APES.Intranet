@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Core\Legal\LegalPages;
 use App\Core\Legal\LegalPageVersionStatus;
 use App\Core\Legal\LegalPageVisibility;
 use App\Models\LegalPage;
@@ -45,6 +46,47 @@ class LegalPagesSeeder extends Seeder
                 'material_change' => false,
             ]);
         }
+
+        $this->seedHostingAndSecurityPage();
+    }
+
+    private function seedHostingAndSecurityPage(): void
+    {
+        $page = LegalPage::query()->where('slug', 'hosting-and-security')->firstOrFail();
+
+        if ($page->versions()->exists()) {
+            return;
+        }
+
+        $legalPages = app(LegalPages::class);
+        $version = $legalPages->createDraft(
+            $page,
+            self::hostingAndSecurityBody(),
+            changeSummary: 'Initial published wording for signed-in staff.',
+        );
+        $legalPages->publish($version);
+    }
+
+    public static function hostingAndSecurityBody(): string
+    {
+        return <<<'HTML'
+<h2 class="font-serif text-xl font-semibold">Where APES apps run</h2>
+<p>The APES Intranet and related Cloudron applications run on <strong>Akamai Connected Cloud (Linode)</strong> in the <strong>London</strong> region.</p>
+<h2 class="font-serif text-xl font-semibold">Provider certifications</h2>
+<p>Akamai publishes certifications and assurance reports that cover Linode compute. We do not reproduce those documents here; read them on Akamai's official sites:</p>
+<ul class="list-disc space-y-1 pl-6">
+<li><a href="https://trust.akamai.com/">Akamai Trust Centre</a> (<a href="https://trust.akamai.com/">trust.akamai.com</a>)</li>
+<li><a href="https://www.akamai.com/legal/compliance">Akamai legal compliance</a> (<a href="https://www.akamai.com/legal/compliance">www.akamai.com/legal/compliance</a>)</li>
+</ul>
+<h2 class="font-serif text-xl font-semibold">Disk encryption on this server</h2>
+<p>Disk encryption of this Linode was confirmed by Bambie on 12 November 2026 (Europe/London).</p>
+<h2 class="font-serif text-xl font-semibold">What we do not claim</h2>
+<ul class="list-disc space-y-1 pl-6">
+<li>We do <strong>not</strong> claim SOC 2 Type II, SOC 1, SOC 3, CSA STAR or HDS for this hosting.</li>
+<li>Cyber Essentials covers Akamai's UK offices and staff, not the servers that run APES applications.</li>
+<li>This page does not list server identifiers, account numbers or internal review findings.</li>
+</ul>
+HTML;
     }
 
     public static function privacyDraftBody(): string
