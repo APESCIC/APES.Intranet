@@ -53,7 +53,7 @@ enum RoleName: string
             self::Supervisor => 'Oversees their own team: sees it, and approves its shifts, swaps, timesheets, checklists and student hours. Cannot see other teams.',
             self::Management => 'Manages teams and rotas, oversees every team, works the Management help desk queue, and can see all HR records.',
             self::Hr => 'Can see and look after HR records.',
-            self::Legal => 'Can see and look after agreements and legal records.',
+            self::Legal => 'Can see and look after agreements and legal records, and draft and publish legal pages.',
             self::Admin => 'Can do everything, including seeing HR and legal records and running the intranet.',
         };
     }

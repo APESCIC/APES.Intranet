@@ -9,6 +9,10 @@ use App\Core\Appearance\Http\Controllers\AppearancePreferencesController;
 use App\Core\Audit\Http\Controllers\AuditLogIndexController;
 use App\Core\Auth\Http\Controllers\OidcController;
 use App\Core\Changelog\Http\Controllers\ChangeLogController;
+use App\Core\Legal\Http\Controllers\AdminFooterLinkController;
+use App\Core\Legal\Http\Controllers\AdminLegalAcceptanceController;
+use App\Core\Legal\Http\Controllers\AdminLegalPageController;
+use App\Core\Legal\Http\Controllers\TermsAcceptanceController;
 use App\Core\Modules\Http\Controllers\AdminModulesController;
 use App\Core\Navigation\Http\Controllers\AdminOverviewController;
 use App\Core\Notifications\Http\Controllers\NotificationInboxController;
@@ -21,13 +25,19 @@ use App\Core\Qa\Http\Controllers\QaLoginController;
 use App\Core\Qa\Http\Middleware\EnsureQaLoginEnabled;
 use App\Core\System\Http\Controllers\SendTestEmailController;
 use App\Core\System\Http\Controllers\SystemStatusController;
+use App\Http\Controllers\LegalPageController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return redirect()->route(auth()->check() ? 'dashboard' : 'login');
 });
 
-Route::view('/privacy', 'core.privacy')->name('privacy');
+Route::get('/privacy', [LegalPageController::class, 'show'])->defaults('slug', 'privacy')->name('privacy');
+Route::get('/cookies', [LegalPageController::class, 'show'])->defaults('slug', 'cookies')->name('legal.cookies');
+Route::get('/terms', [LegalPageController::class, 'show'])->defaults('slug', 'terms')->name('legal.terms');
+Route::get('/accessibility', [LegalPageController::class, 'show'])->defaults('slug', 'accessibility')->name('legal.accessibility');
+Route::get('/hosting-and-security', [LegalPageController::class, 'show'])->defaults('slug', 'hosting-and-security')->name('legal.hosting-and-security');
+Route::get('/legal/{slug}/versions', [LegalPageController::class, 'versions'])->name('legal.versions');
 
 Route::get('/login', [OidcController::class, 'show'])->name('login');
 Route::get('/auth/redirect', [OidcController::class, 'redirect'])->name('auth.redirect');
@@ -36,6 +46,11 @@ Route::get('/auth/reauth', [OidcController::class, 'reauthenticate'])->middlewar
 Route::post('/logout', [OidcController::class, 'logout'])->middleware('auth')->name('logout');
 
 Route::middleware('auth')->group(function () {
+    Route::get('/legal/accept', [TermsAcceptanceController::class, 'show'])->name('legal.accept.show');
+    Route::post('/legal/accept', [TermsAcceptanceController::class, 'store'])->name('legal.accept.store');
+    Route::post('/legal/notices/{legalPage}/dismiss', [TermsAcceptanceController::class, 'dismissNotice'])
+        ->name('legal.notice.dismiss');
+
     Route::post('/appearance/preferences', AppearancePreferencesController::class)
         ->middleware('throttle:60,1')
         ->name('appearance.preferences.update');
@@ -91,6 +106,23 @@ Route::middleware('auth')->group(function () {
             Route::get('/system', SystemStatusController::class)->name('system.index');
             Route::post('/system/test-email', SendTestEmailController::class)->name('system.test-email');
             Route::get('/push-delivery', PushDeliveryStatsController::class)->name('push-delivery.index');
+        });
+        Route::middleware(['can:'.AccessMatrix::LEGAL_PAGES_MANAGE, 'fresh-signin'])->prefix('legal')->name('legal.')->group(function () {
+            Route::get('pages', [AdminLegalPageController::class, 'index'])->name('pages.index');
+            Route::get('pages/{legalPage}', [AdminLegalPageController::class, 'edit'])->name('pages.edit');
+            Route::post('pages/{legalPage}/draft', [AdminLegalPageController::class, 'saveDraft'])->name('pages.draft');
+            Route::get('pages/{legalPage}/preview', [AdminLegalPageController::class, 'preview'])->name('pages.preview');
+            Route::post('pages/{legalPage}/publish', [AdminLegalPageController::class, 'publish'])->name('pages.publish');
+            Route::get('pages/{legalPage}/history', [AdminLegalPageController::class, 'history'])->name('pages.history');
+            Route::get('pages/{legalPage}/compare', [AdminLegalPageController::class, 'compare'])->name('pages.compare');
+            Route::post('pages/{legalPage}/versions/{legalPageVersion}/restore', [AdminLegalPageController::class, 'restore'])->name('pages.restore');
+            Route::get('acceptance', [AdminLegalAcceptanceController::class, 'index'])->name('acceptance.index');
+            Route::get('acceptance/export', [AdminLegalAcceptanceController::class, 'export'])->name('acceptance.export');
+            Route::get('footer-links', [AdminFooterLinkController::class, 'index'])->name('footer-links.index');
+            Route::post('footer-links', [AdminFooterLinkController::class, 'store'])->name('footer-links.store');
+            Route::put('footer-links/{footerLink}', [AdminFooterLinkController::class, 'update'])->name('footer-links.update');
+            Route::delete('footer-links/{footerLink}', [AdminFooterLinkController::class, 'destroy'])->name('footer-links.destroy');
+            Route::post('footer-links/{footerLink}/reorder', [AdminFooterLinkController::class, 'reorder'])->name('footer-links.reorder');
         });
         Route::middleware(['can:'.AccessMatrix::ADMIN_MODULES_MANAGE, 'fresh-signin'])->prefix('modules')->name('modules.')->group(function () {
             Route::get('/', [AdminModulesController::class, 'index'])->name('index');

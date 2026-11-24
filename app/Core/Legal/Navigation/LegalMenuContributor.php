@@ -1,0 +1,69 @@
+<?php
+
+namespace App\Core\Legal\Navigation;
+
+use App\Core\Access\AccessMatrix;
+use App\Core\Navigation\MenuContributor;
+use App\Core\Navigation\MenuMode;
+use App\Core\Navigation\NavGroup;
+use App\Core\Navigation\NavItem;
+use App\Models\User;
+
+/**
+ * Admin › Apps and content › Legal. Routes arrive in later v0.6.18 stories;
+ * until then the entries show as Soon so the permission gate is visible.
+ */
+final class LegalMenuContributor implements MenuContributor
+{
+    public function groups(User $user, MenuMode $mode): array
+    {
+        if ($mode !== MenuMode::Admin) {
+            return [];
+        }
+
+        return [
+            new NavGroup(
+                'admin-legal',
+                'Legal',
+                [
+                    NavItem::route(
+                        'legal-pages',
+                        'Legal pages',
+                        'scale',
+                        AccessMatrix::LEGAL_PAGES_MANAGE,
+                        'admin.legal.pages.index',
+                        'admin.legal.pages.*',
+                        description: 'Draft, preview and publish privacy, cookies, terms and related pages',
+                    ),
+                    NavItem::route(
+                        'legal-footer-links',
+                        'Footer links',
+                        'link',
+                        AccessMatrix::LEGAL_PAGES_MANAGE,
+                        'admin.legal.footer-links.index',
+                        'admin.legal.footer-links.*',
+                        description: 'Choose and order the links in the site footer',
+                    ),
+                    NavItem::route(
+                        'legal-acceptance',
+                        'Acceptance',
+                        'clipboard-check',
+                        AccessMatrix::LEGAL_PAGES_MANAGE,
+                        'admin.legal.acceptance.index',
+                        'admin.legal.acceptance.*',
+                        description: 'Who has accepted the current Terms of use',
+                    ),
+                    NavItem::soon(
+                        'legal-audit',
+                        'Legal audit log',
+                        'scroll-text',
+                        AccessMatrix::LEGAL_PAGES_MANAGE,
+                        description: 'Draft, publish, restore, footer and export events',
+                    ),
+                ],
+                icon: 'scale',
+                foldInto: 'admin-apps',
+            ),
+        ];
+    }
+}

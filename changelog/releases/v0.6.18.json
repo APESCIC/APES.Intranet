@@ -1,0 +1,41 @@
+{
+    "version": "v0.6.18",
+    "released_at": "2026-11-24",
+    "title": "Legal pages and footer",
+    "summary": "Legal pages such as Privacy, Cookies, Terms, Accessibility, and Hosting and security can be edited and published from Admin. The site footer groups legal and trust links, and signed-in people accept the Terms of use when they first sign in or after a material change.",
+    "audiences": [
+        "staff",
+        "volunteers",
+        "students"
+    ],
+    "changes": {
+        "added": [
+            "Editable legal pages for Privacy notice, Cookies, Terms of use, Accessibility statement, and Hosting and security, with version history, compare and restore.",
+            "A Hosting and security page for signed-in people, with approved wording about London hosting and certifications.",
+            "A cookie register on the Cookies page listing the strictly necessary cookies the intranet uses.",
+            "Grouped footer links (Legal, Trust and help, About) that admins can manage; Privacy and Cookies stay visible to everyone.",
+            "Terms of use acceptance at first sign-in and after a material change, with a one-time note when Privacy or Cookies are updated.",
+            "An Acceptance report and CSV export for who has accepted the current Terms."
+        ],
+        "changed": [
+            "The site footer on app, error and sign-in pages shows grouped legal links and the version pill."
+        ],
+        "accessibility": [
+            "Legal pages have an on-this-page list from headings, and the footer uses group headings with keyboard-friendly links."
+        ]
+    },
+    "internal_notes": [
+        "Epic #445. Leaves #453, #446, #280, #455, #454, #452, #447, #448, #449, #450, #451, #456. New tables: legal_pages, legal_page_versions, footer_links, legal_acceptances, legal_notice_dismissals — Cloudron backup before deploy. LEGAL_ACCEPTANCE_PROMPT off-switch. Docs: docs/legal-pages.md."
+    ],
+    "module_versions": {
+        "core": "v0.6.18",
+        "communications": "0.1.0",
+        "helpdesk": "0.1.0",
+        "hr": "0.1.0",
+        "learning": "0.1.0",
+        "microsoft-365": "0.1.0",
+        "operations": "0.1.0",
+        "people": "0.1.0"
+    },
+    "published": true
+}

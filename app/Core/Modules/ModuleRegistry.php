@@ -23,7 +23,7 @@ final class ModuleRegistry
      *
      * @var list<string>
      */
-    public const CORE_SLUGS = ['core', 'auth', 'audit', 'settings', 'health', 'shell'];
+    public const CORE_SLUGS = ['core', 'auth', 'audit', 'settings', 'health', 'shell', 'legal'];
 
     /** @var array<string, ModuleManifest>|null */
     private ?array $manifests = null;

@@ -45,6 +45,31 @@
                         <span class="text-xs" aria-label="Core cannot be switched off">Locked</span>
                     </td>
                 </tr>
+                <tr
+                    id="module-legal"
+                    class="align-top"
+                    data-module="legal"
+                    data-enabled="true"
+                >
+                    <th scope="row" class="font-semibold text-sg-ink">
+                        <span id="module-heading-legal">Legal</span>
+                        <p class="mt-1 text-xs font-normal text-sg-muted">Legal pages, footer links and Terms acceptance. Part of Core.</p>
+                    </th>
+                    <td>Core</td>
+                    <td>
+                        <code data-version="{{ $coreVersion }}">{{ $coreVersion }}</code>
+                    </td>
+                    <td class="text-sg-muted">—</td>
+                    <td class="text-sg-muted">—</td>
+                    <td>
+                        <span class="sg-badge sg-badge--ok" data-status="enabled">
+                            Always on
+                        </span>
+                    </td>
+                    <td class="text-sg-muted">
+                        <span class="text-xs" aria-label="Legal cannot be switched off">Locked</span>
+                    </td>
+                </tr>
                 @forelse ($rows as $row)
                     @php($manifest = $row['manifest'])
                     @php($blockDisable = $row['enabled'] && $row['enabled_dependents']->isNotEmpty())

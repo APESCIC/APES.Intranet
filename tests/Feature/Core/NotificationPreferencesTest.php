@@ -7,6 +7,7 @@ use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
+use Tests\Support\LegalPageFixtures;
 
 uses(RefreshDatabase::class);
 
@@ -97,6 +98,8 @@ it('removes a device from the preferences page', function () {
 });
 
 it('mentions push endpoints and generic wording on the privacy notice', function () {
+    LegalPageFixtures::publishPrivacyNotice();
+
     $this->get(route('privacy'))
         ->assertOk()
         ->assertSee('push subscription endpoint')

@@ -30,6 +30,7 @@ for organisation members ([where documents live](decisions.md#where-documents-li
 | [decisions.md](decisions.md) | Bambie's decisions: stack, sign-in, features, hosting, shipping, roadmap |
 | [architecture.md](architecture.md) | Core, Modules and Plugins, roles and permissions, fresh sign-in and the audit log |
 | [shell.md](shell.md) | Top horizontal menu, account menu, bell, Staff/Admin switch and mobile drawer |
+| [legal-pages.md](legal-pages.md) | Edit and publish legal pages, footer links, Terms acceptance, cookie register |
 | [adr/0001-modules-and-integrations.md](adr/0001-modules-and-integrations.md) | Modules, Integrations and the module registry |
 | [accessibility.md](accessibility.md) | The WCAG 2.2 AA baseline, the automated check and rules for new pages |
 | [accessibility-themes-v0.6.14.md](accessibility-themes-v0.6.14.md) | Theme contrast and keyboard check for Glass/Jungle × light/dark (v0.6.14) |
