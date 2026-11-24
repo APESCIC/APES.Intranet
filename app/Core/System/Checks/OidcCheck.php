@@ -40,6 +40,15 @@ class OidcCheck implements AddonCheck
         if (! is_array($metadata) || ($metadata['issuer'] ?? null) !== $issuer) {
             throw new RuntimeException('OIDC discovery does not match the issuer.');
         }
+
+        $scopes = $metadata['scopes_supported'] ?? [];
+        $claims = $metadata['claims_supported'] ?? [];
+        if (! is_array($scopes) || ! in_array('groups', $scopes, true)) {
+            throw new RuntimeException('OIDC discovery does not list the groups scope.');
+        }
+        if (! is_array($claims) || ! in_array('groups', $claims, true)) {
+            throw new RuntimeException('OIDC discovery does not list the groups claim.');
+        }
     }
 
     public function details(): array

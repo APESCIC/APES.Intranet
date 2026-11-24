@@ -64,7 +64,33 @@ class CloudronIdentityProvider implements IdentityProvider
             email: $this->claim($userInfo->email ?? null),
             name: $this->claim($userInfo->name ?? null),
             authTime: is_numeric($authTime) ? (int) $authTime : null,
+            groups: $this->groupsClaim($userInfo),
+            preferredUsername: $this->claim($userInfo->preferred_username ?? null),
         );
+    }
+
+    /**
+     * @return list<string>|null null when the claim is absent (not an empty list)
+     */
+    private function groupsClaim(object $userInfo): ?array
+    {
+        if (! property_exists($userInfo, 'groups')) {
+            return null;
+        }
+
+        $raw = $userInfo->groups;
+        if (! is_array($raw)) {
+            return null;
+        }
+
+        $groups = [];
+        foreach ($raw as $group) {
+            if (is_string($group) && trim($group) !== '') {
+                $groups[] = strtolower(trim($group));
+            }
+        }
+
+        return array_values(array_unique($groups));
     }
 
     private function client(): SessionOpenIdConnectClient

@@ -66,7 +66,9 @@ final class SystemStatus
             $rows[] = [
                 'key' => $check->key(),
                 'label' => $definition['label'],
-                'present' => $check->key() === 'oidc' ? $check->configured() : ($variables[$definition['variables'][0]] ?? false),
+                'present' => in_array($check->key(), ['oidc', 'cloudron_api'], true)
+                    ? $check->configured()
+                    : ($variables[$definition['variables'][0]] ?? false),
                 'status' => $result === null ? 'not_checked' : $result->status,
                 'checkedAt' => $result?->checked_at,
                 'details' => $check->details(),

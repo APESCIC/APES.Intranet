@@ -113,13 +113,39 @@ else
     warn "no current release yet"
 fi
 
-for addon in MYSQL REDIS MAIL LDAP; do
+for addon in MYSQL REDIS MAIL; do
     if env | grep -q "^CLOUDRON_${addon}_"; then
         pass "CLOUDRON_${addon}_* variables exist"
     else
         fail "no CLOUDRON_${addon}_* variables"
     fi
 done
+
+if env | grep -q "^CLOUDRON_LDAP_"; then
+    pass "CLOUDRON_LDAP_* variables exist (kept for switch-back)"
+else
+    warn "no CLOUDRON_LDAP_* variables (LDAP switch-back unavailable)"
+fi
+
+if grep -q "^CLOUDRON_API_TOKEN=." "$ENV_FILE" 2> /dev/null || env | grep -q "^CLOUDRON_API_TOKEN=."; then
+    pass "CLOUDRON_API_TOKEN is set (value not shown)"
+else
+    fail "CLOUDRON_API_TOKEN is not set (directory sync needs a read-only Cloudron API token)"
+fi
+
+app_env="$(grep -E '^APP_ENV=' "$ENV_FILE" 2> /dev/null | tail -n1 | cut -d= -f2- | tr -d '"' || true)"
+if [[ "$app_env" == "production" ]]; then
+    pass "APP_ENV is production"
+else
+    fail "APP_ENV must be production on Cloudron (got: ${app_env:-empty})"
+fi
+
+qa_enabled="$(grep -E '^QA_LOGIN_ENABLED=' "$ENV_FILE" 2> /dev/null | tail -n1 | cut -d= -f2- | tr -d '"' | tr '[:upper:]' '[:lower:]' || true)"
+if [[ "$qa_enabled" == "true" || "$qa_enabled" == "1" || "$qa_enabled" == "yes" ]]; then
+    fail "QA_LOGIN_ENABLED must be off on Cloudron"
+else
+    pass "QA_LOGIN_ENABLED is off"
+fi
 
 oidc_missing=""
 for key in ISSUER CLIENT_ID CLIENT_SECRET; do

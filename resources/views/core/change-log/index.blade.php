@@ -2,7 +2,7 @@
     <p class="mb-4 text-sm text-sg-muted">
         @php($appVersion = app(\App\Core\Version\AppVersion::class))
         @if ($appVersion->isDevelopmentBuild())
-            You are using the intranet <strong>development build {{ $appVersion->label() }}, based on {{ $appVersion->baseVersion() }}</strong>.
+            You are using a <strong>development preview of {{ $appVersion->baseVersion() }}</strong>.
         @elseif ($appVersion->current() === \App\Core\Version\AppVersion::DEV)
             You are using the intranet <strong>development version</strong>.
         @else

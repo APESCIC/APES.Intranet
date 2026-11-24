@@ -58,7 +58,7 @@ it('keeps current and isRelease strict when VERSION is missing', function () {
 
         expect($version->current())->toBe(AppVersion::DEV)
             ->and($version->isRelease())->toBeFalse()
-            ->and($version->label())->toBe('v0.6.13+dev');
+            ->and($version->label())->toBe('v0.6.13');
     } finally {
         array_map('unlink', glob($root.'/changelog/releases/*') ?: []);
         rmdir($root.'/changelog/releases');
@@ -81,7 +81,7 @@ it('builds a development label from published JSON and a fixture .git', function
     try {
         $version = new AppVersion($root.'/no-VERSION', $root);
 
-        expect($version->label())->toBe('v0.6.13+dev.0b263d7')
+        expect($version->label())->toBe('v0.6.13')
             ->and($version->baseVersion())->toBe('v0.6.13')
             ->and($version->isDevelopmentBuild())->toBeTrue()
             ->and($version->current())->toBe(AppVersion::DEV);

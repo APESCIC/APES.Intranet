@@ -26,19 +26,27 @@ return [
     'fresh_signin_minutes' => max(1, (int) (env('FRESH_SIGNIN_MINUTES') ?: 15)),
 
     /*
-    | Cloudron OIDC. The OIDC_* values win; otherwise the Cloudron addon
-    | variables are used. Never commit real values.
+    | Cloudron OIDC. CLOUDRON_OIDC_* (addon) is preferred; OIDC_* is the
+    | fallback for local and hand-set shared .env. Never commit real values.
     */
     'oidc' => [
         'issuer' => env('CLOUDRON_OIDC_ISSUER') ?: env('OIDC_ISSUER'),
         'client_id' => env('CLOUDRON_OIDC_CLIENT_ID') ?: env('OIDC_CLIENT_ID'),
         'client_secret' => env('CLOUDRON_OIDC_CLIENT_SECRET') ?: env('OIDC_CLIENT_SECRET'),
         'redirect_uri' => env('OIDC_REDIRECT_URI', rtrim((string) env('CLOUDRON_APP_ORIGIN', ''), '/').'/auth/callback'),
-        'scopes' => $csv(env('OIDC_SCOPES', 'openid,profile,email')),
+        'scopes' => $csv(env('OIDC_SCOPES', 'openid,profile,email,groups')),
     ],
 
     /*
-    | Cloudron LDAP, read-only, used to look up a person's groups at sign-in.
+    | Directory source for nightly sync (and, from v0.6.19, sign-in groups when
+    | OIDC groups are wired). cloudron = Cloudron API (default); ldap = switch
+    | back to LDAP. Restart the app after changing. Name only in .env.
+    */
+    'directory_source' => strtolower((string) env('INTRANET_DIRECTORY_SOURCE', 'cloudron')),
+
+    /*
+    | Cloudron LDAP, read-only. Kept for the ldap switch-back and the shadow
+    | comparison while both sources run in parallel.
     */
     'ldap' => [
         'host' => env('CLOUDRON_LDAP_HOST') ?: env('LDAP_HOST'),
@@ -114,7 +122,8 @@ return [
 
     /*
     | Cloudron dashboard links and optional read-only API access. The API
-    | token is for the 2FA status view only; never commit a real value.
+    | token is for the 2FA status view and (from v0.6.19) directory sync;
+    | never commit a real value.
     */
     'cloudron' => [
         'profile_url' => env('CLOUDRON_PROFILE_URL', 'https://my.cloudron.apes.org.uk/#/profile'),

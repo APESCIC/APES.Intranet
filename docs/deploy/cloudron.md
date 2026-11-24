@@ -62,7 +62,8 @@ cache on every start, which picks up any changed value.
 | Redis | `CLOUDRON_REDIS_HOST`, `CLOUDRON_REDIS_PORT`, `CLOUDRON_REDIS_PASSWORD`, `CLOUDRON_REDIS_URL` | `CLOUDRON_REDIS_PASSWORD`, `CLOUDRON_REDIS_URL` |
 | Sendmail | `CLOUDRON_MAIL_SMTP_SERVER`, `CLOUDRON_MAIL_SMTP_PORT`, `CLOUDRON_MAIL_SMTP_USERNAME`, `CLOUDRON_MAIL_SMTP_PASSWORD`, `CLOUDRON_MAIL_FROM`, `CLOUDRON_MAIL_DOMAIN` | `CLOUDRON_MAIL_SMTP_PASSWORD` |
 | LDAP | `CLOUDRON_LDAP_HOST`, `CLOUDRON_LDAP_PORT`, `CLOUDRON_LDAP_USERS_BASE_DN`, `CLOUDRON_LDAP_GROUPS_BASE_DN`, `CLOUDRON_LDAP_BIND_DN`, `CLOUDRON_LDAP_BIND_PASSWORD` | `CLOUDRON_LDAP_BIND_PASSWORD` |
-| OIDC client (no addon, set by hand) | `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `OIDC_REDIRECT_URI` in `shared/.env` | `OIDC_CLIENT_SECRET` |
+| OIDC client (groups claim; no addon, set by hand) | `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `OIDC_REDIRECT_URI`, `OIDC_SCOPES` in `shared/.env` | `OIDC_CLIENT_SECRET` |
+| Cloudron API (directory sync; no addon, set by hand) | `CLOUDRON_API_BASE`, `CLOUDRON_API_TOKEN` in `shared/.env` | `CLOUDRON_API_TOKEN` |
 | Web Push VAPID (no addon, set by hand) | `VAPID_SUBJECT`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` in `shared/.env` | `VAPID_PRIVATE_KEY` |
 
 `CLOUDRON_APP_ORIGIN` sets the app URL. When Redis is present it is used for
@@ -418,3 +419,59 @@ restoring the whole app.
   The sendmail check only connects and says `QUIT`, so it sends nothing.
   After 3 failed checks in a row, admins get one email per outage.
 - Sign in with a Cloudron account in one of the 8 approved groups.
+
+## Switch-over and rollback (v0.6.19 Cloudron groups)
+
+Use this when going live with OIDC groups and the Cloudron API directory, or
+when you need to go back. Sign-in detail:
+[cloudron-sign-in.md](../cloudron-sign-in.md).
+
+### Before deploy
+
+1. Take a Cloudron backup of the intranet app and wait until it finishes.
+2. Run the [preflight](#preflight) against the live app. It must `PASS` that
+   `CLOUDRON_API_TOKEN` is set and that `QA_LOGIN_ENABLED` is off. LDAP checks
+   are `WARN` only for this release. **Stop** if the token is missing: the
+   APES IT Administrator creates a Readonly API token with Bambie's approval
+   and adds it to `shared/.env` (record the token *name* only on the issue —
+   never the value).
+3. Confirm the eight `intranet.*` groups still exist in Cloudron (admin,
+   staff, volunteer, student, tutor, trustee, contractor, plus the access
+   group used by the mapper — see [cloudron-sign-in.md](../cloudron-sign-in.md)).
+
+### After deploy
+
+1. Check `/healthz` shows the new tag (`version` and `revision`).
+2. Smoke sign-in: an `intranet.admin` member, a staff member, and a Cloudron
+   user in none of the eight groups (expect "No intranet access").
+3. Open **Admin > System status**: directory source should read `cloudron`,
+   OIDC client (groups claim) and Cloudron API checks should be `ok`, with the
+   API token shown only as `•••••• (set)`.
+4. After the first nightly sync, check the audit log and System status for the
+   LDAP shadow comparison. Zero differences is the goal; a comparison failure
+   must not block sign-in or sync.
+
+### Rollback 1 — switch back to LDAP (no redeploy)
+
+1. In Cloudron File Manager (or `cloudron exec`), set
+   `INTRANET_DIRECTORY_SOURCE=ldap` in `/app/data/shared/.env`.
+2. Restart the app: `cloudron restart --app $app`.
+3. Confirm **Admin > System status** shows directory source `ldap`, and that
+   an admin can still sign in. Nightly sync and group lookup use LDAP again.
+4. To return to Cloudron groups/API: set `INTRANET_DIRECTORY_SOURCE=cloudron`
+   (or remove the line) and restart.
+
+The LDAP addon variables stay on the LAMP package for this release, so this
+rollback needs no redeploy.
+
+### Rollback 2 — redeploy the previous release
+
+Redeploy tag `v0.6.18` (the last release before Cloudron groups) via
+
+```powershell
+gh workflow run deploy-cloudron.yml -f tag=v0.6.18
+```
+
+then confirm `/healthz` shows `v0.6.18`. The LDAP addon remains on the package.
+Prefer Rollback 1 first; use Rollback 2 only if the new code itself is at
+fault.

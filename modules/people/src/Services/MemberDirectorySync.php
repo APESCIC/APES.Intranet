@@ -2,19 +2,27 @@
 
 namespace Modules\People\Services;
 
+use App\Core\Access\RoleName;
 use App\Core\Audit\AuditLogger;
 use App\Core\Auth\Contracts\DirectoryRoster;
 use App\Core\Auth\DirectoryPerson;
+use App\Core\Auth\Exceptions\DirectoryUnavailable;
 use App\Core\Auth\GroupRoleMapper;
+use App\Core\Notifications\AlertDispatcher;
+use App\Core\Notifications\NotificationCategory;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Throwable;
 
 /**
  * Create, update and deactivate intranet members from a read-only directory.
  */
 final class MemberDirectorySync
 {
+    /** Stop and change nothing when a run would deactivate more than this share of active directory members. */
+    public const MAX_DEACTIVATION_RATIO = 0.20;
+
     public function __construct(
         private readonly DirectoryRoster $roster,
         private readonly GroupRoleMapper $mapper,
@@ -22,18 +30,57 @@ final class MemberDirectorySync
     ) {}
 
     /**
-     * @return array{created: int, updated: int, deactivated: int, unchanged: int, seen: int}
+     * @return array{created: int, updated: int, deactivated: int, unchanged: int, seen: int, stopped?: string}
      */
     public function run(string $source = 'ldap'): array
     {
-        $people = $this->roster->listPeople();
-        $summary = ['created' => 0, 'updated' => 0, 'deactivated' => 0, 'unchanged' => 0, 'seen' => count($people)];
+        try {
+            $people = $this->roster->listPeople();
+        } catch (DirectoryUnavailable $exception) {
+            return $this->stop($source, 'directory_unavailable', $exception);
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return $this->stop($source, 'directory_unavailable', $exception);
+        }
+
+        if ($people === []) {
+            return $this->stop($source, 'empty_roster');
+        }
+
+        $plannedDeactivations = $this->countPlannedDeactivations($people);
+        $activeDirectoryMembers = User::query()
+            ->where('is_active', true)
+            ->where(function ($q) {
+                $q->whereNotNull('oidc_sub')->orWhereNotNull('cloudron_username');
+            })
+            ->count();
+
+        if (
+            $activeDirectoryMembers > 0
+            && ($plannedDeactivations / $activeDirectoryMembers) > self::MAX_DEACTIVATION_RATIO
+        ) {
+            return $this->stop($source, 'deactivation_cap', null, [
+                'planned_deactivations' => $plannedDeactivations,
+                'active_directory_members' => $activeDirectoryMembers,
+            ]);
+        }
+
+        $created = 0;
+        $updated = 0;
+        $deactivated = 0;
+        $unchanged = 0;
         $seenIds = [];
 
-        DB::transaction(function () use ($people, $source, &$summary, &$seenIds) {
+        DB::transaction(function () use ($people, $source, &$created, &$updated, &$deactivated, &$unchanged, &$seenIds) {
             foreach ($people as $person) {
                 $result = $this->syncPerson($person, $source);
-                $summary[$result['status']]++;
+                match ($result['status']) {
+                    'created' => $created++,
+                    'updated' => $updated++,
+                    'deactivated' => $deactivated++,
+                    default => $unchanged++,
+                };
                 if ($result['user'] !== null) {
                     $seenIds[] = (int) $result['user']->getKey();
                 }
@@ -48,16 +95,89 @@ final class MemberDirectorySync
 
             foreach ($query->get() as $stale) {
                 if ($this->deactivate($stale, $source)) {
-                    $summary['deactivated']++;
+                    $deactivated++;
                 } else {
-                    $summary['unchanged']++;
+                    $unchanged++;
                 }
             }
         });
 
+        $summary = [
+            'created' => $created,
+            'updated' => $updated,
+            'deactivated' => $deactivated,
+            'unchanged' => $unchanged,
+            'seen' => count($people),
+        ];
+
         $this->audit->record('people.directory_synced', null, $summary);
 
         return $summary;
+    }
+
+    /**
+     * @param  list<DirectoryPerson>  $people
+     */
+    private function countPlannedDeactivations(array $people): int
+    {
+        $keepEmails = [];
+        foreach ($people as $person) {
+            $roles = $this->mapper->rolesFor($person->groups);
+            if ($person->active && $roles !== []) {
+                $keepEmails[Str::lower($person->email)] = true;
+            }
+        }
+
+        return User::query()
+            ->where('is_active', true)
+            ->where(function ($q) {
+                $q->whereNotNull('oidc_sub')->orWhereNotNull('cloudron_username');
+            })
+            ->get()
+            ->filter(fn (User $user) => ! isset($keepEmails[Str::lower($user->email)]))
+            ->count();
+    }
+
+    /**
+     * @param  array<string, mixed>  $extra
+     * @return array{created: int, updated: int, deactivated: int, unchanged: int, seen: int, stopped: string}
+     */
+    private function stop(string $source, string $reason, ?Throwable $exception = null, array $extra = []): array
+    {
+        $summary = [
+            'created' => 0,
+            'updated' => 0,
+            'deactivated' => 0,
+            'unchanged' => 0,
+            'seen' => 0,
+            'stopped' => $reason,
+            'source' => $source,
+            ...$extra,
+        ];
+
+        $this->audit->record('people.directory_sync_stopped', null, $summary);
+
+        $admins = User::role(RoleName::Admin->value)->get();
+        AlertDispatcher::send(
+            $admins,
+            NotificationCategory::AccountSecurity,
+            'Directory sync stopped on the APES Intranet.',
+            'Open System status for details. No member records were changed.',
+            route('admin.system.index'),
+        );
+
+        if ($exception !== null) {
+            report($exception);
+        }
+
+        return [
+            'created' => 0,
+            'updated' => 0,
+            'deactivated' => 0,
+            'unchanged' => 0,
+            'seen' => 0,
+            'stopped' => $reason,
+        ];
     }
 
     /**
@@ -70,7 +190,7 @@ final class MemberDirectorySync
 
         $user = User::query()->where('email', $email)->first();
 
-        if ($roles === []) {
+        if (! $person->active || $roles === []) {
             if ($user === null) {
                 return ['status' => 'unchanged', 'user' => null];
             }

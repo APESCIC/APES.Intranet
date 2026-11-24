@@ -41,9 +41,14 @@ final class CloudronAddons
                 'secrets' => ['CLOUDRON_LDAP_BIND_PASSWORD'],
             ],
             'oidc' => [
-                'label' => 'OIDC client (set by hand in shared .env)',
-                'variables' => ['OIDC_ISSUER', 'OIDC_CLIENT_ID', 'OIDC_CLIENT_SECRET', 'OIDC_REDIRECT_URI'],
+                'label' => 'OIDC client (groups claim)',
+                'variables' => ['OIDC_ISSUER', 'OIDC_CLIENT_ID', 'OIDC_CLIENT_SECRET', 'OIDC_REDIRECT_URI', 'OIDC_SCOPES'],
                 'secrets' => ['OIDC_CLIENT_SECRET'],
+            ],
+            'cloudron_api' => [
+                'label' => 'Cloudron API (directory sync)',
+                'variables' => ['CLOUDRON_API_BASE', 'CLOUDRON_API_TOKEN'],
+                'secrets' => ['CLOUDRON_API_TOKEN'],
             ],
         ];
     }

@@ -38,6 +38,7 @@ use App\Core\Navigation\Menu;
 use App\Core\Navigation\MenuMode;
 use App\Core\Qa\QaLogin;
 use App\Core\Search\SearchProviders;
+use App\Core\System\Checks\CloudronApiCheck;
 use App\Core\System\Checks\LdapCheck;
 use App\Core\System\Checks\MysqlCheck;
 use App\Core\System\Checks\OidcCheck;
@@ -79,6 +80,7 @@ class CoreServiceProvider extends ServiceProvider
             $app->make(SmtpCheck::class),
             $app->make(LdapCheck::class),
             $app->make(OidcCheck::class),
+            $app->make(CloudronApiCheck::class),
         ]));
     }
 
