@@ -9,6 +9,7 @@ use App\Core\Audit\AuditLog;
 use App\Core\Modules\ModuleRegistry;
 use App\Core\Version\AppVersion;
 use App\Models\User;
+
 /**
  * Core admin dashboard cards that do not belong to a feature module.
  */
