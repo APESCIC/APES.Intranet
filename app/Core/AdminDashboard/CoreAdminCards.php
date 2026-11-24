@@ -9,8 +9,6 @@ use App\Core\Audit\AuditLog;
 use App\Core\Modules\ModuleRegistry;
 use App\Core\Version\AppVersion;
 use App\Models\User;
-use Illuminate\Support\Carbon;
-
 /**
  * Core admin dashboard cards that do not belong to a feature module.
  */
@@ -132,9 +130,7 @@ final class CoreAdminCards implements AdminDashboardCardContributor
         }
 
         $lines = $latest->map(function (AuditLog $entry) {
-            $when = $entry->occurred_at instanceof Carbon
-                ? $entry->occurred_at->timezone('Europe/London')->format('j M H:i')
-                : '';
+            $when = $entry->occurred_at->timezone('Europe/London')->format('j M H:i');
 
             return $when.' · '.$entry->event;
         })->implode("\n");
@@ -163,8 +159,7 @@ final class CoreAdminCards implements AdminDashboardCardContributor
 
         $lines = ['Core '.$this->version->label()];
         foreach ($this->modules->manifests()->sortKeys() as $slug => $manifest) {
-            $ver = is_object($manifest) && isset($manifest->version) ? (string) $manifest->version : 'unknown';
-            $lines[] = $slug.' '.$ver;
+            $lines[] = $slug.' '.$manifest->version;
         }
 
         return [
