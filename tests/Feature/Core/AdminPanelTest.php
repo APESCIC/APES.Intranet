@@ -89,7 +89,7 @@ it('keeps Admin selected after the fresh sign-in redirect returns to an admin pa
     $this->travel(16)->minutes();
 
     $this->get(route('admin.system.index'))->assertRedirect(route('auth.reauth'));
-    $this->idp->identity = new OidcIdentity('sub-alex', 'alex@example.test', 'Alex Example', now()->getTimestamp());
+    $this->idp->identity = new OidcIdentity('sub-alex', 'alex@example.test', 'Alex Example', now()->getTimestamp(), ['intranet.staff', 'intranet.admin'], 'alex');
     $this->get(route('auth.callback'))->assertRedirect(route('admin.system.index'));
 
     assertAdminPanel($this->get(route('admin.system.index')));

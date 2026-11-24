@@ -123,11 +123,55 @@ it('shows a temporary error when Cloudron is unavailable', function () {
     $this->assertGuest();
 });
 
-it('shows a temporary error when the directory is unavailable', function () {
+it('shows a temporary error when the LDAP directory is unavailable and source is ldap', function () {
+    config(['intranet.directory_source' => 'ldap']);
     $this->directory->unavailable = true;
 
     signInWithCloudron($this, ['intranet.staff'])->assertStatus(503);
     $this->assertGuest();
+});
+
+it('maps OIDC groups claim roles and ignores other groups when source is cloudron', function () {
+    config(['intranet.directory_source' => 'cloudron']);
+    $this->directory->groups = ['intranet.admin']; // must not be used
+
+    signInWithCloudron($this, ['intranet.staff', 'intranet.hr', 'other']);
+
+    expect(User::where('email', 'alex@example.test')->firstOrFail()->getRoleNames()->sort()->values()->all())
+        ->toBe(['hr', 'staff'])
+        ->and(User::where('email', 'alex@example.test')->firstOrFail()->cloudron_username)->toBe('alex');
+});
+
+it('returns 503 and leaves roles unchanged when the groups claim is missing', function () {
+    config(['intranet.directory_source' => 'cloudron']);
+    signInWithCloudron($this, ['intranet.staff']);
+    $user = User::where('oidc_sub', 'sub-alex')->firstOrFail();
+    $this->post(route('logout'));
+
+    $this->idp->identity = new OidcIdentity('sub-alex', 'alex@example.test', 'Alex Example', null, null, 'alex');
+    $this->get(route('auth.callback'))->assertStatus(503);
+
+    $user->refresh();
+    expect($user->getRoleNames()->all())->toBe(['staff'])
+        ->and($user->is_active)->toBeTrue();
+});
+
+it('denies access for an empty groups claim or only non-intranet groups', function () {
+    config(['intranet.directory_source' => 'cloudron']);
+
+    signInWithCloudron($this, [])->assertForbidden();
+    $this->assertGuest();
+
+    signInWithCloudron($this, ['students.only'])->assertForbidden();
+    $this->assertGuest();
+});
+
+it('does not call LDAP DirectoryGroups when source is cloudron', function () {
+    config(['intranet.directory_source' => 'cloudron']);
+    $this->directory->unavailable = true;
+
+    signInWithCloudron($this, ['intranet.staff'])->assertRedirect(route('dashboard'));
+    $this->assertAuthenticated();
 });
 
 it('signs out', function () {
