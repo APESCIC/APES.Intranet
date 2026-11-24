@@ -50,7 +50,7 @@ parts (manifest with SemVer version, provider registration, routes and menu).
 | Schedules | Commands under `modules/<slug>/src/Console/`, registered in the provider with `ModuleGuards::whenEnabled` |
 | Settings | Manifest `settings` keys; optional `modules/<slug>/config/<slug>.php` merged in the provider |
 | Migrations | `modules/<slug>/database/migrations/` — also in `databaseMigrationsPath` in `phpstan.neon` |
-| Dashboard cards | `modules/<slug>/src/Dashboard/` — contributors tagged `intranet.dashboard` when the home page needs them |
+| Dashboard cards | `modules/<slug>/src/Dashboard/` — contributors tagged `intranet.dashboard` (staff home) or `intranet.admin-dashboard` (Admin `/admin`) |
 | Tests | `tests/Feature/<Area>/` (and `tests/Unit/` where useful), not inside the module |
 
 A new module still needs, at minimum:

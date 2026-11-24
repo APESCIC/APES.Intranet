@@ -6,6 +6,8 @@ use App\Core\Access\Console\RemindAccessReview;
 use App\Core\Access\Policies\MatrixPolicies;
 use App\Core\Access\Policies\RolePolicy;
 use App\Core\Access\RoleName;
+use App\Core\AdminDashboard\AdminDashboard;
+use App\Core\AdminDashboard\AdminSectionCards;
 use App\Core\Appearance\AppearancePreferences;
 use App\Core\Audit\Console\PruneAuditLog;
 use App\Core\Auth\Cloudron\CloudronIdentityProvider;
@@ -53,6 +55,9 @@ class CoreServiceProvider extends ServiceProvider
         $this->app->bind(PublishIntranetUpdate::class, NullPublishIntranetUpdate::class);
         $this->app->singleton(ModuleRegistry::class);
         $this->app->singleton(SearchProviders::class);
+        $this->app->singleton(AdminDashboard::class);
+        $this->app->singleton(AdminSectionCards::class);
+        $this->app->tag([AdminSectionCards::class], 'intranet.admin-dashboard');
         $this->app->bind(SystemStatus::class, fn ($app) => new SystemStatus([
             $app->make(MysqlCheck::class),
             $app->make(RedisCheck::class),
