@@ -24,7 +24,10 @@ interface AdminDashboardCardContributor
      *     module?: string|null,
      *     tone?: string,
      *     icon?: string,
-     *     external?: bool
+     *     external?: bool,
+     *     section?: string,
+     *     group?: string,
+     *     group_heading?: string
      * }>
      */
     public function cards(User $user): array;
