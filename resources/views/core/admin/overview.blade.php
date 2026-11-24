@@ -26,7 +26,10 @@
                                         {{ $card['title'] }}
                                     </h3>
                                 </div>
-                                <p class="sg-dashboard-card__body sg-type-body text-sg-muted">{{ $card['body'] }}</p>
+                                <p @class(['sg-dashboard-card__body sg-type-body text-sg-muted', 'whitespace-pre-line' => ! empty($card['preserve_newlines'])])>{{ $card['body'] }}</p>
+                                @if (! empty($card['chart']))
+                                    <div class="mt-3 text-sg-teal-dark dark:text-sg-teal">{!! $card['chart'] !!}</div>
+                                @endif
                                 @if (! empty($card['href']))
                                     <a
                                         href="{{ $card['href'] }}"
