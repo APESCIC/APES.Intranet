@@ -5,6 +5,7 @@ namespace App\Core\Legal;
 use App\Core\Modules\ModuleRegistry;
 use App\Models\FooterLink;
 use App\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
 
@@ -21,10 +22,17 @@ final class FooterLinks
     {
         $signedIn = $user !== null;
 
-        return FooterLink::query()
-            ->orderBy('group')
-            ->orderBy('sort_order')
-            ->get()
+        try {
+            $links = FooterLink::query()
+                ->orderBy('group')
+                ->orderBy('sort_order')
+                ->get();
+        } catch (QueryException) {
+            // Error pages must still render when the database is down.
+            return collect();
+        }
+
+        return $links
             ->filter(function (FooterLink $link) use ($signedIn): bool {
                 if ($link->visibility === LegalPageVisibility::SignedIn && ! $signedIn) {
                     return false;

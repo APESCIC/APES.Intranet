@@ -4,9 +4,7 @@ namespace App\Core\Legal;
 
 use App\Models\FooterLink;
 
-/**
- * Renders a single footer link for the public shell (grouped UI arrives in #447).
- */
+/** Renders a single footer link for the public shell. */
 final class FooterLinkPresenter
 {
     public function __construct(
@@ -44,5 +42,16 @@ final class FooterLinkPresenter
             : '';
 
         return "<a {$attrString}>{$label}{$externalHint}</a>";
+    }
+
+    public function ariaCurrent(FooterLink $link): ?string
+    {
+        return match ($link->target_type) {
+            FooterLinkTargetType::LegalPage => request()->routeIs(
+                $link->target_value === 'privacy' ? 'privacy' : 'legal.'.$link->target_value,
+            ) ? 'page' : null,
+            FooterLinkTargetType::Route => request()->routeIs($link->target_value) ? 'page' : null,
+            default => null,
+        };
     }
 }
