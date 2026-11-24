@@ -66,13 +66,21 @@ final class MemberDirectorySync
             ]);
         }
 
-        $summary = ['created' => 0, 'updated' => 0, 'deactivated' => 0, 'unchanged' => 0, 'seen' => count($people)];
+        $created = 0;
+        $updated = 0;
+        $deactivated = 0;
+        $unchanged = 0;
         $seenIds = [];
 
-        DB::transaction(function () use ($people, $source, &$summary, &$seenIds) {
+        DB::transaction(function () use ($people, $source, &$created, &$updated, &$deactivated, &$unchanged, &$seenIds) {
             foreach ($people as $person) {
                 $result = $this->syncPerson($person, $source);
-                $summary[$result['status']]++;
+                match ($result['status']) {
+                    'created' => $created++,
+                    'updated' => $updated++,
+                    'deactivated' => $deactivated++,
+                    default => $unchanged++,
+                };
                 if ($result['user'] !== null) {
                     $seenIds[] = (int) $result['user']->getKey();
                 }
@@ -87,12 +95,20 @@ final class MemberDirectorySync
 
             foreach ($query->get() as $stale) {
                 if ($this->deactivate($stale, $source)) {
-                    $summary['deactivated']++;
+                    $deactivated++;
                 } else {
-                    $summary['unchanged']++;
+                    $unchanged++;
                 }
             }
         });
+
+        $summary = [
+            'created' => $created,
+            'updated' => $updated,
+            'deactivated' => $deactivated,
+            'unchanged' => $unchanged,
+            'seen' => count($people),
+        ];
 
         $this->audit->record('people.directory_synced', null, $summary);
 

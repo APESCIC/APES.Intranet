@@ -44,10 +44,6 @@ final class CloudronApiDirectoryRoster implements DirectoryRoster
         $people = [];
 
         foreach ($users as $row) {
-            if (! is_array($row)) {
-                continue;
-            }
-
             $email = Str::lower(trim((string) ($row['email'] ?? '')));
             if ($email === '') {
                 continue;
@@ -101,9 +97,6 @@ final class CloudronApiDirectoryRoster implements DirectoryRoster
         $byId = [];
 
         foreach ($groups as $group) {
-            if (! is_array($group)) {
-                continue;
-            }
             $id = (string) ($group['id'] ?? '');
             $name = Str::lower(trim((string) ($group['name'] ?? '')));
             if ($id !== '' && $name !== '') {
@@ -128,10 +121,14 @@ final class CloudronApiDirectoryRoster implements DirectoryRoster
             throw new DirectoryUnavailable('Cloudron users API refused the read-only request.');
         }
 
-        /** @var list<array<string, mixed>> $users */
         $users = $response->json('users') ?? [];
+        if (! is_array($users)) {
+            return [];
+        }
 
-        return is_array($users) ? $users : [];
+        /** @var list<array<string, mixed>> $users */
+
+        return $users;
     }
 
     private function redact(Throwable $exception): Throwable
