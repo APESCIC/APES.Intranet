@@ -15,7 +15,7 @@ step with `.env.herd.example` and `vite.config.js`.
 | Web server | Herd's nginx |
 | PHP | 8.4, as on Cloudron. The site is pinned to it (`herd isolate 8.4`), whatever Herd's global PHP is |
 | PHP handler | FastCGI (`php-cgi.exe` behind nginx) |
-| PHP extensions | ctype, curl, dom, fileinfo, intl, ldap, mbstring, openssl, pdo_mysql, pdo_sqlite, tokenizer, zip |
+| PHP extensions | ctype, curl, dom, fileinfo, intl, mbstring, openssl, pdo_mysql, pdo_sqlite, tokenizer, zip |
 | Database engine | Herd's MySQL 8.4 service, InnoDB, `utf8mb4_unicode_ci` |
 | Database | `apes_intranet_local` on `127.0.0.1:3306`, user `root`, no password |
 | Mail | Herd's mail catcher, SMTP on `127.0.0.1` port 2525. Nothing is sent |
@@ -43,12 +43,8 @@ Artisan, Composer and the tests use the same PHP and `php.ini` as the website.
 
 ## PHP extensions
 
-Herd's PHP 8.4 ships `php_ldap.dll` but leaves it off. Turn it on once: open
-the `php.ini` with `herd ini 8.4`, change `;extension=ldap` to
-`extension=ldap`, then run `herd restart php`. The app only talks to LDAP on
-Cloudron, and checks for the extension first, but keeping it on locally
-matches Cloudron. `scripts/herd-setup.ps1` stops if any extension in the
-profile is missing.
+`scripts/herd-setup.ps1` stops if any extension in the profile is missing.
+The intranet no longer needs the PHP `ldap` extension.
 
 ## FastCGI and `.env` values
 

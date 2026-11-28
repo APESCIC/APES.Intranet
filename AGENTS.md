@@ -25,7 +25,7 @@ The private intranet for APES CIC staff, volunteers and students: updates, the d
 | Item | Value |
 | --- | --- |
 | Clone | `C:\Users\BambieMurphy\Documents\GitHub\APES.Intranet` |
-| Herd site | `apes-intranet` (linked; PHP 8.4 isolated, `ldap` on, as on Cloudron) |
+| Herd site | `apes-intranet` (linked; PHP 8.4 isolated) |
 | Preview URL | `https://apes-intranet.test` (Herd secure; `http://` redirects) |
 | Preview command | `scripts\preview.ps1` (live preview gate: syncs code, runs pending migrations locally, idempotent `LegalPagesSeeder` only, `/healthz`, Vite), then `npm run dev` / Vite |
 | HMR port | 5174 (Vite) |
