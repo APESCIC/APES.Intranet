@@ -50,7 +50,11 @@ Do not change any of them without her approval. Terms are explained in the
   panel (section icons, expandable groups, shared appearance controls). This
   replaces the v0.6.11 rule that forbade any hamburger or drawer on small
   screens; the old left-rail drawer clone is still not used.
-- Rota, built in: templates, open shifts, swaps and approvals.
+- Rota, built in: person-by-day week table, editable templates, copy week,
+  open shifts, swaps and approvals. Supervisors manage their own team's
+  rotas; management and admin manage all teams. Only people with
+  `operations.rota.manage` see the full week table; everyone else keeps My
+  shifts (24 November 2026).
 - Clock in/out by a tap on the web app or PWA. An optional geofence check
   runs at clock-in only. No continuous tracking. A DPIA is required before
   the geofence check is switched on ([DPIA](dpia/clock-in-geofence.md)).
