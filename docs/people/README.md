@@ -84,7 +84,7 @@ night at 02:30. Only the yes or no is stored.
 
 | Command | When | What |
 | --- | --- | --- |
-| `people:sync-directory` | Daily at 02:15 | Creates, updates and deactivates members from Cloudron LDAP |
+| `people:sync-directory` | Daily at 02:15 | Creates, updates and deactivates members from the Cloudron read-only API |
 | `people:refresh-totp-status` | Daily at 02:30 | Refreshes the 2FA yes or no flags |
 
 Both are in `routes/console.php` and run under the Cloudron scheduler

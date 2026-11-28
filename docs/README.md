@@ -47,7 +47,7 @@ for organisation members ([where documents live](decisions.md#where-documents-li
 | Doc | What it covers |
 | --- | --- |
 | [people/README.md](people/README.md) | Directory, organisation chart, profiles, student placements and 2FA status |
-| [people/directory-sync.md](people/directory-sync.md) | The nightly read-only sync from Cloudron LDAP |
+| [people/directory-sync.md](people/directory-sync.md) | The nightly read-only sync from the Cloudron API |
 | [communications/README.md](communications/README.md) | Dashboard, updates, events, handbook, policies and Microsoft 365 links |
 | [communications/admin-menu-mode.md](communications/admin-menu-mode.md) | The Staff and Admin panel switch |
 | [communications/microsoft-links-a11y.md](communications/microsoft-links-a11y.md) | Accessibility and mobile notes for the Microsoft 365 links |
