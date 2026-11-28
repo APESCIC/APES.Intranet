@@ -35,6 +35,7 @@ Route::middleware(['web', 'auth'])->group(function () {
 
         Route::get('/rota/templates', [ShiftTemplateController::class, 'index'])->name('rota.templates.index');
         Route::post('/rota/templates', [ShiftTemplateController::class, 'store'])->name('rota.templates.store');
+        Route::patch('/rota/templates/{template}', [ShiftTemplateController::class, 'update'])->name('rota.templates.update');
         Route::delete('/rota/templates/{template}', [ShiftTemplateController::class, 'destroy'])->name('rota.templates.destroy');
 
         Route::get('/clock', [ClockController::class, 'index'])->name('clock.index');

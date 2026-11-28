@@ -54,16 +54,46 @@
             <x-operations::table-scroll label="Shift templates">
                 <table class="sg-table">
                     <thead>
-                        <tr><th scope="col">Site</th><th scope="col">Day</th><th scope="col">Name</th><th scope="col">Role</th><th scope="col">Time</th><th scope="col">Status</th><th scope="col"><span class="sr-only">Retire</span></th></tr>
+                        <tr><th scope="col">Site</th><th scope="col">Template</th><th scope="col">Status</th><th scope="col"><span class="sr-only">Retire</span></th></tr>
                     </thead>
                     <tbody>
                         @forelse ($templates as $template)
-                            <tr>
+                            <tr data-template="{{ $template->id }}">
                                 <td>{{ $template->site->name }}</td>
-                                <td>{{ $template->weekdayName() }}</td>
-                                <td>{{ $template->name }}</td>
-                                <td>{{ $template->role }}</td>
-                                <td>{{ substr($template->starts_at, 0, 5) }}–{{ substr($template->ends_at, 0, 5) }}</td>
+                                <td colspan="4">
+                                    @if ($template->active)
+                                        <form method="post" action="{{ route('operations.rota.templates.update', $template) }}" class="grid gap-2 sm:grid-cols-4">
+                                            @csrf
+                                            @method('patch')
+                                            <div>
+                                                <label class="sr-only" for="template-weekday-{{ $template->id }}">Day</label>
+                                                <select id="template-weekday-{{ $template->id }}" name="weekday" class="sg-input w-full" required>
+                                                    @foreach (\Modules\Operations\Models\ShiftTemplate::WEEKDAYS as $number => $day)
+                                                        <option value="{{ $number }}" @selected($template->weekday === $number)>{{ $day }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label class="sr-only" for="template-name-{{ $template->id }}">Name</label>
+                                                <input id="template-name-{{ $template->id }}" name="name" class="sg-input w-full" value="{{ $template->name }}" required>
+                                            </div>
+                                            <div>
+                                                <label class="sr-only" for="template-role-{{ $template->id }}">Role</label>
+                                                <input id="template-role-{{ $template->id }}" name="role" class="sg-input w-full" value="{{ $template->role }}" required>
+                                            </div>
+                                            <div class="flex flex-wrap items-center gap-2">
+                                                <label class="sr-only" for="template-starts-{{ $template->id }}">Starts</label>
+                                                <input id="template-starts-{{ $template->id }}" type="time" name="starts_at" class="sg-input" value="{{ substr($template->starts_at, 0, 5) }}" required>
+                                                <span aria-hidden="true">–</span>
+                                                <label class="sr-only" for="template-ends-{{ $template->id }}">Ends</label>
+                                                <input id="template-ends-{{ $template->id }}" type="time" name="ends_at" class="sg-input" value="{{ substr($template->ends_at, 0, 5) }}" required>
+                                                <button type="submit" class="sg-btn sg-btn-secondary sg-btn-sm">Save</button>
+                                            </div>
+                                        </form>
+                                    @else
+                                        <span>{{ $template->weekdayName() }} · {{ $template->name }} · {{ $template->role }} · {{ substr($template->starts_at, 0, 5) }}–{{ substr($template->ends_at, 0, 5) }}</span>
+                                    @endif
+                                </td>
                                 <td><span @class(['sg-badge', 'sg-badge--ok' => $template->active])>{{ $template->active ? 'Active' : 'Retired' }}</span></td>
                                 <td>
                                     @if ($template->active)
