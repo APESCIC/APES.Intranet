@@ -104,7 +104,7 @@ final class RotaBuilder
                 $userId = $shift->user_id;
 
                 if ($userId !== null && $this->leave->overlaps((int) $userId, $startsAt, $endsAt)) {
-                    $leftOff[] = ($shift->member?->name ?? 'Someone').' ('.$shift->role.' '.$startsAt->format('D j M').')';
+                    $leftOff[] = ($shift->member->name ?? 'Someone').' ('.$shift->role.' '.$startsAt->format('D j M').')';
                     $userId = null;
                 }
 
