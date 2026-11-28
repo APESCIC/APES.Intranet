@@ -188,3 +188,64 @@ it('shows the week as a person-by-day grid with open shifts and team volunteers'
 
     $this->actingAs(Operations::member())->get(route('operations.rota.weeks.show', $week))->assertForbidden();
 });
+
+it('lets a manager add and change shifts from a table cell', function () {
+    $supervisor = Operations::member(RoleName::Supervisor);
+    $member = Operations::member(RoleName::Staff, ['name' => 'Cell Member']);
+    $weekStart = CarbonImmutable::parse('2026-11-16');
+    $week = Operations::week($this->site, RotaWeek::STATUS_DRAFT, $weekStart);
+    $template = ShiftTemplate::query()->create([
+        'site_id' => $this->site->id,
+        'name' => 'Morning feed',
+        'role' => 'Animal care',
+        'weekday' => 1,
+        'starts_at' => '08:00',
+        'ends_at' => '12:00',
+        'active' => true,
+    ]);
+
+    $this->actingAs($supervisor)->post(route('operations.rota.weeks.shifts.store', $week), [
+        'shift_template_id' => $template->id,
+        'day' => '2026-11-16',
+        'user_id' => $member->id,
+    ])->assertRedirect();
+
+    $templated = $week->shifts()->where('shift_template_id', $template->id)->firstOrFail();
+    expect($templated->role)->toBe('Animal care')
+        ->and($templated->starts_at->toDateTimeString())->toBe('2026-11-16 08:00:00')
+        ->and($templated->user_id)->toBe($member->id)
+        ->and(AuditLog::query()->where('event', 'operations.shift_added')->exists())->toBeTrue();
+
+    $this->actingAs($supervisor)->post(route('operations.rota.weeks.shifts.store', $week), [
+        'role' => 'Night check',
+        'starts_at' => '2026-11-17T22:00',
+        'ends_at' => '2026-11-18T02:00',
+        'user_id' => null,
+    ])->assertRedirect();
+
+    $overnight = $week->shifts()->where('role', 'Night check')->firstOrFail();
+    expect($overnight->ends_at->toDateTimeString())->toBe('2026-11-18 02:00:00');
+
+    $this->actingAs($supervisor)->patch(route('operations.rota.shifts.update', $overnight), [
+        'role' => 'Night care',
+        'starts_at' => '2026-11-17T21:00',
+        'ends_at' => '2026-11-18T01:00',
+        'user_id' => $member->id,
+    ])->assertRedirect()->assertSessionHas('status');
+
+    expect($overnight->refresh()->role)->toBe('Night care')
+        ->and($overnight->starts_at->format('H:i'))->toBe('21:00')
+        ->and($overnight->user_id)->toBe($member->id);
+
+    $this->actingAs(Operations::member())->post(route('operations.rota.weeks.shifts.store', $week), [
+        'role' => 'Forbidden',
+        'starts_at' => '2026-11-18T09:00',
+        'ends_at' => '2026-11-18T17:00',
+    ])->assertForbidden();
+
+    $this->actingAs($supervisor)->get(route('operations.rota.weeks.show', $week))
+        ->assertOk()
+        ->assertSee('data-rota-add-cell', false)
+        ->assertSee('data-rota-edit-shift', false)
+        ->assertSee('Add a one-off shift');
+});
