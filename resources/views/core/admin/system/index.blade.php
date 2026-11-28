@@ -69,7 +69,7 @@
     <section class="sg-card mb-4 p-5" aria-labelledby="directory-sync-heading">
         <h2 id="directory-sync-heading" class="font-serif text-lg font-semibold">Directory sync</h2>
         <p class="mt-2 text-sm text-sg-muted">
-            Nightly sync creates, updates and deactivates members from the active directory source.
+            Nightly sync creates, updates and deactivates members from the Cloudron read-only API.
             Leavers lose their intranet sessions at the next run.
         </p>
         <dl class="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm" data-directory-source>
@@ -87,23 +87,6 @@
             </dl>
         @else
             <p class="mt-3 text-sm text-sg-muted">No directory sync has been recorded yet.</p>
-        @endif
-        @if ($directoryShadow)
-            <h3 class="mt-4 font-serif text-base font-semibold">LDAP shadow comparison</h3>
-            <dl class="mt-2 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm" data-directory-shadow>
-                <dt class="text-sg-muted">Status</dt>
-                <dd>{{ $directoryShadow['status'] }}</dd>
-                <dt class="text-sg-muted">Differences</dt>
-                <dd>{{ $directoryShadow['difference_count'] ?? 0 }}</dd>
-                @if (! empty($directoryShadow['usernames']))
-                    <dt class="text-sg-muted">Usernames</dt>
-                    <dd>{{ implode(', ', $directoryShadow['usernames']) }}</dd>
-                @endif
-                @if (! empty($directoryShadow['message']))
-                    <dt class="text-sg-muted">Note</dt>
-                    <dd>{{ $directoryShadow['message'] }}</dd>
-                @endif
-            </dl>
         @endif
     </section>
 

@@ -8,6 +8,6 @@ return [
     'description' => 'Directory, profiles, placements and TOTP status.',
     'default_enabled' => true,
     'depends_on' => [],
-    'cloudron_addons' => ['mysql', 'ldap'],
+    'cloudron_addons' => ['mysql'],
     'settings' => [],
 ];

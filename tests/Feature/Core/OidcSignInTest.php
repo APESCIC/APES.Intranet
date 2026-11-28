@@ -108,8 +108,7 @@ it('refuses an email already used by a different Cloudron account', function () 
 });
 
 it('denies an identity without an email', function () {
-    $this->idp->identity = new OidcIdentity('sub-alex', null, 'Alex');
-    $this->directory->groups = ['intranet.staff'];
+    $this->idp->identity = new OidcIdentity('sub-alex', null, 'Alex', null, ['intranet.staff']);
 
     $this->get(route('auth.callback'))->assertForbidden();
     $this->assertGuest();
@@ -123,18 +122,7 @@ it('shows a temporary error when Cloudron is unavailable', function () {
     $this->assertGuest();
 });
 
-it('shows a temporary error when the LDAP directory is unavailable and source is ldap', function () {
-    config(['intranet.directory_source' => 'ldap']);
-    $this->directory->unavailable = true;
-
-    signInWithCloudron($this, ['intranet.staff'])->assertStatus(503);
-    $this->assertGuest();
-});
-
-it('maps OIDC groups claim roles and ignores other groups when source is cloudron', function () {
-    config(['intranet.directory_source' => 'cloudron']);
-    $this->directory->groups = ['intranet.admin']; // must not be used
-
+it('maps OIDC groups claim roles and ignores other groups', function () {
     signInWithCloudron($this, ['intranet.staff', 'intranet.hr', 'other']);
 
     expect(User::where('email', 'alex@example.test')->firstOrFail()->getRoleNames()->sort()->values()->all())
@@ -143,7 +131,6 @@ it('maps OIDC groups claim roles and ignores other groups when source is cloudro
 });
 
 it('returns 503 and leaves roles unchanged when the groups claim is missing', function () {
-    config(['intranet.directory_source' => 'cloudron']);
     signInWithCloudron($this, ['intranet.staff']);
     $user = User::where('oidc_sub', 'sub-alex')->firstOrFail();
     $this->post(route('logout'));
@@ -157,21 +144,11 @@ it('returns 503 and leaves roles unchanged when the groups claim is missing', fu
 });
 
 it('denies access for an empty groups claim or only non-intranet groups', function () {
-    config(['intranet.directory_source' => 'cloudron']);
-
     signInWithCloudron($this, [])->assertForbidden();
     $this->assertGuest();
 
     signInWithCloudron($this, ['students.only'])->assertForbidden();
     $this->assertGuest();
-});
-
-it('does not call LDAP DirectoryGroups when source is cloudron', function () {
-    config(['intranet.directory_source' => 'cloudron']);
-    $this->directory->unavailable = true;
-
-    signInWithCloudron($this, ['intranet.staff'])->assertRedirect(route('dashboard'));
-    $this->assertAuthenticated();
 });
 
 it('signs out', function () {
@@ -181,12 +158,16 @@ it('signs out', function () {
     $this->assertGuest();
 });
 
-it('keeps OIDC and LDAP secrets blank in the committed env examples', function () {
+it('keeps OIDC secrets blank in the committed env examples and omits LDAP keys', function () {
     foreach (['.env.example', '.env.herd.example'] as $file) {
         $lines = file(base_path($file), FILE_IGNORE_NEW_LINES);
+        $joined = implode("\n", $lines);
 
-        foreach (['OIDC_CLIENT_ID', 'OIDC_CLIENT_SECRET', 'LDAP_BIND_DN', 'LDAP_BIND_PASSWORD'] as $key) {
+        foreach (['OIDC_CLIENT_ID', 'OIDC_CLIENT_SECRET'] as $key) {
             expect($lines)->toContain($key.'=');
         }
+
+        expect($joined)->not->toMatch('/^LDAP_/m')
+            ->and($joined)->not->toContain('INTRANET_DIRECTORY_SOURCE');
     }
 });

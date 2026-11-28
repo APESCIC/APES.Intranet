@@ -38,29 +38,6 @@ return [
     ],
 
     /*
-    | Directory source for nightly sync (and, from v0.6.19, sign-in groups when
-    | OIDC groups are wired). cloudron = Cloudron API (default); ldap = switch
-    | back to LDAP. Restart the app after changing. Name only in .env.
-    */
-    'directory_source' => strtolower((string) env('INTRANET_DIRECTORY_SOURCE', 'cloudron')),
-
-    /*
-    | Cloudron LDAP, read-only. Kept for the ldap switch-back and the shadow
-    | comparison while both sources run in parallel.
-    */
-    'ldap' => [
-        'host' => env('CLOUDRON_LDAP_HOST') ?: env('LDAP_HOST'),
-        'port' => (int) (env('CLOUDRON_LDAP_PORT') ?: env('LDAP_PORT', 389)),
-        'base_dn' => env('CLOUDRON_LDAP_USERS_BASE_DN') ?: env('LDAP_BASE_DN'),
-        'groups_base_dn' => env('CLOUDRON_LDAP_GROUPS_BASE_DN') ?: env('LDAP_GROUPS_BASE_DN'),
-        'bind_dn' => env('CLOUDRON_LDAP_BIND_DN') ?: env('LDAP_BIND_DN'),
-        'bind_password' => env('CLOUDRON_LDAP_BIND_PASSWORD') ?: env('LDAP_BIND_PASSWORD'),
-        'user_filter' => env('LDAP_USER_FILTER', '(mail=%s)'),
-        'group_attribute' => env('LDAP_GROUP_ATTRIBUTE', 'memberOf'),
-        'timeout_seconds' => 5,
-    ],
-
-    /*
     | Names (never values) of the addon variables that are set, worked out
     | when the config is cached, for Admin > System status.
     */
