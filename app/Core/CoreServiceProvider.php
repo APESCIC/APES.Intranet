@@ -15,8 +15,6 @@ use App\Core\Analytics\RecordDailyAnalytics;
 use App\Core\Appearance\AppearancePreferences;
 use App\Core\Audit\Console\PruneAuditLog;
 use App\Core\Auth\Cloudron\CloudronIdentityProvider;
-use App\Core\Auth\Cloudron\LdapDirectoryGroups;
-use App\Core\Auth\Contracts\DirectoryGroups;
 use App\Core\Auth\Contracts\IdentityProvider;
 use App\Core\Changelog\Console\SyncChangelog;
 use App\Core\Changelog\Console\ValidateChangelog;
@@ -39,7 +37,6 @@ use App\Core\Navigation\MenuMode;
 use App\Core\Qa\QaLogin;
 use App\Core\Search\SearchProviders;
 use App\Core\System\Checks\CloudronApiCheck;
-use App\Core\System\Checks\LdapCheck;
 use App\Core\System\Checks\MysqlCheck;
 use App\Core\System\Checks\OidcCheck;
 use App\Core\System\Checks\RedisCheck;
@@ -58,7 +55,6 @@ class CoreServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(IdentityProvider::class, CloudronIdentityProvider::class);
-        $this->app->bind(DirectoryGroups::class, LdapDirectoryGroups::class);
         $this->app->bind(ApprovedLeaveLookup::class, NullApprovedLeaveLookup::class);
         $this->app->bind(RaiseItTicket::class, NullRaiseItTicket::class);
         $this->app->bind(PublishIntranetUpdate::class, NullPublishIntranetUpdate::class);
@@ -78,7 +74,6 @@ class CoreServiceProvider extends ServiceProvider
             $app->make(MysqlCheck::class),
             $app->make(RedisCheck::class),
             $app->make(SmtpCheck::class),
-            $app->make(LdapCheck::class),
             $app->make(OidcCheck::class),
             $app->make(CloudronApiCheck::class),
         ]));

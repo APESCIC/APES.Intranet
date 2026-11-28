@@ -4,8 +4,6 @@ namespace App\Core\System\Http\Controllers;
 
 use App\Core\Audit\AuditLog;
 use App\Core\Audit\AuditLogger;
-use App\Core\Auth\DirectoryShadowComparison;
-use App\Core\Auth\DirectorySource;
 use App\Core\Modules\ModuleRegistry;
 use App\Core\System\SystemStatus;
 use App\Core\Version\AppVersion;
@@ -36,8 +34,7 @@ class SystemStatusController
         return view('core.admin.system.index', [
             'addons' => $status->summary(),
             'directorySync' => $directorySync,
-            'directorySource' => DirectorySource::current(),
-            'directoryShadow' => DirectoryShadowComparison::latest(),
+            'directorySource' => 'cloudron',
             'versions' => $versions,
         ]);
     }

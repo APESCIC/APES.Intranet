@@ -3,9 +3,7 @@
 namespace Modules\People;
 
 use App\Core\Auth\Cloudron\CloudronApiDirectoryRoster;
-use App\Core\Auth\Cloudron\LdapDirectoryGroups;
 use App\Core\Auth\Contracts\DirectoryRoster;
-use App\Core\Auth\DirectorySource;
 use App\Core\Modules\ModuleGuards;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
@@ -24,11 +22,7 @@ class PeopleServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->bind(DirectoryRoster::class, function () {
-            return DirectorySource::isCloudron()
-                ? $this->app->make(CloudronApiDirectoryRoster::class)
-                : $this->app->make(LdapDirectoryGroups::class);
-        });
+        $this->app->bind(DirectoryRoster::class, CloudronApiDirectoryRoster::class);
 
         $this->mergeConfigFrom(__DIR__.'/../config/people.php', 'people');
 

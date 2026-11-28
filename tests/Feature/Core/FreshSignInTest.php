@@ -25,7 +25,6 @@ function signInAt(object $test, string $group, int $authTime): void
 {
     $groups = ['intranet.staff', $group];
     $test->idp->identity = new OidcIdentity('sub-alex', 'alex@example.test', 'Alex Example', $authTime, $groups, 'alex');
-    $test->directory->groups = $groups;
     $test->get(route('auth.callback'))->assertRedirect();
 }
 
