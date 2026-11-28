@@ -14,6 +14,7 @@ every team.
 | Area | Members | Supervisors | Management | HR | Admin |
 | --- | --- | --- | --- | --- | --- |
 | See own published shifts, set unavailability, claim and swap | Yes | Yes | Yes | Yes | Yes |
+| See the full person-by-day week table, copy a week, edit templates | | Own team | All | | All |
 | Build and publish rotas, shift templates | | Own team | All | | All |
 | Approve claims, swaps and timesheets, record missed clock-outs | | Own team | All | | All |
 | Clock in and out, build and submit own timesheets | Yes | Yes | Yes | Yes | Yes |
@@ -35,13 +36,21 @@ geofence is approved and switched on.
 
 ## Rota
 
-1. Add shift templates (site, name, role, days and times) on **Rota → Shift templates**.
-   A shift that ends before it starts runs past midnight.
-2. On **Rota**, choose a site and a week and **Create draft week**. Every
-   active template becomes an open shift.
-3. Assign members. A shift that overlaps the member's unavailability or
-   another of their shifts is flagged as a clash. Clashes are warnings, not
-   blocks.
+Supervisors manage rotas for their own team (sites linked to that team).
+Management and admin manage every team. Staff, volunteers, students, HR and
+legal do not get `operations.rota.manage`: they keep **My shifts** and cannot
+open the person-by-day week table. Confirmed 24 November 2026.
+
+1. Add or edit shift templates (site, name, role, day and times) on
+   **Rota → Shift templates**. A shift that ends before it starts runs past
+   midnight. Retiring a template leaves shifts already on a week in place.
+2. On **Rota**, choose a site and a week and **Create draft week**, or **Copy
+   to next week** from an existing week. Every active template (or the copied
+   pattern) becomes shifts on a draft week. Copy does not send publish email.
+3. Use the person-by-day table to add or change shifts from a cell (template
+   or one-off), or the fallback form. Assigning someone with **approved leave**
+   covering the shift is blocked. Overlap with unavailability or another shift
+   is a clash warning, not a block.
 4. **Publish and email members.** Each member with shifts gets one email.
    Members only ever see their own published shifts.
 

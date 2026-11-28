@@ -13,11 +13,13 @@ use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use Modules\Operations\Models\RotaWeek;
 use Modules\Operations\Models\Shift;
+use Modules\Operations\Models\ShiftTemplate;
 use Modules\Operations\Models\Site;
 use Modules\Operations\OperationsPermissions;
 use Modules\Operations\Services\ClashDetector;
 use Modules\Operations\Services\RotaBuilder;
 use Modules\Operations\Services\RotaPublisher;
+use Modules\Operations\Support\RotaWeekGrid;
 use Modules\Operations\Support\TeamAccess;
 use RuntimeException;
 
@@ -71,40 +73,80 @@ class RotaController
     {
         $this->authoriseManage($request, $week);
 
-        $week->load(['site', 'shifts.member']);
+        $week->load(['site', 'shifts.member', 'shifts.checklistRuns.template']);
 
         return view('operations::rota.week', [
             'week' => $week,
             'clashes' => $clashes->forWeek($week),
+            'grid' => RotaWeekGrid::forWeek($week),
+            'templates' => ShiftTemplate::query()
+                ->where('site_id', $week->site_id)
+                ->where('active', true)
+                ->orderBy('weekday')
+                ->orderBy('starts_at')
+                ->get(),
             'members' => User::query()->active()->permission(AccessMatrix::INTRANET_ACCESS)->orderBy('name')->get(['id', 'name', 'team']),
         ]);
     }
 
-    public function storeShift(Request $request, RotaWeek $week, AuditLogger $audit, ApprovedLeaveLookup $leave): RedirectResponse
+    public function storeShift(Request $request, RotaWeek $week, AuditLogger $audit, ApprovedLeaveLookup $leave, ClashDetector $clashes): RedirectResponse
     {
         $this->authoriseManage($request, $week);
 
         $data = $request->validate([
-            'role' => ['required', 'string', 'max:120'],
-            'starts_at' => ['required', 'date'],
-            'ends_at' => ['required', 'date', 'after:starts_at'],
+            'shift_template_id' => ['nullable', 'integer', Rule::exists('operations_shift_templates', 'id')],
+            'role' => ['required_without:shift_template_id', 'nullable', 'string', 'max:120'],
+            'starts_at' => ['required_without:shift_template_id', 'nullable', 'date'],
+            'ends_at' => ['required_without:shift_template_id', 'nullable', 'date'],
+            'day' => ['nullable', 'date'],
             'user_id' => ['nullable', 'integer', Rule::exists('users', 'id')],
         ]);
 
-        if ($data['user_id'] !== null && $leave->overlaps(
-            (int) $data['user_id'],
-            CarbonImmutable::parse($data['starts_at']),
-            CarbonImmutable::parse($data['ends_at']),
-        )) {
+        $templateId = $data['shift_template_id'] ?? null;
+        $role = $data['role'] ?? null;
+        $startsAt = isset($data['starts_at']) ? CarbonImmutable::parse($data['starts_at']) : null;
+        $endsAt = isset($data['ends_at']) ? CarbonImmutable::parse($data['ends_at']) : null;
+
+        if ($templateId !== null) {
+            $template = ShiftTemplate::query()->findOrFail($templateId);
+            abort_unless((int) $template->site_id === (int) $week->site_id && $template->active, 403);
+
+            $day = isset($data['day'])
+                ? CarbonImmutable::parse($data['day'])->startOfDay()
+                : CarbonImmutable::parse($week->week_start)->addDays($template->weekday - 1);
+            $startsAt = $day->setTimeFromTimeString($template->starts_at);
+            $endsAt = $day->setTimeFromTimeString($template->ends_at);
+            if ($endsAt->lessThanOrEqualTo($startsAt)) {
+                $endsAt = $endsAt->addDay();
+            }
+            $role = $template->role;
+        }
+
+        abort_if($startsAt === null || $endsAt === null || $role === null, 422);
+        abort_unless($endsAt->greaterThan($startsAt), 422);
+
+        $userId = $data['user_id'] ?? null;
+        if ($userId !== null && $leave->overlaps((int) $userId, $startsAt, $endsAt)) {
             return back()->withErrors([
                 'user_id' => 'That person has approved leave covering this shift.',
             ])->withInput();
         }
 
-        $shift = $week->shifts()->create($data + ['site_id' => $week->site_id]);
+        $shift = $week->shifts()->create([
+            'site_id' => $week->site_id,
+            'shift_template_id' => $templateId,
+            'role' => $role,
+            'starts_at' => $startsAt,
+            'ends_at' => $endsAt,
+            'user_id' => $userId,
+        ]);
         $audit->record('operations.shift_added', $shift, ['rota_week_id' => $week->id, 'user_id' => $shift->user_id]);
 
-        return back()->with('status', 'Shift added.');
+        $found = $userId !== null ? $clashes->forShift($shift) : [];
+
+        return back()->with('status', $found === []
+            ? 'Shift added.'
+            : 'Shift added with a clash: '.implode('; ', $found).'.');
     }
 
     public function updateShift(Request $request, Shift $shift, AuditLogger $audit, ClashDetector $clashes, ApprovedLeaveLookup $leave): RedirectResponse
@@ -114,18 +156,40 @@ class RotaController
 
         $data = $request->validate([
             'user_id' => ['nullable', 'integer', Rule::exists('users', 'id')],
+            'role' => ['sometimes', 'string', 'max:120'],
+            'starts_at' => ['sometimes', 'date'],
+            'ends_at' => ['sometimes', 'date'],
         ]);
 
-        $userId = $data['user_id'] ?? null;
-        if ($userId !== null && $leave->overlaps((int) $userId, $shift->starts_at, $shift->ends_at)) {
+        $startsAt = isset($data['starts_at']) ? CarbonImmutable::parse($data['starts_at']) : $shift->starts_at;
+        $endsAt = isset($data['ends_at']) ? CarbonImmutable::parse($data['ends_at']) : $shift->ends_at;
+        abort_unless($endsAt->greaterThan($startsAt), 422);
+
+        $userId = array_key_exists('user_id', $data) ? $data['user_id'] : $shift->user_id;
+        if ($userId !== null && $leave->overlaps((int) $userId, $startsAt, $endsAt)) {
             return back()->withErrors([
                 'user_id' => 'That person has approved leave covering this shift.',
             ])->withInput();
         }
 
         $before = $shift->user_id;
-        $shift->update(['user_id' => $userId]);
-        $audit->record('operations.shift_assigned', $shift, ['from_user_id' => $before, 'to_user_id' => $shift->user_id]);
+        $payload = [
+            'user_id' => $userId,
+            'starts_at' => $startsAt,
+            'ends_at' => $endsAt,
+        ];
+        if (isset($data['role'])) {
+            $payload['role'] = $data['role'];
+        }
+
+        $shift->update($payload);
+        $audit->record('operations.shift_assigned', $shift, [
+            'from_user_id' => $before,
+            'to_user_id' => $shift->user_id,
+            'role' => $shift->role,
+            'starts_at' => $shift->starts_at->toDateTimeString(),
+            'ends_at' => $shift->ends_at->toDateTimeString(),
+        ]);
 
         $found = $clashes->forShift($shift);
 
@@ -142,6 +206,33 @@ class RotaController
         $shift->delete();
 
         return back()->with('status', 'Shift removed.');
+    }
+
+    public function copyWeek(Request $request, RotaWeek $week, RotaBuilder $builder): RedirectResponse
+    {
+        $this->authoriseManage($request, $week);
+
+        try {
+            $result = $builder->copyWeek($week, $request->user());
+        } catch (RuntimeException $e) {
+            $existing = RotaWeek::query()
+                ->where('site_id', $week->site_id)
+                ->whereDate('week_start', CarbonImmutable::parse($week->week_start->toDateString())->addWeek())
+                ->first();
+
+            return back()
+                ->withErrors(['copy' => $e->getMessage()])
+                ->with('existing_week_id', $existing?->id);
+        }
+
+        $status = 'Draft week copied for the week of '.$result['week']->week_start->format('j F Y').'.';
+        if ($result['left_off'] !== []) {
+            $status .= ' Left open because of approved leave: '.implode('; ', $result['left_off']).'.';
+        }
+
+        return redirect()
+            ->route('operations.rota.weeks.show', $result['week'])
+            ->with('status', $status);
     }
 
     public function publish(Request $request, RotaWeek $week, RotaPublisher $publisher): RedirectResponse

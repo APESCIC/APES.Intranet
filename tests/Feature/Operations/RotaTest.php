@@ -5,6 +5,7 @@ use App\Core\Audit\AuditLog;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
+use Modules\Hr\Models\LeaveRequest;
 use Modules\Operations\Mail\OperationsNoticeMail;
 use Modules\Operations\Models\Availability;
 use Modules\Operations\Models\RotaWeek;
@@ -154,4 +155,207 @@ it('lets members record and remove their own unavailability', function () {
     $this->actingAs($member)->delete(route('operations.rota.availability.destroy', $period))->assertRedirect();
 
     expect(Availability::query()->count())->toBe(0);
+});
+
+it('shows the week as a person-by-day grid with open shifts and team volunteers', function () {
+    $supervisor = Operations::member(RoleName::Supervisor);
+    $staff = Operations::member(RoleName::Staff, ['name' => 'Alex Keeper']);
+    $volunteer = Operations::member(RoleName::Volunteer, ['name' => 'Vic Volunteer']);
+    $student = Operations::member(RoleName::Student, ['name' => 'Sam Student']);
+    $outsider = Operations::member(RoleName::Staff, ['name' => 'Other Team', 'team' => 'Office']);
+
+    $weekStart = CarbonImmutable::parse('2026-11-16');
+    $week = Operations::week($this->site, RotaWeek::STATUS_DRAFT, $weekStart);
+    $monday = $weekStart->setTime(9, 0);
+    $tuesday = $weekStart->addDay()->setTime(9, 0);
+    $overnight = Operations::shift($week, $staff, $weekStart->addDays(2)->setTime(22, 0), 6, 'Night check');
+    Operations::shift($week, $volunteer, $monday, role: 'Morning feed');
+    Operations::shift($week, null, $tuesday, role: 'Open clean');
+
+    $this->actingAs($supervisor)->get(route('operations.rota.weeks.show', $week))
+        ->assertOk()
+        ->assertSee('data-rota-grid', false)
+        ->assertSee('data-rota-row="user:'.$staff->id.'"', false)
+        ->assertSee('data-rota-row="user:'.$volunteer->id.'"', false)
+        ->assertSee('data-rota-row="user:'.$student->id.'"', false)
+        ->assertSee('data-rota-row="open"', false)
+        ->assertSee('Vic Volunteer')
+        ->assertSee('Sam Student')
+        ->assertSee('Open shifts')
+        ->assertSee('Open clean')
+        ->assertSee('Overnight')
+        ->assertDontSee('data-rota-row="user:'.$outsider->id.'"', false)
+        ->assertSee('data-shift="'.$overnight->id.'"', false);
+
+    $this->actingAs(Operations::member())->get(route('operations.rota.weeks.show', $week))->assertForbidden();
+});
+
+it('lets a manager add and change shifts from a table cell', function () {
+    $supervisor = Operations::member(RoleName::Supervisor);
+    $member = Operations::member(RoleName::Staff, ['name' => 'Cell Member']);
+    $weekStart = CarbonImmutable::parse('2026-11-16');
+    $week = Operations::week($this->site, RotaWeek::STATUS_DRAFT, $weekStart);
+    $template = ShiftTemplate::query()->create([
+        'site_id' => $this->site->id,
+        'name' => 'Morning feed',
+        'role' => 'Animal care',
+        'weekday' => 1,
+        'starts_at' => '08:00',
+        'ends_at' => '12:00',
+        'active' => true,
+    ]);
+
+    $this->actingAs($supervisor)->post(route('operations.rota.weeks.shifts.store', $week), [
+        'shift_template_id' => $template->id,
+        'day' => '2026-11-16',
+        'user_id' => $member->id,
+    ])->assertRedirect();
+
+    $templated = $week->shifts()->where('shift_template_id', $template->id)->firstOrFail();
+    expect($templated->role)->toBe('Animal care')
+        ->and($templated->starts_at->toDateTimeString())->toBe('2026-11-16 08:00:00')
+        ->and($templated->user_id)->toBe($member->id)
+        ->and(AuditLog::query()->where('event', 'operations.shift_added')->exists())->toBeTrue();
+
+    $this->actingAs($supervisor)->post(route('operations.rota.weeks.shifts.store', $week), [
+        'role' => 'Night check',
+        'starts_at' => '2026-11-17T22:00',
+        'ends_at' => '2026-11-18T02:00',
+        'user_id' => null,
+    ])->assertRedirect();
+
+    $overnight = $week->shifts()->where('role', 'Night check')->firstOrFail();
+    expect($overnight->ends_at->toDateTimeString())->toBe('2026-11-18 02:00:00');
+
+    $this->actingAs($supervisor)->patch(route('operations.rota.shifts.update', $overnight), [
+        'role' => 'Night care',
+        'starts_at' => '2026-11-17T21:00',
+        'ends_at' => '2026-11-18T01:00',
+        'user_id' => $member->id,
+    ])->assertRedirect()->assertSessionHas('status');
+
+    expect($overnight->refresh()->role)->toBe('Night care')
+        ->and($overnight->starts_at->format('H:i'))->toBe('21:00')
+        ->and($overnight->user_id)->toBe($member->id);
+
+    $this->actingAs(Operations::member())->post(route('operations.rota.weeks.shifts.store', $week), [
+        'role' => 'Forbidden',
+        'starts_at' => '2026-11-18T09:00',
+        'ends_at' => '2026-11-18T17:00',
+    ])->assertForbidden();
+
+    $this->actingAs($supervisor)->get(route('operations.rota.weeks.show', $week))
+        ->assertOk()
+        ->assertSee('data-rota-add-cell', false)
+        ->assertSee('data-rota-edit-shift', false)
+        ->assertSee('Add a one-off shift');
+});
+
+it('lets a manager edit a template and keeps retired shifts on existing weeks', function () {
+    $management = Operations::member(RoleName::Management, ['team' => 'Office']);
+    $template = ShiftTemplate::query()->create([
+        'site_id' => $this->site->id,
+        'name' => 'Morning feed',
+        'role' => 'Animal care',
+        'weekday' => 1,
+        'starts_at' => '08:00',
+        'ends_at' => '12:00',
+        'active' => true,
+    ]);
+    $existingWeek = Operations::week($this->site, RotaWeek::STATUS_DRAFT, CarbonImmutable::parse('2026-11-09'));
+    $kept = Operations::shift($existingWeek, null, CarbonImmutable::parse('2026-11-09 08:00:00'), 4, 'Animal care');
+    $kept->update(['shift_template_id' => $template->id]);
+
+    $this->actingAs($management)->patch(route('operations.rota.templates.update', $template), [
+        'name' => 'Late morning',
+        'role' => 'Senior care',
+        'weekday' => 2,
+        'starts_at' => '10:00',
+        'ends_at' => '14:00',
+    ])->assertRedirect();
+
+    expect($template->refresh()->name)->toBe('Late morning')
+        ->and($template->role)->toBe('Senior care')
+        ->and($template->weekday)->toBe(2)
+        ->and(substr((string) $template->starts_at, 0, 5))->toBe('10:00')
+        ->and($kept->refresh()->starts_at->format('H:i'))->toBe('08:00');
+
+    $response = $this->actingAs($management)->post(route('operations.rota.weeks.store'), [
+        'site_id' => $this->site->id,
+        'week_of' => '2026-11-18',
+    ]);
+    $response->assertSessionHasNoErrors()->assertRedirect();
+
+    $newWeek = RotaWeek::query()
+        ->where('site_id', $this->site->id)
+        ->whereKeyNot($existingWeek->id)
+        ->orderByDesc('id')
+        ->firstOrFail();
+    $created = $newWeek->shifts()->firstOrFail();
+    expect($created->role)->toBe('Senior care')
+        ->and($created->starts_at->toDateTimeString())->toBe('2026-11-17 10:00:00');
+
+    $this->actingAs($management)->delete(route('operations.rota.templates.destroy', $template))->assertRedirect();
+    expect($template->refresh()->active)->toBeFalse()
+        ->and($kept->fresh()->exists)->toBeTrue();
+
+    $cellWeek = Operations::week($this->site, RotaWeek::STATUS_DRAFT, CarbonImmutable::parse('2026-11-23'));
+    $active = ShiftTemplate::query()->create([
+        'site_id' => $this->site->id,
+        'name' => 'Cell template',
+        'role' => 'Feed',
+        'weekday' => 1,
+        'starts_at' => '09:00',
+        'ends_at' => '11:00',
+        'active' => true,
+    ]);
+
+    $this->actingAs($management)->post(route('operations.rota.weeks.shifts.store', $cellWeek), [
+        'shift_template_id' => $active->id,
+        'day' => '2026-11-23',
+    ])->assertRedirect();
+
+    expect($cellWeek->shifts()->where('shift_template_id', $active->id)->exists())->toBeTrue();
+});
+
+it('copies a week to the next as a draft, omitting leave and refusing a second copy', function () {
+    Mail::fake();
+    $supervisor = Operations::member(RoleName::Supervisor);
+    $member = Operations::member(RoleName::Staff, ['name' => 'Leave Person']);
+    $weekStart = CarbonImmutable::parse('2026-11-16');
+    $week = Operations::week($this->site, RotaWeek::STATUS_PUBLISHED, $weekStart);
+    Operations::shift($week, $member, $weekStart->setTime(9, 0), role: 'Morning feed');
+    Operations::shift($week, null, $weekStart->addDay()->setTime(9, 0), role: 'Open clean');
+
+    LeaveRequest::query()->create([
+        'user_id' => $member->id,
+        'starts_on' => '2026-11-23',
+        'ends_on' => '2026-11-23',
+        'days' => 1,
+        'status' => LeaveRequest::STATUS_APPROVED,
+        'reason' => 'Demo leave',
+    ]);
+
+    $this->actingAs($supervisor)->post(route('operations.rota.weeks.copy', $week))
+        ->assertRedirect();
+
+    $copied = RotaWeek::query()
+        ->where('site_id', $this->site->id)
+        ->whereKeyNot($week->id)
+        ->orderByDesc('id')
+        ->firstOrFail();
+
+    expect($copied->status)->toBe(RotaWeek::STATUS_DRAFT)
+        ->and($copied->week_start->toDateString())->toBe('2026-11-23')
+        ->and($copied->shifts)->toHaveCount(2);
+
+    $assigned = $copied->shifts()->where('role', 'Morning feed')->firstOrFail();
+    expect($assigned->user_id)->toBeNull()
+        ->and($assigned->starts_at->toDateString())->toBe('2026-11-23');
+
+    Mail::assertNothingSent();
+    expect(AuditLog::query()->where('event', 'operations.rota_copied')->exists())->toBeTrue();
+
+    $this->actingAs($supervisor)->post(route('operations.rota.weeks.copy', $week))
+        ->assertSessionHasErrors('copy');
 });

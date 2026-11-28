@@ -1,0 +1,34 @@
+{
+    "version": "v0.6.21",
+    "released_at": "2026-11-28",
+    "title": "Weekly rota table, templates and copy week",
+    "summary": "Rota managers now build the week on a person-by-day table, edit shift templates, and copy a week to the next as a draft. Everyone else still only sees their own published shifts.",
+    "audiences": [
+        "staff"
+    ],
+    "changes": {
+        "added": [
+            "A person-by-day week table for rota managers, with an Open shifts row and overnight labels.",
+            "Add or change a shift from a table cell (from a template or as a one-off), including role and times.",
+            "Copy this week to the next as a new draft, without sending a publish email."
+        ],
+        "changed": [
+            "Shift templates can be edited (name, role, day and times); retiring a template still leaves existing shifts in place.",
+            "Docs and tests confirm supervisors manage their own team's rota, and management and admin manage every team. Only rota managers see the full table."
+        ]
+    },
+    "internal_notes": [
+        "Epic #518. Leaves #519, #520, #521, #522, #524. Approved leave still hard-blocks assignment; unavailability and double-booking stay as clash warnings. Stack remains Blade and small JavaScript; no Livewire."
+    ],
+    "module_versions": {
+        "core": "v0.6.21",
+        "communications": "0.1.0",
+        "helpdesk": "0.1.0",
+        "hr": "0.1.0",
+        "learning": "0.1.0",
+        "microsoft-365": "0.1.0",
+        "operations": "0.1.0",
+        "people": "0.1.0"
+    },
+    "published": true
+}
