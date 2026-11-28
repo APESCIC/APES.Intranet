@@ -13,9 +13,21 @@
             @csrf
             <button type="submit" class="sg-btn sg-btn-primary sg-btn-sm">{{ $week->isPublished() ? 'Publish changes and email members' : 'Publish and email members' }}</button>
         </form>
+        <form method="post" action="{{ route('operations.rota.weeks.copy', $week) }}">
+            @csrf
+            <button type="submit" class="sg-btn sg-btn-secondary sg-btn-sm">Copy to next week</button>
+        </form>
         @if ($week->isPublished())
             <span class="sg-badge sg-badge--ok">Published {{ $week->published_at?->format('j M H:i') }}</span>
         @endif
+        @error('copy')
+            <p class="text-sg-error" role="alert">
+                {{ $message }}
+                @if (session('existing_week_id'))
+                    <a class="underline" href="{{ route('operations.rota.weeks.show', session('existing_week_id')) }}">Open the existing week</a>
+                @endif
+            </p>
+        @enderror
     </div>
 
     <section class="sg-card mb-6 p-6" aria-labelledby="week-grid-heading">
