@@ -208,6 +208,33 @@ class RotaController
         return back()->with('status', 'Shift removed.');
     }
 
+    public function copyWeek(Request $request, RotaWeek $week, RotaBuilder $builder): RedirectResponse
+    {
+        $this->authoriseManage($request, $week);
+
+        try {
+            $result = $builder->copyWeek($week, $request->user());
+        } catch (RuntimeException $e) {
+            $existing = RotaWeek::query()
+                ->where('site_id', $week->site_id)
+                ->whereDate('week_start', CarbonImmutable::parse($week->week_start->toDateString())->addWeek())
+                ->first();
+
+            return back()
+                ->withErrors(['copy' => $e->getMessage()])
+                ->with('existing_week_id', $existing?->id);
+        }
+
+        $status = 'Draft week copied for the week of '.$result['week']->week_start->format('j F Y').'.';
+        if ($result['left_off'] !== []) {
+            $status .= ' Left open because of approved leave: '.implode('; ', $result['left_off']).'.';
+        }
+
+        return redirect()
+            ->route('operations.rota.weeks.show', $result['week'])
+            ->with('status', $status);
+    }
+
     public function publish(Request $request, RotaWeek $week, RotaPublisher $publisher): RedirectResponse
     {
         $this->authoriseManage($request, $week);

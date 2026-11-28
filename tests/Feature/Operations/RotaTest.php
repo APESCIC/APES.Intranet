@@ -5,6 +5,7 @@ use App\Core\Audit\AuditLog;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
+use Modules\Hr\Models\LeaveRequest;
 use Modules\Operations\Mail\OperationsNoticeMail;
 use Modules\Operations\Models\Availability;
 use Modules\Operations\Models\RotaWeek;
@@ -315,4 +316,46 @@ it('lets a manager edit a template and keeps retired shifts on existing weeks', 
     ])->assertRedirect();
 
     expect($cellWeek->shifts()->where('shift_template_id', $active->id)->exists())->toBeTrue();
+});
+
+it('copies a week to the next as a draft, omitting leave and refusing a second copy', function () {
+    Mail::fake();
+    $supervisor = Operations::member(RoleName::Supervisor);
+    $member = Operations::member(RoleName::Staff, ['name' => 'Leave Person']);
+    $weekStart = CarbonImmutable::parse('2026-11-16');
+    $week = Operations::week($this->site, RotaWeek::STATUS_PUBLISHED, $weekStart);
+    Operations::shift($week, $member, $weekStart->setTime(9, 0), role: 'Morning feed');
+    Operations::shift($week, null, $weekStart->addDay()->setTime(9, 0), role: 'Open clean');
+
+    LeaveRequest::query()->create([
+        'user_id' => $member->id,
+        'starts_on' => '2026-11-23',
+        'ends_on' => '2026-11-23',
+        'days' => 1,
+        'status' => LeaveRequest::STATUS_APPROVED,
+        'reason' => 'Demo leave',
+    ]);
+
+    $this->actingAs($supervisor)->post(route('operations.rota.weeks.copy', $week))
+        ->assertRedirect();
+
+    $copied = RotaWeek::query()
+        ->where('site_id', $this->site->id)
+        ->whereKeyNot($week->id)
+        ->orderByDesc('id')
+        ->firstOrFail();
+
+    expect($copied->status)->toBe(RotaWeek::STATUS_DRAFT)
+        ->and($copied->week_start->toDateString())->toBe('2026-11-23')
+        ->and($copied->shifts)->toHaveCount(2);
+
+    $assigned = $copied->shifts()->where('role', 'Morning feed')->firstOrFail();
+    expect($assigned->user_id)->toBeNull()
+        ->and($assigned->starts_at->toDateString())->toBe('2026-11-23');
+
+    Mail::assertNothingSent();
+    expect(AuditLog::query()->where('event', 'operations.rota_copied')->exists())->toBeTrue();
+
+    $this->actingAs($supervisor)->post(route('operations.rota.weeks.copy', $week))
+        ->assertSessionHasErrors('copy');
 });

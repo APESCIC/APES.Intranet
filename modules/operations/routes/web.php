@@ -21,6 +21,7 @@ Route::middleware(['web', 'auth'])->group(function () {
         Route::post('/rota/weeks', [RotaController::class, 'storeWeek'])->name('rota.weeks.store');
         Route::get('/rota/weeks/{week}', [RotaController::class, 'showWeek'])->name('rota.weeks.show');
         Route::post('/rota/weeks/{week}/shifts', [RotaController::class, 'storeShift'])->name('rota.weeks.shifts.store');
+        Route::post('/rota/weeks/{week}/copy', [RotaController::class, 'copyWeek'])->name('rota.weeks.copy');
         Route::post('/rota/weeks/{week}/publish', [RotaController::class, 'publish'])->name('rota.weeks.publish');
         Route::patch('/rota/shifts/{shift}', [RotaController::class, 'updateShift'])->name('rota.shifts.update');
         Route::delete('/rota/shifts/{shift}', [RotaController::class, 'destroyShift'])->name('rota.shifts.destroy');
