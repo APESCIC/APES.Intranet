@@ -1,0 +1,28 @@
+{
+    "version": "v0.6.20",
+    "released_at": "2026-11-28",
+    "title": "Remove LDAP",
+    "summary": "No changes you will notice. Sign-in and the directory keep using Cloudron as before.",
+    "audiences": [
+        "staff"
+    ],
+    "changes": {
+        "changed": [
+            "Behind the scenes, the intranet no longer keeps a unused LDAP path; sign-in and directory sync use Cloudron only."
+        ]
+    },
+    "internal_notes": [
+        "Epic #472. Leaves #539, #536 (waived), #478, #479, #480. Removed LDAP classes, directory source switch, shadow compare, ldap PHP extension requirement and docs. LAMP may still inject unused CLOUDRON_LDAP_*; LDAP_BIND_PASSWORD stays forbidden in shared/.env."
+    ],
+    "module_versions": {
+        "core": "v0.6.20",
+        "communications": "0.1.0",
+        "helpdesk": "0.1.0",
+        "hr": "0.1.0",
+        "learning": "0.1.0",
+        "microsoft-365": "0.1.0",
+        "operations": "0.1.0",
+        "people": "0.1.0"
+    },
+    "published": true
+}
