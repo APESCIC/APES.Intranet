@@ -18,6 +18,7 @@ use Modules\Operations\OperationsPermissions;
 use Modules\Operations\Services\ClashDetector;
 use Modules\Operations\Services\RotaBuilder;
 use Modules\Operations\Services\RotaPublisher;
+use Modules\Operations\Support\RotaWeekGrid;
 use Modules\Operations\Support\TeamAccess;
 use RuntimeException;
 
@@ -71,11 +72,12 @@ class RotaController
     {
         $this->authoriseManage($request, $week);
 
-        $week->load(['site', 'shifts.member']);
+        $week->load(['site', 'shifts.member', 'shifts.checklistRuns.template']);
 
         return view('operations::rota.week', [
             'week' => $week,
             'clashes' => $clashes->forWeek($week),
+            'grid' => RotaWeekGrid::forWeek($week),
             'members' => User::query()->active()->permission(AccessMatrix::INTRANET_ACCESS)->orderBy('name')->get(['id', 'name', 'team']),
         ]);
     }

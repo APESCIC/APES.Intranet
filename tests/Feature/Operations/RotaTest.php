@@ -155,3 +155,36 @@ it('lets members record and remove their own unavailability', function () {
 
     expect(Availability::query()->count())->toBe(0);
 });
+
+it('shows the week as a person-by-day grid with open shifts and team volunteers', function () {
+    $supervisor = Operations::member(RoleName::Supervisor);
+    $staff = Operations::member(RoleName::Staff, ['name' => 'Alex Keeper']);
+    $volunteer = Operations::member(RoleName::Volunteer, ['name' => 'Vic Volunteer']);
+    $student = Operations::member(RoleName::Student, ['name' => 'Sam Student']);
+    $outsider = Operations::member(RoleName::Staff, ['name' => 'Other Team', 'team' => 'Office']);
+
+    $weekStart = CarbonImmutable::parse('2026-11-16');
+    $week = Operations::week($this->site, RotaWeek::STATUS_DRAFT, $weekStart);
+    $monday = $weekStart->setTime(9, 0);
+    $tuesday = $weekStart->addDay()->setTime(9, 0);
+    $overnight = Operations::shift($week, $staff, $weekStart->addDays(2)->setTime(22, 0), 6, 'Night check');
+    Operations::shift($week, $volunteer, $monday, role: 'Morning feed');
+    Operations::shift($week, null, $tuesday, role: 'Open clean');
+
+    $this->actingAs($supervisor)->get(route('operations.rota.weeks.show', $week))
+        ->assertOk()
+        ->assertSee('data-rota-grid', false)
+        ->assertSee('data-rota-row="user:'.$staff->id.'"', false)
+        ->assertSee('data-rota-row="user:'.$volunteer->id.'"', false)
+        ->assertSee('data-rota-row="user:'.$student->id.'"', false)
+        ->assertSee('data-rota-row="open"', false)
+        ->assertSee('Vic Volunteer')
+        ->assertSee('Sam Student')
+        ->assertSee('Open shifts')
+        ->assertSee('Open clean')
+        ->assertSee('Overnight')
+        ->assertDontSee('data-rota-row="user:'.$outsider->id.'"', false)
+        ->assertSee('data-shift="'.$overnight->id.'"', false);
+
+    $this->actingAs(Operations::member())->get(route('operations.rota.weeks.show', $week))->assertForbidden();
+});
