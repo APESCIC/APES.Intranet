@@ -249,3 +249,70 @@ it('lets a manager add and change shifts from a table cell', function () {
         ->assertSee('data-rota-edit-shift', false)
         ->assertSee('Add a one-off shift');
 });
+
+it('lets a manager edit a template and keeps retired shifts on existing weeks', function () {
+    $management = Operations::member(RoleName::Management, ['team' => 'Office']);
+    $template = ShiftTemplate::query()->create([
+        'site_id' => $this->site->id,
+        'name' => 'Morning feed',
+        'role' => 'Animal care',
+        'weekday' => 1,
+        'starts_at' => '08:00',
+        'ends_at' => '12:00',
+        'active' => true,
+    ]);
+    $existingWeek = Operations::week($this->site, RotaWeek::STATUS_DRAFT, CarbonImmutable::parse('2026-11-09'));
+    $kept = Operations::shift($existingWeek, null, CarbonImmutable::parse('2026-11-09 08:00:00'), 4, 'Animal care');
+    $kept->update(['shift_template_id' => $template->id]);
+
+    $this->actingAs($management)->patch(route('operations.rota.templates.update', $template), [
+        'name' => 'Late morning',
+        'role' => 'Senior care',
+        'weekday' => 2,
+        'starts_at' => '10:00',
+        'ends_at' => '14:00',
+    ])->assertRedirect();
+
+    expect($template->refresh()->name)->toBe('Late morning')
+        ->and($template->role)->toBe('Senior care')
+        ->and($template->weekday)->toBe(2)
+        ->and(substr((string) $template->starts_at, 0, 5))->toBe('10:00')
+        ->and($kept->refresh()->starts_at->format('H:i'))->toBe('08:00');
+
+    $response = $this->actingAs($management)->post(route('operations.rota.weeks.store'), [
+        'site_id' => $this->site->id,
+        'week_of' => '2026-11-18',
+    ]);
+    $response->assertSessionHasNoErrors()->assertRedirect();
+
+    $newWeek = RotaWeek::query()
+        ->where('site_id', $this->site->id)
+        ->whereKeyNot($existingWeek->id)
+        ->orderByDesc('id')
+        ->firstOrFail();
+    $created = $newWeek->shifts()->firstOrFail();
+    expect($created->role)->toBe('Senior care')
+        ->and($created->starts_at->toDateTimeString())->toBe('2026-11-17 10:00:00');
+
+    $this->actingAs($management)->delete(route('operations.rota.templates.destroy', $template))->assertRedirect();
+    expect($template->refresh()->active)->toBeFalse()
+        ->and($kept->fresh()->exists)->toBeTrue();
+
+    $cellWeek = Operations::week($this->site, RotaWeek::STATUS_DRAFT, CarbonImmutable::parse('2026-11-23'));
+    $active = ShiftTemplate::query()->create([
+        'site_id' => $this->site->id,
+        'name' => 'Cell template',
+        'role' => 'Feed',
+        'weekday' => 1,
+        'starts_at' => '09:00',
+        'ends_at' => '11:00',
+        'active' => true,
+    ]);
+
+    $this->actingAs($management)->post(route('operations.rota.weeks.shifts.store', $cellWeek), [
+        'shift_template_id' => $active->id,
+        'day' => '2026-11-23',
+    ])->assertRedirect();
+
+    expect($cellWeek->shifts()->where('shift_template_id', $active->id)->exists())->toBeTrue();
+});

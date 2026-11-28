@@ -60,6 +60,25 @@ class ShiftTemplateController
         return back()->with('status', 'Shift template saved.');
     }
 
+    public function update(Request $request, ShiftTemplate $template, AuditLogger $audit): RedirectResponse
+    {
+        abort_unless(TeamAccess::canManageSite($request->user(), $template->site, OperationsPermissions::ROTA_MANAGE), 403);
+        abort_unless($template->active, 422);
+
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:120'],
+            'role' => ['required', 'string', 'max:120'],
+            'weekday' => ['required', 'integer', 'between:1,7'],
+            'starts_at' => ['required', 'date_format:H:i'],
+            'ends_at' => ['required', 'date_format:H:i', 'different:starts_at'],
+        ]);
+
+        $template->update($data);
+        $audit->record('operations.shift_template_updated', $template, ['site_id' => $template->site_id]);
+
+        return back()->with('status', 'Shift template updated. New draft weeks and cell adds use the new times.');
+    }
+
     public function destroy(Request $request, ShiftTemplate $template, AuditLogger $audit): RedirectResponse
     {
         abort_unless(TeamAccess::canManageSite($request->user(), $template->site, OperationsPermissions::ROTA_MANAGE), 403);
