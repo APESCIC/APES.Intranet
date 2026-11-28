@@ -13,7 +13,6 @@
         "dom",
         "fileinfo",
         "intl",
-        "ldap",
         "mbstring",
         "openssl",
         "pdo_mysql",
