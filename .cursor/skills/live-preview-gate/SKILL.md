@@ -11,7 +11,7 @@ Follows `.cursor/rules/herd.mdc`. Full guide: `docs/local-development.md`.
 
 1. Put Herd's PHP 8.4, Composer and Node 22 first on `PATH` for the session (Herd's global PHP may be newer):
    `Set-ExecutionPolicy -Scope Process Bypass; . .\scripts\herd-env.ps1`
-2. Run `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\preview.ps1`. It loads the latest code, installs changed dependencies, reports pending migrations, checks `/healthz` shows the checked-out revision on PHP 8.4 through FastCGI, and starts Vite on port 5174.
+2. Run `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\preview.ps1`. It loads the latest code, installs changed dependencies, runs any pending migrations (`php artisan migrate`, local only), re-runs only the idempotent `LegalPagesSeeder` (not roles/module deploy seeders), checks `/healthz` shows the checked-out revision on PHP 8.4 through FastCGI, and starts Vite on port 5174.
    - Exit 3 means a decision (uncommitted changes, a diverged branch, a merge conflict): ask with AskQuestion.
    - Exit 1 is a blocker: report its message.
 3. Open <https://apes-intranet.test> in Cursor's browser, confirm it loaded, report the URL, the Vite port and a screenshot, then say "Preview ready, starting work".

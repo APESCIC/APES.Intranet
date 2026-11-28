@@ -61,7 +61,6 @@ cache on every start, which picks up any changed value.
 | MySQL | `CLOUDRON_MYSQL_HOST`, `CLOUDRON_MYSQL_PORT`, `CLOUDRON_MYSQL_DATABASE`, `CLOUDRON_MYSQL_USERNAME`, `CLOUDRON_MYSQL_PASSWORD`, `CLOUDRON_MYSQL_URL` | `CLOUDRON_MYSQL_PASSWORD`, `CLOUDRON_MYSQL_URL` |
 | Redis | `CLOUDRON_REDIS_HOST`, `CLOUDRON_REDIS_PORT`, `CLOUDRON_REDIS_PASSWORD`, `CLOUDRON_REDIS_URL` | `CLOUDRON_REDIS_PASSWORD`, `CLOUDRON_REDIS_URL` |
 | Sendmail | `CLOUDRON_MAIL_SMTP_SERVER`, `CLOUDRON_MAIL_SMTP_PORT`, `CLOUDRON_MAIL_SMTP_USERNAME`, `CLOUDRON_MAIL_SMTP_PASSWORD`, `CLOUDRON_MAIL_FROM`, `CLOUDRON_MAIL_DOMAIN` | `CLOUDRON_MAIL_SMTP_PASSWORD` |
-| LDAP | `CLOUDRON_LDAP_HOST`, `CLOUDRON_LDAP_PORT`, `CLOUDRON_LDAP_USERS_BASE_DN`, `CLOUDRON_LDAP_GROUPS_BASE_DN`, `CLOUDRON_LDAP_BIND_DN`, `CLOUDRON_LDAP_BIND_PASSWORD` | `CLOUDRON_LDAP_BIND_PASSWORD` |
 | OIDC client (groups claim; no addon, set by hand) | `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `OIDC_REDIRECT_URI`, `OIDC_SCOPES` in `shared/.env` | `OIDC_CLIENT_SECRET` |
 | Cloudron API (directory sync; no addon, set by hand) | `CLOUDRON_API_BASE`, `CLOUDRON_API_TOKEN` in `shared/.env` | `CLOUDRON_API_TOKEN` |
 | Web Push VAPID (no addon, set by hand) | `VAPID_SUBJECT`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` in `shared/.env` | `VAPID_PRIVATE_KEY` |
@@ -95,9 +94,9 @@ Rules:
 - `shared/.env` must not set `DB_PASSWORD`, `REDIS_PASSWORD`, `MAIL_PASSWORD`
   or `LDAP_BIND_PASSWORD`. The [preflight](#preflight) fails if it does, and a
   test fails if `.env.example` does.
-- The app was installed with Cloudron user management on, so the
-  `CLOUDRON_LDAP_*` variables exist (checked by name on 5 November 2026). The
-  preflight fails if they disappear.
+- The Cloudron LAMP package may still inject unused `CLOUDRON_LDAP_*`
+  variables. The intranet ignores them; do not copy `LDAP_BIND_PASSWORD` into
+  `shared/.env`.
 - The OIDC values live in `/app/data/shared/.env`, which is part of the app
   backup, so a restore keeps them. A clone on another domain needs its own
   OIDC client with that domain's redirect URI
@@ -420,24 +419,21 @@ restoring the whole app.
   After 3 failed checks in a row, admins get one email per outage.
 - Sign in with a Cloudron account in one of the 8 approved groups.
 
-## Switch-over and rollback (v0.6.19 Cloudron groups)
+## Sign-in and directory smoke checks
 
-Use this when going live with OIDC groups and the Cloudron API directory, or
-when you need to go back. Sign-in detail:
-[cloudron-sign-in.md](../cloudron-sign-in.md).
+Sign-in detail: [cloudron-sign-in.md](../cloudron-sign-in.md). Directory sync:
+[people/directory-sync.md](../people/directory-sync.md).
 
 ### Before deploy
 
 1. Take a Cloudron backup of the intranet app and wait until it finishes.
 2. Run the [preflight](#preflight) against the live app. It must `PASS` that
-   `CLOUDRON_API_TOKEN` is set and that `QA_LOGIN_ENABLED` is off. LDAP checks
-   are `WARN` only for this release. **Stop** if the token is missing: the
-   APES IT Administrator creates a Readonly API token with Bambie's approval
-   and adds it to `shared/.env` (record the token *name* only on the issue —
-   never the value).
-3. Confirm the eight `intranet.*` groups still exist in Cloudron (admin,
-   staff, volunteer, student, tutor, trustee, contractor, plus the access
-   group used by the mapper — see [cloudron-sign-in.md](../cloudron-sign-in.md)).
+   `CLOUDRON_API_TOKEN` is set and that `QA_LOGIN_ENABLED` is off. **Stop** if
+   the token is missing: the APES IT Administrator creates a Readonly API
+   token with Bambie's approval and adds it to `shared/.env` (record the
+   token *name* only on the issue — never the value).
+3. Confirm the eight approved `intranet.*` groups still exist in Cloudron
+   (see [cloudron-sign-in.md](../cloudron-sign-in.md)).
 
 ### After deploy
 
@@ -446,32 +442,15 @@ when you need to go back. Sign-in detail:
    user in none of the eight groups (expect "No intranet access").
 3. Open **Admin > System status**: directory source should read `cloudron`,
    OIDC client (groups claim) and Cloudron API checks should be `ok`, with the
-   API token shown only as `•••••• (set)`.
-4. After the first nightly sync, check the audit log and System status for the
-   LDAP shadow comparison. Zero differences is the goal; a comparison failure
-   must not block sign-in or sync.
+   API token shown only as `•••••• (set)`. There is no LDAP row.
 
-### Rollback 1 — switch back to LDAP (no redeploy)
+### Rollback — redeploy the previous release
 
-1. In Cloudron File Manager (or `cloudron exec`), set
-   `INTRANET_DIRECTORY_SOURCE=ldap` in `/app/data/shared/.env`.
-2. Restart the app: `cloudron restart --app $app`.
-3. Confirm **Admin > System status** shows directory source `ldap`, and that
-   an admin can still sign in. Nightly sync and group lookup use LDAP again.
-4. To return to Cloudron groups/API: set `INTRANET_DIRECTORY_SOURCE=cloudron`
-   (or remove the line) and restart.
-
-The LDAP addon variables stay on the LAMP package for this release, so this
-rollback needs no redeploy.
-
-### Rollback 2 — redeploy the previous release
-
-Redeploy tag `v0.6.18` (the last release before Cloudron groups) via
+Redeploy the previous published tag via
 
 ```powershell
-gh workflow run deploy-cloudron.yml -f tag=v0.6.18
+gh workflow run deploy-cloudron.yml -f tag=vX.Y.Z
 ```
 
-then confirm `/healthz` shows `v0.6.18`. The LDAP addon remains on the package.
-Prefer Rollback 1 first; use Rollback 2 only if the new code itself is at
-fault.
+then confirm `/healthz` shows that tag. There is no LDAP switch-back; the
+intranet uses only OIDC groups and the Cloudron API.

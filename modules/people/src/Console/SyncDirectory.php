@@ -2,22 +2,18 @@
 
 namespace Modules\People\Console;
 
-use App\Core\Auth\Contracts\DirectoryRoster;
-use App\Core\Auth\DirectoryShadowComparison;
-use App\Core\Auth\DirectorySource;
 use Illuminate\Console\Command;
 use Modules\People\Services\MemberDirectorySync;
-use Throwable;
 
 class SyncDirectory extends Command
 {
     protected $signature = 'people:sync-directory';
 
-    protected $description = 'Read the configured directory and create, update or deactivate intranet members.';
+    protected $description = 'Read the Cloudron directory and create, update or deactivate intranet members.';
 
-    public function handle(MemberDirectorySync $sync, DirectoryShadowComparison $shadow): int
+    public function handle(MemberDirectorySync $sync): int
     {
-        $source = DirectorySource::syncAuditSource();
+        $source = 'cloudron_api';
         $summary = $sync->run($source);
 
         if (isset($summary['stopped'])) {
@@ -35,20 +31,6 @@ class SyncDirectory extends Command
             $summary['deactivated'],
             $summary['unchanged'],
         ));
-
-        if (DirectorySource::isCloudron() && DirectorySource::ldapConfigured()) {
-            try {
-                $comparison = $shadow->run(app(DirectoryRoster::class));
-                $this->info(sprintf(
-                    'LDAP shadow comparison: %s (%d difference(s)).',
-                    $comparison['status'],
-                    $comparison['difference_count'],
-                ));
-            } catch (Throwable $exception) {
-                report($exception);
-                $this->warn('LDAP shadow comparison failed; sync itself succeeded.');
-            }
-        }
 
         return self::SUCCESS;
     }

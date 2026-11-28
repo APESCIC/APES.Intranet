@@ -32,7 +32,7 @@ final class MemberDirectorySync
     /**
      * @return array{created: int, updated: int, deactivated: int, unchanged: int, seen: int, stopped?: string}
      */
-    public function run(string $source = 'ldap'): array
+    public function run(string $source = 'cloudron_api'): array
     {
         try {
             $people = $this->roster->listPeople();

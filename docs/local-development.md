@@ -16,8 +16,6 @@ a local database, a fixture or this repository.
 - PHP 8.4 in Herd (**Settings**, then **PHP**). If it is missing, run
   `herd php:install 8.4`. Herd's global PHP can be newer: the site is pinned
   to 8.4.
-- The `ldap` extension on in Herd's PHP 8.4. Run `herd ini 8.4`, change
-  `;extension=ldap` to `extension=ldap`, save, then run `herd restart php`.
 - A MySQL 8.4 service on port 3306 (**Services** in Herd, or
   `herd services:create mysql --service-version=8.4.13 --port=3306`).
 - Node 22 through Herd's nvm. Turn on Node.js in **Settings**, then run
@@ -116,12 +114,14 @@ repository folder.
 
 Before any work, run the live preview gate,
 `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\preview.ps1`. It
-loads the latest code and dependencies and reports pending migrations (ask
-before running them). When no migrations are pending, it also syncs roles and
-permissions as a deploy does, by running the seeders in
-`deploy/cloudron/activate-release.sh`. Then it checks Herd and its MySQL
-service are running, and that `/healthz` serves the checked-out revision on
-PHP 8.4 through FastCGI, and starts Vite.
+loads the latest code and dependencies, and runs any pending migrations with
+`php artisan migrate` (local `APP_ENV` only; it never runs `demo:reset`). It
+then re-runs only the idempotent `LegalPagesSeeder` (legal starter pages and
+footer links). It does not re-run `RolesAndPermissionsSeeder` or other
+`activate-release.sh` seeders on every preview — those belong on Cloudron
+deploy and `demo:seed`, and fail against an already-seeded local database.
+Then it checks Herd and its MySQL service are running, and that `/healthz`
+serves the checked-out revision on PHP 8.4 through FastCGI, and starts Vite.
 
 `npm run dev` starts Vite on port 5174 and writes `public/hot`, so the pages
 at <https://apes-intranet.test> load their CSS and JavaScript from Vite. Saving
@@ -235,7 +235,6 @@ they never send anything either.
 | Problem | Fix |
 | --- | --- |
 | The setup script says PHP 8.4 is not installed | Run `herd php:install 8.4`, then run the script again |
-| The setup script says `ldap` is missing | Run `herd ini 8.4`, change `;extension=ldap` to `extension=ldap`, then `herd restart php` |
 | The setup script says Herd's nvm has no Node 22 | Turn on Node.js in Herd's **Settings**, then run `herd node:install 22` |
 | `php -v` is not 8.4 in your own terminal | Run `. .\scripts\herd-env.ps1`, as in [Everyday commands](#everyday-commands) |
 | `/healthz` or `preview.ps1` reports another PHP version | Run `herd isolate 8.4 --site=apes-intranet` |

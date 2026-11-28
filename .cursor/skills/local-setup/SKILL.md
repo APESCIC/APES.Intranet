@@ -9,7 +9,7 @@ Follows `.cursor/rules/herd.mdc`. The live preview gate is `.cursor/skills/live-
 
 ## Steps
 
-1. **Check Herd.** Laravel Herd Pro for Windows, running, with PHP 8.4 (`ldap` turned on), a MySQL 8.4 service on port 3306 and Node 22 through Herd's nvm. `herd status`, `herd services:list` and `herd node:list` show them. **Stop and ask** before installing anything, naming the tool, why, and the exact command. Turning on Node.js in Herd's Settings needs Bambie's click.
+1. **Check Herd.** Laravel Herd Pro for Windows, running, with PHP 8.4, a MySQL 8.4 service on port 3306 and Node 22 through Herd's nvm. `herd status`, `herd services:list` and `herd node:list` show them. **Stop and ask** before installing anything, naming the tool, why, and the exact command. Turning on Node.js in Herd's Settings needs Bambie's click.
 2. **Set up or repair.** `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\herd-setup.ps1 -NoDemo`. It only touches this project and is safe to run twice.
 3. **Demo data.** If the database is empty, `php artisan demo:seed`. **Stop and ask** before `php artisan demo:reset`, because it empties the local database.
 4. **Preview.** Follow the `live-preview-gate` skill. Do not use Herd's badge "dev" stack.

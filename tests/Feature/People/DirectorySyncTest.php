@@ -19,7 +19,7 @@ beforeEach(function () {
     app()->instance(DirectoryRoster::class, $this->roster);
 });
 
-it('creates updates and deactivates members from a fake LDAP roster', function () {
+it('creates updates and deactivates members from a fake Cloudron roster', function () {
     $existing = User::factory()->create([
         'email' => 'leavers@example.test',
         'oidc_sub' => 'sub-leaver',
@@ -55,7 +55,7 @@ it('creates updates and deactivates members from a fake LDAP roster', function (
         new DirectoryPerson('keep4@example.test', 'Keep 4', 'keep4', ['intranet.staff'], true),
     ];
 
-    $summary = app(MemberDirectorySync::class)->run('ldap');
+    $summary = app(MemberDirectorySync::class)->run('cloudron_api');
 
     expect($summary['created'])->toBe(2)
         ->and(User::where('email', 'alex@example.test')->firstOrFail()->is_active)->toBeTrue()
@@ -68,7 +68,7 @@ it('creates updates and deactivates members from a fake LDAP roster', function (
 
     expect(AuditLog::query()->where('event', 'people.directory_synced')->exists())->toBeTrue();
 
-    $second = app(MemberDirectorySync::class)->run('ldap');
+    $second = app(MemberDirectorySync::class)->run('cloudron_api');
     expect($second['created'])->toBe(0)
         ->and($second['updated'])->toBe(0)
         ->and($second['deactivated'])->toBe(0);
@@ -79,8 +79,8 @@ it('keeps a second run unchanged when the roster is the same', function () {
         new DirectoryPerson('alex@example.test', 'Alex Example', 'alex', ['intranet.staff'], true),
     ];
 
-    app(MemberDirectorySync::class)->run('ldap');
-    $again = app(MemberDirectorySync::class)->run('ldap');
+    app(MemberDirectorySync::class)->run('cloudron_api');
+    $again = app(MemberDirectorySync::class)->run('cloudron_api');
 
     expect($again['unchanged'])->toBeGreaterThan(0)
         ->and($again['created'])->toBe(0)

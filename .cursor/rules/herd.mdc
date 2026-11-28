@@ -17,7 +17,8 @@ Values: `docs/herd/profile.json`. Guide: `docs/local-development.md`. Site is HT
 
 ## Ask first
 
-- Migrations, `php artisan demo:reset` (empties the local database), or installing any system tool (PHP version/extension, Herd service, Node version).
+- `php artisan demo:reset` (empties the local database), or installing any system tool (PHP version/extension, Herd service, Node version).
+- Ad-hoc migrations outside `scripts\preview.ps1` / `scripts\herd-setup.ps1` (those scripts already run pending migrations locally).
 - Changing Herd's global PHP, `php.ini`, or a service port.
 
 ## Cloudron safety (local vs server)

@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Http;
 
 uses(RefreshDatabase::class);
 
-const SECRETS = ['redis-pass-S3CRET1', 'mail-pass-S3CRET2', 'ldap-pass-S3CRET3', 'oidc-S3CRET4', 'db-pass-S3CRET5', 'cloudron-api-S3CRET6'];
+const SECRETS = ['redis-pass-S3CRET1', 'mail-pass-S3CRET2', 'oidc-S3CRET3', 'db-pass-S3CRET4', 'cloudron-api-S3CRET5'];
 
 beforeEach(function () {
     $this->seed(RolesAndPermissionsSeeder::class);
@@ -22,10 +22,9 @@ beforeEach(function () {
         'database.redis.default' => array_merge(config('database.redis.default'), ['host' => '127.0.0.1', 'port' => 1, 'password' => SECRETS[0], 'max_retries' => 0, 'timeout' => 1]),
         'mail.default' => 'smtp',
         'mail.mailers.smtp' => array_merge(config('mail.mailers.smtp'), ['host' => '127.0.0.1', 'port' => 1, 'password' => SECRETS[1]]),
-        'intranet.ldap' => array_merge(config('intranet.ldap'), ['host' => '127.0.0.1', 'port' => 1, 'base_dn' => 'dc=example', 'bind_dn' => 'cn=intranet', 'bind_password' => SECRETS[2], 'timeout_seconds' => 1]),
-        'intranet.oidc' => array_merge(config('intranet.oidc'), ['issuer' => 'https://cloudron.example.test/openid', 'client_id' => 'intranet', 'client_secret' => SECRETS[3]]),
-        'intranet.cloudron' => array_merge(config('intranet.cloudron'), ['api_base' => 'https://my.cloudron.example.test', 'api_token' => SECRETS[5]]),
-        'database.connections.mysql.password' => SECRETS[4],
+        'intranet.oidc' => array_merge(config('intranet.oidc'), ['issuer' => 'https://cloudron.example.test/openid', 'client_id' => 'intranet', 'client_secret' => SECRETS[2]]),
+        'intranet.cloudron' => array_merge(config('intranet.cloudron'), ['api_base' => 'https://my.cloudron.example.test', 'api_token' => SECRETS[4]]),
+        'database.connections.mysql.password' => SECRETS[3],
         'intranet.cloudron_variables' => ['CLOUDRON_MYSQL_HOST', 'CLOUDRON_MYSQL_PASSWORD', 'CLOUDRON_REDIS_HOST', 'CLOUDRON_REDIS_PASSWORD', 'CLOUDRON_API_TOKEN'],
     ]);
     Http::fake([
@@ -69,9 +68,10 @@ it('shows each addon with its presence, health and masked variables', function (
 
     $response = $this->get(route('admin.system.index'))->assertOk();
 
-    foreach (['MySQL', 'Redis', 'Sendmail', 'LDAP', 'OIDC client (groups claim)', 'Cloudron API (directory sync)', 'Scheduler'] as $label) {
+    foreach (['MySQL', 'Redis', 'Sendmail', 'OIDC client (groups claim)', 'Cloudron API (directory sync)', 'Scheduler'] as $label) {
         $response->assertSee($label);
     }
+    $response->assertDontSee('data-addon="ldap"', false);
     $response->assertSee('CLOUDRON_API_TOKEN')
         ->assertSee('•••••• (set)');
     $response->assertSee('data-summary="checks"', false)
@@ -81,7 +81,7 @@ it('shows each addon with its presence, health and masked variables', function (
         ->assertSee('Details and Cloudron variables')
         ->assertSee('CLOUDRON_REDIS_PASSWORD')
         ->assertSee('•••••• (set)')
-        ->assertSee('CLOUDRON_LDAP_BIND_PASSWORD');
+        ->assertDontSee('CLOUDRON_LDAP_BIND_PASSWORD');
     expect(SystemCheck::where('check', 'mysql')->value('status'))->toBe(SystemCheck::OK);
 });
 

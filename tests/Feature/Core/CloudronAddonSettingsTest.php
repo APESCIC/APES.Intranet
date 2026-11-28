@@ -108,21 +108,15 @@ it('falls back to the database for cache, sessions and queues without Redis', fu
         ->and(configWithEnv('queue', $env)['default'])->toBe('database');
 });
 
-it('reads the live sendmail and LDAP addon values before anything in .env', function () {
+it('reads the live sendmail addon values before anything in .env', function () {
     $mail = configWithEnv('mail', [
         'CLOUDRON_MAIL_SMTP_SERVER' => 'mail.addon', 'MAIL_HOST' => 'stale',
         'CLOUDRON_MAIL_SMTP_PASSWORD' => 'rotated', 'MAIL_PASSWORD' => 'stale', 'MAIL_MAILER' => 'log',
     ]);
-    $intranet = configWithEnv('intranet', [
-        'CLOUDRON_LDAP_HOST' => 'ldap.addon', 'LDAP_HOST' => 'stale',
-        'CLOUDRON_LDAP_BIND_PASSWORD' => 'rotated', 'LDAP_BIND_PASSWORD' => 'stale',
-    ]);
 
     expect($mail['default'])->toBe('smtp')
         ->and($mail['mailers']['smtp']['host'])->toBe('mail.addon')
-        ->and($mail['mailers']['smtp']['password'])->toBe('rotated')
-        ->and($intranet['ldap']['host'])->toBe('ldap.addon')
-        ->and($intranet['ldap']['bind_password'])->toBe('rotated');
+        ->and($mail['mailers']['smtp']['password'])->toBe('rotated');
 });
 
 it('documents every addon variable it reads', function () {

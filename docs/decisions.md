@@ -24,7 +24,8 @@ Do not change any of them without her approval. Terms are explained in the
 
 ## Sign-in
 
-- Cloudron OIDC, with LDAP groups, in the same way as MyAPES Account. See
+- Cloudron OIDC, with groups from the OIDC `groups` claim and directory sync
+  from the Cloudron read-only API (decided by Bambie, 28 November 2026). See
   [cloudron-sign-in.md](cloudron-sign-in.md).
 - Volunteers and students are Cloudron directory users. Access comes only
   from the 8 approved groups in `config/intranet.php`: `intranet.staff`,

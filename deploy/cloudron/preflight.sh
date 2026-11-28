@@ -121,11 +121,8 @@ for addon in MYSQL REDIS MAIL; do
     fi
 done
 
-if env | grep -q "^CLOUDRON_LDAP_"; then
-    pass "CLOUDRON_LDAP_* variables exist (kept for switch-back)"
-else
-    warn "no CLOUDRON_LDAP_* variables (LDAP switch-back unavailable)"
-fi
+# LAMP may still inject unused CLOUDRON_LDAP_* variables; the app ignores them.
+# LDAP_BIND_PASSWORD must never be copied into shared/.env (checked above).
 
 if grep -q "^CLOUDRON_API_TOKEN=." "$ENV_FILE" 2> /dev/null || env | grep -q "^CLOUDRON_API_TOKEN=."; then
     pass "CLOUDRON_API_TOKEN is set (value not shown)"
