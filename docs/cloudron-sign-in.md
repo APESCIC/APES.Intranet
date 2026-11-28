@@ -1,10 +1,9 @@
 # Cloudron sign-in
 
 Staff, volunteers and students sign in with their Cloudron account through
-OpenID Connect (OIDC). From v0.6.19 the intranet reads groups from the OIDC
-`groups` claim (when `INTRANET_DIRECTORY_SOURCE=cloudron`) and syncs the
-directory from the Cloudron read-only API. LDAP remains available as a
-switch-back for this release only.
+OpenID Connect (OIDC). Groups come from the OIDC `groups` claim. The nightly
+directory sync reads the Cloudron read-only API. The intranet does not use
+LDAP.
 
 The owner, the APES IT Administrator, or an agent with the owner's approval in
 the current chat does the steps below.
@@ -52,63 +51,36 @@ Someone who is already signed in keeps their roles until they sign in again.
 
 ## OIDC client
 
-The intranet reads `OIDC_*` settings from the shared `.env`, and falls back to
-`CLOUDRON_OIDC_*` variables. It reads groups through the `CLOUDRON_LDAP_*`
-variables. The LAMP app has an LDAP addon but no OIDC addon, so it never gets
-`CLOUDRON_OIDC_*` variables. Production needs an OIDC client, created once by
-hand.
+The OpenID client **APES Intranet** comes with the Cloudron app install and is
+stored on Cloudron. There is no Vault copy and no separate manual creation
+step for a normal install. Check it under **Users > OpenID** in the Cloudron
+dashboard (not an older "User Directory > OpenID Connect clients" menu).
 
-1. **Create the client** in the Cloudron dashboard (**User Directory > OpenID
-   Connect clients**):
+The intranet prefers `CLOUDRON_OIDC_*` when Cloudron injects them, and falls
+back to `OIDC_*` in `shared/.env`. Production needs:
 
-   | Field | Value |
-   | --- | --- |
-   | Name | APES Intranet |
-   | Login redirect URI | `https://intranet.apes.org.uk/auth/callback` |
-   | Token signature algorithm | RS256 |
+| Setting | Typical value |
+| --- | --- |
+| Issuer | `https://my.cloudron.apes.org.uk/openid` |
+| Client id / secret | From the **APES Intranet** OpenID client on Cloudron |
+| Redirect URI | `https://intranet.apes.org.uk/auth/callback` |
+| Scopes | `openid,profile,email,groups` |
 
-2. **Write the settings to a local file**, `$env:TEMP\intranet-oidc.env`, and
-   never to git or chat. Use these four lines, filling in the client id and
-   secret from the dashboard:
+Cloudron has no end-session (logout) endpoint, so the intranet does not set a
+logout URL. **Sign out** ends the intranet session only.
 
-   ```dotenv
-   OIDC_ISSUER=https://my.cloudron.apes.org.uk/openid
-   OIDC_CLIENT_ID=
-   OIDC_CLIENT_SECRET=
-   OIDC_REDIRECT_URI=https://intranet.apes.org.uk/auth/callback
-   ```
+If the client settings need to be written or repaired by hand:
 
-   `OIDC_ISSUER` is the Cloudron dashboard URL followed by `/openid`. It must
-   match the `issuer` in
-   <https://my.cloudron.apes.org.uk/openid/.well-known/openid-configuration>.
-3. **Copy them into `/app/data/shared/.env`** and restart, so `run.sh`
-   re-caches the config. `set-oidc.sh` accepts only `OIDC_*` lines, replaces
-   any old ones, prints key names only, and deletes the uploaded file. Use
-   `$app` from [deploy/cloudron.md](deploy/cloudron.md). This changes
-   production, so it needs a Cloudron backup first and, for an agent, the
-   owner's ship-gate deploy answer in the current chat:
+1. Confirm the client under **Users > OpenID**.
+2. Write `OIDC_*` lines to a local file under `$env:TEMP` (never git or chat).
+3. Copy them into `/app/data/shared/.env` with `set-oidc.sh` and restart, after
+   a Cloudron backup and (for an agent) the ship-gate deploy answer in the
+   current chat. Commands: [deploy/cloudron.md](deploy/cloudron.md).
+4. Check: preflight shows OIDC values set; an `intranet.admin` can sign in;
+   a Cloudron user in none of the 8 groups gets "No intranet access".
 
-   ```powershell
-   cloudron backup create --app $app
-   cloudron push --app $app "$env:TEMP\intranet-oidc.env" /tmp/intranet-oidc.env
-   cloudron push --app $app .\deploy\cloudron\set-oidc.sh /tmp/set-oidc.sh
-   cloudron exec --app $app '--' bash /tmp/set-oidc.sh /tmp/intranet-oidc.env
-   cloudron exec --app $app '--' rm -f /tmp/set-oidc.sh
-   Remove-Item "$env:TEMP\intranet-oidc.env"
-   cloudron restart --app $app
-   ```
-
-4. **Check.**
-   - Run the preflight
-     ([deploy/cloudron.md](deploy/cloudron.md#preflight)). It should show
-     `PASS OIDC issuer, client id and client secret are set`.
-   - An `intranet.admin` member signs in at <https://intranet.apes.org.uk>
-     and opens **Admin > Audit log**.
-   - A Cloudron user in none of the 8 approved groups gets the "No intranet access"
-     page.
-
-The PHP `ldap` extension must be enabled on the app. The Cloudron LAMP image
-includes it.
+The Cloudron LAMP package may still inject unused `CLOUDRON_LDAP_*` variables.
+The intranet ignores them. Do not enable the PHP `ldap` extension for this app.
 
 ## Fresh sign-in for HR and agreements
 
@@ -120,32 +92,15 @@ depend on how the person signs in (password, passkey or two-factor), only on
 Cloudron's `auth_time` claim. Details are in
 [architecture.md](architecture.md#fresh-sign-in).
 
-## Switching back to LDAP (v0.6.19 only)
-
-Full switch-over and rollback steps (backup, preflight, smoke checks,
-Rollback 1 without redeploy, Rollback 2 to `v0.6.18`) are in
-[deploy/cloudron.md — Switch-over and rollback](deploy/cloudron.md#switch-over-and-rollback-v0619-cloudron-groups).
-
-Set `INTRANET_DIRECTORY_SOURCE=ldap` in Cloudron `shared/.env` and restart the
-app. Nightly sync and (until OIDC groups are the only path) group lookup use
-LDAP again. Set it back to `cloudron` (or remove the line) and restart to
-return to the Cloudron API. The LDAP addon variables stay on the LAMP package
-for this release so the switch-back works without a redeploy.
-
-When the source is `cloudron` and LDAP is still configured, each nightly sync
-also compares the two directories read-only and records differences in the
-audit log and **Admin > System status**. A comparison failure never blocks
-sign-in or the sync itself.
-
 ## Locally
 
-The local Herd preview has no Cloudron. Use the amber **Developer sign-in**
-panel under "Sign in with Cloudron" on <https://apes-intranet.test/login>
-instead, then the amber **QA** pill in the menu to switch role
-(<https://apes-intranet.test/qa> is the fallback). "Sign in with Cloudron"
-shows a "temporarily unavailable" page locally, because the OIDC values are
-blank. Pages that need a fresh sign-in ask a QA account to confirm its current
-role instead of going through Cloudron.
+The local Herd preview has no Cloudron client. Use the amber **Developer
+sign-in** panel under "Sign in with Cloudron" on
+<https://apes-intranet.test/login>, then the amber **QA** pill in the menu to
+switch role (<https://apes-intranet.test/qa> is the fallback). "Sign in with
+Cloudron" shows a "temporarily unavailable" page locally, because the OIDC
+values are blank. Pages that need a fresh sign-in ask a QA account to confirm
+its current role instead of going through Cloudron.
 
 ## Signing out
 

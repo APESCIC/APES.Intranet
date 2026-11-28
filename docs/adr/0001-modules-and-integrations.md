@@ -39,7 +39,7 @@ without a code change and a deploy.
 | **Module** | An area of the intranet with its own routes, navigation, data and permissions, for example People, Communications or a future Training Module. Lives in `modules/<slug>/`. | Yes |
 | **Integration** | A Module whose main job is to connect to an outside system, for example the LMS links, Microsoft 365 links or DocuSeal. Same layout as a Module (`modules/<slug>/`), marked `kind: integration`. | Yes. Switching it off also stops outbound calls and inbound webhooks. |
 | **Plugin** | **Reserved.** Kept for a later, trusted, installable mechanism that needs its own approval. | Not applicable |
-| **Cloudron addon** | A platform service that Cloudron provides: MySQL, Redis, mail, OIDC, LDAP, the scheduler and backups. Configured in Cloudron, not in the intranet. | Not from the intranet |
+| **Cloudron addon** | A platform service that Cloudron provides: MySQL, Redis, mail, OIDC, the scheduler and backups (the LAMP package may also inject unused LDAP variables). Configured in Cloudron, not in the intranet. | Not from the intranet |
 
 The `plugins/` folder stays empty and reserved. Until a Plugins mechanism is
 approved, a feature shared by several modules goes into a Core contract. The

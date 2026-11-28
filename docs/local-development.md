@@ -16,8 +16,6 @@ a local database, a fixture or this repository.
 - PHP 8.4 in Herd (**Settings**, then **PHP**). If it is missing, run
   `herd php:install 8.4`. Herd's global PHP can be newer: the site is pinned
   to 8.4.
-- The `ldap` extension on in Herd's PHP 8.4. Run `herd ini 8.4`, change
-  `;extension=ldap` to `extension=ldap`, save, then run `herd restart php`.
 - A MySQL 8.4 service on port 3306 (**Services** in Herd, or
   `herd services:create mysql --service-version=8.4.13 --port=3306`).
 - Node 22 through Herd's nvm. Turn on Node.js in **Settings**, then run
@@ -237,7 +235,6 @@ they never send anything either.
 | Problem | Fix |
 | --- | --- |
 | The setup script says PHP 8.4 is not installed | Run `herd php:install 8.4`, then run the script again |
-| The setup script says `ldap` is missing | Run `herd ini 8.4`, change `;extension=ldap` to `extension=ldap`, then `herd restart php` |
 | The setup script says Herd's nvm has no Node 22 | Turn on Node.js in Herd's **Settings**, then run `herd node:install 22` |
 | `php -v` is not 8.4 in your own terminal | Run `. .\scripts\herd-env.ps1`, as in [Everyday commands](#everyday-commands) |
 | `/healthz` or `preview.ps1` reports another PHP version | Run `herd isolate 8.4 --site=apes-intranet` |
